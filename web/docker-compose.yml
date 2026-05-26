@@ -5,7 +5,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: books_platform_web
     restart: unless-stopped
-    ports:
-      - "3000:3000"
+    # Coolify (and similar) reach the app on the Docker network; do not bind host :3000.
+    expose:
+      - "3000"
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
