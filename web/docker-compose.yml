@@ -15,6 +15,18 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: books_platform_web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - redis
+    volumes:
+      - .:/app
 
 volumes:
   redis_data:
