@@ -1,7 +1,6 @@
 version: "3.9"
 
 services:
-
   redis:
     image: redis:7-alpine
     container_name: books_platform_redis
@@ -15,6 +14,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
   web:
     build:
       context: .
@@ -24,9 +24,10 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - redis
-    volumes:
-      - .:/app
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
 
 volumes:
   redis_data:

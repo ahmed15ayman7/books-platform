@@ -8,7 +8,10 @@ RUN apt-get update \
 
 FROM base AS deps
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json .npmrc ./
+# Install all deps (including dev) for the build; ignore Coolify/runtime NODE_ENV here.
+ENV NODE_ENV=development
+ENV HUSKY=0
 RUN npm ci
 
 FROM base AS builder
@@ -16,8 +19,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+ENV HUSKY=0
+RUN npx prisma generate
 RUN npm run build
-# RUN npx prisma db push
 
 FROM base AS runner
 WORKDIR /app
