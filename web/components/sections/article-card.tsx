@@ -1,0 +1,125 @@
+"use client";
+
+import Link from "next/link";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { BookOpen, Clock } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { formatDate } from "@/lib/utils/formatters";
+import type { Locale } from "@/lib/i18n";
+
+interface ArticleCardProps {
+  slug: string;
+  title: string;
+  excerpt?: string | null;
+  imageUrl?: string | null;
+  date?: Date | string | null;
+  channel?: string | null;
+  readingTimeMinutes?: number | null;
+  locale: Locale;
+  className?: string;
+  featured?: boolean;
+}
+
+const channelLabels: Record<string, { ar: string; en: string }> = {
+  harvest: { ar: "حصاد الكتب", en: "Book Harvest" },
+  ideas: { ar: "زبدة الأفكار", en: "Essence of Ideas" },
+  "world-reads": { ar: "العالم يقرأ", en: "World Reads" },
+  "books-talk": { ar: "حديث الكتب", en: "Book Talk" },
+  "watch-your-book": { ar: "شاهد كتابك", en: "Watch Your Book" },
+  "novel-story": { ar: "رواية فحكاية", en: "Novel & Story" },
+};
+
+export function ArticleCard({
+  slug,
+  title,
+  excerpt,
+  imageUrl,
+  date,
+  channel,
+  readingTimeMinutes,
+  locale,
+  className,
+  featured = false,
+}: ArticleCardProps) {
+  const channelLabel = channel
+    ? (channelLabels[channel]?.[locale] ?? channel)
+    : null;
+
+  return (
+    <motion.div
+      whileHover={{ y: -4 }}
+      transition={{ type: "spring", stiffness: 360, damping: 22 }}
+      className={cn("will-change-transform h-full", className)}
+    >
+      <Link
+        href={`/${locale}/articles/${slug}`}
+        className={cn(
+          "group flex h-full overflow-hidden surface-card",
+          featured ? "flex-col md:flex-row" : "flex-col",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]"
+        )}
+      >
+        {/* Image */}
+        <div
+          className={cn(
+            "relative overflow-hidden bg-[var(--brand-gray-100)] flex-shrink-0",
+            featured ? "w-full md:w-64 aspect-video md:aspect-auto" : "aspect-video w-full"
+          )}
+        >
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-full min-h-[160px] w-full items-center justify-center bg-gradient-to-br from-[var(--brand-gray-100)] to-[var(--brand-red-soft)]">
+              <BookOpen
+                className="h-10 w-10 text-[var(--brand-gray-400)]"
+                strokeWidth={1.25}
+                aria-hidden="true"
+              />
+            </div>
+          )}
+          {/* Hover overlay */}
+          <div className="absolute inset-0 bg-[var(--brand-red)]/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        </div>
+
+        {/* Content */}
+        <div className="flex flex-1 flex-col gap-2 p-4">
+          {channelLabel && (
+            <Badge variant="outline" className="self-start text-xs">
+              {channelLabel}
+            </Badge>
+          )}
+          <h3
+            className={cn(
+              "font-bold text-[var(--brand-gray-900)] group-hover:text-[var(--brand-red)] transition-colors text-balance line-clamp-2",
+              featured ? "text-lg" : "text-base"
+            )}
+          >
+            {title}
+          </h3>
+          {excerpt && (
+            <p className="text-sm text-[var(--brand-gray-500)] line-clamp-2">
+              {excerpt}
+            </p>
+          )}
+          <div className="mt-auto flex items-center gap-3 text-xs text-[var(--brand-gray-400)]">
+            {date && <span>{formatDate(date, locale, "PP")}</span>}
+            {readingTimeMinutes && (
+              <span className="flex items-center gap-1">
+                <Clock className="h-3 w-3" aria-hidden="true" />
+                {readingTimeMinutes} {locale === "ar" ? "دقيقة" : "min"}
+              </span>
+            )}
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+}

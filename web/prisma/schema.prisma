@@ -1,0 +1,828 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ===================================
+// TAXONOMY — inherited from WordPress export
+// ===================================
+
+model ArticleCategory {
+  id          String    @id @default(cuid())
+  termId      Int       @unique @map("term_id")
+  name        String
+  nameAr      String?   @map("name_ar")
+  slug        String
+  linkedCount Int       @default(0) @map("linked_count")
+  spamFlag    String?   @map("spam_flag")
+  articles    Article[]
+
+  @@index([slug])
+  @@map("article_categories")
+}
+
+model Country {
+  id          String      @id @default(cuid())
+  termId      Int         @unique @map("term_id")
+  name        String
+  nameAr      String?     @map("name_ar")
+  slug        String
+  linkedCount Int         @default(0) @map("linked_count")
+  spamFlag    String?     @map("spam_flag")
+  notes       String?     @db.Text
+  publishers  Publisher[] @relation("PublisherCountries")
+
+  @@index([slug])
+  @@map("countries")
+}
+
+model Author {
+  id          String  @id @default(cuid())
+  termId      Int     @unique @map("term_id")
+  name        String
+  nameAr      String? @map("name_ar")
+  slug        String
+  linkedCount Int     @default(0) @map("linked_count")
+  spamFlag    String? @map("spam_flag")
+
+  @@index([slug])
+  @@map("authors")
+}
+
+model PostTag {
+  id          String    @id @default(cuid())
+  termId      Int       @unique @map("term_id")
+  name        String
+  slug        String
+  linkedCount Int       @default(0) @map("linked_count")
+  articles    Article[] @relation("ArticlePostTags")
+
+  @@index([slug])
+  @@map("post_tags")
+}
+
+model ProductCategory {
+  id                 String    @id @default(cuid())
+  termId             Int       @unique @map("term_id")
+  name               String
+  nameAr             String?   @map("name_ar")
+  slug               String
+  linkedCount        Int       @default(0) @map("linked_count")
+  products           Product[] @relation("ProductProductCategories")
+  primaryForProducts Product[] @relation("ProductPrimaryCategory")
+
+  @@index([slug])
+  @@map("product_categories")
+}
+
+model ProductTag {
+  id          String    @id @default(cuid())
+  termId      Int       @unique @map("term_id")
+  name        String
+  slug        String
+  linkedCount Int       @default(0) @map("linked_count")
+  products    Product[] @relation("ProductProductTags")
+
+  @@index([slug])
+  @@map("product_tags")
+}
+
+// ===================================
+// CONTENT — Articles
+// ===================================
+
+model Article {
+  id               String           @id @default(cuid())
+  originalId       Int              @unique @map("original_id")
+  title            String
+  content          String?          @db.Text
+  excerpt          String?          @db.Text
+  date             DateTime?
+  postType         String?          @map("post_type")
+  permalink        String?
+  imageUrl         String?          @map("image_url")
+  imageTitle       String?          @map("image_title")
+  imageCaption     String?          @map("image_caption")
+  imageDescription String?          @map("image_description")
+  imageAltText     String?          @map("image_alt_text")
+  imageFeatured    String?          @map("image_featured")
+  attachmentUrl    String?          @map("attachment_url")
+  languageTag      String?          @map("language_tag")
+  postTranslations String?          @map("post_translations")
+  status           String           @default("publish")
+  channel          String?          // harvest | ideas | world-reads | books-talk | watch-your-book | novel-story
+  authorId         Int?             @map("author_id")
+  authorUsername   String?          @map("author_username")
+  authorEmail      String?          @map("author_email")
+  authorFirstName  String?          @map("author_first_name")
+  authorLastName   String?          @map("author_last_name")
+  slug             String
+  format           String?
+  template         String?
+  parentId         Int?             @map("parent_id")
+  parentSlug       String?          @map("parent_slug")
+  order            Int              @default(0)
+  commentStatus    String?          @map("comment_status")
+  pingStatus       String?          @map("ping_status")
+  postModifiedDate DateTime?        @map("post_modified_date")
+  spamFlag         String?          @map("spam_flag")
+  notes            String?          @db.Text
+  isFeatured       Boolean          @default(false) @map("is_featured")
+  articleCategoryId String?         @map("article_category_id")
+  articleCategory  ArticleCategory? @relation(fields: [articleCategoryId], references: [id])
+  postTags         PostTag[]        @relation("ArticlePostTags")
+  comments         Comment[]
+
+  @@index([slug])
+  @@index([channel])
+  @@index([status])
+  @@index([date])
+  @@map("articles")
+}
+
+// ===================================
+// CONTENT — Products (Books)
+// ===================================
+
+model Product {
+  id                  String           @id @default(cuid())
+  originalId          Int              @unique @map("original_id")
+  type                String           @default("simple")
+  nameEn              String           @map("name_en")
+  nameAr              String?          @map("name_ar")
+  isbn                String?
+  language            String?
+  publicationYear     Int?             @map("publication_year")
+  published           Boolean          @default(true)
+  featured            Boolean          @default(false)
+  translationStatus   String           @default("NOT_TRANSLATED") @map("translation_status")
+  purchaseOption      String           @default("NOT_AVAILABLE") @map("purchase_option")
+  referralLink        String?          @map("referral_link")
+  catalogVisibility   String?          @map("catalog_visibility")
+  shortDesc           String?          @map("short_desc") @db.Text
+  shortDescAr         String?          @map("short_desc_ar") @db.Text
+  description         String?          @db.Text
+  descriptionAr       String?          @map("description_ar") @db.Text
+  price               Decimal?         @db.Decimal(10, 2)
+  currency            String?          @default("USD")
+  inStock             Boolean          @default(true) @map("in_stock")
+  reviewsAllowed      Boolean          @default(true) @map("reviews_allowed")
+  imageUrl            String?          @map("image_url")
+  position            Int              @default(0)
+  slug                String           @unique
+  yoastMetadesc       String?          @map("yoast_metadesc") @db.Text
+  spamFlag            String?          @map("spam_flag")
+  notes               String?          @db.Text
+  primaryCategoryId   String?          @map("primary_category_id")
+  publisherId         String?          @map("publisher_id")
+  primaryCategory     ProductCategory? @relation("ProductPrimaryCategory", fields: [primaryCategoryId], references: [id])
+  publisher           Publisher?       @relation(fields: [publisherId], references: [id])
+  categories          ProductCategory[] @relation("ProductProductCategories")
+  tags                ProductTag[]     @relation("ProductProductTags")
+  cartItems           CartItem[]
+  wishlistItems       WishlistItem[]
+  ratings             Rating[]
+  referralLinks           ReferralLink[]
+  orderItems              OrderItem[]
+  bookViews               BookView[]
+  sponsoredByPublisher    SponsoredPublisher?    @relation("SponsoredFeaturedProduct")
+
+  @@index([slug])
+  @@index([translationStatus])
+  @@index([publisherId])
+  @@index([primaryCategoryId])
+  @@index([published])
+  @@index([featured])
+  @@map("products")
+}
+
+// ===================================
+// CONTENT — Publishers
+// ===================================
+
+model Publisher {
+  id               String     @id @default(cuid())
+  originalId       Int        @unique @map("original_id")
+  title            String
+  content          String?    @db.Text
+  excerpt          String?    @db.Text
+  date             DateTime?
+  postType         String?    @map("post_type")
+  permalink        String?
+  imageUrl         String?    @map("image_url")
+  imageTitle       String?    @map("image_title")
+  imageCaption     String?    @map("image_caption")
+  imageDescription String?    @map("image_description")
+  imageAltText     String?    @map("image_alt_text")
+  imageFeatured    String?    @map("image_featured")
+  attachmentUrl    String?    @map("attachment_url")
+  tags             String?
+  postTranslations String?    @map("post_translations")
+  status           String     @default("publish")
+  authorId         Int?       @map("author_id")
+  authorUsername   String?    @map("author_username")
+  authorEmail      String?    @map("author_email")
+  authorFirstName  String?    @map("author_first_name")
+  authorLastName   String?    @map("author_last_name")
+  slug             String     @unique
+  format           String?
+  template         String?
+  parentId         Int?       @map("parent_id")
+  parentSlug       String?    @map("parent_slug")
+  order            Int        @default(0)
+  commentStatus    String?    @map("comment_status")
+  pingStatus       String?    @map("ping_status")
+  postModifiedDate DateTime?  @map("post_modified_date")
+  websiteUrl       String?    @map("website_url")
+  contactEmail     String?    @map("contact_email")
+  countries        Country[]  @relation("PublisherCountries")
+  products         Product[]
+  sponsored        SponsoredPublisher?
+
+  @@index([slug])
+  @@index([status])
+  @@map("publishers")
+}
+
+// ===================================
+// CONTENT — Comments
+// ===================================
+
+model Comment {
+  id                     String    @id @default(cuid())
+  originalId             Int?      @unique @map("original_id")
+  authorName             String    @map("author_name")
+  email                  String?
+  content                String    @db.Text
+  commentDate            DateTime? @map("comment_date")
+  materialBeingCommented String?   @map("material_being_commented")
+  spamFlag               String?   @map("spam_flag")
+  notes                  String?   @db.Text
+  status                 String    @default("pending") // pending | approved | spam | trash
+  parentId               String?   @map("parent_id")
+  articleId              String?   @map("article_id")
+  productId              String?   @map("product_id")
+  article                Article?  @relation(fields: [articleId], references: [id])
+
+  @@index([articleId])
+  @@index([productId])
+  @@index([status])
+  @@map("comments")
+}
+
+// ===================================
+// SUBMISSIONS
+// ===================================
+
+model PublishBookSubmission {
+  id               String    @id @default(cuid())
+  originalId       Int?      @unique @map("original_id")
+  title            String
+  titleAr          String?   @map("title_ar")
+  content          String?   @db.Text
+  excerpt          String?   @db.Text
+  date             DateTime?
+  postType         String?   @map("post_type")
+  permalink        String?
+  imageUrl         String?   @map("image_url")
+  imageTitle       String?   @map("image_title")
+  imageCaption     String?   @map("image_caption")
+  imageDescription String?   @map("image_description")
+  imageAltText     String?   @map("image_alt_text")
+  imageFeatured    String?   @map("image_featured")
+  attachmentUrl    String?   @map("attachment_url")
+  tags             String?
+  postTranslations String?   @map("post_translations")
+  status           String    @default("pending")
+  authorId         Int?      @map("author_id")
+  authorUsername   String?   @map("author_username")
+  authorEmail      String?   @map("author_email")
+  authorFirstName  String?   @map("author_first_name")
+  authorLastName   String?   @map("author_last_name")
+  authorPhone      String?   @map("author_phone")
+  authorBio        String?   @map("author_bio") @db.Text
+  bookLanguage     String?   @map("book_language")
+  bookCategory     String?   @map("book_category")
+  fileUrl          String?   @map("file_url")
+  allowFreeDownload Boolean  @default(false) @map("allow_free_download")
+  reviewNotes      String?   @map("review_notes") @db.Text
+  reviewedBy       String?   @map("reviewed_by")
+  reviewedAt       DateTime? @map("reviewed_at")
+  isFirstFree      Boolean   @default(true) @map("is_first_free")
+  paymentStatus    String    @default("pending") @map("payment_status")
+  paymentRef       String?   @map("payment_ref")
+  approvedProductId String?  @map("approved_product_id")
+  slug             String
+  format           String?
+  template         String?
+  parentId         Int?      @map("parent_id")
+  parentSlug       String?   @map("parent_slug")
+  order            Int       @default(0)
+  commentStatus    String?   @map("comment_status")
+  pingStatus       String?   @map("ping_status")
+  postModifiedDate DateTime? @map("post_modified_date")
+  spamFlag         String?   @map("spam_flag")
+  notes            String?   @db.Text
+
+  @@index([authorEmail])
+  @@index([status])
+  @@map("publish_book_submissions")
+}
+
+// ===================================
+// AUTH & USERS
+// ===================================
+
+model User {
+  id             String        @id @default(cuid())
+  email          String        @unique
+  passwordHash   String        @map("password_hash")
+  fullName       String        @map("full_name")
+  role           String        @default("ADMIN") // ADMIN | AMBASSADOR
+  isActive       Boolean       @default(true) @map("is_active")
+  lastLoginAt    DateTime?     @map("last_login_at")
+  failedAttempts Int           @default(0) @map("failed_attempts")
+  lockedUntil    DateTime?     @map("locked_until")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  refreshTokens  RefreshToken[]
+  auditLogs      AuditLog[]
+  ambassador     Ambassador?
+
+  @@index([email])
+  @@map("users")
+}
+
+model RefreshToken {
+  id         String    @id @default(cuid())
+  userId     String    @map("user_id")
+  tokenHash  String    @unique @map("token_hash")
+  expiresAt  DateTime  @map("expires_at")
+  revokedAt  DateTime? @map("revoked_at")
+  userAgent  String?   @map("user_agent")
+  ipAddress  String?   @map("ip_address")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+// ===================================
+// COMMERCE
+// ===================================
+
+model Cart {
+  id                    String     @id @default(cuid())
+  sessionId             String     @unique @map("session_id")
+  email                 String?
+  abandonedAt           DateTime?  @map("abandoned_at")
+  recoveryEmailSentAt   DateTime?  @map("recovery_email_sent_at")
+  createdAt             DateTime   @default(now()) @map("created_at")
+  updatedAt             DateTime   @updatedAt @map("updated_at")
+  items                 CartItem[]
+
+  @@index([email])
+  @@index([abandonedAt])
+  @@map("carts")
+}
+
+model CartItem {
+  id             String   @id @default(cuid())
+  cartId         String   @map("cart_id")
+  productId      String   @map("product_id")
+  quantity       Int      @default(1)
+  priceSnapshot  Decimal  @map("price_snapshot") @db.Decimal(10, 2)
+  cart           Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product        Product  @relation(fields: [productId], references: [id])
+
+  @@unique([cartId, productId])
+  @@map("cart_items")
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique @map("order_number")
+  customerEmail   String      @map("customer_email")
+  customerName    String      @map("customer_name")
+  customerPhone   String?     @map("customer_phone")
+  shippingAddress Json?       @map("shipping_address")
+  subtotal        Decimal     @db.Decimal(10, 2)
+  discount        Decimal     @default(0) @db.Decimal(10, 2)
+  shipping        Decimal     @default(0) @db.Decimal(10, 2)
+  tax             Decimal     @default(0) @db.Decimal(10, 2)
+  total           Decimal     @db.Decimal(10, 2)
+  currency        String      @default("USD")
+  status          String      @default("PENDING")
+  paymentStatus   String      @default("PENDING") @map("payment_status")
+  paymentProvider String?     @map("payment_provider")
+  paymentRef      String?     @map("payment_ref")
+  couponCode      String?     @map("coupon_code")
+  referralCode    String?     @map("referral_code")
+  notes           String?     @db.Text
+  paidAt          DateTime?   @map("paid_at")
+  shippedAt       DateTime?   @map("shipped_at")
+  deliveredAt     DateTime?   @map("delivered_at")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+  items           OrderItem[]
+  commissions     Commission[]
+
+  @@index([customerEmail])
+  @@index([status])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String   @map("order_id")
+  productId String   @map("product_id")
+  quantity  Int
+  unitPrice Decimal  @map("unit_price") @db.Decimal(10, 2)
+  total     Decimal  @db.Decimal(10, 2)
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Coupon {
+  id         String   @id @default(cuid())
+  code       String   @unique
+  type       String   // FIXED | PERCENTAGE
+  value      Decimal  @db.Decimal(10, 2)
+  minOrder   Decimal? @map("min_order") @db.Decimal(10, 2)
+  maxUses    Int?     @map("max_uses")
+  usedCount  Int      @default(0) @map("used_count")
+  validFrom  DateTime @map("valid_from")
+  validUntil DateTime @map("valid_until")
+  isActive   Boolean  @default(true) @map("is_active")
+  source     String?  // admin | cart-recovery | ambassador
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([code])
+  @@index([validUntil])
+  @@map("coupons")
+}
+
+// ===================================
+// ENGAGEMENT
+// ===================================
+
+model Wishlist {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  accessToken  String         @unique @map("access_token")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  items        WishlistItem[]
+
+  @@index([accessToken])
+  @@map("wishlists")
+}
+
+model WishlistItem {
+  id         String   @id @default(cuid())
+  wishlistId String   @map("wishlist_id")
+  productId  String   @map("product_id")
+  addedAt    DateTime @default(now()) @map("added_at")
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id])
+
+  @@unique([wishlistId, productId])
+  @@map("wishlist_items")
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  productId String   @map("product_id")
+  email     String
+  stars     Int
+  createdAt DateTime @default(now()) @map("created_at")
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@unique([productId, email])
+  @@index([productId])
+  @@map("ratings")
+}
+
+model NewsletterSubscriber {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  status         String    @default("PENDING") // PENDING | CONFIRMED | UNSUBSCRIBED
+  confirmToken   String?   @unique @map("confirm_token")
+  confirmedAt    DateTime? @map("confirmed_at")
+  unsubscribedAt DateTime? @map("unsubscribed_at")
+  source         String?
+  locale         String    @default("ar")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  @@index([status])
+  @@map("newsletter_subscribers")
+}
+
+// ===================================
+// NOTIFICATIONS
+// ===================================
+
+model PushSubscription {
+  id          String   @id @default(cuid())
+  endpoint    String   @unique @db.Text
+  p256dh      String   @db.Text
+  auth        String   @db.Text
+  email       String?
+  locale      String   @default("ar")
+  topics      String[]
+  createdAt   DateTime @default(now()) @map("created_at")
+  lastUsedAt  DateTime? @map("last_used_at")
+
+  @@index([email])
+  @@map("push_subscriptions")
+}
+
+model NotificationChannel {
+  id         String   @id @default(cuid())
+  type       String   // WHATSAPP | TELEGRAM
+  identifier String
+  email      String?
+  isActive   Boolean  @default(true) @map("is_active")
+  topics     String[]
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@unique([type, identifier])
+  @@map("notification_channels")
+}
+
+model NotificationLog {
+  id           String   @id @default(cuid())
+  type         String
+  recipient    String
+  subject      String?
+  body         String   @db.Text
+  status       String   // sent | failed
+  errorMessage String?  @map("error_message")
+  productId    String?  @map("product_id")
+  articleId    String?  @map("article_id")
+  sentAt       DateTime @default(now()) @map("sent_at")
+
+  @@index([type])
+  @@index([sentAt])
+  @@map("notification_logs")
+}
+
+// ===================================
+// AMBASSADOR PROGRAM
+// ===================================
+
+model Ambassador {
+  id             String         @id @default(cuid())
+  userId         String         @unique @map("user_id")
+  displayName    String         @map("display_name")
+  bio            String?        @db.Text
+  avatarUrl      String?        @map("avatar_url")
+  commissionRate Decimal        @map("commission_rate") @db.Decimal(5, 2)
+  status         String         @default("PENDING") // PENDING | ACTIVE | PAUSED | CLOSED
+  approvedAt     DateTime?      @map("approved_at")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  links          ReferralLink[]
+  commissions    Commission[]
+  payouts        Payout[]
+
+  @@map("ambassadors")
+}
+
+model ReferralLink {
+  id              String          @id @default(cuid())
+  ambassadorId    String          @map("ambassador_id")
+  productId       String          @map("product_id")
+  code            String          @unique
+  clickCount      Int             @default(0) @map("click_count")
+  conversionCount Int             @default(0) @map("conversion_count")
+  isActive        Boolean         @default(true) @map("is_active")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  ambassador      Ambassador      @relation(fields: [ambassadorId], references: [id], onDelete: Cascade)
+  product         Product         @relation(fields: [productId], references: [id])
+  clicks          ReferralClick[]
+
+  @@unique([ambassadorId, productId])
+  @@index([code])
+  @@map("referral_links")
+}
+
+model ReferralClick {
+  id                   String   @id @default(cuid())
+  linkId               String   @map("link_id")
+  ipAddress            String?  @map("ip_address")
+  userAgent            String?  @map("user_agent")
+  referer              String?
+  country              String?
+  convertedToOrderId   String?  @map("converted_to_order_id")
+  clickedAt            DateTime @default(now()) @map("clicked_at")
+  link                 ReferralLink @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  @@index([linkId])
+  @@index([clickedAt])
+  @@map("referral_clicks")
+}
+
+model Commission {
+  id           String     @id @default(cuid())
+  ambassadorId String     @map("ambassador_id")
+  orderId      String     @map("order_id")
+  linkId       String?    @map("link_id")
+  amount       Decimal    @db.Decimal(10, 2)
+  rate         Decimal    @db.Decimal(5, 2)
+  status       String     @default("PENDING") // PENDING | APPROVED | PAID | CANCELLED
+  paidAt       DateTime?  @map("paid_at")
+  payoutId     String?    @map("payout_id")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  ambassador   Ambassador @relation(fields: [ambassadorId], references: [id])
+  order        Order      @relation(fields: [orderId], references: [id])
+  payout       Payout?    @relation(fields: [payoutId], references: [id])
+
+  @@index([ambassadorId])
+  @@index([status])
+  @@map("commissions")
+}
+
+model Payout {
+  id           String       @id @default(cuid())
+  ambassadorId String       @map("ambassador_id")
+  amount       Decimal      @db.Decimal(10, 2)
+  method       String       // bank-transfer | paypal | cash
+  reference    String?
+  notes        String?
+  paidAt       DateTime     @default(now()) @map("paid_at")
+  ambassador   Ambassador   @relation(fields: [ambassadorId], references: [id])
+  commissions  Commission[]
+
+  @@index([ambassadorId])
+  @@map("payouts")
+}
+
+// ===================================
+// B2B SUBSCRIPTIONS
+// ===================================
+
+model B2BPlan {
+  id            String            @id @default(cuid())
+  nameAr        String            @map("name_ar")
+  nameEn        String            @map("name_en")
+  description   String            @db.Text
+  features      String[]
+  priceMonthly  Decimal           @map("price_monthly") @db.Decimal(10, 2)
+  priceYearly   Decimal           @map("price_yearly") @db.Decimal(10, 2)
+  isActive      Boolean           @default(true) @map("is_active")
+  subscriptions B2BSubscription[]
+
+  @@map("b2b_plans")
+}
+
+model B2BClient {
+  id               String            @id @default(cuid())
+  organizationName String            @map("organization_name")
+  contactName      String            @map("contact_name")
+  contactEmail     String            @unique @map("contact_email")
+  contactPhone     String?           @map("contact_phone")
+  country          String?
+  type             String?           // library | university | newspaper | tv-channel
+  notes            String?           @db.Text
+  createdAt        DateTime          @default(now()) @map("created_at")
+  subscriptions    B2BSubscription[]
+
+  @@map("b2b_clients")
+}
+
+model B2BSubscription {
+  id           String    @id @default(cuid())
+  clientId     String    @map("client_id")
+  planId       String    @map("plan_id")
+  startsAt     DateTime  @map("starts_at")
+  endsAt       DateTime  @map("ends_at")
+  isActive     Boolean   @default(true) @map("is_active")
+  billingCycle String    @map("billing_cycle") // monthly | yearly
+  amount       Decimal   @db.Decimal(10, 2)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  client       B2BClient @relation(fields: [clientId], references: [id])
+  plan         B2BPlan   @relation(fields: [planId], references: [id])
+
+  @@index([clientId])
+  @@index([endsAt])
+  @@map("b2b_subscriptions")
+}
+
+// ===================================
+// SPONSORED PUBLISHERS
+// ===================================
+
+model SponsoredPublisher {
+  id          String    @id @default(cuid())
+  publisherId String    @unique @map("publisher_id")
+  featuredProductId String? @unique @map("featured_product_id")
+  priority    Int       @default(0)
+  startsAt    DateTime  @map("starts_at")
+  endsAt      DateTime  @map("ends_at")
+  isActive    Boolean   @default(true) @map("is_active")
+  amountPaid  Decimal   @map("amount_paid") @db.Decimal(10, 2)
+  notes       String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at")
+  publisher   Publisher @relation(fields: [publisherId], references: [id])
+  featuredProduct Product? @relation("SponsoredFeaturedProduct", fields: [featuredProductId], references: [id])
+
+  @@index([endsAt])
+  @@map("sponsored_publishers")
+}
+
+// ===================================
+// HOMEPAGE HERO CAROUSEL
+// ===================================
+
+model HomeHeroSlide {
+  id                 String   @id @default(cuid())
+  titleAr            String   @map("title_ar") @db.Text
+  titleEn            String?  @map("title_en") @db.Text
+  subtitleAr         String?  @map("subtitle_ar") @db.Text
+  subtitleEn         String?  @map("subtitle_en") @db.Text
+  imageUrl           String   @map("image_url")
+  foregroundImageUrl String?  @map("foreground_image_url")
+  linkUrl            String?  @map("link_url")
+  position           Int      @default(0)
+  isActive           Boolean  @default(true) @map("is_active")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@index([isActive, position])
+  @@map("home_hero_slides")
+}
+
+// ===================================
+// SETTINGS & AUDIT
+// ===================================
+
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy String?  @map("updated_by")
+
+  @@map("settings")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?  @map("user_id")
+  action    String
+  entity    String
+  entityId  String?  @map("entity_id")
+  changes   Json?
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ===================================
+// ANALYTICS (lightweight)
+// ===================================
+
+model VisitorSession {
+  id             String   @id @default(cuid())
+  sessionId      String   @unique @map("session_id")
+  ipAddress      String?  @map("ip_address")
+  country        String?
+  userAgent      String?  @map("user_agent")
+  locale         String?
+  referer        String?
+  utmSource      String?  @map("utm_source")
+  utmMedium      String?  @map("utm_medium")
+  utmCampaign    String?  @map("utm_campaign")
+  startedAt      DateTime @default(now()) @map("started_at")
+  lastActivityAt DateTime @map("last_activity_at")
+  pageViews      Int      @default(1) @map("page_views")
+
+  @@index([sessionId])
+  @@map("visitor_sessions")
+}
+
+model BookView {
+  id        String   @id @default(cuid())
+  productId String   @map("product_id")
+  sessionId String   @map("session_id")
+  duration  Int?
+  viewedAt  DateTime @default(now()) @map("viewed_at")
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+  @@index([sessionId])
+  @@map("book_views")
+}

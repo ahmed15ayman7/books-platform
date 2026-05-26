@@ -1,0 +1,371 @@
+@import "tailwindcss";
+
+/* ===================================
+   BRAND DESIGN TOKENS — Books Platform
+   Soft UI: rounded + motion (أحمر + أسود + أبيض)
+   =================================== */
+
+@layer base {
+  :root {
+    --brand-black: #0b0b0b;
+    --brand-white: #ffffff;
+    --brand-red: #b11e2e;
+    --brand-red-hover: #8b1623;
+    --brand-red-soft: #f8e5e8;
+
+    --brand-gray-50: #fafafa;
+    --brand-gray-100: #f5f5f5;
+    --brand-gray-200: #e5e5e5;
+    --brand-gray-300: #d4d4d4;
+    --brand-gray-400: #a3a3a3;
+    --brand-gray-500: #6b6b6b;
+    --brand-gray-600: #525252;
+    --brand-gray-700: #404040;
+    --brand-gray-800: #262626;
+    --brand-gray-900: #1a1a1a;
+
+    --success: #15803d;
+    --success-soft: #dcfce7;
+    --warning: #ca8a04;
+    --warning-soft: #fef9c3;
+    --info: #1d4ed8;
+    --info-soft: #dbeafe;
+    --error: #dc2626;
+    --error-soft: #fee2e2;
+
+    --background: var(--brand-gray-50);
+    --foreground: var(--brand-gray-900);
+    --card: var(--brand-white);
+    --card-foreground: var(--brand-gray-900);
+    --popover: var(--brand-white);
+    --popover-foreground: var(--brand-gray-900);
+    --primary: var(--brand-red);
+    --primary-foreground: var(--brand-white);
+    --secondary: var(--brand-gray-100);
+    --secondary-foreground: var(--brand-gray-900);
+    --muted: var(--brand-gray-100);
+    --muted-foreground: var(--brand-gray-500);
+    --accent: var(--brand-red-soft);
+    --accent-foreground: var(--brand-red);
+    --destructive: var(--error);
+    --destructive-foreground: var(--brand-white);
+    --border: var(--brand-gray-200);
+    --input: var(--brand-gray-200);
+    --ring: var(--brand-red);
+    --radius: 0.875rem;
+
+    --radius-sm: 0.5rem;
+    --radius-md: 0.875rem;
+    --radius-lg: 1.125rem;
+    --radius-xl: 1.5rem;
+    --radius-2xl: 1.75rem;
+    --radius-full: 9999px;
+
+    --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.06);
+    --shadow-soft-lg: 0 12px 40px rgba(0, 0, 0, 0.08);
+    --shadow-brand: 0 8px 28px rgba(177, 30, 46, 0.22);
+    --shadow-header: 0 12px 40px rgba(0, 0, 0, 0.45);
+
+    --motion-fast: 180ms;
+    --motion-base: 320ms;
+    --motion-slow: 520ms;
+    --motion-spring: cubic-bezier(0.34, 1.45, 0.64, 1);
+    --motion-easing: cubic-bezier(0.4, 0, 0.2, 1);
+    --motion-smooth: cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    --container-max: 1440px;
+    --section-py: 4rem;
+    --section-py-lg: 6rem;
+  }
+
+  .dark {
+    --background: var(--brand-black);
+    --foreground: var(--brand-white);
+    --card: var(--brand-gray-900);
+    --card-foreground: var(--brand-white);
+    --popover: var(--brand-gray-900);
+    --popover-foreground: var(--brand-white);
+    --primary: var(--brand-red);
+    --primary-foreground: var(--brand-white);
+    --secondary: var(--brand-gray-800);
+    --secondary-foreground: var(--brand-white);
+    --muted: var(--brand-gray-800);
+    --muted-foreground: var(--brand-gray-400);
+    --accent: var(--brand-gray-800);
+    --accent-foreground: var(--brand-red);
+    --destructive: var(--error);
+    --destructive-foreground: var(--brand-white);
+    --border: var(--brand-gray-800);
+    --input: var(--brand-gray-800);
+    --ring: var(--brand-red);
+  }
+
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .site-chrome,
+  .site-chrome a {
+    color: #ffffff;
+  }
+
+  .hero-embla__viewport {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .hero-embla__container {
+    display: flex;
+    touch-action: pan-y pinch-zoom;
+    margin-inline-start: 0;
+  }
+
+  .hero-embla__slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    width: 100%;
+  }
+
+  [dir="rtl"] {
+    text-align: right;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--brand-gray-100);
+    border-radius: var(--radius-full);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--brand-gray-300);
+    border-radius: var(--radius-full);
+    transition: background var(--motion-base) var(--motion-easing);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-red);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brand-red);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+
+  ::selection {
+    background-color: var(--brand-red-soft);
+    color: var(--brand-red);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@layer utilities {
+  .container-platform {
+    width: 100%;
+    max-width: var(--container-max);
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .container-platform {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container-platform {
+      padding-inline: 2rem;
+    }
+  }
+
+  .section-spacing {
+    padding-block: var(--section-py);
+  }
+
+  @media (min-width: 1024px) {
+    .section-spacing {
+      padding-block: var(--section-py-lg);
+    }
+  }
+
+  .gradient-brand {
+    background: linear-gradient(135deg, var(--brand-black) 0%, #1a0a0c 50%, var(--brand-black) 100%);
+  }
+
+  .section-title-line::after {
+    content: "";
+    display: block;
+    width: 2.5rem;
+    height: 4px;
+    background-color: var(--brand-red);
+    margin-block-start: 0.5rem;
+    border-radius: var(--radius-full);
+  }
+
+  .prose-brand {
+    max-width: 65ch;
+    line-height: 1.8;
+  }
+
+  .prose-brand h2,
+  .prose-brand h3 {
+    color: var(--brand-gray-900);
+    font-weight: 700;
+  }
+
+  .prose-brand a {
+    color: var(--brand-red);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color var(--motion-fast) var(--motion-easing);
+  }
+
+  .prose-brand a:hover {
+    color: var(--brand-red-hover);
+  }
+
+  .transition-brand {
+    transition: all var(--motion-base) var(--motion-smooth);
+  }
+
+  .surface-card {
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--brand-gray-200);
+    background: var(--brand-white);
+    box-shadow: var(--shadow-soft);
+    transition:
+      transform var(--motion-base) var(--motion-spring),
+      box-shadow var(--motion-base) var(--motion-easing),
+      border-color var(--motion-fast) var(--motion-easing);
+  }
+
+  .surface-card:hover {
+    border-color: color-mix(in srgb, var(--brand-red) 35%, var(--brand-gray-200));
+  }
+
+  .book-card-hover {
+    transition:
+      transform var(--motion-base) var(--motion-spring),
+      box-shadow var(--motion-base) var(--motion-easing);
+  }
+
+  .book-card-hover:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: var(--shadow-soft-lg), 0 0 0 1px color-mix(in srgb, var(--brand-red) 12%, transparent);
+  }
+
+  .hover-lift {
+    transition: transform var(--motion-base) var(--motion-spring);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-3px);
+  }
+
+  .hover-scale {
+    transition: transform var(--motion-base) var(--motion-spring);
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.04);
+  }
+
+  .animate-page-in {
+    animation: fade-in-up var(--motion-slow) var(--motion-smooth) both;
+  }
+
+  .animate-fade-in {
+    animation: fade-in var(--motion-base) var(--motion-easing) both;
+  }
+
+  .animate-scale-in {
+    animation: scale-in var(--motion-base) var(--motion-spring) both;
+  }
+
+  .animate-stagger-1 {
+    animation-delay: 80ms;
+  }
+
+  .animate-stagger-2 {
+    animation-delay: 160ms;
+  }
+
+  .animate-stagger-3 {
+    animation-delay: 240ms;
+  }
+
+  .rounded-soft {
+    border-radius: var(--radius-lg);
+  }
+
+  .rounded-softer {
+    border-radius: var(--radius-xl);
+  }
+
+  .rounded-pill {
+    border-radius: var(--radius-full);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .book-card-hover:hover,
+    .hover-lift:hover,
+    .hover-scale:hover {
+      transform: none;
+    }
+
+    .animate-page-in,
+    .animate-fade-in,
+    .animate-scale-in {
+      animation: none;
+    }
+
+    * {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
