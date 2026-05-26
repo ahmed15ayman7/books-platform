@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir D:\\\\Programing\\\\Flutter\\\\freelancing\\\\BooksPlatform\\\\booksplatform *)",
+      "Bash(dir D:\\\\Programing\\\\Flutter\\\\freelancing\\\\BooksPlatform\\\\booksplatform\\\\lib *)",
+      "Bash(flutter --version)",
+      "Bash(Get-ChildItem -Path \"lib\" -Recurse -Force)",
+      "Bash(Select-Object FullName, PSIsContainer)",
+      "Bash(Sort-Object FullName)"
+    ]
+  }
+}

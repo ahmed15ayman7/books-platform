@@ -1,0 +1,282 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// platform-export-category
+model ArticleCategory {
+  id          String    @id @default(cuid())
+  termId      Int       @unique @map("term_id")
+  name        String
+  nameAr      String?   @map("name_ar")
+  slug        String
+  linkedCount Int       @default(0) @map("linked_count")
+  spamFlag    String?   @map("spam_flag")
+  articles    Article[]
+
+  @@map("article_categories")
+}
+
+// platform-export-country + platform-export-publisher_country (unified)
+model Country {
+  id          String      @id @default(cuid())
+  termId      Int         @unique @map("term_id")
+  name        String
+  nameAr      String?     @map("name_ar")
+  slug        String
+  linkedCount Int         @default(0) @map("linked_count")
+  spamFlag    String?     @map("spam_flag")
+  notes       String?     @db.Text
+  publishers  Publisher[] @relation("PublisherCountries")
+
+  @@map("countries")
+}
+
+// platform-export-author_book
+model Author {
+  id         String  @id @default(cuid())
+  termId     Int     @unique @map("term_id")
+  name       String
+  nameAr     String? @map("name_ar")
+  slug       String
+  linkedCount Int    @default(0) @map("linked_count")
+  spamFlag   String? @map("spam_flag")
+
+  @@map("authors")
+}
+
+// platform-export-post_tag
+model PostTag {
+  id          String    @id @default(cuid())
+  termId      Int       @unique @map("term_id")
+  name        String
+  slug        String
+  linkedCount Int       @default(0) @map("linked_count")
+  articles    Article[] @relation("ArticlePostTags")
+
+  @@map("post_tags")
+}
+
+// platform-export-product_cat
+model ProductCategory {
+  id                 String    @id @default(cuid())
+  termId             Int       @unique @map("term_id")
+  name               String
+  nameAr             String?   @map("name_ar")
+  slug               String
+  linkedCount        Int       @default(0) @map("linked_count")
+  products           Product[] @relation("ProductProductCategories")
+  primaryForProducts Product[] @relation("ProductPrimaryCategory")
+
+  @@map("product_categories")
+}
+
+// platform-export-product_tag
+model ProductTag {
+  id          String    @id @default(cuid())
+  termId      Int       @unique @map("term_id")
+  name        String
+  slug        String
+  linkedCount Int       @default(0) @map("linked_count")
+  products    Product[] @relation("ProductProductTags")
+
+  @@map("product_tags")
+}
+
+// مقالات-Export
+model Article {
+  id               String           @id @default(cuid())
+  originalId       Int              @unique @map("original_id")
+  title            String
+  content          String?          @db.Text
+  excerpt          String?          @db.Text
+  date             DateTime?
+  postType         String?          @map("post_type")
+  permalink        String?
+  imageUrl         String?          @map("image_url")
+  imageTitle       String?          @map("image_title")
+  imageCaption     String?          @map("image_caption")
+  imageDescription String?          @map("image_description")
+  imageAltText     String?          @map("image_alt_text")
+  imageFeatured    String?          @map("image_featured")
+  attachmentUrl    String?          @map("attachment_url")
+  languageTag      String?          @map("language_tag")
+  postTranslations String?          @map("post_translations")
+  status           String           @default("publish")
+  authorId         Int?             @map("author_id")
+  authorUsername   String?          @map("author_username")
+  authorEmail      String?          @map("author_email")
+  authorFirstName  String?          @map("author_first_name")
+  authorLastName   String?          @map("author_last_name")
+  slug             String
+  format           String?
+  template         String?
+  parentId         Int?             @map("parent_id")
+  parentSlug       String?          @map("parent_slug")
+  order            Int              @default(0)
+  commentStatus    String?          @map("comment_status")
+  pingStatus       String?          @map("ping_status")
+  postModifiedDate DateTime?        @map("post_modified_date")
+  spamFlag         String?          @map("spam_flag")
+  notes            String?          @db.Text
+  articleCategoryId String?         @map("article_category_id")
+  articleCategory  ArticleCategory? @relation(fields: [articleCategoryId], references: [id])
+  postTags         PostTag[]        @relation("ArticlePostTags")
+  comments         Comment[]
+
+  @@map("articles")
+}
+
+// wc-product-export
+model Product {
+  id                          String           @id @default(cuid())
+  originalId                  Int              @unique @map("original_id")
+  type                        String           @default("simple")
+  nameEn                      String           @map("name_en")
+  nameAr                      String?          @map("name_ar")
+  published                   Boolean          @default(true)
+  featured                    Boolean          @default(false)
+  catalogVisibility           String?          @map("catalog_visibility")
+  shortDesc                   String?          @map("short_desc") @db.Text
+  description                 String?          @db.Text
+  taxStatus                   String?          @map("tax_status")
+  inStock                     Boolean          @default(true) @map("in_stock")
+  backordersAllowed           Boolean          @default(false) @map("backorders_allowed")
+  soldIndividually            Boolean          @default(false) @map("sold_individually")
+  reviewsAllowed              Boolean          @default(true) @map("reviews_allowed")
+  imageUrl                    String?          @map("image_url")
+  position                    Int              @default(0)
+  language                    String?
+  wpmlWordCount               String?          @map("wpml_word_count") @db.Text
+  wpmlMediaFeatured           String?          @map("wpml_media_featured")
+  wpmlMediaDuplicate          String?          @map("wpml_media_duplicate")
+  alpProcessed                String?          @map("alp_processed")
+  slideTemplate               String?          @map("slide_template")
+  znPageLayout                String?          @map("zn_page_layout")
+  znSidebarSelect             String?          @map("zn_sidebar_select")
+  znSubheaderStyle            String?          @map("zn_subheader_style")
+  znPageOverrideBoxedLayout   String?          @map("zn_page_override_boxed_layout")
+  znPageTitleShow             String?          @map("zn_page_title_show")
+  znCustomLayout              String?          @map("zn_custom_layout")
+  yoastPrimaryProductCatTermId Int?            @map("yoast_primary_product_cat_term_id")
+  yoastFocuskwTextInput       String?          @map("yoast_focuskw_text_input")
+  yoastFocuskw                String?          @map("yoast_focuskw")
+  yoastTitle                  String?          @map("yoast_title")
+  yoastMetadesc               String?          @map("yoast_metadesc") @db.Text
+  yoastLinkdex                String?          @map("yoast_linkdex")
+  yoastContentScore           String?          @map("yoast_content_score")
+  vortexLikes                 String?          @map("vortex_likes")
+  vortexDislikes              String?          @map("vortex_dislikes")
+  spamFlag                    String?          @map("spam_flag")
+  notes                       String?          @db.Text
+  primaryCategoryId           String?          @map("primary_category_id")
+  publisherId                 String?          @map("publisher_id")
+  primaryCategory             ProductCategory? @relation("ProductPrimaryCategory", fields: [primaryCategoryId], references: [id])
+  publisher                   Publisher?       @relation(fields: [publisherId], references: [id])
+  categories                  ProductCategory[] @relation("ProductProductCategories")
+  tags                        ProductTag[]     @relation("ProductProductTags")
+
+  @@map("products")
+}
+
+// ناشرون-Export
+model Publisher {
+  id               String    @id @default(cuid())
+  originalId       Int       @unique @map("original_id")
+  title            String
+  content          String?   @db.Text
+  excerpt          String?   @db.Text
+  date             DateTime?
+  postType         String?   @map("post_type")
+  permalink        String?
+  imageUrl         String?   @map("image_url")
+  imageTitle       String?   @map("image_title")
+  imageCaption     String?   @map("image_caption")
+  imageDescription String?   @map("image_description")
+  imageAltText     String?   @map("image_alt_text")
+  imageFeatured    String?   @map("image_featured")
+  attachmentUrl    String?   @map("attachment_url")
+  tags             String?
+  postTranslations String?   @map("post_translations")
+  status           String    @default("publish")
+  authorId         Int?      @map("author_id")
+  authorUsername   String?   @map("author_username")
+  authorEmail      String?   @map("author_email")
+  authorFirstName  String?   @map("author_first_name")
+  authorLastName   String?   @map("author_last_name")
+  slug             String
+  format           String?
+  template         String?
+  parentId         Int?      @map("parent_id")
+  parentSlug       String?   @map("parent_slug")
+  order            Int       @default(0)
+  commentStatus    String?   @map("comment_status")
+  pingStatus       String?   @map("ping_status")
+  postModifiedDate DateTime? @map("post_modified_date")
+  countries        Country[] @relation("PublisherCountries")
+  products         Product[]
+
+  @@map("publishers")
+}
+
+// platform-export-comments
+model Comment {
+  id                     String    @id @default(cuid())
+  originalId             Int       @unique @map("original_id")
+  authorName             String    @map("author_name")
+  email                  String?
+  content                String    @db.Text
+  commentDate            DateTime? @map("comment_date")
+  materialBeingCommented String?   @map("material_being_commented")
+  spamFlag               String?   @map("spam_flag")
+  notes                  String?   @db.Text
+  articleId              String?   @map("article_id")
+  article                Article?  @relation(fields: [articleId], references: [id])
+
+  @@map("comments")
+}
+
+// انشر-كتابك-Export
+model PublishBookSubmission {
+  id               String    @id @default(cuid())
+  originalId       Int       @unique @map("original_id")
+  title            String
+  titleAr          String?   @map("title_ar")
+  content          String?   @db.Text
+  excerpt          String?   @db.Text
+  date             DateTime?
+  postType         String?   @map("post_type")
+  permalink        String?
+  imageUrl         String?   @map("image_url")
+  imageTitle       String?   @map("image_title")
+  imageCaption     String?   @map("image_caption")
+  imageDescription String?   @map("image_description")
+  imageAltText     String?   @map("image_alt_text")
+  imageFeatured    String?   @map("image_featured")
+  attachmentUrl    String?   @map("attachment_url")
+  tags             String?
+  postTranslations String?   @map("post_translations")
+  status           String    @default("pending")
+  authorId         Int?      @map("author_id")
+  authorUsername   String?   @map("author_username")
+  authorEmail      String?   @map("author_email")
+  authorFirstName  String?   @map("author_first_name")
+  authorLastName   String?   @map("author_last_name")
+  slug             String
+  format           String?
+  template         String?
+  parentId         Int?      @map("parent_id")
+  parentSlug       String?   @map("parent_slug")
+  order            Int       @default(0)
+  commentStatus    String?   @map("comment_status")
+  pingStatus       String?   @map("ping_status")
+  postModifiedDate DateTime? @map("post_modified_date")
+  spamFlag         String?   @map("spam_flag")
+  notes            String?   @db.Text
+
+  @@map("publish_book_submissions")
+}

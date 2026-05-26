@@ -1,0 +1,624 @@
+# BooksPlatform — Feature Scaffold Guide
+
+> **Companion to `flutter_scaffold_prompt.md`.**
+> That file owns the foundation and core layer (DI, networking, storage, routing, theming).
+> This file owns everything inside `lib/features/<feature_name>/`.
+> When building a new feature, read both. Core is already built; this is your blueprint.
+
+---
+
+## 1. Canonical Folder Structure
+
+```
+lib/features/<feature>/
+├── data/
+│   ├── datasources/                                # add base_* + local_* only when local source needed (§1.1)
+│   │   ├── base_<feature>_data_source.dart        # abstract — only when local source exists
+│   │   ├── <feature>_remote_data_source_impl.dart # @lazySingleton
+│   │   └── <feature>_local_data_source_impl.dart  # @lazySingleton — only when local source exists
+│   ├── models/
+│   │   ├── <input>_request.dart                    # toJson only
+│   │   └── <output>_response.dart                  # fromJson + toEntity()
+│   └── repositories/
+│       └── <feature>_repository_impl.dart          # @LazySingleton(as: <Feature>Repository)
+├── domain/
+│   ├── entities/
+│   │   └── <entity>.dart                           # pure Dart, Equatable, no imports from data/
+│   ├── repositories/
+│   │   └── base_<feature>_repository.dart          # abstract, returns entities not models
+│   └── use_cases/                                  # add only when rule in §4 applies
+│       └── <verb>_<noun>_use_case.dart             # @injectable
+└── presentation/
+    ├── cubit/
+    │   ├── <action>_cubit/
+    │   │   ├── <action>_cubit.dart                 # @injectable (factory)
+    │   │   └── <action>_state.dart                 # sealed class
+    │   └── <query>_cubit/
+    │       ├── <query>_cubit.dart                  # @injectable (factory)
+    │       └── <query>_state.dart                  # sealed class
+    ├── pages/
+    │   └── <screen>_screen.dart
+    └── widgets/
+        └── <component>.dart
+```
+
+**Rule:** Never add folders that are empty. Only create `use_cases/` when §4 applies.
+Only create a `widgets/` folder if widgets are shared across two or more screens in the feature.
+
+### Data source: single file vs contract + implementations
+
+Default — remote only:
+```
+datasources/
+└── <feature>_remote_data_source_impl.dart   # concrete, @lazySingleton
+```
+
+When a feature needs a **local data source** (offline cache, Hive, SQLite), introduce an
+abstract contract and split into two implementations:
+```
+datasources/
+├── base_<feature>_data_source.dart              # abstract contract
+├── <feature>_remote_data_source_impl.dart       # @Named('remote') @lazySingleton
+└── <feature>_local_data_source_impl.dart        # @Named('local')  @lazySingleton
+```
+
+The repository impl then holds both and decides which to call:
+```dart
+@LazySingleton(as: BookRepository)
+class BookRepositoryImpl implements BookRepository {
+  final BaseBookDataSource _remote;
+  final BaseBookDataSource _local;
+
+  BookRepositoryImpl(
+    @Named('remote') this._remote,
+    @Named('local') this._local,
+  );
+}
+```
+
+Do not create the abstract contract until a local data source actually exists.
+A base class with one implementation is ceremony with no benefit.
+
+---
+
+## 2. The Five Non-Negotiable Rules
+
+### Rule 1 — Auth is invisible to the data layer
+
+Data source methods must never touch a token, call an auth service, or manually build a
+`headers` map. Auth is handled entirely by `AuthInterceptor` (defined in the scaffold —
+`lib/core/network/interceptors/auth_interceptor.dart`).
+
+**Correct:**
+```dart
+Future<Either<Failure, BookResponse>> getBook(String id) =>
+    _api.get<BookResponse>(
+      path: '/books/$id',
+      fromJson: (json) => BookResponse.fromJson(json as Map<String, dynamic>),
+    );
+```
+
+**Wrong — never do this:**
+```dart
+// ❌ Manual token in data source — violates Rule 1
+final token = await storage.getToken();
+final headers = {'Authorization': 'Bearer $token'};
+final response = await dio.get('/books/$id', options: Options(headers: headers));
+```
+
+---
+
+### Rule 2 — ApiManager is the single error mapper
+
+All HTTP calls go through `ApiManager` (defined in the scaffold). It catches every
+`DioException` and returns `Either<Failure, T>` — features never see raw exceptions.
+
+Data source methods must never contain a `try/catch` block. They return the `Either` that
+`ApiManager` already produced.
+
+**Correct:**
+```dart
+Future<Either<Failure, String>> forgotPassword(String email, UserRole role) =>
+    _api.post<String>(
+      path: '${role.path}/forgot-password',
+      data: {'email': email},
+      fromJson: (json) => unwrapServiceResult(json, (inner) => inner.toString()),
+    );
+```
+
+**Wrong:**
+```dart
+// ❌ try/catch in data source — violates Rule 2
+try {
+  final response = await dio.post('/forgot-password', data: {...});
+  if (response.statusCode == 200) return right(response.data['nonce']);
+  return left(ServerFailure(...));
+} on DioException catch (e) {
+  return left(NetworkFailure(...));
+} catch (e) {
+  return left(ServerFailure(...));
+}
+```
+
+**Corollary:** All user-facing error strings come from `failureToMessage(Failure)` in
+`lib/core/network/failure_messages.dart` (created during scaffold phase — see §7).
+No screen or cubit hardcodes error strings.
+
+---
+
+### Rule 3 — Domain entities are never response models
+
+The domain repository contract (`abstract class <Feature>Repository`) returns only:
+- Domain entities defined in `domain/entities/`
+- Dart primitives (`String`, `int`, `bool`)
+- `Unit` (dartz) for void operations
+
+Response models (`data/models/*_response.dart`) never cross into the domain or presentation
+layers. The repository implementation maps them with `toEntity()`.
+
+**Correct domain contract:**
+```dart
+// domain/repositories/base_book_repository.dart
+abstract class BookRepository {
+  Future<Either<Failure, Book>> getBook(String id);           // ✅ entity
+  Future<Either<Failure, List<Book>>> searchBooks(String q);  // ✅ entity list
+  Future<Either<Failure, Unit>> addToFavourites(String id);   // ✅ Unit
+}
+```
+
+**Wrong:**
+```dart
+// ❌ Response model in domain contract — violates Rule 3
+abstract class BookRepository {
+  Future<Either<Failure, BookResponseModel>> getBook(String id);
+}
+```
+
+**Mapping in the repository impl:**
+```dart
+@override
+Future<Either<Failure, Book>> getBook(String id) async {
+  final result = await _remote.getBook(id);
+  return result.fold(
+    (failure) async => Left(failure),
+    (response) async => Right(response.toEntity()),  // ← toEntity() lives on the model
+  );
+}
+```
+
+---
+
+### Rule 4 — Use cases: add only when the rule applies
+
+A use case is a class with a `call()` method that wraps one repository operation.
+The overhead is real (one file, one class, one constructor parameter per cubit).
+Do not add use cases by default.
+
+**Add a use case when ANY of these is true:**
+
+| Condition | Example |
+|---|---|
+| The operation is called from **two or more cubits** | `GetCurrentUserUseCase` called by `ProfileCubit` and `HomeCubit` |
+| The operation has **non-trivial domain logic** beyond a single repo call | Combining two repo calls, applying business rules, coordinating side-effects |
+| The operation needs **independent unit testing** away from the cubit | Complex validation, ordering, filtering logic |
+
+**Skip use cases when:**
+- The cubit calls the repository once and emits a state — no logic beyond that.
+- The operation is specific to one screen and one cubit.
+
+**Use case template (when warranted):**
+```dart
+// domain/use_cases/get_book_recommendations_use_case.dart
+@injectable
+class GetBookRecommendationsUseCase {
+  final BookRepository _bookRepo;
+  final UserRepository _userRepo;
+
+  GetBookRecommendationsUseCase(this._bookRepo, this._userRepo);
+
+  Future<Either<Failure, List<Book>>> call(String userId) async {
+    final profileResult = await _userRepo.getProfile(userId);
+    return profileResult.fold(
+      Left.new,
+      (profile) => _bookRepo.getRecommendations(profile.preferences),
+    );
+  }
+}
+```
+
+**Direct repo call in cubit (no use case, correct for simple ops):**
+```dart
+// presentation/cubit/login/login_cubit.dart
+Future<void> submit({required String email, required String password}) async {
+  emit(const LoginLoading());
+  final result = await _authRepository.login(LoginRequest(email: email, password: password));
+  result.fold(
+    (failure) => emit(LoginFailure(failureToMessage(failure))),
+    (_) => emit(const LoginSuccess()),
+  );
+}
+```
+
+---
+
+### Rule 5 — Action/query cubit split
+
+Any feature that has **both mutations (write operations) and lists (read operations)** must
+use separate cubits for each concern. Mixing them in one cubit causes state collisions —
+a loading indicator on "accept request" would clobber the loaded friends list.
+
+**Split pattern:**
+
+```
+cubit/
+├── <feature>_action_cubit/   ← handles: add, remove, update, block, send, etc.
+│   ├── <feature>_action_cubit.dart
+│   └── <feature>_action_state.dart
+└── <feature>_list_cubit/     ← handles: fetch, refresh, paginate
+    ├── <feature>_list_cubit.dart
+    └── <feature>_list_state.dart
+```
+
+**In the screen — `BlocConsumer` for action, `BlocBuilder` for list:**
+```dart
+BlocConsumer<BookActionCubit, BookActionState>(
+  listener: (context, state) {
+    if (state is BookActionSuccess) {
+      getIt<SnackBarHelper>().showSuccess(state.message);
+      context.read<BookListCubit>().refresh();  // ← action triggers list refresh
+    } else if (state is BookActionError) {
+      getIt<SnackBarHelper>().showError(state.message);
+    }
+  },
+  builder: (context, _) {
+    return BlocBuilder<BookListCubit, BookListState>(
+      builder: (context, state) {
+        // render list
+      },
+    );
+  },
+);
+```
+
+**When a feature has only reads or only writes, one cubit is fine.**
+
+---
+
+## 3. DI Scopes — Per Class Type
+
+| Class | Annotation | Scope | Reason |
+|---|---|---|---|
+| Remote data source | `@lazySingleton` | Lifetime | Stateless HTTP wrapper |
+| Repository impl | `@LazySingleton(as: Repo)` | Lifetime | Stateless, bound to interface |
+| Use case | `@injectable` | Factory | Injected into cubit which is also a factory |
+| Cubit | `@injectable` | Factory | Has local state — must never be shared |
+| Request model | — | n/a | Plain Dart, instantiated inline |
+| Response model | — | n/a | Plain Dart, instantiated in `fromJson` |
+| Entity | — | n/a | Plain Dart, returned from `toEntity()` |
+
+Cubit registration as factory is mandatory. `AppRouter` always does
+`BlocProvider(create: (_) => getIt<XxxCubit>())` — each route build gets a fresh instance.
+
+---
+
+## 4. State Design — Sealed Classes
+
+Every cubit state file uses a `sealed class` as the base and `final class` for each variant.
+Extend `Equatable` and override `props`.
+
+```dart
+// presentation/cubit/book_list/book_list_state.dart
+sealed class BookListState extends Equatable {
+  const BookListState();
+  @override
+  List<Object?> get props => const [];
+}
+
+final class BookListInitial extends BookListState {
+  const BookListInitial();
+}
+
+final class BookListLoading extends BookListState {
+  const BookListLoading();
+}
+
+final class BookListSuccess extends BookListState {
+  final List<Book> books;
+  const BookListSuccess(this.books);
+  @override
+  List<Object?> get props => [books];
+}
+
+final class BookListError extends BookListState {
+  final String message;
+  const BookListError(this.message);
+  @override
+  List<Object?> get props => [message];
+}
+```
+
+The `sealed` keyword enables exhaustive `switch` expressions in `BlocBuilder` and prevents
+unhandled state variants at compile time.
+
+---
+
+## 5. Response Model Rules
+
+Response models live in `data/models/` and have two responsibilities only:
+1. `fromJson(Map<String, dynamic>)` — deserialize from API JSON
+2. `toEntity()` — return the domain entity
+
+```dart
+// data/models/book_response.dart
+class BookResponse {
+  final String id;
+  final String title;
+  final String authorName;
+  final String? coverUrl;
+
+  const BookResponse({
+    required this.id,
+    required this.title,
+    required this.authorName,
+    this.coverUrl,
+  });
+
+  factory BookResponse.fromJson(Map<String, dynamic> json) => BookResponse(
+        id: json['id'] as String,
+        title: json['title'] as String,
+        authorName: json['authorName'] as String,
+        coverUrl: json['coverUrl'] as String?,
+      );
+
+  Book toEntity() => Book(
+        id: id,
+        title: title,
+        authorName: authorName,
+        coverUrl: coverUrl,
+      );
+}
+```
+
+Response models must never be `Equatable` or carry business logic.
+They are data transfer objects — instantiated once, mapped to entity, then discarded.
+
+---
+
+## 6. Request Model Rules
+
+Request models live in `data/models/` and expose only `toJson()`.
+
+```dart
+// data/models/add_review_request.dart
+class AddReviewRequest {
+  final String bookId;
+  final int rating;
+  final String? comment;
+
+  const AddReviewRequest({
+    required this.bookId,
+    required this.rating,
+    this.comment,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'bookId': bookId,
+        'rating': rating,
+        if (comment != null) 'comment': comment,   // ← omit null fields
+      };
+}
+```
+
+Omit null optional fields from `toJson()` rather than sending `"field": null` unless the
+backend explicitly requires null for "clear this field" semantics.
+
+---
+
+## 7. Error Messages — One Place
+
+> **This file is created during scaffold phase.** `lib/core/network/failure_messages.dart`
+> already exists when you start a feature. Do not recreate it. Import it directly.
+
+All common failure messages live in **one shared file**:
+`lib/core/network/failure_messages.dart`
+
+```dart
+// lib/core/network/failure_messages.dart
+import 'package:flutter/foundation.dart';
+import 'failure.dart';
+
+String failureToMessage(Failure failure) => switch (failure) {
+      NetworkFailure()        => 'No internet connection.',
+      UnauthorizedFailure()   => 'Session expired. Please sign in again.',
+      CacheFailure()          => 'Local storage error.',
+      ValidationFailure(message: final m) => m,
+      ServerFailure(statusCode: final code, message: final m) =>
+        kReleaseMode ? 'Something went wrong. Please try again.' : '[$code] $m',
+      UnexpectedFailure(message: final m) =>
+        kReleaseMode ? 'Unexpected error.' : (m.isEmpty ? 'Unexpected error.' : m),
+      Failure() => 'Unexpected error.',
+    };
+```
+
+**Dev vs prod behaviour:**
+- `ValidationFailure` — always passes the backend message through; it is written for the user.
+- `ServerFailure` / `UnexpectedFailure` — in debug/profile builds shows the raw message and status
+  code so developers see exactly what went wrong; in release builds shows a safe, generic string.
+- All other failures are environment-independent — their messages are always user-friendly.
+
+`kReleaseMode` is tree-shaken by the Flutter compiler — the debug branch does not exist in
+production binaries. If the project adopts Flutter flavors later, replace `kReleaseMode` with
+`AppConfig.isProduction` in this one file.
+
+Cubits import and call this directly — no per-feature file needed:
+```dart
+import '../../../../core/network/failure_messages.dart' as core;
+
+result.fold(
+  (failure) => emit(LoginFailure(core.failureToMessage(failure))),
+  (_) => emit(const LoginSuccess()),
+);
+```
+
+### Feature-level override — only when needed
+
+Create `presentation/cubit/failure_messages.dart` **only** when a feature has
+feature-specific status codes to handle. Delegate everything else to core:
+
+```dart
+// lib/features/auth/presentation/cubit/failure_messages.dart
+import 'package:booksplatform/core/network/failure_messages.dart' as core;
+import 'package:booksplatform/core/network/failure.dart';
+
+String failureToMessage(Failure failure) => switch (failure) {
+      ServerFailure(statusCode: 423, message: final m) =>
+        'Account locked: $m. Try again in 5 minutes.',
+      _ => core.failureToMessage(failure),
+    };
+```
+
+No screen or widget ever maps a `Failure` directly.
+Do not create a feature-level `failure_messages.dart` unless a unique status code requires it.
+
+---
+
+## 8. Route Args
+
+Only screens that require navigation parameters have an args class.
+Args classes live in `lib/core/router/args/` — one file per screen:
+
+```
+lib/core/router/
+├── app_router.dart
+├── app_routes.dart
+└── args/
+    ├── book_detail_args.dart
+    ├── author_profile_args.dart
+    └── reader_args.dart
+```
+
+**Why `core/router/args/` and not next to the screen?**
+The caller must import and construct the args object before navigating.
+If args lived inside a feature, any other feature navigating there would import
+from a foreign feature's presentation layer — a cross-feature dependency violation.
+Placing args in `core/router/args/` makes the dependency direction clean:
+Feature → Core, never Feature → Feature.
+
+```dart
+// lib/core/router/args/book_detail_args.dart
+class BookDetailArgs {
+  final String bookId;
+  final String title;
+  const BookDetailArgs({required this.bookId, required this.title});
+}
+```
+
+`AppRouter.generateRoute` casts with a null guard:
+
+```dart
+case AppRoutes.bookDetail:
+  final args = settings.arguments as BookDetailArgs?;
+  if (args == null) return _unknown(settings);
+  return MaterialPageRoute(
+    settings: settings,
+    builder: (_) => BlocProvider(
+      create: (_) => getIt<BookDetailCubit>(),
+      child: BookDetailScreen(args: args),
+    ),
+  );
+```
+
+Caller in any feature:
+```dart
+Navigator.pushNamed(
+  context,
+  AppRoutes.bookDetail,
+  arguments: BookDetailArgs(bookId: '123', title: 'My Book'),
+);
+```
+
+New route name constants go in `lib/core/router/app_routes.dart`.
+Do not add args classes to `app_router.dart` or inside any feature folder.
+
+---
+
+## 9. ApiEnvelope Unwrapper
+
+**Only applies if the backend wraps every response in a general envelope:**
+```json
+{ "success": true, "data": { ... }, "errors": {} }
+```
+
+If the backend returns raw JSON with no wrapper, skip this section entirely —
+do not create `api_envelope.dart` and call `fromJson` directly on the response.
+
+When the envelope exists, `unwrapServiceResult` in `lib/core/network/api_envelope.dart`
+extracts `data` so that `fromJson` only sees the inner object and never knows the envelope exists:
+
+```dart
+fromJson: (json) => unwrapServiceResult(
+  json,
+  (inner) => BookResponse.fromJson(inner as Map<String, dynamic>),
+),
+```
+
+`unwrapServiceResult` throws a `FormatException` (caught by `ApiManager` as `UnexpectedFailure`) in two cases:
+- The top-level response is not a JSON object
+- `data` is `null` — explicit fast-fail with a message pointing to the fix
+
+For endpoints that return `data: null` (e.g., logout, delete), **bypass the unwrapper entirely**:
+
+```dart
+fromJson: (_) => unit,
+```
+
+Never pass a void endpoint through `unwrapServiceResult` — it will throw.
+
+---
+
+## 10. Pre-Ship Checklist
+
+Before marking a feature complete, verify every item:
+
+**Data layer**
+- [ ] No `try/catch` in data source — all error handling is in `ApiManager`
+- [ ] No token/auth logic in data source — `AuthInterceptor` handles it
+- [ ] All response models have `fromJson` + `toEntity()` and nothing else
+- [ ] All request models omit null optional fields in `toJson()`
+
+**Domain layer**
+- [ ] Repository abstract returns only entities and primitives — no `*ResponseModel` types
+- [ ] Use cases added only where Rule 4 applies; otherwise cubits call repo directly
+
+**Presentation layer**
+- [ ] All cubits are `@injectable` (factory), never `@lazySingleton`
+- [ ] All states are `sealed class` extending `Equatable`
+- [ ] Action and query state machines are in separate cubits (Rule 5) if feature has both
+- [ ] All error messages go through `failureToMessage()` — no inline string literals
+- [ ] Screens use `BlocListener` for side effects, `BlocBuilder` for rendering
+- [ ] `BlocProvider` is created in `AppRouter`, not inside the screen widget
+
+**DI**
+- [ ] After adding `@injectable` / `@lazySingleton` classes, run:
+  `dart run build_runner build --delete-conflicting-outputs`
+- [ ] Verify the new registrations appear in `injection_container.config.dart`
+
+**Analysis**
+- [ ] `flutter analyze` → No issues found
+
+---
+
+## 11. Anti-Patterns (Do Not Repeat)
+
+The following patterns were found in other projects and features and must not appear
+in this codebase:
+
+| Anti-pattern | Why it's wrong | Correct approach |
+|---|---|---|
+| Token fetch + refresh in every data source method | 280+ lines of duplicate code; auth logic in wrong layer | `AuthInterceptor` handles it once |
+| Domain repo returning `*ResponseModel` types | Domain leaks data-layer details; API changes break domain | Return entities from `toEntity()` |
+| Repository impl that only delegates (zero transformation) | Adds files and ceremony with no value | Impl does real work: persists, maps, checks expiry |
+| 13 trivial use case classes each wrapping one repo call | File count explodes; no benefit over direct repo call | Add use case only when Rule 4 applies |
+| One cubit taking 9 constructor-injected use cases | Fragile DI, god-object cubit, unclear responsibility | Split into action cubit + query cubit |
+| Error string literals inline in data source / cubit | Can't localize, can't change centrally | `failureToMessage()` in one file |
+| Numbered comments (`// 1. Send Friend Request`) | Noise; file structure and method names carry this | Clean code, no redundant comments |
