@@ -134,7 +134,7 @@ export const ArticleService = {
   },
 
   async listByCategory(slug: string, page = 1, limit = 10) {
-    const category = await db.articleCategory.findUnique({
+    const category = await db.articleCategory.findFirst({
       where: { slug },
       select: { id: true, name: true, nameAr: true, slug: true },
     });

@@ -102,7 +102,9 @@ export default async function HomePage() {
           },
         ];
 
-  const { newlyReleased, translated, nominated, publishers, publisherGrid, categorySections } = homeBooks as typeof homeBooks & { publisherGrid: { id: string; title: string; slug: string; imageUrl?: string | null; websiteUrl?: string | null; country?: string | null; bookCount: number }[] };
+  const { newlyReleased, translated, nominated, publishers, publisherGrid = [], categorySections } = homeBooks as typeof homeBooks & {
+    publisherGrid?: Array<{ id: string; title: string; slug: string; imageUrl: string | null; websiteUrl: string | null; country: string | null; bookCount: number }>;
+  };
 
   type ArticleSnippet = {
     id: string;
