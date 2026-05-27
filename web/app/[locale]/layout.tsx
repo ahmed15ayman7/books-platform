@@ -6,6 +6,7 @@ import { Tajawal, Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { locales } from "@/lib/i18n/config";
 import type { Locale } from "@/lib/i18n/config";
+import { buildRootMetadata } from "@/lib/seo/metadata";
 import "@/app/globals.css";
 
 const tajawal = Tajawal({
@@ -21,37 +22,7 @@ const inter = Inter({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: {
-    template: "%s | منصة الكتب العالمية",
-    default: "منصة الكتب العالمية — Books Platform",
-  },
-  description:
-    "منصة الكتب العالمية — نافذة العالم على الكتب. اكتشف الكتب، تعرف على الناشرين، اقرأ المقالات.",
-  metadataBase: new URL(
-    process.env["NEXT_PUBLIC_APP_URL"] ?? "https://booksplatform.net"
-  ),
-  openGraph: {
-    type: "website",
-    locale: "ar_AR",
-    alternateLocale: ["en_US"],
-    siteName: "منصة الكتب العالمية",
-  },
-  twitter: {
-    card: "summary_large_image",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
-};
+export const metadata: Metadata = buildRootMetadata();
 
 interface LocaleLayoutProps {
   children: React.ReactNode;

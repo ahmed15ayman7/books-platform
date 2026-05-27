@@ -1,3 +1,5 @@
+import { absoluteUrl, getSiteUrl, resolveMediaUrl, siteConfig } from "@/lib/seo/site";
+
 export function JsonLd({ data }: { data: Record<string, unknown> }) {
   return (
     <script
@@ -8,12 +10,13 @@ export function JsonLd({ data }: { data: Record<string, unknown> }) {
 }
 
 export function websiteJsonLd(locale: string) {
-  const base = process.env["NEXT_PUBLIC_APP_URL"] ?? "https://booksplatform.net";
+  const base = getSiteUrl();
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: locale === "ar" ? "منصة الكتب العالمية" : "Books Platform",
+    name: locale === "ar" ? siteConfig.nameAr : siteConfig.nameEn,
     url: `${base}/${locale}`,
+    inLanguage: locale === "ar" ? "ar" : "en",
     potentialAction: {
       "@type": "SearchAction",
       target: `${base}/${locale}/books?q={search_term_string}`,
@@ -23,12 +26,30 @@ export function websiteJsonLd(locale: string) {
 }
 
 export function organizationJsonLd(locale: string) {
-  const base = process.env["NEXT_PUBLIC_APP_URL"] ?? "https://booksplatform.net";
+  const base = getSiteUrl();
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: locale === "ar" ? "منصة الكتب العالمية" : "Books Platform",
+    name: locale === "ar" ? siteConfig.nameAr : siteConfig.nameEn,
     url: `${base}/${locale}`,
-    logo: `${base}/og-default.jpg`,
+    logo: resolveMediaUrl("/logo.webp"),
+    sameAs: siteConfig.twitterHandle
+      ? [`https://twitter.com/${siteConfig.twitterHandle.replace("@", "")}`]
+      : undefined,
+  };
+}
+
+export function breadcrumbJsonLd(
+  items: { name: string; path: string }[]
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: absoluteUrl(item.path),
+    })),
   };
 }

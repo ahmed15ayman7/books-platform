@@ -11,7 +11,7 @@ import { Clock, Calendar } from "lucide-react";
 import { formatDate } from "@/lib/utils/formatters";
 import readingTime from "reading-time";
 import type { Locale } from "@/lib/i18n";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { articleSeoMetadata } from "@/lib/seo/metadata";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -22,14 +22,12 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   const locale = (await getLocale()) as Locale;
   const article = await ArticleService.getBySlug(slug).catch(() => null);
   if (!article) return { title: "Article Not Found" };
-  return buildPageMetadata({
-    locale,
-    path: `/${locale}/articles/${slug}`,
+  return articleSeoMetadata(locale, {
+    slug: article.slug,
     title: article.title,
-    description: article.excerpt ?? article.title,
+    excerpt: article.excerpt,
     imageUrl: article.imageUrl,
-    type: "article",
-    keywords: [article.title, locale === "ar" ? "مقالات" : "articles"],
+    date: article.date,
   });
 }
 
