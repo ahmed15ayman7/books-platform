@@ -8,9 +8,11 @@ import { MobileNavTrigger } from "@/components/sections/mobile-nav";
 import { DesktopNavClient } from "@/components/sections/desktop-nav-client";
 import { SiteLogo } from "@/components/sections/site-logo";
 import { SOCIAL_LINKS } from "@/components/icons";
+import { ArticleService } from "@/server/services/article.service";
 
 export async function SiteHeader() {
   const locale = await getLocale();
+  const articleCategories = await ArticleService.getCategories().catch(() => []);
 
   const utilityLinks =
     locale === "ar"
@@ -74,7 +76,7 @@ export async function SiteHeader() {
           <SiteLogo locale={locale} />
 
           <div className="hidden min-w-0 flex-1 justify-center px-4 lg:flex">
-            <DesktopNavClient locale={locale} />
+            <DesktopNavClient locale={locale} articleCategories={articleCategories} />
           </div>
 
           <div className="flex shrink-0 items-center gap-1">

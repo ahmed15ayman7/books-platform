@@ -58,9 +58,9 @@ export function BookCarousel({ books, locale, className }: BookCarouselProps) {
         </div>
       </div>
 
-      {/* Navigation buttons */}
+      {/* Navigation buttons — left = ChevronLeft, right = ChevronRight; handlers swap in RTL */}
       <button
-        onClick={scrollPrev}
+        onClick={locale === "ar" ? scrollNext : scrollPrev}
         className={cn(
           "absolute top-1/2 -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center",
           "rounded-full bg-white shadow-md border border-[var(--brand-gray-200)]",
@@ -70,14 +70,10 @@ export function BookCarousel({ books, locale, className }: BookCarouselProps) {
         )}
         aria-label={locale === "ar" ? "التالي" : "Previous"}
       >
-        {locale === "ar" ? (
-          <ChevronRight className="h-5 w-5" />
-        ) : (
-          <ChevronLeft className="h-5 w-5" />
-        )}
+        <ChevronLeft className="h-5 w-5" />
       </button>
       <button
-        onClick={scrollNext}
+        onClick={locale === "ar" ? scrollPrev : scrollNext}
         className={cn(
           "absolute top-1/2 -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center",
           "rounded-full bg-white shadow-md border border-[var(--brand-gray-200)]",
@@ -87,11 +83,7 @@ export function BookCarousel({ books, locale, className }: BookCarouselProps) {
         )}
         aria-label={locale === "ar" ? "السابق" : "Next"}
       >
-        {locale === "ar" ? (
-          <ChevronLeft className="h-5 w-5" />
-        ) : (
-          <ChevronRight className="h-5 w-5" />
-        )}
+        <ChevronRight className="h-5 w-5" />
       </button>
     </div>
   );

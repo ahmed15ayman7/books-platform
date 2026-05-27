@@ -272,7 +272,7 @@ export const BookService = {
       },
     } as const;
 
-    const [categories, newlyReleased, translated, nominated, sponsoredPublishers] = await Promise.all([
+    const [categories, newlyReleased, translated, nominated, sponsoredPublishers, topPublishers] = await Promise.all([
       db.productCategory.findMany({
         where: { nameAr: { in: TARGET_CATEGORIES } },
         select: { id: true, name: true, nameAr: true, slug: true },
@@ -305,6 +305,21 @@ export const BookService = {
           },
         },
       }),
+      db.publisher.findMany({
+        where: { status: "publish" },
+        orderBy: { order: "desc" },
+        take: 12,
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          imageFeatured: true,
+          imageUrl: true,
+          websiteUrl: true,
+          countries: { select: { name: true }, take: 1 },
+          _count: { select: { products: true } },
+        },
+      }),
     ]);
 
     const categoryBooks = await Promise.all(
@@ -332,6 +347,15 @@ export const BookService = {
       translated,
       nominated,
       publishers: sponsoredPublishers.map((sp) => sp.publisher),
+      publisherGrid: topPublishers.map((p) => ({
+        id: p.id,
+        title: p.title,
+        slug: p.slug,
+        imageUrl: p.imageFeatured ?? p.imageUrl,
+        websiteUrl: p.websiteUrl,
+        country: p.countries[0]?.name ?? null,
+        bookCount: p._count.products,
+      })),
       categorySections,
     };
   },

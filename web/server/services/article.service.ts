@@ -125,6 +125,61 @@ export const ArticleService = {
     });
   },
 
+  async getCategories() {
+    return db.articleCategory.findMany({
+      where: { spamFlag: null },
+      orderBy: { linkedCount: "desc" },
+      select: { id: true, name: true, nameAr: true, slug: true, linkedCount: true },
+    });
+  },
+
+  async listByCategory(slug: string, page = 1, limit = 10) {
+    const category = await db.articleCategory.findUnique({
+      where: { slug },
+      select: { id: true, name: true, nameAr: true, slug: true },
+    });
+    if (!category) return null;
+
+    const [articles, total] = await Promise.all([
+      db.article.findMany({
+        where: { status: "publish", articleCategoryId: category.id },
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { date: "desc" },
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          excerpt: true,
+          imageUrl: true,
+          date: true,
+          channel: true,
+          isFeatured: true,
+          content: true,
+        },
+      }),
+      db.article.count({ where: { status: "publish", articleCategoryId: category.id } }),
+    ]);
+
+    const articlesWithRT = articles.map(({ content, ...rest }) => ({
+      ...rest,
+      readingTimeMinutes: content ? Math.ceil(readingTime(content).minutes) : null,
+    }));
+
+    return {
+      category,
+      articles: articlesWithRT,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPrevPage: page > 1,
+      },
+    };
+  },
+
   async getFeaturedForHome() {
     const channels = ["harvest", "ideas", "world-reads", "books-talk", "watch-your-book", "novel-story"];
 

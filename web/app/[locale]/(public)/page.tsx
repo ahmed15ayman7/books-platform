@@ -15,6 +15,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { StatsCounter } from "@/components/sections/stats-counter";
 import { NewsletterStrip } from "@/components/sections/newsletter-strip";
 import { PublishersMarquee } from "@/components/sections/publishers-marquee";
+import { PublisherCard } from "@/components/sections/publisher-card";
 import { Button } from "@/components/ui/button";
 import { PenTool, Library, PenLine, Building2 } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
@@ -63,12 +64,13 @@ export default async function HomePage() {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("home");
 
-  const [homeBooks, stats, articlesMap, dbSlides, categories] = await Promise.all([
+  const [homeBooks, stats, articlesMap, dbSlides, categories, articleCategories] = await Promise.all([
     BookService.getHomeData().catch(() => ({
       newlyReleased: [],
       translated: [],
       nominated: [],
       publishers: [],
+      publisherGrid: [],
       categorySections: [],
     })),
     BookService.getStats().catch(() => ({
@@ -80,6 +82,7 @@ export default async function HomePage() {
     ArticleService.getFeaturedForHome().catch(() => ({})),
     HeroSlideService.listActive().catch(() => []),
     BookService.getCategories().catch(() => []),
+    ArticleService.getCategories().catch(() => []),
   ]);
 
   const heroSlides =
@@ -99,7 +102,7 @@ export default async function HomePage() {
           },
         ];
 
-  const { newlyReleased, translated, nominated, publishers, categorySections } = homeBooks;
+  const { newlyReleased, translated, nominated, publishers, publisherGrid, categorySections } = homeBooks as typeof homeBooks & { publisherGrid: { id: string; title: string; slug: string; imageUrl?: string | null; websiteUrl?: string | null; country?: string | null; bookCount: number }[] };
 
   type ArticleSnippet = {
     id: string;
@@ -123,7 +126,7 @@ export default async function HomePage() {
 
   // After dark publishers section backgrounds reset to 0
   const postDarkBgs = buildBgList(
-    2 + ARTICLE_CHANNELS.length, // translated + nominated + 6 channels
+    4 + ARTICLE_CHANNELS.length, // publishers grid + translated + nominated + article categories + 6 channels
   );
 
   let preIdx  = 0;
@@ -293,6 +296,42 @@ export default async function HomePage() {
         </AnimatedSection>
       )}
 
+      {/* ── شبكة دور النشر ──────────────────────────────────── */}
+      {publisherGrid.length > 0 && (
+        <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="pub-grid-heading">
+          <div className="container-platform">
+            <FadeIn className="mb-8 flex items-end justify-between gap-4">
+              <SectionHeading
+                id="pub-grid-heading"
+                title={locale === "ar" ? "أبرز دور النشر" : "Top Publishers"}
+                subtitle={locale === "ar" ? "شركاؤنا من دور النشر حول العالم" : "Our publishing partners worldwide"}
+              />
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/${locale}/publishers`}>
+                  {locale === "ar" ? "كل الناشرين" : "All Publishers"}
+                </Link>
+              </Button>
+            </FadeIn>
+            <StaggerContainer className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+              {publisherGrid.map((pub) => (
+                <StaggerItem key={pub.id}>
+                  <PublisherCard
+                    id={pub.id}
+                    title={pub.title}
+                    slug={pub.slug}
+                    imageUrl={pub.imageUrl}
+                    websiteUrl={pub.websiteUrl}
+                    country={pub.country}
+                    bookCount={pub.bookCount}
+                    locale={locale}
+                  />
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
+          </div>
+        </AnimatedSection>
+      )}
+
       {/* ── كتب مترجمة ──────────────────────────────────────── */}
       {translated.length > 0 && (
         <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="translated-heading">
@@ -331,6 +370,43 @@ export default async function HomePage() {
               </Button>
             </FadeIn>
             <BookCarousel books={nominated} locale={locale} />
+          </div>
+        </AnimatedSection>
+      )}
+
+      {/* ── تصنيفات المقالات ─────────────────────────────────── */}
+      {articleCategories.length > 0 && (
+        <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="article-cats-heading">
+          <div className="container-platform">
+            <FadeIn className="mb-8 flex items-end justify-between gap-4">
+              <SectionHeading
+                id="article-cats-heading"
+                title={locale === "ar" ? "تصنيفات المقالات" : "Article Categories"}
+                subtitle={locale === "ar" ? "تصفّح المقالات حسب التصنيف" : "Browse articles by category"}
+              />
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/${locale}/articles/harvest`}>
+                  {locale === "ar" ? "كل المقالات" : "All Articles"}
+                </Link>
+              </Button>
+            </FadeIn>
+            <StaggerContainer className="flex flex-wrap gap-3">
+              {articleCategories.slice(0, 14).map((cat) => (
+                <StaggerItem key={cat.id}>
+                  <Link
+                    href={`/${locale}/articles/category/${cat.slug}`}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[var(--brand-gray-200)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-gray-700)] transition-all hover:border-[var(--brand-red)] hover:bg-[var(--brand-red-soft)] hover:text-[var(--brand-red)]"
+                  >
+                    {locale === "ar" && cat.nameAr ? cat.nameAr : cat.name}
+                    {cat.linkedCount > 0 && (
+                      <span className="rounded-full bg-[var(--brand-gray-100)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--brand-gray-500)]">
+                        {cat.linkedCount}
+                      </span>
+                    )}
+                  </Link>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
           </div>
         </AnimatedSection>
       )}
