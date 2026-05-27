@@ -22,41 +22,10 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV HUSKY=0
 ENV NODE_ENV=production
 
-# Coolify injects ARGs per stage; promote build-args to ENV for Next.js + Prisma.
-ENV DATABASE_URL=${DATABASE_URL} \
-    NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL} \
-    SERVICE_FQDN_WEB=${SERVICE_FQDN_WEB} \
-    COOLIFY_FQDN=${COOLIFY_FQDN} \
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY} \
-    NEXT_PUBLIC_VAPID_PUBLIC_KEY=${NEXT_PUBLIC_VAPID_PUBLIC_KEY} \
-    NEXT_PUBLIC_POSTHOG_KEY=${NEXT_PUBLIC_POSTHOG_KEY} \
-    NEXT_PUBLIC_POSTHOG_HOST=${NEXT_PUBLIC_POSTHOG_HOST} \
-    NEXT_PUBLIC_CLARITY_PROJECT_ID=${NEXT_PUBLIC_CLARITY_PROJECT_ID} \
-    NEXT_PUBLIC_FACEBOOK_PIXEL_ID=${NEXT_PUBLIC_FACEBOOK_PIXEL_ID} \
-    NEXT_PUBLIC_TIKTOK_PIXEL_ID=${NEXT_PUBLIC_TIKTOK_PIXEL_ID} \
-    NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN} \
-    NEXT_PUBLIC_OG_IMAGE=${NEXT_PUBLIC_OG_IMAGE} \
-    NEXT_PUBLIC_SITE_NAME_AR=${NEXT_PUBLIC_SITE_NAME_AR} \
-    NEXT_PUBLIC_SITE_NAME_EN=${NEXT_PUBLIC_SITE_NAME_EN} \
-    NEXT_PUBLIC_SITE_TAGLINE_AR=${NEXT_PUBLIC_SITE_TAGLINE_AR} \
-    NEXT_PUBLIC_SITE_TAGLINE_EN=${NEXT_PUBLIC_SITE_TAGLINE_EN} \
-    NEXT_PUBLIC_TWITTER_HANDLE=${NEXT_PUBLIC_TWITTER_HANDLE} \
-    NEXT_PUBLIC_FACEBOOK_APP_ID=${NEXT_PUBLIC_FACEBOOK_APP_ID}
-
-RUN set -eux; \
-    if [ -z "${DATABASE_URL}" ]; then \
-      export DATABASE_URL="postgresql://build:build@127.0.0.1:5432/build"; \
-    fi; \
-    if [ -z "${NEXT_PUBLIC_APP_URL}" ]; then \
-      if [ -n "${SERVICE_FQDN_WEB}" ]; then \
-        export NEXT_PUBLIC_APP_URL="https://${SERVICE_FQDN_WEB}"; \
-      elif [ -n "${COOLIFY_FQDN}" ]; then \
-        export NEXT_PUBLIC_APP_URL="https://${COOLIFY_FQDN}"; \
-      else \
-        export NEXT_PUBLIC_APP_URL="http://localhost:3000"; \
-      fi; \
-    fi; \
-    npm run build
+# Do not ENV-expand DATABASE_URL here: URL credentials break Dockerfile parsing/log redaction.
+# Coolify passes build-args; RUN sees them as env for subprocesses including `npm run build`.
+RUN chmod +x scripts/docker-next-build.sh \
+  && ./scripts/docker-next-build.sh
 
 FROM base AS runner
 WORKDIR /app
