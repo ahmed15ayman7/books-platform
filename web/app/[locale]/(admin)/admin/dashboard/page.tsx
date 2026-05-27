@@ -19,6 +19,13 @@ export const metadata: Metadata = {
   title: "لوحة التحكم — Books Platform Admin",
 };
 
+function safe<T>(promise: Promise<T>, fallback: T): Promise<T> {
+  return promise.catch((err: unknown) => {
+    console.error("[dashboard]", err);
+    return fallback;
+  });
+}
+
 async function getDashboardData() {
   const [
     totalBooks,
@@ -31,23 +38,37 @@ async function getDashboardData() {
     recentBooks,
     recentOrders,
   ] = await Promise.all([
-    db.product.count({ where: { published: true } }),
-    db.publisher.count({ where: { status: "publish" } }),
-    db.publishBookSubmission.count({ where: { status: "pending" } }),
-    db.order.count(),
-    db.comment.count({ where: { status: "pending" } }),
-    db.newsletterSubscriber.count({ where: { status: "CONFIRMED" } }),
-    db.article.count({ where: { status: "publish" } }),
-    db.product.findMany({
-      take: 5,
-      orderBy: { id: "desc" },
-      select: { id: true, nameEn: true, nameAr: true, published: true },
-    }),
-    db.order.findMany({
-      take: 5,
-      orderBy: { createdAt: "desc" },
-      select: { id: true, customerEmail: true, total: true, status: true, orderNumber: true, createdAt: true },
-    }),
+    safe(db.product.count({ where: { published: true } }), 0),
+    safe(db.publisher.count({ where: { status: "publish" } }), 0),
+    safe(db.publishBookSubmission.count({ where: { status: "pending" } }), 0),
+    safe(db.order.count(), 0),
+    safe(db.comment.count({ where: { status: "pending" } }), 0),
+    safe(db.newsletterSubscriber.count({ where: { status: "CONFIRMED" } }), 0),
+    safe(db.article.count({ where: { status: "publish" } }), 0),
+    safe(
+      db.product.findMany({
+        take: 5,
+        orderBy: { originalId: "desc" },
+        select: {
+          id: true,
+          nameEn: true,
+          nameAr: true,
+          published: true,
+          translationStatus: true,
+          publisher: { select: { title: true, slug: true } },
+          primaryCategory: { select: { name: true, nameAr: true } },
+        },
+      }),
+      [],
+    ),
+    safe(
+      db.order.findMany({
+        take: 5,
+        orderBy: { createdAt: "desc" },
+        select: { id: true, customerEmail: true, total: true, status: true, orderNumber: true, createdAt: true },
+      }),
+      [],
+    ),
   ]);
 
   return {
@@ -64,17 +85,7 @@ async function getDashboardData() {
 }
 
 export default async function AdminDashboardPage() {
-  const data = await getDashboardData().catch(() => ({
-    totalBooks: 0,
-    totalPublishers: 0,
-    pendingSubmissions: 0,
-    totalOrders: 0,
-    pendingComments: 0,
-    newsletterSubscribers: 0,
-    totalArticles: 0,
-    recentBooks: [],
-    recentOrders: [],
-  }));
+  const data = await getDashboardData();
 
   const kpis = [
     {
@@ -200,6 +211,12 @@ export default async function AdminDashboardPage() {
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium">
                       {(book.nameAr as string | null) ?? (book.nameEn as string)}
+                    </p>
+                    <p className="truncate text-xs text-[var(--brand-gray-500)]">
+                      {(book.publisher as { title: string } | null)?.title ?? "—"}
+                      {(book.primaryCategory as { nameAr: string | null; name: string } | null) && (
+                        <> · {(book.primaryCategory as { nameAr: string | null; name: string }).nameAr ?? (book.primaryCategory as { nameAr: string | null; name: string }).name}</>
+                      )}
                     </p>
                   </div>
                   <AdminStatusBadge
