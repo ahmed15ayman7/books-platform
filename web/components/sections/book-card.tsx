@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { BookOpen } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Badge, BadgeProps } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import {
   localizedBookName,
@@ -134,7 +134,7 @@ export function BookCard({
           )}
           {translationStatus && !compact && (
             <Badge
-              variant={statusVariant}
+              variant={statusVariant as BadgeProps["variant"]}
               className="self-start text-[10px] px-2 py-0.5"
             >
               {statusLabel}

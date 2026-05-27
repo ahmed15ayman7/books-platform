@@ -155,7 +155,7 @@ function MultiSelect({
 }
 
 /* ─── Main form ──────────────────────────────────────────────────────── */
-export function BookEditForm({ book, publishers, categories, authors, locale }: BookEditFormProps) {
+export function BookEditForm({ book, publishers, categories, authors }: BookEditFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
