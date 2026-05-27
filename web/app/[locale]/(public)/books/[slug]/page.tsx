@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { BookCarousel } from "@/components/sections/book-carousel";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { BookOpen, ExternalLink, Share2, Heart, ShoppingCart, Star } from "lucide-react";
+import { BookBiblioTable } from "@/components/sections/book-biblio-table";
 import type { Locale } from "@/lib/i18n";
 import {
   localizedBookAlternateName,
@@ -214,31 +215,19 @@ export default async function BookDetailPage({ params }: BookPageProps) {
                 </div>
               )}
 
-              {/* Book metadata */}
-              <div className="mt-6 grid grid-cols-2 gap-3 rounded-lg bg-white p-4 shadow-sm border border-[var(--brand-gray-200)]">
-                {book.publisher && (
-                  <MetaItem
-                    label={t("publisher")}
-                    value={
-                      <Link
-                        href={`/${locale}/publishers/${book.publisher.slug}`}
-                        className="text-[var(--brand-red)] hover:underline"
-                      >
-                        {book.publisher.title}
-                      </Link>
-                    }
-                  />
-                )}
-                {book.language && (
-                  <MetaItem label={t("language")} value={book.language.toUpperCase()} />
-                )}
-                {book.publicationYear && (
-                  <MetaItem label={t("year")} value={String(book.publicationYear)} />
-                )}
-                {book.isbn && (
-                  <MetaItem label={t("isbn")} value={book.isbn} />
-                )}
-              </div>
+              {/* Bibliographic data table */}
+              <BookBiblioTable
+                isbn={book.isbn}
+                language={book.language}
+                publicationYear={book.publicationYear}
+                translationStatus={book.translationStatus}
+                notes={book.notes}
+                publisher={book.publisher}
+                primaryCategory={book.primaryCategory}
+                categories={book.categories}
+                tags={book.tags}
+                locale={locale}
+              />
 
               {/* Description */}
               {description && (
@@ -273,13 +262,3 @@ export default async function BookDetailPage({ params }: BookPageProps) {
   );
 }
 
-function MetaItem({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div>
-      <dt className="text-xs text-[var(--brand-gray-500)] uppercase tracking-wide mb-0.5">
-        {label}
-      </dt>
-      <dd className="text-sm font-medium text-[var(--brand-gray-900)]">{value}</dd>
-    </div>
-  );
-}
