@@ -1,6 +1,9 @@
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
 
+/** Admin UI is authenticated and DB-backed — never prerender at build time. */
+export const dynamic = "force-dynamic";
+
 interface AdminLayoutProps {
   children: React.ReactNode;
 }

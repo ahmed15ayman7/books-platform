@@ -38,6 +38,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   );
 
+  // DB may be unreachable during Docker image build; dynamic URLs are added at runtime.
+  if (process.env["NEXT_PHASE"] === "phase-production-build") {
+    return staticEntries;
+  }
+
   const [books, categories, articles] = await Promise.all([
     db.product
       .findMany({

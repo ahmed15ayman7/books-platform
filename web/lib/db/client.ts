@@ -20,11 +20,31 @@ function createPrismaClient() {
 
 declare global {
   // eslint-disable-next-line no-var
-  var prisma: ReturnType<typeof createPrismaClient> | undefined;
+  var prisma: PrismaClient | undefined;
 }
 
-export const db = globalThis.prisma ?? createPrismaClient();
+let prismaSingleton: PrismaClient | undefined;
 
-if (process.env["NODE_ENV"] !== "production") {
-  globalThis.prisma = db;
+function getPrismaClient(): PrismaClient {
+  if (process.env["NODE_ENV"] !== "production") {
+    if (!globalThis.prisma) {
+      globalThis.prisma = createPrismaClient();
+    }
+    return globalThis.prisma;
+  }
+  if (!prismaSingleton) {
+    prismaSingleton = createPrismaClient();
+  }
+  return prismaSingleton;
 }
+
+/** Lazy Prisma client — avoids connecting at import time during `next build`. */
+export const db = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    const client = getPrismaClient();
+    const value = client[prop as keyof PrismaClient];
+    return typeof value === "function"
+      ? (value as (...args: unknown[]) => unknown).bind(client)
+      : value;
+  },
+});
