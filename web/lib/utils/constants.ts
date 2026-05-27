@@ -6,7 +6,8 @@ export const TRANSLATION_STATUS = {
   NOT_TRANSLATED: "NOT_TRANSLATED",
   NOMINATED: "NOMINATED",
   TRANSLATED: "TRANSLATED",
-} as const;
+  PARTIAL: "PARTIAL",
+  } as const;
 
 export const ARTICLE_CHANNELS = {
   HARVEST: "harvest",

@@ -32,7 +32,11 @@ export function BooksFeaturedCarousel({ books, locale }: BooksFeaturedCarouselPr
         : book.primaryCategory?.name;
 
     const statusLabel =
-      book.translationStatus === "TRANSLATED"
+      book.translationStatus === "PARTIAL"
+        ? isAr
+          ? "مرشح للترجمة"
+          : "For Translation"
+        : book.translationStatus === "TRANSLATED"
         ? isAr
           ? "مترجم"
           : "Translated"

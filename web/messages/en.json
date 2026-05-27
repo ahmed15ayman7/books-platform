@@ -100,7 +100,8 @@
     "translationStatus": {
       "NOT_TRANSLATED": "Not Translated",
       "NOMINATED": "Recommended for Translation",
-      "TRANSLATED": "Translated"
+      "TRANSLATED": "Translated",
+      "PARTIAL":"Recommended for Translation"
     },
     "filters": {
       "all": "All",

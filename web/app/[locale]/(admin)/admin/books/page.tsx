@@ -94,6 +94,8 @@ export default function AdminBooksPage() {
               ? "غير مترجم"
               : row.translationStatus === "NOMINATED"
                 ? "مرشح"
+                : row.translationStatus === "PARTIAL"
+                  ? "مرشح"
                 : "مترجم"
           }
         />

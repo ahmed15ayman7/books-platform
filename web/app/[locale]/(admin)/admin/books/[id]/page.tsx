@@ -232,6 +232,7 @@ export default function AdminBookEditPage() {
                 <option value="NOT_TRANSLATED">NOT_TRANSLATED</option>
                 <option value="NOMINATED">NOMINATED</option>
                 <option value="TRANSLATED">TRANSLATED</option>
+                <option value="PARTIAL">PARTIAL</option>
               </select>
             </div>
           </div>

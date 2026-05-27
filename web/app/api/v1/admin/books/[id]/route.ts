@@ -16,7 +16,7 @@ const updateSchema = z.object({
   language: z.string().max(10).optional().nullable(),
   price: z.number().positive().optional().nullable(),
   imageUrl: z.string().max(2000).optional().nullable(),
-  translationStatus: z.enum(["NOT_TRANSLATED", "NOMINATED", "TRANSLATED"]).optional(),
+  translationStatus: z.enum(["NOT_TRANSLATED", "NOMINATED", "TRANSLATED", "PARTIAL"]).optional(),
   purchaseOption: z.enum(["DIRECT", "REFERRAL", "NOT_AVAILABLE"]).optional(),
   published: z.boolean().optional(),
   featured: z.boolean().optional(),

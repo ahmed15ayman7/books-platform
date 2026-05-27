@@ -17,7 +17,7 @@ const createBookSchema = z.object({
   price: z.number().positive().optional(),
   currency: z.string().default("USD"),
   imageUrl: z.string().url().optional(),
-  translationStatus: z.enum(["NOT_TRANSLATED", "NOMINATED", "TRANSLATED"]).default("NOT_TRANSLATED"),
+  translationStatus: z.enum(["NOT_TRANSLATED", "NOMINATED", "TRANSLATED", "PARTIAL"]).default("NOT_TRANSLATED"),
   purchaseOption: z.enum(["DIRECT", "REFERRAL", "NOT_AVAILABLE"]).default("NOT_AVAILABLE"),
   referralLink: z.string().url().optional(),
   publisherId: z.string().cuid().optional(),

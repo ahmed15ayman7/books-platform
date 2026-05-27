@@ -100,7 +100,8 @@
     "translationStatus": {
       "NOT_TRANSLATED": "غير مترجم",
       "NOMINATED": "مرشح للترجمة",
-      "TRANSLATED": "مترجم"
+      "TRANSLATED": "مترجم",
+      "PARTIAL":"مرشح للترجمة"
     },
     "filters": {
       "all": "الكل",

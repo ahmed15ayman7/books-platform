@@ -50,7 +50,11 @@ export function BookCard({
       ? "translated"
       : translationStatus === "NOMINATED"
         ? "nominated"
-        : "not-translated";
+        : translationStatus === "PARTIAL"
+          ? "partial"
+        : translationStatus === "NOT_TRANSLATED"
+          ? "not-translated"
+          : undefined;
 
   const statusLabel =
     translationStatus === "TRANSLATED"
@@ -61,7 +65,11 @@ export function BookCard({
         ? locale === "ar"
           ? "مرشح للترجمة"
           : "For Translation"
-        : locale === "ar"
+        : translationStatus === "PARTIAL"
+          ? locale === "ar"
+            ? "مرشح للترجمة"
+            : "For Translation"
+          : locale === "ar"
           ? "غير مترجم"
           : "Not Translated";
 

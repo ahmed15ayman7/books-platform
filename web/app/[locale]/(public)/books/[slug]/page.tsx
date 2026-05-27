@@ -54,17 +54,20 @@ export default async function BookDetailPage({ params }: BookPageProps) {
       : null;
 
   const translationStatusVariant =
-    book.translationStatus === "TRANSLATED"
+    book.translationStatus === "PARTIAL"
+      ? "partial"
+      : book.translationStatus === "TRANSLATED"
       ? "translated"
       : book.translationStatus === "NOMINATED"
         ? "nominated"
-        : ("not-translated" as const);
+          : ("not-translated" as const);
 
   const translationStatusLabel = t(
     `translationStatus.${book.translationStatus}` as
       | "translationStatus.NOT_TRANSLATED"
       | "translationStatus.NOMINATED"
       | "translationStatus.TRANSLATED"
+      | "translationStatus.PARTIAL"
   );
 
   // JSON-LD
@@ -190,7 +193,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
 
               {/* Translation status */}
               <div className="mt-3">
-                <Badge variant={translationStatusVariant} className="text-sm px-3 py-1">
+                <Badge variant={translationStatusVariant as any} className="text-sm px-3 py-1">
                   {translationStatusLabel}
                 </Badge>
               </div>
