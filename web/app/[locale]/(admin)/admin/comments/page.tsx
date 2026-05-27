@@ -28,6 +28,7 @@ export default function AdminCommentsPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -35,10 +36,11 @@ export default function AdminCommentsPage() {
       const q = new URLSearchParams({ page: String(page), limit: "20" });
       if (search.trim()) q.set("search", search.trim());
       const res = await fetch(`/api/v1/admin/comments?${q}`, { headers: adminAuthHeaders() });
-      const data = await res.json() as { success: boolean; data?: Comment[]; pagination?: { totalPages: number } };
+      const data = await res.json() as { success: boolean; data?: Comment[]; pagination?: { totalPages: number; total: number } };
       if (data.success && data.data) {
         setComments(data.data);
         setTotalPages(data.pagination?.totalPages ?? 1);
+        setTotal(data.pagination?.total ?? 0);
       }
     } finally {
       setLoading(false);
@@ -144,7 +146,7 @@ export default function AdminCommentsPage() {
         }
       />
       <AdminTable columns={columns} data={comments} loading={loading} emptyMessage="لا توجد تعليقات بعد" />
-      <AdminPagination page={page} totalPages={totalPages} onPage={setPage} />
+      <AdminPagination page={page} totalPages={totalPages} onPage={setPage} total={total} pageSize={20} />
     </div>
   );
 }

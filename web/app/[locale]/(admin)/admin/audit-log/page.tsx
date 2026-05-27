@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminPaginationServer } from "@/components/admin/admin-table";
 
 export const metadata: Metadata = {
   title: "سجل الأحداث — Admin",
@@ -85,27 +86,13 @@ export default async function AdminAuditLogPage({
         </table>
       </div>
 
-      {totalPages > 1 && (
-        <div className="mt-4 flex items-center gap-2">
-          {page > 1 && (
-            <a
-              href={`?page=${page - 1}`}
-              className="rounded-lg border border-[var(--brand-gray-700)] px-3 py-1.5 text-sm text-[var(--brand-gray-300)] hover:bg-[var(--brand-gray-800)] transition-colors"
-            >
-              السابق
-            </a>
-          )}
-          <span className="text-xs text-[var(--brand-gray-400)]">{page} / {totalPages}</span>
-          {page < totalPages && (
-            <a
-              href={`?page=${page + 1}`}
-              className="rounded-lg border border-[var(--brand-gray-700)] px-3 py-1.5 text-sm text-[var(--brand-gray-300)] hover:bg-[var(--brand-gray-800)] transition-colors"
-            >
-              التالي
-            </a>
-          )}
-        </div>
-      )}
+      <AdminPaginationServer
+        page={page}
+        totalPages={totalPages}
+        buildHref={(p) => `?page=${p}`}
+        total={total}
+        pageSize={limit}
+      />
     </div>
   );
 }

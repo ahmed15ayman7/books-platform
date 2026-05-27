@@ -39,6 +39,7 @@ export default function AdminBooksPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
   const loadBooks = useCallback(async () => {
     setLoading(true);
@@ -52,6 +53,7 @@ export default function AdminBooksPage() {
       if (data.success && data.data) {
         setBooks(data.data);
         setTotalPages(data.pagination?.totalPages ?? 1);
+        setTotal(data.pagination?.total ?? 0);
       }
     } finally {
       setLoading(false);
@@ -149,7 +151,7 @@ export default function AdminBooksPage() {
         emptyMessage="لا توجد كتب — ابدأ بإضافة كتاب جديد"
       />
 
-      <AdminPagination page={page} totalPages={totalPages} onPage={setPage} />
+      <AdminPagination page={page} totalPages={totalPages} onPage={setPage} total={total} pageSize={20} />
     </div>
   );
 }

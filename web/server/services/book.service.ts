@@ -248,4 +248,91 @@ export const BookService = {
 
     return { newlyReleased, sponsoredPublishers };
   },
+
+  async getHomeData() {
+    const TARGET_CATEGORIES = [
+      "تقنيات وعلوم",
+      "دراسات اجتماعية",
+      "لغات وآداب",
+      "فلسفات وثقافات",
+      "أديان وعقائد",
+      "اقتصاد وتنمية",
+      "أفكار وسياسات",
+    ];
+
+    const bookSelect = {
+      id: true,
+      slug: true,
+      nameEn: true,
+      nameAr: true,
+      imageUrl: true,
+      translationStatus: true,
+      primaryCategory: {
+        select: { nameAr: true, name: true, slug: true },
+      },
+    } as const;
+
+    const [categories, newlyReleased, translated, nominated, sponsoredPublishers] = await Promise.all([
+      db.productCategory.findMany({
+        where: { nameAr: { in: TARGET_CATEGORIES } },
+        select: { id: true, name: true, nameAr: true, slug: true },
+      }),
+      db.product.findMany({
+        where: { published: true },
+        orderBy: { position: "desc" },
+        take: 12,
+        select: bookSelect,
+      }),
+      db.product.findMany({
+        where: { published: true, translationStatus: "TRANSLATED" },
+        orderBy: { position: "desc" },
+        take: 12,
+        select: bookSelect,
+      }),
+      db.product.findMany({
+        where: { published: true, translationStatus: "NOMINATED" },
+        orderBy: { position: "desc" },
+        take: 12,
+        select: bookSelect,
+      }),
+      db.sponsoredPublisher.findMany({
+        where: { isActive: true, endsAt: { gte: new Date() } },
+        orderBy: { priority: "desc" },
+        take: 16,
+        include: {
+          publisher: {
+            select: { id: true, title: true, slug: true, imageUrl: true },
+          },
+        },
+      }),
+    ]);
+
+    const categoryBooks = await Promise.all(
+      categories.map((cat) =>
+        db.product.findMany({
+          where: { published: true, primaryCategoryId: cat.id },
+          orderBy: { position: "desc" },
+          take: 10,
+          select: bookSelect,
+        })
+      )
+    );
+
+    const categorySections = categories
+      .map((cat, i) => ({ category: cat, books: categoryBooks[i] ?? [] }))
+      .filter((s) => s.books.length > 0)
+      .sort((a, b) => {
+        const ai = TARGET_CATEGORIES.indexOf(a.category.nameAr ?? "");
+        const bi = TARGET_CATEGORIES.indexOf(b.category.nameAr ?? "");
+        return ai - bi;
+      });
+
+    return {
+      newlyReleased,
+      translated,
+      nominated,
+      publishers: sponsoredPublishers.map((sp) => sp.publisher),
+      categorySections,
+    };
+  },
 };

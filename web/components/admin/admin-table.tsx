@@ -1,5 +1,6 @@
 import { type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { getVisiblePageNumbers } from "@/lib/pagination";
 
 // ─── Status Badge ─────────────────────────────────────────────────
 
@@ -163,33 +164,153 @@ interface AdminPaginationProps {
   page: number;
   totalPages: number;
   onPage: (p: number) => void;
+  total?: number;
+  pageSize?: number;
 }
 
 export function AdminPagination({
   page,
   totalPages,
   onPage,
+  total,
+  pageSize,
 }: AdminPaginationProps) {
-  if (totalPages <= 1) return null;
+  if (totalPages <= 1 && !total) return null;
+
+  const pages = getVisiblePageNumbers(page, totalPages);
+  const from = total && pageSize ? Math.min((page - 1) * pageSize + 1, total) : null;
+  const to = total && pageSize ? Math.min(page * pageSize, total) : null;
+
+  const btnBase =
+    "min-w-[32px] h-8 rounded-lg border border-[var(--brand-gray-700)] px-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40";
+  const btnIdle = `${btnBase} text-[var(--brand-gray-300)] hover:bg-[var(--brand-gray-800)]`;
+  const btnActive = `${btnBase} bg-[var(--brand-red)] border-[var(--brand-red)] text-white font-medium`;
+
   return (
-    <div className="mt-4 flex items-center gap-2">
-      <button
-        onClick={() => onPage(Math.max(1, page - 1))}
-        disabled={page <= 1}
-        className="rounded-lg border border-[var(--brand-gray-700)] px-3 py-1.5 text-sm text-[var(--brand-gray-300)] transition-colors hover:bg-[var(--brand-gray-800)] disabled:cursor-not-allowed disabled:opacity-40"
-      >
-        السابق
-      </button>
-      <span className="text-xs text-[var(--brand-gray-400)]">
-        {page} / {totalPages}
-      </span>
-      <button
-        onClick={() => onPage(Math.min(totalPages, page + 1))}
-        disabled={page >= totalPages}
-        className="rounded-lg border border-[var(--brand-gray-700)] px-3 py-1.5 text-sm text-[var(--brand-gray-300)] transition-colors hover:bg-[var(--brand-gray-800)] disabled:cursor-not-allowed disabled:opacity-40"
-      >
-        التالي
-      </button>
+    <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+      {total !== undefined && from !== null && to !== null ? (
+        <span className="text-xs text-[var(--brand-gray-400)]">
+          عرض {from}–{to} من {total} نتيجة
+        </span>
+      ) : (
+        <span />
+      )}
+
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => onPage(Math.max(1, page - 1))}
+          disabled={page <= 1}
+          className={btnIdle}
+          aria-label="الصفحة السابقة"
+        >
+          ‹
+        </button>
+
+        {pages.map((p, i) =>
+          p === "ellipsis" ? (
+            <span
+              key={`ellipsis-${i}`}
+              className="flex h-8 min-w-[32px] items-center justify-center text-sm text-[var(--brand-gray-500)]"
+            >
+              …
+            </span>
+          ) : (
+            <button
+              key={p}
+              onClick={() => onPage(p)}
+              className={p === page ? btnActive : btnIdle}
+              aria-current={p === page ? "page" : undefined}
+            >
+              {p}
+            </button>
+          )
+        )}
+
+        <button
+          onClick={() => onPage(Math.min(totalPages, page + 1))}
+          disabled={page >= totalPages}
+          className={btnIdle}
+          aria-label="الصفحة التالية"
+        >
+          ›
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Pagination (Server / RSC) ────────────────────────────────────
+
+interface AdminPaginationServerProps {
+  page: number;
+  totalPages: number;
+  buildHref: (p: number) => string;
+  total?: number;
+  pageSize?: number;
+}
+
+export function AdminPaginationServer({
+  page,
+  totalPages,
+  buildHref,
+  total,
+  pageSize,
+}: AdminPaginationServerProps) {
+  if (totalPages <= 1 && !total) return null;
+
+  const pages = getVisiblePageNumbers(page, totalPages);
+  const from = total && pageSize ? Math.min((page - 1) * pageSize + 1, total) : null;
+  const to = total && pageSize ? Math.min(page * pageSize, total) : null;
+
+  const linkBase =
+    "min-w-[32px] h-8 rounded-lg border border-[var(--brand-gray-700)] px-2 text-sm transition-colors inline-flex items-center justify-center";
+  const linkIdle = `${linkBase} text-[var(--brand-gray-300)] hover:bg-[var(--brand-gray-800)]`;
+  const linkActive = `${linkBase} bg-[var(--brand-red)] border-[var(--brand-red)] text-white font-medium`;
+  const linkDisabled = `${linkBase} text-[var(--brand-gray-600)] pointer-events-none opacity-40`;
+
+  return (
+    <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+      {total !== undefined && from !== null && to !== null ? (
+        <span className="text-xs text-[var(--brand-gray-400)]">
+          عرض {from}–{to} من {total} نتيجة
+        </span>
+      ) : (
+        <span />
+      )}
+
+      <div className="flex items-center gap-1">
+        {page <= 1 ? (
+          <span className={linkDisabled} aria-disabled="true">‹</span>
+        ) : (
+          <a href={buildHref(page - 1)} className={linkIdle} aria-label="الصفحة السابقة">‹</a>
+        )}
+
+        {pages.map((p, i) =>
+          p === "ellipsis" ? (
+            <span
+              key={`ellipsis-${i}`}
+              className="flex h-8 min-w-[32px] items-center justify-center text-sm text-[var(--brand-gray-500)]"
+            >
+              …
+            </span>
+          ) : (
+            <a
+              key={p}
+              href={buildHref(p)}
+              className={p === page ? linkActive : linkIdle}
+              aria-current={p === page ? "page" : undefined}
+            >
+              {p}
+            </a>
+          )
+        )}
+
+        {page >= totalPages ? (
+          <span className={linkDisabled} aria-disabled="true">›</span>
+        ) : (
+          <a href={buildHref(page + 1)} className={linkIdle} aria-label="الصفحة التالية">›</a>
+        )}
+      </div>
     </div>
   );
 }

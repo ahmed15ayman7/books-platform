@@ -32,6 +32,7 @@ export default function AdminPublishersPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -41,10 +42,11 @@ export default function AdminPublishersPage() {
       const res = await fetch(`/api/v1/admin/publishers?${q}`, {
         headers: adminAuthHeaders(),
       });
-      const data = await res.json() as { success: boolean; data?: Publisher[]; pagination?: { totalPages: number } };
+      const data = await res.json() as { success: boolean; data?: Publisher[]; pagination?: { totalPages: number; total: number } };
       if (data.success && data.data) {
         setPublishers(data.data);
         setTotalPages(data.pagination?.totalPages ?? 1);
+        setTotal(data.pagination?.total ?? 0);
       }
     } finally {
       setLoading(false);
@@ -135,7 +137,7 @@ export default function AdminPublishersPage() {
         }
       />
       <AdminTable columns={columns} data={publishers} loading={loading} emptyMessage="لا يوجد ناشرون بعد" />
-      <AdminPagination page={page} totalPages={totalPages} onPage={setPage} />
+      <AdminPagination page={page} totalPages={totalPages} onPage={setPage} total={total} pageSize={20} />
     </div>
   );
 }

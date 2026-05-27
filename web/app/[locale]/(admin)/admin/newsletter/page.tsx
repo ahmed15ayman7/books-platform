@@ -153,7 +153,7 @@ export default function AdminNewsletterPage() {
             loading={loading}
             emptyMessage="لا يوجد مشتركون بعد"
           />
-          <AdminPagination page={page} totalPages={totalPages} onPage={setPage} />
+          <AdminPagination page={page} totalPages={totalPages} onPage={setPage} total={total} pageSize={20} />
         </div>
       </div>
     </div>

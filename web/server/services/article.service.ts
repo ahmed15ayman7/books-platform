@@ -140,9 +140,10 @@ export const ArticleService = {
 
     const results = await Promise.all(
       channels.map((channel) =>
-        db.article.findFirst({
+        db.article.findMany({
           where: { status: "publish", channel },
           orderBy: { date: "desc" },
+          take: 3,
           select: {
             id: true,
             slug: true,
@@ -158,13 +159,10 @@ export const ArticleService = {
 
     return channels.reduce(
       (acc, channel, index) => {
-        const result = results[index];
-        if (result !== undefined) {
-          acc[channel] = result;
-        }
+        acc[channel] = results[index] ?? [];
         return acc;
       },
-      {} as Record<string, ArticleSnippet | null>
+      {} as Record<string, ArticleSnippet[]>
     );
   },
 };

@@ -49,6 +49,7 @@ export default function AdminB2BPage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
@@ -59,10 +60,11 @@ export default function AdminB2BPage() {
     try {
       const q = new URLSearchParams({ page: String(page), limit: "20" });
       const res = await fetch(`/api/v1/admin/b2b?${q}`, { headers: adminAuthHeaders() });
-      const data = await res.json() as { success: boolean; data?: B2BSubscription[]; pagination?: { totalPages: number } };
+      const data = await res.json() as { success: boolean; data?: B2BSubscription[]; pagination?: { totalPages: number; total: number } };
       if (data.success && data.data) {
         setSubscriptions(data.data);
         setTotalPages(data.pagination?.totalPages ?? 1);
+        setTotal(data.pagination?.total ?? 0);
       }
     } finally {
       setLoading(false);
@@ -184,7 +186,7 @@ export default function AdminB2BPage() {
 
         <div className="lg:col-span-2">
           <AdminTable columns={columns} data={subscriptions} loading={loading} emptyMessage="لا توجد اشتراكات بعد" />
-          <AdminPagination page={page} totalPages={totalPages} onPage={setPage} />
+          <AdminPagination page={page} totalPages={totalPages} onPage={setPage} total={total} pageSize={20} />
         </div>
       </div>
     </div>
