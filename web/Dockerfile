@@ -25,6 +25,8 @@ ENV NODE_ENV=production
 # Coolify injects ARGs per stage; promote build-args to ENV for Next.js + Prisma.
 ENV DATABASE_URL=${DATABASE_URL} \
     NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL} \
+    SERVICE_FQDN_WEB=${SERVICE_FQDN_WEB} \
+    COOLIFY_FQDN=${COOLIFY_FQDN} \
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY} \
     NEXT_PUBLIC_VAPID_PUBLIC_KEY=${NEXT_PUBLIC_VAPID_PUBLIC_KEY} \
     NEXT_PUBLIC_POSTHOG_KEY=${NEXT_PUBLIC_POSTHOG_KEY} \
@@ -41,7 +43,20 @@ ENV DATABASE_URL=${DATABASE_URL} \
     NEXT_PUBLIC_TWITTER_HANDLE=${NEXT_PUBLIC_TWITTER_HANDLE} \
     NEXT_PUBLIC_FACEBOOK_APP_ID=${NEXT_PUBLIC_FACEBOOK_APP_ID}
 
-RUN npx prisma generate && npm run build
+RUN set -eux; \
+    if [ -z "${DATABASE_URL}" ]; then \
+      export DATABASE_URL="postgresql://build:build@127.0.0.1:5432/build"; \
+    fi; \
+    if [ -z "${NEXT_PUBLIC_APP_URL}" ]; then \
+      if [ -n "${SERVICE_FQDN_WEB}" ]; then \
+        export NEXT_PUBLIC_APP_URL="https://${SERVICE_FQDN_WEB}"; \
+      elif [ -n "${COOLIFY_FQDN}" ]; then \
+        export NEXT_PUBLIC_APP_URL="https://${COOLIFY_FQDN}"; \
+      else \
+        export NEXT_PUBLIC_APP_URL="http://localhost:3000"; \
+      fi; \
+    fi; \
+    npm run build
 
 FROM base AS runner
 WORKDIR /app
