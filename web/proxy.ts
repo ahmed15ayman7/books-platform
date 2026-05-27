@@ -11,9 +11,11 @@ const intlMiddleware = createMiddleware({
   localeDetection: true,
 });
 
-// Protected route patterns
-const ADMIN_PATTERN = /^\/[a-z]{2}\/admin/;
-const AMBASSADOR_PATTERN = /^\/[a-z]{2}\/ambassador/;
+// Protected route patterns (login pages must stay public)
+const ADMIN_PATTERN = /^\/[a-z]{2}\/admin(?:\/|$)/;
+const ADMIN_LOGIN_PATTERN = /^\/[a-z]{2}\/admin\/login\/?$/;
+const AMBASSADOR_PATTERN = /^\/[a-z]{2}\/ambassador(?:\/|$)/;
+const AMBASSADOR_LOGIN_PATTERN = /^\/[a-z]{2}\/ambassador\/login\/?$/;
 
 export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -27,8 +29,8 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Protect admin routes
-  if (ADMIN_PATTERN.test(pathname)) {
+  // Protect admin routes (except login — otherwise infinite redirect loop)
+  if (ADMIN_PATTERN.test(pathname) && !ADMIN_LOGIN_PATTERN.test(pathname)) {
     const token = request.cookies.get("access_token")?.value
       ?? request.headers.get("authorization")?.replace("Bearer ", "");
 
@@ -44,8 +46,8 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
-  // Protect ambassador routes
-  if (AMBASSADOR_PATTERN.test(pathname)) {
+  // Protect ambassador routes (except login)
+  if (AMBASSADOR_PATTERN.test(pathname) && !AMBASSADOR_LOGIN_PATTERN.test(pathname)) {
     const token = request.cookies.get("access_token")?.value
       ?? request.headers.get("authorization")?.replace("Bearer ", "");
 
