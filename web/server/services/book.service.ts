@@ -140,11 +140,16 @@ export const BookService = {
             slug: true,
             imageUrl: true,
             websiteUrl: true,
+            address: true,
+            countries: { select: { name: true, nameAr: true }, take: 1 },
           },
         },
         primaryCategory: true,
         categories: true,
         tags: true,
+        authors: {
+          select: { id: true, name: true, nameAr: true, slug: true, bio: true, bioAr: true },
+        },
         ratings: {
           select: { stars: true },
         },

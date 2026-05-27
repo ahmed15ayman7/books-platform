@@ -40,13 +40,16 @@ model Country {
 }
 
 model Author {
-  id          String  @id @default(cuid())
-  termId      Int     @unique @map("term_id")
+  id          String    @id @default(cuid())
+  termId      Int       @unique @map("term_id")
   name        String
-  nameAr      String? @map("name_ar")
+  nameAr      String?   @map("name_ar")
   slug        String
-  linkedCount Int     @default(0) @map("linked_count")
-  spamFlag    String? @map("spam_flag")
+  linkedCount Int       @default(0) @map("linked_count")
+  spamFlag    String?   @map("spam_flag")
+  bio         String?   @db.Text
+  bioAr       String?   @map("bio_ar") @db.Text
+  products    Product[] @relation("ProductAuthors")
 
   @@index([slug])
   @@map("authors")
@@ -156,6 +159,10 @@ model Product {
   isbn                String?
   language            String?
   publicationYear     Int?             @map("publication_year")
+  country             String?
+  pageCount           Int?             @map("page_count")
+  edition             String?
+  dimensions          String?
   published           Boolean          @default(true)
   featured            Boolean          @default(false)
   translationStatus   String           @default("NOT_TRANSLATED") @map("translation_status")
@@ -182,6 +189,7 @@ model Product {
   publisher           Publisher?       @relation(fields: [publisherId], references: [id])
   categories          ProductCategory[] @relation("ProductProductCategories")
   tags                ProductTag[]     @relation("ProductProductTags")
+  authors             Author[]         @relation("ProductAuthors")
   cartItems           CartItem[]
   wishlistItems       WishlistItem[]
   ratings             Rating[]
@@ -238,6 +246,7 @@ model Publisher {
   postModifiedDate DateTime?  @map("post_modified_date")
   websiteUrl       String?    @map("website_url")
   contactEmail     String?    @map("contact_email")
+  address          String?    @db.Text
   countries        Country[]  @relation("PublisherCountries")
   products         Product[]
   sponsored        SponsoredPublisher?

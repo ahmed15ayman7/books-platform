@@ -220,12 +220,17 @@ export default async function BookDetailPage({ params }: BookPageProps) {
                 isbn={book.isbn}
                 language={book.language}
                 publicationYear={book.publicationYear}
+                country={book.country}
+                pageCount={book.pageCount}
+                edition={book.edition}
+                dimensions={book.dimensions}
                 translationStatus={book.translationStatus}
                 notes={book.notes}
                 publisher={book.publisher}
                 primaryCategory={book.primaryCategory}
                 categories={book.categories}
                 tags={book.tags}
+                authors={book.authors}
                 locale={locale}
               />
 

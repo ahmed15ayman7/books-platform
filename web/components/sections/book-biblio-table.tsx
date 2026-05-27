@@ -17,16 +17,31 @@ interface Tag {
   slug: string;
 }
 
+interface Author {
+  id: string;
+  name: string;
+  nameAr?: string | null;
+  slug: string;
+  bio?: string | null;
+  bioAr?: string | null;
+}
+
 interface Publisher {
   title: string;
   slug: string;
   websiteUrl?: string | null;
+  address?: string | null;
+  countries?: Array<{ name: string; nameAr?: string | null }>;
 }
 
 interface BookBiblioTableProps {
   isbn?: string | null;
   language?: string | null;
   publicationYear?: number | null;
+  country?: string | null;
+  pageCount?: number | null;
+  edition?: string | null;
+  dimensions?: string | null;
   translationStatus?: string | null;
   notes?: string | null;
   type?: string | null;
@@ -34,29 +49,30 @@ interface BookBiblioTableProps {
   primaryCategory?: Category | null;
   categories?: Category[];
   tags?: Tag[];
+  authors?: Author[];
   locale: Locale;
 }
 
 const LANGUAGE_NAMES: Record<string, { ar: string; en: string }> = {
-  en:   { ar: "الإنجليزية",  en: "English" },
-  ar:   { ar: "العربية",     en: "Arabic" },
-  fr:   { ar: "الفرنسية",    en: "French" },
-  de:   { ar: "الألمانية",   en: "German" },
-  es:   { ar: "الإسبانية",   en: "Spanish" },
-  it:   { ar: "الإيطالية",   en: "Italian" },
-  zh:   { ar: "الصينية",     en: "Chinese" },
-  ja:   { ar: "اليابانية",   en: "Japanese" },
-  ru:   { ar: "الروسية",     en: "Russian" },
-  pt:   { ar: "البرتغالية",  en: "Portuguese" },
-  tr:   { ar: "التركية",     en: "Turkish" },
-  fa:   { ar: "الفارسية",    en: "Persian" },
-  ur:   { ar: "الأردية",     en: "Urdu" },
+  en: { ar: "الإنجليزية",  en: "English" },
+  ar: { ar: "العربية",     en: "Arabic" },
+  fr: { ar: "الفرنسية",    en: "French" },
+  de: { ar: "الألمانية",   en: "German" },
+  es: { ar: "الإسبانية",   en: "Spanish" },
+  it: { ar: "الإيطالية",   en: "Italian" },
+  zh: { ar: "الصينية",     en: "Chinese" },
+  ja: { ar: "اليابانية",   en: "Japanese" },
+  ru: { ar: "الروسية",     en: "Russian" },
+  pt: { ar: "البرتغالية",  en: "Portuguese" },
+  tr: { ar: "التركية",     en: "Turkish" },
+  fa: { ar: "الفارسية",    en: "Persian" },
+  ur: { ar: "الأردية",     en: "Urdu" },
 };
 
 const TRANSLATION_STATUS: Record<string, { ar: string; en: string; variant: "translated" | "nominated" | "not-translated" }> = {
-  TRANSLATED:     { ar: "مترجم",           en: "Translated",         variant: "translated" },
-  NOMINATED:      { ar: "مرشح للترجمة",    en: "Nominated",          variant: "nominated" },
-  NOT_TRANSLATED: { ar: "غير مترجم",       en: "Not Translated",     variant: "not-translated" },
+  TRANSLATED:     { ar: "مترجم",           en: "Translated",     variant: "translated" },
+  NOMINATED:      { ar: "مرشح للترجمة",    en: "Nominated",      variant: "nominated" },
+  NOT_TRANSLATED: { ar: "غير مترجم",       en: "Not Translated", variant: "not-translated" },
 };
 
 function resolveLanguage(code: string | null | undefined, locale: Locale): string | null {
@@ -93,21 +109,45 @@ export function BookBiblioTable({
   isbn,
   language,
   publicationYear,
+  country,
+  pageCount,
+  edition,
+  dimensions,
   translationStatus,
   notes,
   publisher,
   primaryCategory,
   categories = [],
   tags = [],
+  authors = [],
   locale,
 }: BookBiblioTableProps) {
   const isAr = locale === "ar";
 
-  // Build ordered rows — only rows with real data
   type RowEntry = { label: string; content: React.ReactNode };
   const rows: RowEntry[] = [];
 
-  // Publisher
+  // ── Authors ─────────────────────────────────────────────────────────
+  if (authors.length > 0) {
+    rows.push({
+      label: isAr ? "المؤلف" : "Author",
+      content: (
+        <div className="flex flex-col gap-1">
+          {authors.map((author) => (
+            <Link
+              key={author.id}
+              href={`/${locale}/books?author=${author.slug}`}
+              className="font-medium text-[var(--brand-red)] hover:underline"
+            >
+              {isAr && author.nameAr ? author.nameAr : author.name}
+            </Link>
+          ))}
+        </div>
+      ),
+    });
+  }
+
+  // ── Publisher ────────────────────────────────────────────────────────
   if (publisher) {
     rows.push({
       label: isAr ? "دار النشر" : "Publisher",
@@ -136,7 +176,30 @@ export function BookBiblioTable({
     });
   }
 
-  // Primary category
+  // ── Publisher address ─────────────────────────────────────────────────
+  if (publisher?.address) {
+    rows.push({
+      label: isAr ? "عنوان الناشر" : "Publisher Address",
+      content: <span className="text-sm leading-relaxed">{publisher.address}</span>,
+    });
+  }
+
+  // ── Publisher country ─────────────────────────────────────────────────
+  const pubCountry = publisher?.countries?.[0];
+  if (pubCountry) {
+    const countryName = isAr && pubCountry.nameAr ? pubCountry.nameAr : pubCountry.name;
+    rows.push({
+      label: isAr ? "بلد النشر" : "Country",
+      content: countryName,
+    });
+  } else if (country) {
+    rows.push({
+      label: isAr ? "بلد النشر" : "Country",
+      content: country,
+    });
+  }
+
+  // ── Primary category ─────────────────────────────────────────────────
   if (primaryCategory) {
     const catName = isAr && primaryCategory.nameAr ? primaryCategory.nameAr : primaryCategory.name;
     rows.push({
@@ -152,7 +215,7 @@ export function BookBiblioTable({
     });
   }
 
-  // Additional categories (excluding primary)
+  // ── Additional categories ─────────────────────────────────────────────
   const extraCats = categories.filter((c) => c.id !== primaryCategory?.id);
   if (extraCats.length > 0) {
     rows.push({
@@ -171,7 +234,7 @@ export function BookBiblioTable({
     });
   }
 
-  // Publication year
+  // ── Publication year ──────────────────────────────────────────────────
   if (publicationYear) {
     rows.push({
       label: isAr ? "سنة النشر" : "Published",
@@ -179,7 +242,7 @@ export function BookBiblioTable({
     });
   }
 
-  // Language
+  // ── Language ──────────────────────────────────────────────────────────
   const langLabel = resolveLanguage(language, locale);
   if (langLabel) {
     rows.push({
@@ -188,7 +251,35 @@ export function BookBiblioTable({
     });
   }
 
-  // ISBN
+  // ── Page count ────────────────────────────────────────────────────────
+  if (pageCount) {
+    rows.push({
+      label: isAr ? "عدد الصفحات" : "Pages",
+      content: (
+        <span className="font-mono">
+          {pageCount} {isAr ? "صفحة" : "pages"}
+        </span>
+      ),
+    });
+  }
+
+  // ── Edition ───────────────────────────────────────────────────────────
+  if (edition) {
+    rows.push({
+      label: isAr ? "الطبعة" : "Edition",
+      content: edition,
+    });
+  }
+
+  // ── Dimensions ────────────────────────────────────────────────────────
+  if (dimensions) {
+    rows.push({
+      label: isAr ? "الحجم" : "Dimensions",
+      content: <span className="font-mono text-xs">{dimensions}</span>,
+    });
+  }
+
+  // ── ISBN ──────────────────────────────────────────────────────────────
   if (isbn) {
     rows.push({
       label: "ISBN",
@@ -200,7 +291,7 @@ export function BookBiblioTable({
     });
   }
 
-  // Translation status
+  // ── Translation status ────────────────────────────────────────────────
   if (translationStatus) {
     const st = TRANSLATION_STATUS[translationStatus];
     if (st) {
@@ -215,7 +306,7 @@ export function BookBiblioTable({
     }
   }
 
-  // Tags / Keywords
+  // ── Tags / Keywords ───────────────────────────────────────────────────
   if (tags.length > 0) {
     rows.push({
       label: isAr ? "الكلمات المفتاحية" : "Keywords",
@@ -234,7 +325,7 @@ export function BookBiblioTable({
     });
   }
 
-  // Notes
+  // ── Notes ─────────────────────────────────────────────────────────────
   if (notes) {
     rows.push({
       label: isAr ? "ملاحظات" : "Notes",
@@ -244,22 +335,50 @@ export function BookBiblioTable({
 
   if (rows.length === 0) return null;
 
+  // Author bio section (shown below the table)
+  const authorsWithBio = authors.filter((a) => (isAr ? a.bioAr ?? a.bio : a.bio));
+
   return (
-    <div className="mt-6 overflow-hidden rounded-xl border border-[var(--brand-gray-200)] bg-white shadow-sm">
-      <div className="border-b border-[var(--brand-gray-200)] bg-[var(--brand-gray-50)] px-4 py-2.5">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-[var(--brand-gray-500)]">
-          {isAr ? "البيانات الببليوغرافية" : "Bibliographic Data"}
-        </h3>
+    <div className="mt-6 space-y-4">
+      {/* Bibliographic data table */}
+      <div className="overflow-hidden rounded-xl border border-[var(--brand-gray-200)] bg-white shadow-sm">
+        <div className="border-b border-[var(--brand-gray-200)] bg-[var(--brand-gray-50)] px-4 py-2.5">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-[var(--brand-gray-500)]">
+            {isAr ? "البيانات الببليوغرافية" : "Bibliographic Data"}
+          </h3>
+        </div>
+        <table className="w-full border-collapse">
+          <tbody>
+            {rows.map((row, i) => (
+              <Row key={row.label} label={row.label} even={i % 2 === 0}>
+                {row.content}
+              </Row>
+            ))}
+          </tbody>
+        </table>
       </div>
-      <table className="w-full border-collapse">
-        <tbody>
-          {rows.map((row, i) => (
-            <Row key={row.label} label={row.label} even={i % 2 === 0}>
-              {row.content}
-            </Row>
-          ))}
-        </tbody>
-      </table>
+
+      {/* Author bio cards */}
+      {authorsWithBio.map((author) => {
+        const bioText = isAr ? (author.bioAr ?? author.bio) : author.bio;
+        const authorName = isAr && author.nameAr ? author.nameAr : author.name;
+        if (!bioText) return null;
+        return (
+          <div
+            key={author.id}
+            className="overflow-hidden rounded-xl border border-[var(--brand-gray-200)] bg-white shadow-sm"
+          >
+            <div className="border-b border-[var(--brand-gray-200)] bg-[var(--brand-gray-50)] px-4 py-2.5">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-[var(--brand-gray-500)]">
+                {isAr ? `نبذة عن ${authorName}` : `About ${authorName}`}
+              </h3>
+            </div>
+            <p className="px-4 py-3 text-sm leading-relaxed text-[var(--brand-gray-700)]">
+              {bioText}
+            </p>
+          </div>
+        );
+      })}
     </div>
   );
 }
