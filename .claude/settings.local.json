@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npx tsc *)",
       "Bash(NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 npm run build)",
-      "Bash(awk *)"
+      "Bash(awk *)",
+      "Bash(grep -rh \"fetch\\(\\\\`\" /Users/ahmedayman/Documents/developer/freeleancer/books-platform/web/app/\\\\[locale\\\\]/\\\\\\(admin\\\\\\) --include=\"*.tsx\" --include=\"*.ts\")"
     ]
   }
 }
