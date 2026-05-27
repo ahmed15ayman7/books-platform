@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Pencil, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
@@ -111,14 +111,20 @@ export default function AdminBooksPage() {
     {
       key: "actions",
       label: "",
-      headerClassName: "w-16",
+      headerClassName: "w-24",
       render: (row: AdminBook) => (
-        <Link href={`/${locale}/admin/books/${row.id}`}>
-          <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-            <Pencil className="h-3 w-3" />
-            تعديل
-          </Button>
-        </Link>
+        <div className="flex items-center gap-1">
+          <Link href={`/${locale}/admin/books/${row.id}`} aria-label="عرض">
+            <Button size="icon" variant="ghost" className="h-8 w-8 text-[var(--brand-gray-400)] hover:text-white">
+              <Eye className="h-4 w-4" />
+            </Button>
+          </Link>
+          <Link href={`/${locale}/admin/books/${row.id}/edit`} aria-label="تعديل">
+            <Button size="icon" variant="ghost" className="h-8 w-8 text-[var(--brand-gray-400)] hover:text-white">
+              <Pencil className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
       ),
     },
   ];

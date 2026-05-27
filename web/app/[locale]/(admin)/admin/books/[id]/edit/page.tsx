@@ -46,26 +46,22 @@ export default async function BookEditPage({ params }: Props) {
   if (!book) notFound();
 
   return (
-    <div className="min-h-screen bg-[var(--brand-gray-50)]">
-      {/* Header */}
-      <div className="border-b border-[var(--brand-gray-200)] bg-white px-6 py-4">
-        <div className="mx-auto max-w-5xl flex items-center gap-4">
-          <Link
-            href={`/${locale}/admin/books`}
-            className="flex items-center gap-1.5 text-sm text-[var(--brand-gray-500)] hover:text-[var(--brand-gray-900)] transition-colors"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            العودة للكتب
-          </Link>
-          <span className="text-[var(--brand-gray-300)]">/</span>
-          <h1 className="text-base font-semibold text-[var(--brand-gray-900)] truncate">
-            {book.nameAr ?? book.nameEn}
-          </h1>
-        </div>
+    <div className="text-white">
+      <div className="mb-6 flex items-center gap-4 border-b border-[var(--brand-gray-800)] pb-4">
+        <Link
+          href={`/${locale}/admin/books/${id}`}
+          className="flex items-center gap-1.5 text-sm text-[var(--brand-gray-400)] transition-colors hover:text-white"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          العودة للكتاب
+        </Link>
+        <span className="text-[var(--brand-gray-600)]">/</span>
+        <h1 className="truncate text-base font-semibold">
+          تعديل: {book.nameAr ?? book.nameEn}
+        </h1>
       </div>
 
-      {/* Form */}
-      <div className="mx-auto max-w-5xl px-6 py-8">
+      <div className="mx-auto max-w-5xl">
         <BookEditForm
           book={{
             id: book.id,
@@ -101,7 +97,6 @@ export default async function BookEditPage({ params }: Props) {
           publishers={publishers}
           categories={categories}
           authors={allAuthors}
-          locale={locale}
         />
       </div>
     </div>
