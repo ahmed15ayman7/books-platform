@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { AdminStatCard } from "@/components/admin/admin-card";
 import { AdminStatusBadge } from "@/components/admin/admin-table";
+import { SalesAreaChart } from "@/components/admin/sales-area-chart";
+import { getDailySalesSeries, type SalesSeries } from "@/lib/admin/sales-stats";
 
 export const metadata: Metadata = {
   title: "لوحة التحكم — Books Platform Admin",
@@ -26,6 +28,17 @@ function safe<T>(promise: Promise<T>, fallback: T): Promise<T> {
   });
 }
 
+const EMPTY_SALES: SalesSeries = {
+  points: Array.from({ length: 30 }, (_, i) => {
+    const d = new Date();
+    d.setUTCHours(0, 0, 0, 0);
+    d.setUTCDate(d.getUTCDate() - (29 - i));
+    return { date: d.toISOString().slice(0, 10), revenue: 0, discount: 0, orders: 0 };
+  }),
+  totals: { revenue: 0, discount: 0, orders: 0 },
+  currency: "EGP",
+};
+
 async function getDashboardData() {
   const [
     totalBooks,
@@ -37,6 +50,7 @@ async function getDashboardData() {
     totalArticles,
     recentBooks,
     recentOrders,
+    salesSeries,
   ] = await Promise.all([
     safe(db.product.count({ where: { published: true } }), 0),
     safe(db.publisher.count({ where: { status: "publish" } }), 0),
@@ -69,6 +83,7 @@ async function getDashboardData() {
       }),
       [],
     ),
+    safe(getDailySalesSeries(30), EMPTY_SALES),
   ]);
 
   return {
@@ -81,6 +96,7 @@ async function getDashboardData() {
     totalArticles,
     recentBooks,
     recentOrders,
+    salesSeries,
   };
 }
 
@@ -163,6 +179,11 @@ export default async function AdminDashboardPage() {
         {kpis.map((kpi) => (
           <AdminStatCard key={kpi.label} {...kpi} />
         ))}
+      </div>
+
+      {/* Sales Chart */}
+      <div className="mt-8">
+        <SalesAreaChart data={data.salesSeries} />
       </div>
 
       {/* Quick Actions */}
