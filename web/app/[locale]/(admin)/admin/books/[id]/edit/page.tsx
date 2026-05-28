@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { db } from "@/lib/db";
 import { BookEditForm } from "./book-edit-form";
+import { BookDeleteButton } from "../book-delete-button";
 
 interface Props {
   params: Promise<{ id: string; locale: string }>;
@@ -47,18 +48,25 @@ export default async function BookEditPage({ params }: Props) {
 
   return (
     <div className="text-white">
-      <div className="mb-6 flex items-center gap-4 border-b border-[var(--brand-gray-800)] pb-4">
-        <Link
-          href={`/${locale}/admin/books/${id}`}
-          className="flex items-center gap-1.5 text-sm text-[var(--brand-gray-400)] transition-colors hover:text-white"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          العودة للكتاب
-        </Link>
-        <span className="text-[var(--brand-gray-600)]">/</span>
-        <h1 className="truncate text-base font-semibold">
-          تعديل: {book.nameAr ?? book.nameEn}
-        </h1>
+      <div className="mb-6 flex flex-col gap-4 border-b border-[var(--brand-gray-800)] pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-4">
+          <Link
+            href={`/${locale}/admin/books/${id}`}
+            className="flex shrink-0 items-center gap-1.5 text-sm text-[var(--brand-gray-400)] transition-colors hover:text-white"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            العودة للكتاب
+          </Link>
+          <span className="text-[var(--brand-gray-600)]">/</span>
+          <h1 className="truncate text-base font-semibold">
+            تعديل: {book.nameAr ?? book.nameEn}
+          </h1>
+        </div>
+        <BookDeleteButton
+          bookId={id}
+          bookTitle={book.nameAr ?? book.nameEn}
+          locale={locale}
+        />
       </div>
 
       <div className="mx-auto max-w-5xl">

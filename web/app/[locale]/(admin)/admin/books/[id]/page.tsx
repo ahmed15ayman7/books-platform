@@ -7,6 +7,7 @@ import { absoluteUrl } from "@/lib/seo/site";
 import { Button } from "@/components/ui/button";
 import { AdminStatusBadge } from "@/components/admin/admin-table";
 import { BookMarketingDialog } from "./book-marketing-dialog";
+import { BookDeleteButton } from "./book-delete-button";
 
 interface Props {
   params: Promise<{ id: string; locale: string }>;
@@ -153,6 +154,7 @@ export default async function AdminBookViewPage({ params }: Props) {
             publicUrl={publicUrl}
             imageUrl={book.imageUrl}
           />
+          <BookDeleteButton bookId={id} bookTitle={title} locale={locale} />
         </div>
       </div>
 
