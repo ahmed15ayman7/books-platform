@@ -4,6 +4,7 @@ import { z } from "zod";
 import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { notDeleted, withCreate } from "@/lib/admin/audit-fields";
 
 const createBookSchema = z.object({
   nameEn: z.string().min(1).max(300),
@@ -39,14 +40,17 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") ?? undefined;
     const skip = (page - 1) * limit;
 
-    const where = search
-      ? {
-          OR: [
-            { nameEn: { contains: search, mode: "insensitive" as const } },
-            { nameAr: { contains: search, mode: "insensitive" as const } },
-          ],
-        }
-      : {};
+    const where = {
+      ...notDeleted,
+      ...(search
+        ? {
+            OR: [
+              { nameEn: { contains: search, mode: "insensitive" as const } },
+              { nameAr: { contains: search, mode: "insensitive" as const } },
+            ],
+          }
+        : {}),
+    };
 
     const [books, total] = await Promise.all([
       db.product.findMany({
@@ -82,7 +86,12 @@ export async function POST(request: NextRequest) {
     const originalId = Date.now();
 
     const book = await db.product.create({
-      data: { ...parsed.data, originalId, slug: parsed.data.slug },
+      data: {
+        ...parsed.data,
+        originalId,
+        slug: parsed.data.slug,
+        ...withCreate(auth.payload.userId),
+      },
     });
 
     await db.auditLog.create({

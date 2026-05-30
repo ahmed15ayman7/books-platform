@@ -138,11 +138,19 @@ model Article {
   articleCategory  ArticleCategory? @relation(fields: [articleCategoryId], references: [id])
   postTags         PostTag[]        @relation("ArticlePostTags")
   comments         Comment[]
+  createdById      String?          @map("created_by_id")
+  updatedById      String?          @map("updated_by_id")
+  deletedById      String?          @map("deleted_by_id")
+  deletedAt        DateTime?        @map("deleted_at")
+  createdBy        User?            @relation("ArticleCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy        User?            @relation("ArticleUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  deletedBy        User?            @relation("ArticleDeletedBy", fields: [deletedById], references: [id], onDelete: SetNull)
 
   @@index([slug])
   @@index([channel])
   @@index([status])
   @@index([date])
+  @@index([deletedAt])
   @@map("articles")
 }
 
@@ -197,8 +205,16 @@ model Product {
   orderItems              OrderItem[]
   bookViews               BookView[]
   sponsoredByPublisher    SponsoredPublisher?    @relation("SponsoredFeaturedProduct")
+  createdById             String?                @map("created_by_id")
+  updatedById             String?                @map("updated_by_id")
+  deletedById             String?                @map("deleted_by_id")
+  deletedAt               DateTime?              @map("deleted_at")
+  createdBy               User?                  @relation("ProductCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy               User?                  @relation("ProductUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  deletedBy               User?                  @relation("ProductDeletedBy", fields: [deletedById], references: [id], onDelete: SetNull)
 
   @@index([slug])
+  @@index([deletedAt])
   @@index([translationStatus])
   @@index([publisherId])
   @@index([primaryCategoryId])
@@ -250,9 +266,17 @@ model Publisher {
   countries        Country[]  @relation("PublisherCountries")
   products         Product[]
   sponsored        SponsoredPublisher?
+  createdById      String?    @map("created_by_id")
+  updatedById      String?    @map("updated_by_id")
+  deletedById      String?    @map("deleted_by_id")
+  deletedAt        DateTime?  @map("deleted_at")
+  createdBy        User?      @relation("PublisherCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy        User?      @relation("PublisherUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  deletedBy        User?      @relation("PublisherDeletedBy", fields: [deletedById], references: [id], onDelete: SetNull)
 
   @@index([slug])
   @@index([status])
+  @@index([deletedAt])
   @@map("publishers")
 }
 
@@ -346,25 +370,67 @@ model PublishBookSubmission {
 // ===================================
 
 model User {
-  id             String        @id @default(cuid())
-  email          String        @unique
-  passwordHash   String        @map("password_hash")
-  fullName       String        @map("full_name")
-  role           String        @default("ADMIN") // ADMIN | AMBASSADOR
-  isSuperAdmin   Boolean       @default(false) @map("is_super_admin")
-  permissions    Json          @default("[]")
-  isActive       Boolean       @default(true) @map("is_active")
-  lastLoginAt    DateTime?     @map("last_login_at")
-  failedAttempts Int           @default(0) @map("failed_attempts")
-  lockedUntil    DateTime?     @map("locked_until")
-  createdAt      DateTime      @default(now()) @map("created_at")
-  updatedAt      DateTime      @updatedAt @map("updated_at")
-  refreshTokens  RefreshToken[]
-  auditLogs      AuditLog[]
-  ambassador     Ambassador?
+  id              String         @id @default(cuid())
+  email           String         @unique
+  passwordHash    String         @map("password_hash")
+  fullName        String         @map("full_name")
+  role            String         @default("ADMIN") // ADMIN | AMBASSADOR
+  isSuperAdmin    Boolean        @default(false) @map("is_super_admin")
+  permissions     Json           @default("[]")
+  isActive        Boolean        @default(true) @map("is_active")
+  passkeyRequired Boolean        @default(false) @map("passkey_required")
+  lastLoginAt     DateTime?      @map("last_login_at")
+  failedAttempts  Int            @default(0) @map("failed_attempts")
+  lockedUntil     DateTime?      @map("locked_until")
+  createdById     String?        @map("created_by_id")
+  updatedById     String?        @map("updated_by_id")
+  deletedById     String?        @map("deleted_by_id")
+  deletedAt       DateTime?      @map("deleted_at")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  refreshTokens   RefreshToken[]
+  auditLogs       AuditLog[]
+  passkeys        UserPasskey[]
+  ambassador      Ambassador?
+  createdBy       User?          @relation("UserCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy       User?          @relation("UserUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  deletedBy       User?          @relation("UserDeletedBy", fields: [deletedById], references: [id], onDelete: SetNull)
+  usersCreated    User[]         @relation("UserCreatedBy")
+  usersUpdated    User[]         @relation("UserUpdatedBy")
+  usersDeleted    User[]         @relation("UserDeletedBy")
+  productsCreated    Product[]       @relation("ProductCreatedBy")
+  productsUpdated    Product[]       @relation("ProductUpdatedBy")
+  productsDeleted    Product[]       @relation("ProductDeletedBy")
+  articlesCreated    Article[]       @relation("ArticleCreatedBy")
+  articlesUpdated    Article[]       @relation("ArticleUpdatedBy")
+  articlesDeleted    Article[]       @relation("ArticleDeletedBy")
+  publishersCreated  Publisher[]     @relation("PublisherCreatedBy")
+  publishersUpdated  Publisher[]     @relation("PublisherUpdatedBy")
+  publishersDeleted  Publisher[]     @relation("PublisherDeletedBy")
+  heroSlidesCreated  HomeHeroSlide[] @relation("HeroCreatedBy")
+  heroSlidesUpdated  HomeHeroSlide[] @relation("HeroUpdatedBy")
+  heroSlidesDeleted  HomeHeroSlide[] @relation("HeroDeletedBy")
+  settingsCreated    Setting[]       @relation("SettingCreatedBy")
+  settingsUpdated    Setting[]       @relation("SettingUpdatedBy")
 
   @@index([email])
+  @@index([deletedAt])
   @@map("users")
+}
+
+model UserPasskey {
+  id           String    @id @default(cuid())
+  userId       String    @map("user_id")
+  credentialId String    @unique @map("credential_id") @db.Text
+  publicKey    String    @map("public_key") @db.Text
+  counter      BigInt    @default(0)
+  deviceName   String?   @map("device_name")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  lastUsedAt   DateTime? @map("last_used_at")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_passkeys")
 }
 
 model RefreshToken {
@@ -764,10 +830,18 @@ model HomeHeroSlide {
   linkUrl            String?  @map("link_url")
   position           Int      @default(0)
   isActive           Boolean  @default(true) @map("is_active")
+  createdById        String?  @map("created_by_id")
+  updatedById        String?  @map("updated_by_id")
+  deletedById        String?  @map("deleted_by_id")
+  deletedAt          DateTime? @map("deleted_at")
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @updatedAt @map("updated_at")
+  createdBy          User?    @relation("HeroCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy          User?    @relation("HeroUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  deletedBy          User?    @relation("HeroDeletedBy", fields: [deletedById], references: [id], onDelete: SetNull)
 
   @@index([isActive, position])
+  @@index([deletedAt])
   @@map("home_hero_slides")
 }
 
@@ -776,10 +850,13 @@ model HomeHeroSlide {
 // ===================================
 
 model Setting {
-  key       String   @id
-  value     Json
-  updatedAt DateTime @updatedAt @map("updated_at")
-  updatedBy String?  @map("updated_by")
+  key         String   @id
+  value       Json
+  createdById String?  @map("created_by_id")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  updatedById String?  @map("updated_by_id")
+  createdBy   User?    @relation("SettingCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy   User?    @relation("SettingUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
 
   @@map("settings")
 }

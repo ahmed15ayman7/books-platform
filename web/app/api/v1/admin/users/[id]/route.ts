@@ -5,6 +5,8 @@ import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 import { requireAdminAuth, isAdminAuthError } from "@/lib/auth/rbac";
 import { PERMISSIONS, sanitizePermissions } from "@/lib/auth/permissions";
 import { hashPassword, validatePasswordStrength } from "@/lib/auth/password";
+import { requirePasskeyVerification } from "@/lib/auth/require-passkey";
+import { withSoftDelete, withUpdate } from "@/lib/admin/audit-fields";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -21,6 +23,9 @@ const updateUserSchema = z.object({
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   const auth = await requireAdminAuth(request, PERMISSIONS.users.update);
   if (isAdminAuthError(auth)) return auth;
+
+  const passkeyErr = await requirePasskeyVerification(request, auth.userId);
+  if (passkeyErr) return passkeyErr;
 
   try {
     const { id } = await params;
@@ -81,7 +86,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const updated = await db.user.update({
       where: { id },
-      data: updateData,
+      data: { ...updateData, ...withUpdate(auth.userId) },
       select: {
         id: true,
         email: true,
@@ -114,6 +119,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
   const auth = await requireAdminAuth(request, PERMISSIONS.users.delete);
   if (isAdminAuthError(auth)) return auth;
 
+  const passkeyErr = await requirePasskeyVerification(request, auth.userId);
+  if (passkeyErr) return passkeyErr;
+
   try {
     const { id } = await params;
 
@@ -139,7 +147,11 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     await db.user.update({
       where: { id },
-      data: { isActive: false },
+      data: {
+        isActive: false,
+        ...withSoftDelete(auth.userId),
+        ...withUpdate(auth.userId),
+      },
     });
 
     await db.refreshToken.updateMany({

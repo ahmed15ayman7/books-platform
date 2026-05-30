@@ -90,6 +90,15 @@ export const PERMISSIONS = {
     update: "settings.update",
   },
 
+  account: {
+    view: "account.view",
+    update: "account.update",
+  },
+
+  passkey: {
+    manage: "passkey.manage",
+  },
+
   hero: {
     view: "hero.view",
     create: "hero.create",
@@ -281,6 +290,23 @@ export const PERMISSION_GROUPS: {
     permissions: [
       { key: PERMISSIONS.settings.view, labelAr: "عرض", labelEn: "View" },
       { key: PERMISSIONS.settings.update, labelAr: "تعديل", labelEn: "Update" },
+    ],
+  },
+  {
+    id: "account",
+    labelAr: "حسابي",
+    labelEn: "My account",
+    permissions: [
+      { key: PERMISSIONS.account.view, labelAr: "عرض", labelEn: "View" },
+      { key: PERMISSIONS.account.update, labelAr: "تعديل", labelEn: "Update" },
+    ],
+  },
+  {
+    id: "passkey",
+    labelAr: "Passkey",
+    labelEn: "Passkey",
+    permissions: [
+      { key: PERMISSIONS.passkey.manage, labelAr: "إدارة", labelEn: "Manage" },
     ],
   },
   {

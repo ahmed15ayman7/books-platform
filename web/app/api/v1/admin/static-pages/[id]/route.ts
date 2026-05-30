@@ -38,8 +38,13 @@ export async function PATCH(
 
     await db.setting.upsert({
       where: { key },
-      create: { key, value: updated, updatedBy: auth.payload.userId },
-      update: { value: updated, updatedBy: auth.payload.userId },
+      create: {
+        key,
+        value: updated,
+        createdById: auth.payload.userId,
+        updatedById: auth.payload.userId,
+      },
+      update: { value: updated, updatedById: auth.payload.userId },
     });
 
     return apiSuccess({ id: slug, slug, ...updated });

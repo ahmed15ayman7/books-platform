@@ -3,7 +3,9 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { apiSuccess, apiCreated, ApiErrors } from "@/lib/api-client/response";
 import { requireAdminAuth, isAdminAuthError } from "@/lib/auth/rbac";
-import { PERMISSIONS, sanitizePermissions } from "@/lib/auth/permissions";
+import { PERMISSIONS, sanitizePermissions, type Permission } from "@/lib/auth/permissions";
+import { requirePasskeyVerification } from "@/lib/auth/require-passkey";
+import { withCreate } from "@/lib/admin/audit-fields";
 import { hashPassword, validatePasswordStrength } from "@/lib/auth/password";
 
 const createUserSchema = z.object({
@@ -19,7 +21,7 @@ export async function GET(request: NextRequest) {
   if (isAdminAuthError(auth)) return auth;
 
   const users = await db.user.findMany({
-    where: { role: "ADMIN" },
+    where: { role: "ADMIN", deletedAt: null },
     select: {
       id: true,
       email: true,
@@ -36,9 +38,19 @@ export async function GET(request: NextRequest) {
   return apiSuccess(users);
 }
 
+const DEFAULT_ADMIN_PERMISSIONS: Permission[] = [
+  PERMISSIONS.dashboard.view,
+  PERMISSIONS.account.view,
+  PERMISSIONS.account.update,
+  PERMISSIONS.passkey.manage,
+];
+
 export async function POST(request: NextRequest) {
   const auth = await requireAdminAuth(request, PERMISSIONS.users.create);
   if (isAdminAuthError(auth)) return auth;
+
+  const passkeyErr = await requirePasskeyVerification(request, auth.userId);
+  if (passkeyErr) return passkeyErr;
 
   try {
     const body = await request.json() as unknown;
@@ -60,7 +72,11 @@ export async function POST(request: NextRequest) {
     if (existing) return ApiErrors.badRequest("Email already registered");
 
     const passwordHash = await hashPassword(password);
-    const safePermissions = sanitizePermissions(permissions);
+    const merged = new Set([
+      ...DEFAULT_ADMIN_PERMISSIONS,
+      ...sanitizePermissions(permissions),
+    ]);
+    const safePermissions = [...merged];
 
     const user = await db.user.create({
       data: {
@@ -71,6 +87,7 @@ export async function POST(request: NextRequest) {
         isSuperAdmin: isSuperAdmin && auth.isSuperAdmin,
         permissions: safePermissions,
         isActive: true,
+        ...withCreate(auth.userId),
       },
       select: {
         id: true,

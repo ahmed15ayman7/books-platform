@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Pencil, ExternalLink, Mail, Globe, MapPin } from "lucide-react";
 import { db } from "@/lib/db";
+import { notDeleted } from "@/lib/admin/audit-fields";
 import { absoluteUrl } from "@/lib/seo/site";
 import { Button } from "@/components/ui/button";
 import { AdminStatusBadge } from "@/components/admin/admin-table";
@@ -77,9 +78,11 @@ function DescriptionBlock({ title, text }: { title: string; text: string | null 
 export default async function AdminBookViewPage({ params }: Props) {
   const { id, locale } = await params;
 
-  const book = await db.product.findUnique({
-    where: { id },
+  const book = await db.product.findFirst({
+    where: { id, ...notDeleted },
     include: {
+      createdBy: { select: { fullName: true, email: true } },
+      updatedBy: { select: { fullName: true, email: true } },
       publisher: {
         include: {
           countries: { select: { id: true, name: true, nameAr: true, slug: true } },
@@ -254,6 +257,22 @@ export default async function AdminBookViewPage({ params }: Props) {
                 value={
                   book.tags.length > 0
                     ? book.tags.map((t) => t.name).join("، ")
+                    : null
+                }
+              />
+              <DetailRow
+                label="أُنشئ بواسطة"
+                value={
+                  book.createdBy
+                    ? `${book.createdBy.fullName} (${book.createdBy.email})`
+                    : null
+                }
+              />
+              <DetailRow
+                label="آخر تعديل بواسطة"
+                value={
+                  book.updatedBy
+                    ? `${book.updatedBy.fullName} (${book.updatedBy.email})`
                     : null
                 }
               />

@@ -22,7 +22,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.hero.view);
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.hero.update);
   if (isErrorResponse(auth)) return auth;
 
   try {
@@ -34,7 +34,7 @@ export async function PATCH(
     const parsed = updateSchema.safeParse(body);
     if (!parsed.success) return ApiErrors.badRequest("Validation failed", parsed.error.issues);
 
-    const slide = await HeroSlideService.update(id, parsed.data);
+    const slide = await HeroSlideService.update(id, parsed.data, auth.payload.userId);
 
     await db.auditLog.create({
       data: {
@@ -56,7 +56,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.hero.update);
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.hero.delete);
   if (isErrorResponse(auth)) return auth;
 
   try {
@@ -64,7 +64,7 @@ export async function DELETE(
     const existing = await HeroSlideService.getById(id);
     if (!existing) return ApiErrors.notFound("Hero slide");
 
-    await HeroSlideService.delete(id);
+    await HeroSlideService.delete(id, auth.payload.userId);
 
     await db.auditLog.create({
       data: {

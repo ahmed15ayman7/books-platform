@@ -1,164 +1,70 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Save } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { adminAuthHeaders } from "@/lib/admin/auth-client";
+import Link from "next/link";
+import { useParams, useSearchParams } from "next/navigation";
+import { cn } from "@/lib/utils";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { AdminCard } from "@/components/admin/admin-card";
-import { AdminInput, AdminCheckbox } from "@/components/admin/admin-form-field";
+import { can, loadAdminSession } from "@/lib/admin/permissions-client";
+import { PERMISSIONS } from "@/lib/auth/permissions";
+import { PlatformSettingsTab } from "./_components/platform-settings-tab";
+import { AccountSettingsTab } from "./_components/account-settings-tab";
+import { NotificationsSettingsTab } from "./_components/notifications-settings-tab";
+import { AdminAccountsTab } from "./_components/admin-accounts-tab";
 
-interface Settings {
-  platformNameAr: string;
-  platformNameEn: string;
-  contactEmail: string;
-  socialFacebook: string;
-  socialInstagram: string;
-  socialX: string;
-  socialTelegram: string;
-  socialYoutube: string;
-  submissionFee: string;
-  cartRecoveryEnabled: boolean;
-  cartRecoveryDelay: string;
-  cartRecoveryDiscount: string;
-  maintenanceMode: boolean;
-}
+const TABS = [
+  { id: "platform", label: "المنصة", permission: PERMISSIONS.settings.view },
+  { id: "account", label: "حسابي", permission: PERMISSIONS.account.view },
+  { id: "notifications", label: "إشعارات الموقع", permission: PERMISSIONS.settings.view },
+  { id: "admin-accounts", label: "حسابات المديرين", superOnly: true },
+] as const;
 
-const defaultSettings: Settings = {
-  platformNameAr: "منصة الكتب العالمية",
-  platformNameEn: "Books Platform",
-  contactEmail: "",
-  socialFacebook: "",
-  socialInstagram: "",
-  socialX: "",
-  socialTelegram: "",
-  socialYoutube: "",
-  submissionFee: "50",
-  cartRecoveryEnabled: false,
-  cartRecoveryDelay: "24",
-  cartRecoveryDiscount: "10",
-  maintenanceMode: false,
-};
+type TabId = (typeof TABS)[number]["id"];
 
 export default function AdminSettingsPage() {
-  const [settings, setSettings] = useState<Settings>(defaultSettings);
-  const [saving, setSaving] = useState(false);
-  const [status, setStatus] = useState("");
+  const params = useParams();
+  const locale = (params.locale as string) ?? "ar";
+  const searchParams = useSearchParams();
+  const tab = (searchParams.get("tab") as TabId) || "platform";
+  const session = loadAdminSession();
 
-  useEffect(() => {
-    void fetch("/api/v1/admin/settings", { headers: adminAuthHeaders() })
-      .then((r) => r.json())
-      .then((d: { success: boolean; data?: Partial<Settings> }) => {
-        if (d.success && d.data) setSettings((p) => ({ ...p, ...d.data }));
-      })
-      .catch(() => null);
-  }, []);
+  const visibleTabs = TABS.filter((t) => {
+    if ("superOnly" in t && t.superOnly) return session?.isSuperAdmin ?? false;
+    if ("permission" in t) return can(t.permission) || session?.isSuperAdmin;
+    return true;
+  });
 
-  async function handleSave(e: React.FormEvent) {
-    e.preventDefault();
-    setSaving(true);
-    setStatus("");
-    try {
-      const res = await fetch("/api/v1/admin/settings", {
-        method: "PATCH",
-        headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
-        body: JSON.stringify(settings),
-      });
-      const data = await res.json() as { success: boolean };
-      setStatus(data.success ? "تم الحفظ بنجاح ✓" : "فشل الحفظ");
-    } catch {
-      setStatus("حدث خطأ");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  const set = (k: keyof Settings) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    setSettings((p) => ({ ...p, [k]: e.type === "checkbox" ? (e.target as HTMLInputElement).checked : e.target.value }));
+  const activeTab = visibleTabs.some((t) => t.id === tab)
+    ? tab
+    : (visibleTabs[0]?.id ?? "platform");
 
   return (
     <div className="text-white">
-      <AdminPageHeader title="إعدادات المنصة" subtitle="ضبط الإعدادات العامة للمنصة" />
+      <AdminPageHeader
+        title="الإعدادات"
+        subtitle="إعدادات المنصة، حسابك، والإشعارات"
+      />
 
-      <form onSubmit={handleSave} className="max-w-2xl space-y-5">
-        <AdminCard title="معلومات المنصة">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <AdminInput label="اسم المنصة (عربي)" value={settings.platformNameAr} onChange={set("platformNameAr")} />
-            <AdminInput label="Platform Name (EN)" value={settings.platformNameEn} onChange={set("platformNameEn")} />
-            <AdminInput label="بريد التواصل" type="email" value={settings.contactEmail} onChange={set("contactEmail")} />
-          </div>
-        </AdminCard>
-
-        <AdminCard title="روابط التواصل الاجتماعي">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <AdminInput label="Facebook" value={settings.socialFacebook} onChange={set("socialFacebook")} placeholder="https://facebook.com/..." />
-            <AdminInput label="Instagram" value={settings.socialInstagram} onChange={set("socialInstagram")} placeholder="https://instagram.com/..." />
-            <AdminInput label="X (Twitter)" value={settings.socialX} onChange={set("socialX")} placeholder="https://x.com/..." />
-            <AdminInput label="Telegram" value={settings.socialTelegram} onChange={set("socialTelegram")} placeholder="https://t.me/..." />
-            <AdminInput label="YouTube" value={settings.socialYoutube} onChange={set("socialYoutube")} placeholder="https://youtube.com/..." />
-          </div>
-        </AdminCard>
-
-        <AdminCard title="إعدادات النشر (انشر كتابك)">
-          <AdminInput
-            label="رسوم الطلب المدفوع (ج.م)"
-            type="number"
-            value={settings.submissionFee}
-            onChange={set("submissionFee")}
-            hint="الطلب الأول مجاني دائماً"
-          />
-        </AdminCard>
-
-        <AdminCard title="استرجاع السلة المتروكة">
-          <div className="space-y-4">
-            <AdminCheckbox
-              label="تفعيل استرجاع السلة المتروكة"
-              checked={settings.cartRecoveryEnabled}
-              onChange={(e) => setSettings((p) => ({ ...p, cartRecoveryEnabled: e.target.checked }))}
-            />
-            {settings.cartRecoveryEnabled && (
-              <div className="grid gap-4 sm:grid-cols-2">
-                <AdminInput
-                  label="وقت الانتظار (ساعة)"
-                  type="number"
-                  value={settings.cartRecoveryDelay}
-                  onChange={set("cartRecoveryDelay")}
-                />
-                <AdminInput
-                  label="نسبة الخصم (%)"
-                  type="number"
-                  value={settings.cartRecoveryDiscount}
-                  onChange={set("cartRecoveryDiscount")}
-                />
-              </div>
+      <nav className="mb-8 flex flex-wrap gap-2 border-b border-[var(--brand-gray-800)] pb-4">
+        {visibleTabs.map((t) => (
+          <Link
+            key={t.id}
+            href={`/${locale}/admin/settings?tab=${t.id}`}
+            className={cn(
+              "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+              activeTab === t.id
+                ? "bg-[var(--brand-red)] text-white"
+                : "text-[var(--brand-gray-400)] hover:bg-[var(--brand-gray-800)] hover:text-white"
             )}
-          </div>
-        </AdminCard>
+          >
+            {t.label}
+          </Link>
+        ))}
+      </nav>
 
-        <AdminCard title="وضع الصيانة">
-          <AdminCheckbox
-            label="تفعيل وضع الصيانة (يُظهر رسالة للزوار)"
-            checked={settings.maintenanceMode}
-            onChange={(e) => setSettings((p) => ({ ...p, maintenanceMode: e.target.checked }))}
-          />
-          {settings.maintenanceMode && (
-            <p className="mt-2 text-xs text-[var(--warning)]">
-              ⚠️ تفعيل هذا الوضع سيُظهر رسالة الصيانة لجميع الزوار
-            </p>
-          )}
-        </AdminCard>
-
-        {status && (
-          <p className={`text-sm ${status.includes("✓") ? "text-[var(--success)]" : "text-[var(--error)]"}`}>
-            {status}
-          </p>
-        )}
-
-        <Button type="submit" disabled={saving} className="gap-1.5">
-          <Save className="h-4 w-4" />
-          {saving ? "جاري الحفظ..." : "حفظ الإعدادات"}
-        </Button>
-      </form>
+      {activeTab === "platform" && <PlatformSettingsTab />}
+      {activeTab === "account" && <AccountSettingsTab />}
+      {activeTab === "notifications" && <NotificationsSettingsTab />}
+      {activeTab === "admin-accounts" && <AdminAccountsTab />}
     </div>
   );
 }

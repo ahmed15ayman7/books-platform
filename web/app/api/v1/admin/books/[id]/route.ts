@@ -4,6 +4,8 @@ import { z } from "zod";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { requirePasskeyVerification } from "@/lib/auth/require-passkey";
+import { notDeleted, withSoftDelete, withUpdate } from "@/lib/admin/audit-fields";
 
 interface RouteParams { params: Promise<{ id: string }> }
 
@@ -30,10 +32,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
     const book = await db.product.findUnique({
-      where: { id },
+      where: { id, ...notDeleted },
       include: {
         publisher: { select: { title: true, slug: true } },
         primaryCategory: { select: { name: true, nameAr: true } },
+        createdBy: { select: { email: true, fullName: true } },
+        updatedBy: { select: { email: true, fullName: true } },
+        deletedBy: { select: { email: true, fullName: true } },
       },
     });
     if (!book) return ApiErrors.notFound("Book");
@@ -54,10 +59,13 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const parsed = updateSchema.safeParse(body);
     if (!parsed.success) return ApiErrors.badRequest("Validation failed", parsed.error.issues);
 
-    const existing = await db.product.findUnique({ where: { id } });
+    const existing = await db.product.findFirst({ where: { id, ...notDeleted } });
     if (!existing) return ApiErrors.notFound("Book");
 
-    const updated = await db.product.update({ where: { id }, data: parsed.data });
+    const updated = await db.product.update({
+      where: { id },
+      data: { ...parsed.data, ...withUpdate(auth.payload.userId) },
+    });
 
     await db.auditLog.create({
       data: { userId: auth.payload.userId, action: "UPDATE_BOOK", entity: "Product", entityId: id, changes: JSON.parse(JSON.stringify(parsed.data)) as object },
@@ -74,12 +82,18 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
   const auth = await requireAuth(request, "ADMIN", PERMISSIONS.books.delete);
   if (isErrorResponse(auth)) return auth;
 
+  const passkeyErr = await requirePasskeyVerification(request, auth.payload.userId);
+  if (passkeyErr) return passkeyErr;
+
   try {
     const { id } = await params;
-    const existing = await db.product.findUnique({ where: { id } });
+    const existing = await db.product.findUnique({ where: { id, ...notDeleted } });
     if (!existing) return ApiErrors.notFound("Book");
 
-    await db.product.delete({ where: { id } });
+    await db.product.update({
+      where: { id },
+      data: withSoftDelete(auth.payload.userId),
+    });
 
     await db.auditLog.create({
       data: { userId: auth.payload.userId, action: "DELETE_BOOK", entity: "Product", entityId: id },

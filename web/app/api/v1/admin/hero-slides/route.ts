@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     const parsed = slideSchema.safeParse(body);
     if (!parsed.success) return ApiErrors.badRequest("Validation failed", parsed.error.issues);
 
-    const slide = await HeroSlideService.create(parsed.data);
+    const slide = await HeroSlideService.create(parsed.data, auth.payload.userId);
 
     await db.auditLog.create({
       data: {

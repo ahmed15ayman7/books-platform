@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Plus, Pencil, Shield, UserX } from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { Plus, Pencil, Shield, UserX, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
@@ -11,6 +13,8 @@ import {
   type Permission,
 } from "@/lib/auth/permissions";
 import { can, loadAdminSession } from "@/lib/admin/permissions-client";
+import { usePasskeyGate } from "@/lib/admin/use-passkey-gate";
+import { PasskeyGateDialog } from "@/components/admin/passkey-gate-dialog";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 
 interface AdminUserRow {
@@ -43,8 +47,13 @@ const emptyForm: FormState = {
 };
 
 export default function AdminUsersPage() {
+  const params = useParams();
+  const locale = (params.locale as string) ?? "ar";
   const session = loadAdminSession();
   const isSuper = session?.isSuperAdmin ?? false;
+  const { runWithPasskey, busy: passkeyBusy, error: passkeyError } = usePasskeyGate();
+  const [passkeyOpen, setPasskeyOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<(() => Promise<void>) | null>(null);
 
   const [users, setUsers] = useState<AdminUserRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -113,10 +122,25 @@ export default function AdminUsersPage() {
     }));
   }
 
+  function runSensitive(action: () => Promise<void>) {
+    setPendingAction(() => action);
+    setPasskeyOpen(true);
+  }
+
+  async function handlePasskeyContinue() {
+    if (!pendingAction) return;
+    await runWithPasskey(async () => {
+      setPasskeyOpen(false);
+      await pendingAction();
+      setPendingAction(null);
+    });
+  }
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
-    setSaving(true);
     setError("");
+    runSensitive(async () => {
+    setSaving(true);
     try {
       if (editingId) {
         const body: Record<string, unknown> = {
@@ -162,16 +186,19 @@ export default function AdminUsersPage() {
     } finally {
       setSaving(false);
     }
+    });
   }
 
   async function deactivateUser(id: string, name: string) {
     if (!confirm(`تعطيل حساب «${name}»؟`)) return;
-    const res = await fetch(`/api/v1/admin/users/${id}`, {
-      method: "DELETE",
-      headers: adminAuthHeaders(),
+    runSensitive(async () => {
+      const res = await fetch(`/api/v1/admin/users/${id}`, {
+        method: "DELETE",
+        headers: adminAuthHeaders(),
+      });
+      const data = (await res.json()) as { success: boolean };
+      if (data.success) void loadUsers();
     });
-    const data = (await res.json()) as { success: boolean };
-    if (data.success) void loadUsers();
   }
 
   if (!can(PERMISSIONS.users.view)) {
@@ -216,6 +243,11 @@ export default function AdminUsersPage() {
       headerClassName: "w-28",
       render: (row: AdminUserRow) => (
         <div className="flex items-center gap-1">
+          <Link href={`/${locale}/admin/users/${row.id}`}>
+            <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="سجل الدخول">
+              <History className="h-4 w-4" />
+            </Button>
+          </Link>
           {can(PERMISSIONS.users.update) && (
             <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEdit(row)} aria-label="تعديل">
               <Pencil className="h-4 w-4" />
@@ -376,6 +408,14 @@ export default function AdminUsersPage() {
         data={users}
         loading={loading}
         emptyMessage="لا يوجد مديرون — أضف مديراً جديداً"
+      />
+
+      <PasskeyGateDialog
+        open={passkeyOpen}
+        onOpenChange={setPasskeyOpen}
+        busy={passkeyBusy}
+        error={passkeyError}
+        onConfirm={() => void handlePasskeyContinue()}
       />
     </div>
   );

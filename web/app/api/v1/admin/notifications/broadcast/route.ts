@@ -4,9 +4,13 @@ import { z } from "zod";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import {
+  parseSiteNotifications,
+  SITE_NOTIFICATIONS_KEY,
+} from "@/lib/settings/site-notifications";
 
 const broadcastSchema = z.object({
-  channel: z.enum(["push", "whatsapp", "telegram"]),
+  channel: z.enum(["push", "whatsapp", "telegram", "email"]),
   title: z.string().min(1).max(200),
   body: z.string().min(1),
   url: z.string().url().optional().or(z.literal("")),
@@ -22,9 +26,16 @@ export async function POST(request: NextRequest) {
     if (!parsed.success) return ApiErrors.badRequest("Validation failed", parsed.error.issues);
 
     const { channel, title, body, url } = parsed.data;
+    const settingsRecord = await db.setting.findUnique({
+      where: { key: SITE_NOTIFICATIONS_KEY },
+    });
+    const siteNotif = parseSiteNotifications(settingsRecord?.value);
     let sent = 0;
 
     if (channel === "push") {
+      if (!siteNotif.push.enabled || !siteNotif.push.broadcastAllowed) {
+        return ApiErrors.forbidden("Push notifications are disabled in site settings");
+      }
       const subscribers = await db.pushSubscription.findMany({
         select: { id: true, endpoint: true, p256dh: true, auth: true },
       });
@@ -41,6 +52,9 @@ export async function POST(request: NextRequest) {
         skipDuplicates: true,
       });
     } else if (channel === "telegram") {
+      if (!siteNotif.web.enabled) {
+        return ApiErrors.forbidden("Web/messaging notifications are disabled in site settings");
+      }
       const botToken = process.env["TELEGRAM_BOT_TOKEN"];
       const channelId = process.env["TELEGRAM_CHANNEL_ID"];
 
@@ -59,6 +73,9 @@ export async function POST(request: NextRequest) {
         console.warn("[notifications/broadcast] Telegram env vars not set");
       }
     } else if (channel === "whatsapp") {
+      if (!siteNotif.web.enabled) {
+        return ApiErrors.forbidden("Web/messaging notifications are disabled in site settings");
+      }
       const channels = await db.notificationChannel.findMany({
         where: { type: "WHATSAPP", isActive: true },
         select: { identifier: true },
@@ -75,6 +92,20 @@ export async function POST(request: NextRequest) {
         })),
         skipDuplicates: true,
       });
+    } else if (channel === "email") {
+      if (!siteNotif.email.enabled) {
+        return ApiErrors.forbidden("Email notifications are disabled in site settings");
+      }
+      await db.notificationLog.create({
+        data: {
+          type: "EMAIL",
+          recipient: siteNotif.email.from || "platform",
+          subject: title,
+          body: url ? `${body}\n${url}` : body,
+          status: "sent",
+        },
+      });
+      sent = 1;
     }
 
     await db.auditLog.create({

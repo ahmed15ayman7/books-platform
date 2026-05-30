@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { requirePasskeyVerification } from "@/lib/auth/require-passkey";
+import { withCreate, withUpdate } from "@/lib/admin/audit-fields";
 
 const SETTINGS_KEY = "platform_settings";
 
@@ -24,14 +26,24 @@ export async function PATCH(request: NextRequest) {
   const auth = await requireAuth(request, "ADMIN", PERMISSIONS.settings.update);
   if (isErrorResponse(auth)) return auth;
 
+  const passkeyErr = await requirePasskeyVerification(request, auth.payload.userId);
+  if (passkeyErr) return passkeyErr;
+
   try {
     const body = await request.json() as Record<string, unknown>;
     const value = body as Parameters<typeof db.setting.upsert>[0]["create"]["value"];
 
     await db.setting.upsert({
       where: { key: SETTINGS_KEY },
-      create: { key: SETTINGS_KEY, value, updatedBy: auth.payload.userId },
-      update: { value, updatedBy: auth.payload.userId },
+      create: {
+        key: SETTINGS_KEY,
+        value,
+        ...withCreate(auth.payload.userId),
+      },
+      update: {
+        value,
+        ...withUpdate(auth.payload.userId),
+      },
     });
 
     await db.auditLog.create({

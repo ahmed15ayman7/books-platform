@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { can } from "@/lib/admin/permissions-client";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { usePasskeyGate } from "@/lib/admin/use-passkey-gate";
+import { PasskeyGateDialog } from "@/components/admin/passkey-gate-dialog";
 
 interface BookDeleteButtonProps {
   bookId: string;
@@ -17,15 +19,24 @@ interface BookDeleteButtonProps {
   isBooksPage?: boolean;
 }
 
-export function BookDeleteButton({ bookId, bookTitle, locale, variant = "text", onDeleted, isBooksPage = false }: BookDeleteButtonProps) {
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [error, setError] = useState("");
-  const [isPending, startTransition] = useTransition();
-
+export function BookDeleteButton({
+  bookId,
+  bookTitle,
+  locale,
+  variant = "text",
+  onDeleted,
+  isBooksPage = false,
+}: BookDeleteButtonProps) {
   if (!can(PERMISSIONS.books.delete)) return null;
 
-  function handleDelete() {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [passkeyOpen, setPasskeyOpen] = useState(false);
+  const [error, setError] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const { busy: passkeyBusy, error: passkeyError, runWithPasskey } = usePasskeyGate();
+
+  function executeDelete() {
     setError("");
     startTransition(async () => {
       try {
@@ -44,6 +55,7 @@ export function BookDeleteButton({ bookId, bookTitle, locale, variant = "text", 
         }
 
         setOpen(false);
+        setPasskeyOpen(false);
         if (isBooksPage) {
           router.refresh();
         } else {
@@ -56,12 +68,27 @@ export function BookDeleteButton({ bookId, bookTitle, locale, variant = "text", 
     });
   }
 
+  function handleConfirmDelete() {
+    setPasskeyOpen(true);
+  }
+
+  async function handlePasskeyConfirm() {
+    await runWithPasskey(async () => {
+      setPasskeyOpen(false);
+      executeDelete();
+    });
+  }
+
   return (
     <>
       <Button
         type="button"
         variant="outline"
-        className="gap-2 border-[var(--brand-gray-700)] text-red-400 hover:border-red-800/60 hover:bg-red-950/30"
+        className={
+          variant === "icon"
+            ? "h-9 w-9 border-[var(--brand-gray-700)] p-0 text-red-400 hover:border-red-800/60 hover:bg-red-950/30"
+            : "gap-2 border-[var(--brand-gray-700)] text-red-400 hover:border-red-800/60 hover:bg-red-950/30"
+        }
         onClick={() => {
           setError("");
           setOpen(true);
@@ -132,7 +159,7 @@ export function BookDeleteButton({ bookId, bookTitle, locale, variant = "text", 
                   type="button"
                   className="gap-2 bg-red-700 text-white hover:bg-red-600"
                   disabled={isPending}
-                  onClick={handleDelete}
+                  onClick={handleConfirmDelete}
                 >
                   {isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -146,6 +173,15 @@ export function BookDeleteButton({ bookId, bookTitle, locale, variant = "text", 
           </div>
         </div>
       )}
+
+      <PasskeyGateDialog
+        open={passkeyOpen}
+        onOpenChange={setPasskeyOpen}
+        busy={passkeyBusy || isPending}
+        error={passkeyError}
+        onConfirm={() => void handlePasskeyConfirm()}
+        title="تأكيد الحذف بـ Passkey"
+      />
     </>
   );
 }

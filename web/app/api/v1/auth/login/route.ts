@@ -52,6 +52,17 @@ export async function POST(request: NextRequest) {
         data: { failedAttempts, lockedUntil },
       });
 
+      await db.auditLog.create({
+        data: {
+          userId: user.id,
+          action: "LOGIN_FAILED",
+          entity: "User",
+          entityId: user.id,
+          ipAddress,
+          userAgent,
+        },
+      });
+
       return NextResponse.json(
         { success: false, error: { code: "INVALID_CREDENTIALS", message: "Invalid email or password" } },
         { status: 401 }
