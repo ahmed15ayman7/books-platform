@@ -18,8 +18,6 @@ interface BookDeleteButtonProps {
 }
 
 export function BookDeleteButton({ bookId, bookTitle, locale, variant = "text", onDeleted, isBooksPage = false }: BookDeleteButtonProps) {
-  if (!can(PERMISSIONS.books.delete)) return null;
-
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
