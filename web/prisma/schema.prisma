@@ -351,6 +351,8 @@ model User {
   passwordHash   String        @map("password_hash")
   fullName       String        @map("full_name")
   role           String        @default("ADMIN") // ADMIN | AMBASSADOR
+  isSuperAdmin   Boolean       @default(false) @map("is_super_admin")
+  permissions    Json          @default("[]")
   isActive       Boolean       @default(true) @map("is_active")
   lastLoginAt    DateTime?     @map("last_login_at")
   failedAttempts Int           @default(0) @map("failed_attempts")

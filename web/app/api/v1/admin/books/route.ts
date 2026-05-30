@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { z } from "zod";
 import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
+import { PERMISSIONS } from "@/lib/auth/permissions";
 
 const createBookSchema = z.object({
   nameEn: z.string().min(1).max(300),
@@ -28,7 +29,7 @@ const createBookSchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.books.view);
   if (isErrorResponse(auth)) return auth;
 
   try {
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.books.create);
   if (isErrorResponse(auth)) return auth;
 
   try {

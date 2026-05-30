@@ -21,8 +21,10 @@ import {
   Bell,
   LogOut,
   Globe,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { canAccessNav, clearAdminSession } from "@/lib/admin/permissions-client";
 
 interface NavItem {
   icon: React.ElementType;
@@ -76,6 +78,7 @@ const navGroups: NavGroup[] = [
       { icon: FileEdit, label: "الصفحات الثابتة", href: "/admin/pages" },
       { icon: Globe, label: "الإعدادات العامة", href: "/admin/settings" },
       { icon: ClipboardList, label: "سجل الأحداث", href: "/admin/audit-log" },
+      { icon: Shield, label: "مديرو النظام", href: "/admin/users" },
     ],
   },
 ];
@@ -86,6 +89,7 @@ export function AdminSidebar() {
   const locale = params.locale ?? "ar";
 
   async function handleLogout() {
+    clearAdminSession();
     await fetch("/api/v1/auth/logout", { method: "POST" });
     window.location.href = `/${locale}/admin/login`;
   }
@@ -115,13 +119,16 @@ export function AdminSidebar() {
         className="flex-1 overflow-y-auto px-2 py-3 space-y-4"
         aria-label="Admin navigation"
       >
-        {navGroups.map((group) => (
+        {navGroups.map((group) => {
+          const visibleItems = group.items.filter((item) => canAccessNav(item.href));
+          if (visibleItems.length === 0) return null;
+          return (
           <div key={group.label}>
             <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-widest text-[var(--brand-gray-600)]">
               {group.label}
             </p>
             <div className="space-y-0.5">
-              {group.items.map((item) => {
+              {visibleItems.map((item) => {
                 const href = `/${locale}${item.href}`;
                 const isActive =
                   pathname === href ||
@@ -147,7 +154,8 @@ export function AdminSidebar() {
               })}
             </div>
           </div>
-        ))}
+          );
+        })}
       </nav>
 
       {/* Bottom */}

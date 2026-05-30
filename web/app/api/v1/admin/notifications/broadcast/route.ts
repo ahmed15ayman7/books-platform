@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { z } from "zod";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
+import { PERMISSIONS } from "@/lib/auth/permissions";
 
 const broadcastSchema = z.object({
   channel: z.enum(["push", "whatsapp", "telegram"]),
@@ -12,7 +13,7 @@ const broadcastSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.notifications.broadcast);
   if (isErrorResponse(auth)) return auth;
 
   try {

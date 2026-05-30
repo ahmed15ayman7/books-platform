@@ -3,6 +3,7 @@ import { z } from "zod";
 import { HeroSlideService } from "@/server/services/hero-slide.service";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
+import { PERMISSIONS } from "@/lib/auth/permissions";
 import { db } from "@/lib/db";
 
 const updateSchema = z.object({
@@ -21,7 +22,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.hero.view);
   if (isErrorResponse(auth)) return auth;
 
   try {
@@ -55,7 +56,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.hero.update);
   if (isErrorResponse(auth)) return auth;
 
   try {

@@ -2,9 +2,10 @@ import { type NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { apiPaginated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
+import { PERMISSIONS } from "@/lib/auth/permissions";
 
 export async function GET(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.orders.view);
   if (isErrorResponse(auth)) return auth;
 
   try {
