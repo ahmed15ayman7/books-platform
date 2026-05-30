@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
       isActive: true,
       lastLoginAt: true,
       createdAt: true,
+      updatedAt: true,
     },
     orderBy: { createdAt: "desc" },
   });
@@ -97,6 +98,7 @@ export async function POST(request: NextRequest) {
         permissions: true,
         isActive: true,
         createdAt: true,
+        updatedAt: true,
       },
     });
 

@@ -28,6 +28,8 @@ export async function GET(request: NextRequest) {
       nameAr: c.nameAr,
       slug: c.slug,
       active: true,
+      createdAt: c.createdAt,
+      updatedAt: c.updatedAt,
       _count: c._count,
     }));
 

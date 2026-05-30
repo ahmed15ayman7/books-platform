@@ -11,6 +11,10 @@ import {
   AdminPagination,
   AdminStatusBadge,
 } from "@/components/admin/admin-table";
+import {
+  adminCreatedAtColumn,
+  adminUpdatedAtColumn,
+} from "@/components/admin/admin-timestamps";
 
 interface Order {
   id: string;
@@ -20,6 +24,7 @@ interface Order {
   totalAmount: number;
   status: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export default function AdminOrdersPage() {
@@ -91,15 +96,8 @@ export default function AdminOrdersPage() {
       label: "الحالة",
       render: (row: Order) => <AdminStatusBadge status={row.status.toLowerCase()} />,
     },
-    {
-      key: "createdAt",
-      label: "التاريخ",
-      render: (row: Order) => (
-        <span className="text-xs text-[var(--brand-gray-400)]">
-          {new Date(row.createdAt).toLocaleDateString("ar-EG")}
-        </span>
-      ),
-    },
+    adminCreatedAtColumn<Order>(),
+    adminUpdatedAtColumn<Order>(),
     {
       key: "actions",
       label: "",

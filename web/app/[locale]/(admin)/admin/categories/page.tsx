@@ -6,6 +6,10 @@ import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminTable, AdminStatusBadge } from "@/components/admin/admin-table";
+import {
+  adminCreatedAtColumn,
+  adminUpdatedAtColumn,
+} from "@/components/admin/admin-timestamps";
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminInput, AdminCheckbox } from "@/components/admin/admin-form-field";
 
@@ -16,6 +20,8 @@ interface Category {
   slug: string;
   active: boolean;
   _count?: { products: number };
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface CatForm {
@@ -117,6 +123,8 @@ export default function AdminCategoriesPage() {
         <AdminStatusBadge status={row.active ? "active" : "inactive"} />
       ),
     },
+    adminCreatedAtColumn<Category>(),
+    adminUpdatedAtColumn<Category>(),
     {
       key: "actions",
       label: "",

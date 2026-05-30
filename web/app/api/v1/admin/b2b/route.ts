@@ -71,6 +71,8 @@ export async function GET(request: NextRequest) {
       startDate: s.startsAt.toISOString(),
       endDate: s.endsAt.toISOString(),
       renewalDate: null,
+      createdAt: s.createdAt,
+      updatedAt: s.updatedAt,
     }));
 
     return apiPaginated(data, {

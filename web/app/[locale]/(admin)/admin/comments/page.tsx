@@ -11,6 +11,10 @@ import {
   AdminPagination,
   AdminStatusBadge,
 } from "@/components/admin/admin-table";
+import {
+  adminCreatedAtColumn,
+  adminUpdatedAtColumn,
+} from "@/components/admin/admin-timestamps";
 
 interface Comment {
   id: string;
@@ -19,6 +23,7 @@ interface Comment {
   body: string;
   status: string;
   createdAt: string;
+  updatedAt: string;
   targetTitle?: string;
 }
 
@@ -83,15 +88,8 @@ export default function AdminCommentsPage() {
       label: "الحالة",
       render: (row: Comment) => <AdminStatusBadge status={row.status.toLowerCase()} />,
     },
-    {
-      key: "createdAt",
-      label: "التاريخ",
-      render: (row: Comment) => (
-        <span className="text-xs text-[var(--brand-gray-400)]">
-          {new Date(row.createdAt).toLocaleDateString("ar-EG")}
-        </span>
-      ),
-    },
+    adminCreatedAtColumn<Comment>(),
+    adminUpdatedAtColumn<Comment>(),
     {
       key: "actions",
       label: "",

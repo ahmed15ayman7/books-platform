@@ -11,6 +11,10 @@ import {
   AdminPagination,
   AdminStatusBadge,
 } from "@/components/admin/admin-table";
+import {
+  adminCreatedAtColumn,
+  adminUpdatedAtColumn,
+} from "@/components/admin/admin-timestamps";
 
 interface Submission {
   id: string;
@@ -20,6 +24,7 @@ interface Submission {
   workType: string;
   status: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 interface DetailModal {
@@ -115,15 +120,8 @@ export default function AdminSubmissionsPage() {
       label: "الحالة",
       render: (row: Submission) => <AdminStatusBadge status={row.status.toLowerCase()} />,
     },
-    {
-      key: "createdAt",
-      label: "التاريخ",
-      render: (row: Submission) => (
-        <span className="text-xs text-[var(--brand-gray-400)]">
-          {new Date(row.createdAt).toLocaleDateString("ar-EG")}
-        </span>
-      ),
-    },
+    adminCreatedAtColumn<Submission>(),
+    adminUpdatedAtColumn<Submission>(),
     {
       key: "actions",
       label: "",

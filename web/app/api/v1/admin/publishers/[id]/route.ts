@@ -49,6 +49,8 @@ export async function GET(
       imageUrl: publisher.imageFeatured ?? "",
       status: publisher.status,
       sponsored: publisher.sponsored !== null,
+      createdAt: publisher.createdAt,
+      updatedAt: publisher.updatedAt,
     });
   } catch (error) {
     console.error("[GET /api/v1/admin/publishers/:id]", error);

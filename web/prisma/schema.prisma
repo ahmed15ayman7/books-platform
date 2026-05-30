@@ -20,6 +20,8 @@ model ArticleCategory {
   spamFlag    String?   @map("spam_flag")
   articles    Article[]
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([slug])
   @@map("article_categories")
 }
@@ -35,6 +37,8 @@ model Country {
   notes       String?     @db.Text
   publishers  Publisher[] @relation("PublisherCountries")
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([slug])
   @@map("countries")
 }
@@ -51,6 +55,8 @@ model Author {
   bioAr       String?   @map("bio_ar") @db.Text
   products    Product[] @relation("ProductAuthors")
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([slug])
   @@map("authors")
 }
@@ -63,6 +69,8 @@ model PostTag {
   linkedCount Int       @default(0) @map("linked_count")
   articles    Article[] @relation("ArticlePostTags")
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([slug])
   @@map("post_tags")
 }
@@ -77,6 +85,8 @@ model ProductCategory {
   products           Product[] @relation("ProductProductCategories")
   primaryForProducts Product[] @relation("ProductPrimaryCategory")
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([slug])
   @@map("product_categories")
 }
@@ -89,6 +99,8 @@ model ProductTag {
   linkedCount Int       @default(0) @map("linked_count")
   products    Product[] @relation("ProductProductTags")
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([slug])
   @@map("product_tags")
 }
@@ -145,6 +157,8 @@ model Article {
   createdBy        User?            @relation("ArticleCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   updatedBy        User?            @relation("ArticleUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
   deletedBy        User?            @relation("ArticleDeletedBy", fields: [deletedById], references: [id], onDelete: SetNull)
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @default(now()) @updatedAt @map("updated_at")
 
   @@index([slug])
   @@index([channel])
@@ -212,6 +226,8 @@ model Product {
   createdBy               User?                  @relation("ProductCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   updatedBy               User?                  @relation("ProductUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
   deletedBy               User?                  @relation("ProductDeletedBy", fields: [deletedById], references: [id], onDelete: SetNull)
+  createdAt               DateTime               @default(now()) @map("created_at")
+  updatedAt               DateTime               @default(now()) @updatedAt @map("updated_at")
 
   @@index([slug])
   @@index([deletedAt])
@@ -274,6 +290,8 @@ model Publisher {
   updatedBy        User?      @relation("PublisherUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
   deletedBy        User?      @relation("PublisherDeletedBy", fields: [deletedById], references: [id], onDelete: SetNull)
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([slug])
   @@index([status])
   @@index([deletedAt])
@@ -300,6 +318,8 @@ model Comment {
   productId              String?   @map("product_id")
   article                Article?  @relation(fields: [articleId], references: [id])
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([articleId])
   @@index([productId])
   @@index([status])
@@ -360,6 +380,8 @@ model PublishBookSubmission {
   spamFlag         String?   @map("spam_flag")
   notes            String?   @db.Text
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([authorEmail])
   @@index([status])
   @@map("publish_book_submissions")
@@ -387,7 +409,7 @@ model User {
   deletedById     String?        @map("deleted_by_id")
   deletedAt       DateTime?      @map("deleted_at")
   createdAt       DateTime       @default(now()) @map("created_at")
-  updatedAt       DateTime       @updatedAt @map("updated_at")
+  updatedAt       DateTime       @default(now()) @updatedAt @map("updated_at")
   refreshTokens   RefreshToken[]
   auditLogs       AuditLog[]
   passkeys        UserPasskey[]
@@ -429,6 +451,7 @@ model UserPasskey {
   lastUsedAt   DateTime? @map("last_used_at")
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([userId])
   @@map("user_passkeys")
 }
@@ -444,6 +467,7 @@ model RefreshToken {
   createdAt  DateTime  @default(now()) @map("created_at")
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([userId])
   @@index([expiresAt])
   @@map("refresh_tokens")
@@ -460,7 +484,7 @@ model Cart {
   abandonedAt           DateTime?  @map("abandoned_at")
   recoveryEmailSentAt   DateTime?  @map("recovery_email_sent_at")
   createdAt             DateTime   @default(now()) @map("created_at")
-  updatedAt             DateTime   @updatedAt @map("updated_at")
+  updatedAt             DateTime   @default(now()) @updatedAt @map("updated_at")
   items                 CartItem[]
 
   @@index([email])
@@ -477,6 +501,8 @@ model CartItem {
   cart           Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product        Product  @relation(fields: [productId], references: [id])
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@unique([cartId, productId])
   @@map("cart_items")
 }
@@ -505,7 +531,7 @@ model Order {
   shippedAt       DateTime?   @map("shipped_at")
   deliveredAt     DateTime?   @map("delivered_at")
   createdAt       DateTime    @default(now()) @map("created_at")
-  updatedAt       DateTime    @updatedAt @map("updated_at")
+  updatedAt       DateTime    @default(now()) @updatedAt @map("updated_at")
   items           OrderItem[]
   commissions     Commission[]
 
@@ -525,6 +551,8 @@ model OrderItem {
   order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product   Product  @relation(fields: [productId], references: [id])
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@map("order_items")
 }
 
@@ -542,6 +570,7 @@ model Coupon {
   source     String?  // admin | cart-recovery | ambassador
   createdAt  DateTime @default(now()) @map("created_at")
 
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([code])
   @@index([validUntil])
   @@map("coupons")
@@ -558,6 +587,7 @@ model Wishlist {
   createdAt    DateTime       @default(now()) @map("created_at")
   items        WishlistItem[]
 
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([accessToken])
   @@map("wishlists")
 }
@@ -570,6 +600,8 @@ model WishlistItem {
   wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
   product    Product  @relation(fields: [productId], references: [id])
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@unique([wishlistId, productId])
   @@map("wishlist_items")
 }
@@ -582,6 +614,7 @@ model Rating {
   createdAt DateTime @default(now()) @map("created_at")
   product   Product  @relation(fields: [productId], references: [id])
 
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@unique([productId, email])
   @@index([productId])
   @@map("ratings")
@@ -598,6 +631,7 @@ model NewsletterSubscriber {
   locale         String    @default("ar")
   createdAt      DateTime  @default(now()) @map("created_at")
 
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([status])
   @@map("newsletter_subscribers")
 }
@@ -617,6 +651,7 @@ model PushSubscription {
   createdAt   DateTime @default(now()) @map("created_at")
   lastUsedAt  DateTime? @map("last_used_at")
 
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([email])
   @@map("push_subscriptions")
 }
@@ -630,6 +665,7 @@ model NotificationChannel {
   topics     String[]
   createdAt  DateTime @default(now()) @map("created_at")
 
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@unique([type, identifier])
   @@map("notification_channels")
 }
@@ -646,6 +682,8 @@ model NotificationLog {
   articleId    String?  @map("article_id")
   sentAt       DateTime @default(now()) @map("sent_at")
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([type])
   @@index([sentAt])
   @@map("notification_logs")
@@ -670,6 +708,7 @@ model Ambassador {
   commissions    Commission[]
   payouts        Payout[]
 
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@map("ambassadors")
 }
 
@@ -686,6 +725,7 @@ model ReferralLink {
   product         Product         @relation(fields: [productId], references: [id])
   clicks          ReferralClick[]
 
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@unique([ambassadorId, productId])
   @@index([code])
   @@map("referral_links")
@@ -702,6 +742,8 @@ model ReferralClick {
   clickedAt            DateTime @default(now()) @map("clicked_at")
   link                 ReferralLink @relation(fields: [linkId], references: [id], onDelete: Cascade)
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([linkId])
   @@index([clickedAt])
   @@map("referral_clicks")
@@ -722,6 +764,7 @@ model Commission {
   order        Order      @relation(fields: [orderId], references: [id])
   payout       Payout?    @relation(fields: [payoutId], references: [id])
 
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([ambassadorId])
   @@index([status])
   @@map("commissions")
@@ -738,6 +781,8 @@ model Payout {
   ambassador   Ambassador   @relation(fields: [ambassadorId], references: [id])
   commissions  Commission[]
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([ambassadorId])
   @@map("payouts")
 }
@@ -757,6 +802,8 @@ model B2BPlan {
   isActive      Boolean           @default(true) @map("is_active")
   subscriptions B2BSubscription[]
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@map("b2b_plans")
 }
 
@@ -772,6 +819,7 @@ model B2BClient {
   createdAt        DateTime          @default(now()) @map("created_at")
   subscriptions    B2BSubscription[]
 
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@map("b2b_clients")
 }
 
@@ -788,6 +836,7 @@ model B2BSubscription {
   client       B2BClient @relation(fields: [clientId], references: [id])
   plan         B2BPlan   @relation(fields: [planId], references: [id])
 
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([clientId])
   @@index([endsAt])
   @@map("b2b_subscriptions")
@@ -811,6 +860,7 @@ model SponsoredPublisher {
   publisher   Publisher @relation(fields: [publisherId], references: [id])
   featuredProduct Product? @relation("SponsoredFeaturedProduct", fields: [featuredProductId], references: [id])
 
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([endsAt])
   @@map("sponsored_publishers")
 }
@@ -835,7 +885,7 @@ model HomeHeroSlide {
   deletedById        String?  @map("deleted_by_id")
   deletedAt          DateTime? @map("deleted_at")
   createdAt          DateTime @default(now()) @map("created_at")
-  updatedAt          DateTime @updatedAt @map("updated_at")
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
   createdBy          User?    @relation("HeroCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   updatedBy          User?    @relation("HeroUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
   deletedBy          User?    @relation("HeroDeletedBy", fields: [deletedById], references: [id], onDelete: SetNull)
@@ -853,7 +903,8 @@ model Setting {
   key         String   @id
   value       Json
   createdById String?  @map("created_by_id")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
   updatedById String?  @map("updated_by_id")
   createdBy   User?    @relation("SettingCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   updatedBy   User?    @relation("SettingUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
@@ -873,6 +924,7 @@ model AuditLog {
   createdAt DateTime @default(now()) @map("created_at")
   user      User?    @relation(fields: [userId], references: [id])
 
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([userId])
   @@index([entity, entityId])
   @@index([createdAt])
@@ -898,6 +950,8 @@ model VisitorSession {
   lastActivityAt DateTime @map("last_activity_at")
   pageViews      Int      @default(1) @map("page_views")
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([sessionId])
   @@map("visitor_sessions")
 }
@@ -910,6 +964,8 @@ model BookView {
   viewedAt  DateTime @default(now()) @map("viewed_at")
   product   Product  @relation(fields: [productId], references: [id])
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([productId])
   @@index([sessionId])
   @@map("book_views")

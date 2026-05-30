@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
           total: true,
           status: true,
           createdAt: true,
+          updatedAt: true,
         },
       }),
       db.order.count({ where }),

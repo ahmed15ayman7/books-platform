@@ -38,6 +38,8 @@ export async function GET(request: NextRequest) {
           content: true,
           status: true,
           commentDate: true,
+          createdAt: true,
+          updatedAt: true,
         },
       }),
       db.comment.count({ where }),
@@ -47,7 +49,8 @@ export async function GET(request: NextRequest) {
       ...c,
       authorEmail: c.email,
       body: c.content,
-      createdAt: c.commentDate ?? new Date(0),
+      createdAt: c.createdAt ?? c.commentDate ?? new Date(0),
+      updatedAt: c.updatedAt,
     }));
 
     return apiPaginated(data, {

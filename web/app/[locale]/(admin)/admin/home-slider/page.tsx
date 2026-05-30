@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { Plus, Pencil, Trash2, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
+import { formatAdminDateTime } from "@/lib/admin/format-dates";
 
 interface HeroSlide {
   id: string;
@@ -17,6 +18,8 @@ interface HeroSlide {
   linkUrl: string | null;
   position: number;
   isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const emptyForm = {
@@ -216,6 +219,10 @@ export default function AdminHomeSliderPage() {
                   <p className="truncate font-medium text-white">{slide.titleAr}</p>
                   <p className="text-xs text-[var(--brand-gray-500)]">
                     ترتيب {slide.position} · {slide.isActive ? "نشط" : "معطّل"}
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--brand-gray-600)]">
+                    أُنشئ: {formatAdminDateTime(slide.createdAt)} · آخر تحديث:{" "}
+                    {formatAdminDateTime(slide.updatedAt)}
                   </p>
                 </div>
                 <div className="flex flex-shrink-0 gap-1">

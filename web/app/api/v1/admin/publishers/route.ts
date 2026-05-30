@@ -55,6 +55,8 @@ export async function GET(request: NextRequest) {
       country: p.countries[0]?.name ?? null,
       status: p.status,
       sponsored: p.sponsored !== null,
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt,
       _count: p._count,
     }));
 

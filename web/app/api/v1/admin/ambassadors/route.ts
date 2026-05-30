@@ -55,6 +55,8 @@ export async function GET(request: NextRequest) {
       totalClicks: 0,
       totalSales: a._count.commissions,
       totalEarnings: 0,
+      createdAt: a.createdAt,
+      updatedAt: a.updatedAt,
     }));
 
     return apiPaginated(data, {

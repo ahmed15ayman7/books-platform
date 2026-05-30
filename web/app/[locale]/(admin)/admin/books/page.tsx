@@ -14,6 +14,10 @@ import {
   AdminStatusBadge,
 } from "@/components/admin/admin-table";
 import { BookDeleteButton } from "./[id]/book-delete-button";
+import {
+  adminCreatedAtColumn,
+  adminUpdatedAtColumn,
+} from "@/components/admin/admin-timestamps";
 
 interface AdminBook {
   id: string;
@@ -24,6 +28,8 @@ interface AdminBook {
   published: boolean;
   featured: boolean;
   language: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface PaginatedResponse {
@@ -109,6 +115,8 @@ export default function AdminBooksPage() {
         <AdminStatusBadge status={row.published ? "published" : "draft"} />
       ),
     },
+    adminCreatedAtColumn<AdminBook>(),
+    adminUpdatedAtColumn<AdminBook>(),
     {
       key: "actions",
       label: "",

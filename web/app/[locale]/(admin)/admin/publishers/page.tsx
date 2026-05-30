@@ -13,6 +13,10 @@ import {
   AdminPagination,
   AdminStatusBadge,
 } from "@/components/admin/admin-table";
+import {
+  adminCreatedAtColumn,
+  adminUpdatedAtColumn,
+} from "@/components/admin/admin-timestamps";
 
 interface Publisher {
   id: string;
@@ -22,6 +26,8 @@ interface Publisher {
   status: string;
   sponsored: boolean;
   _count?: { products: number };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function AdminPublishersPage() {
@@ -99,6 +105,8 @@ export default function AdminPublishersPage() {
           <span className="text-[var(--brand-gray-600)] text-xs">—</span>
         ),
     },
+    adminCreatedAtColumn<Publisher>(),
+    adminUpdatedAtColumn<Publisher>(),
     {
       key: "actions",
       label: "",

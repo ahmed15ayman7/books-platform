@@ -9,6 +9,10 @@ import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminTable, AdminStatusBadge } from "@/components/admin/admin-table";
 import {
+  adminCreatedAtColumn,
+  adminUpdatedAtColumn,
+} from "@/components/admin/admin-timestamps";
+import {
   PERMISSION_GROUPS,
   type Permission,
 } from "@/lib/auth/permissions";
@@ -26,6 +30,7 @@ interface AdminUserRow {
   isActive: boolean;
   lastLoginAt: string | null;
   createdAt: string;
+  updatedAt: string;
 }
 
 interface FormState {
@@ -237,6 +242,8 @@ export default function AdminUsersPage() {
         <AdminStatusBadge status={row.isActive ? "published" : "draft"} customLabel={row.isActive ? "نشط" : "معطّل"} />
       ),
     },
+    adminCreatedAtColumn<AdminUserRow>(),
+    adminUpdatedAtColumn<AdminUserRow>(),
     {
       key: "actions",
       label: "",

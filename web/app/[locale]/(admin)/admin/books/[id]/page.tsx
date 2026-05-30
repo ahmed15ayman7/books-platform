@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { AdminStatusBadge } from "@/components/admin/admin-table";
 import { BookMarketingDialog } from "./book-marketing-dialog";
 import { BookDeleteButton } from "./book-delete-button";
+import { AdminTimestamps } from "@/components/admin/admin-timestamps";
 
 interface Props {
   params: Promise<{ id: string; locale: string }>;
@@ -123,6 +124,12 @@ export default async function AdminBookViewPage({ params }: Props) {
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">{title}</h1>
+          <AdminTimestamps
+            createdAt={book.createdAt}
+            updatedAt={book.updatedAt}
+            compact
+            className="mt-2"
+          />
           {book.nameAr && book.nameEn && book.nameAr !== book.nameEn && (
             <p className="mt-1 text-sm text-[var(--brand-gray-400)]" dir="ltr">
               {book.nameEn}

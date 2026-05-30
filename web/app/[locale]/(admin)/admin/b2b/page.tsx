@@ -10,6 +10,10 @@ import {
   AdminPagination,
   AdminStatusBadge,
 } from "@/components/admin/admin-table";
+import {
+  adminCreatedAtColumn,
+  adminUpdatedAtColumn,
+} from "@/components/admin/admin-timestamps";
 import { AdminCard } from "@/components/admin/admin-card";
 import {
   AdminInput,
@@ -25,6 +29,8 @@ interface B2BSubscription {
   startDate: string;
   endDate: string;
   renewalDate: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const packageOptions = [
@@ -130,6 +136,8 @@ export default function AdminB2BPage() {
         </span>
       ),
     },
+    adminCreatedAtColumn<B2BSubscription>(),
+    adminUpdatedAtColumn<B2BSubscription>(),
     {
       key: "actions",
       label: "",

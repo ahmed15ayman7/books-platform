@@ -13,6 +13,7 @@ import {
 } from "@/components/admin/login-history-table";
 import { can } from "@/lib/admin/permissions-client";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { AdminTimestamps } from "@/components/admin/admin-timestamps";
 
 export default function AdminUserDetailPage() {
   const params = useParams();
@@ -21,6 +22,8 @@ export default function AdminUserDetailPage() {
   const [user, setUser] = useState<{
     email: string;
     fullName: string;
+    createdAt?: string;
+    updatedAt?: string;
   } | null>(null);
   const [logs, setLogs] = useState<LoginHistoryRow[]>([]);
 
@@ -63,6 +66,14 @@ export default function AdminUserDetailPage() {
         title={user?.fullName ?? "مدير"}
         subtitle={user?.email}
       />
+
+      {user && (
+        <AdminTimestamps
+          createdAt={user.createdAt}
+          updatedAt={user.updatedAt}
+          className="mt-4"
+        />
+      )}
 
       <AdminCard title="سجل تسجيل الدخول" className="mt-6">
         <LoginHistoryTable logs={logs} />

@@ -11,6 +11,10 @@ import {
   AdminPagination,
   AdminStatusBadge,
 } from "@/components/admin/admin-table";
+import {
+  adminCreatedAtColumn,
+  adminUpdatedAtColumn,
+} from "@/components/admin/admin-timestamps";
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminInput, AdminSelect } from "@/components/admin/admin-form-field";
 
@@ -23,6 +27,8 @@ interface Ambassador {
   totalClicks: number;
   totalSales: number;
   totalEarnings: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const emptyForm = {
@@ -125,6 +131,8 @@ export default function AdminAmbassadorsPage() {
       label: "الحالة",
       render: (row: Ambassador) => <AdminStatusBadge status={row.status.toLowerCase()} />,
     },
+    adminCreatedAtColumn<Ambassador>(),
+    adminUpdatedAtColumn<Ambassador>(),
     {
       key: "actions",
       label: "",

@@ -13,6 +13,7 @@ import {
   AdminSelect,
   AdminCheckbox,
 } from "@/components/admin/admin-form-field";
+import { AdminTimestamps } from "@/components/admin/admin-timestamps";
 
 interface PublisherForm {
   name: string;
@@ -51,6 +52,10 @@ export default function AdminPublisherEditPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [timestamps, setTimestamps] = useState<{
+    createdAt?: string;
+    updatedAt?: string;
+  }>({});
 
   const load = useCallback(async () => {
     if (isNew) return;
@@ -71,6 +76,10 @@ export default function AdminPublisherEditPage() {
           imageUrl: String(d.imageUrl ?? ""),
           status: String(d.status ?? "publish"),
           sponsored: Boolean(d.sponsored),
+        });
+        setTimestamps({
+          createdAt: d.createdAt as string | undefined,
+          updatedAt: d.updatedAt as string | undefined,
         });
       }
     } finally {
@@ -120,9 +129,17 @@ export default function AdminPublisherEditPage() {
         العودة للناشرين
       </Link>
 
-      <h1 className="mb-5 text-2xl font-bold">
+      <h1 className="mb-2 text-2xl font-bold">
         {isNew ? "إضافة ناشر جديد" : "تعديل الناشر"}
       </h1>
+      {!isNew && (
+        <AdminTimestamps
+          createdAt={timestamps.createdAt}
+          updatedAt={timestamps.updatedAt}
+          compact
+          className="mb-5"
+        />
+      )}
 
       <form onSubmit={handleSubmit} className="max-w-3xl space-y-5">
         <AdminCard title="البيانات الأساسية">

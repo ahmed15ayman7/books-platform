@@ -12,6 +12,7 @@ import {
   AdminTextarea,
   AdminSelect,
 } from "@/components/admin/admin-form-field";
+import { AdminTimestamps } from "@/components/admin/admin-timestamps";
 
 interface ArticleForm {
   title: string;
@@ -68,6 +69,10 @@ export default function AdminArticleEditPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [timestamps, setTimestamps] = useState<{
+    createdAt?: string;
+    updatedAt?: string;
+  }>({});
 
   const load = useCallback(async () => {
     if (isNew) return;
@@ -88,6 +93,10 @@ export default function AdminArticleEditPage() {
           status: String(d.status ?? "draft"),
           imageUrl: String(d.imageUrl ?? ""),
           date: d.date ? (new Date(d.date as string).toISOString().split("T")[0] ?? "") : empty.date,
+        });
+        setTimestamps({
+          createdAt: d.createdAt as string | undefined,
+          updatedAt: d.updatedAt as string | undefined,
         });
       }
     } finally {
@@ -131,7 +140,15 @@ export default function AdminArticleEditPage() {
         العودة للمقالات
       </Link>
 
-      <h1 className="mb-5 text-2xl font-bold">{isNew ? "إضافة مقال جديد" : "تعديل المقال"}</h1>
+      <h1 className="mb-2 text-2xl font-bold">{isNew ? "إضافة مقال جديد" : "تعديل المقال"}</h1>
+      {!isNew && (
+        <AdminTimestamps
+          createdAt={timestamps.createdAt}
+          updatedAt={timestamps.updatedAt}
+          compact
+          className="mb-5"
+        />
+      )}
 
       <form onSubmit={handleSubmit} className="max-w-4xl space-y-5">
         <AdminCard title="الإعدادات">

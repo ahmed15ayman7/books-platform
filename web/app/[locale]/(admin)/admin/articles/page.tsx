@@ -13,6 +13,10 @@ import {
   AdminPagination,
   AdminStatusBadge,
 } from "@/components/admin/admin-table";
+import {
+  adminCreatedAtColumn,
+  adminUpdatedAtColumn,
+} from "@/components/admin/admin-timestamps";
 
 interface Article {
   id: string;
@@ -21,6 +25,8 @@ interface Article {
   channel: string | null;
   status: string;
   date: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const channelLabel: Record<string, string> = {
@@ -94,6 +100,8 @@ export default function AdminArticlesPage() {
         <AdminStatusBadge status={row.status === "publish" ? "published" : row.status === "scheduled" ? "pending" : "draft"} />
       ),
     },
+    adminCreatedAtColumn<Article>(),
+    adminUpdatedAtColumn<Article>(),
     {
       key: "actions",
       label: "",

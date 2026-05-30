@@ -16,7 +16,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
   const target = await db.user.findUnique({
     where: { id },
-    select: { id: true, role: true, email: true, fullName: true },
+    select: {
+      id: true,
+      role: true,
+      email: true,
+      fullName: true,
+      createdAt: true,
+      updatedAt: true,
+    },
   });
   if (!target || target.role !== "ADMIN") return ApiErrors.notFound("User");
 

@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
         where,
         skip,
         take: limit,
-        orderBy: { date: "desc" },
+        orderBy: { updatedAt: "desc" },
         select: {
           id: true,
           title: true,
@@ -44,6 +44,8 @@ export async function GET(request: NextRequest) {
           status: true,
           date: true,
           isFirstFree: true,
+          createdAt: true,
+          updatedAt: true,
         },
       }),
       db.publishBookSubmission.count({ where }),
@@ -54,7 +56,8 @@ export async function GET(request: NextRequest) {
       workTitle: s.title,
       workType: s.bookCategory ?? "OTHER",
       authorName: [s.authorFirstName, s.authorLastName].filter(Boolean).join(" ") || "—",
-      createdAt: s.date ?? new Date(0),
+      createdAt: s.createdAt ?? s.date ?? new Date(0),
+      updatedAt: s.updatedAt,
     }));
 
     return apiPaginated(data, {
