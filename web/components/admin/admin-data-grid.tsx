@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { BookOpen } from "lucide-react";
+import { CardMedia } from "@/components/ui/card-media";
 import { cn } from "@/lib/utils";
 
 interface AdminDataGridProps<T extends { id: string }> {
@@ -36,7 +37,7 @@ export function AdminDataGrid<T extends { id: string }>({
   return (
     <div
       className={cn(
-        "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+        "grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
         className,
       )}
     >
@@ -78,7 +79,7 @@ export function AdminGridCardMedia({
   fallback?: ReactNode;
 }) {
   return (
-    <div className="relative aspect-[4/3] w-full shrink-0 bg-[var(--brand-gray-800)]">
+    <CardMedia className="bg-[var(--brand-gray-800)]" rounded="none">
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt={alt} className="h-full w-full object-cover" />
@@ -87,7 +88,7 @@ export function AdminGridCardMedia({
           {fallback ?? <BookOpen className="h-10 w-10 opacity-40" />}
         </div>
       )}
-    </div>
+    </CardMedia>
   );
 }
 

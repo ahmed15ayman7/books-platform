@@ -1,5 +1,18 @@
+"use client";
+
 import { type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface AdminFormFieldProps {
   label: string;
@@ -20,10 +33,10 @@ export function AdminFormField({
 }: AdminFormFieldProps) {
   return (
     <div className={cn("space-y-1", className)}>
-      <label className="block text-xs font-medium text-[var(--brand-gray-300)]">
+      <Label className="text-xs font-medium text-[var(--brand-gray-300)]">
         {label}
         {required && <span className="ms-0.5 text-[var(--brand-red)]">*</span>}
-      </label>
+      </Label>
       {children}
       {hint && !error && (
         <p className="text-[11px] text-[var(--brand-gray-500)]">{hint}</p>
@@ -33,28 +46,32 @@ export function AdminFormField({
   );
 }
 
-// Shared input/textarea/select class
-export const adminInputCls =
-  "w-full rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] px-3 py-2 text-sm text-white placeholder:text-[var(--brand-gray-600)] focus:border-[var(--brand-red)] focus:outline-none focus:ring-1 focus:ring-[var(--brand-red)] transition-colors";
+export const adminFieldClass =
+  "border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] text-white placeholder:text-[var(--brand-gray-600)] focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-0";
 
-interface AdminInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+/** @deprecated Use adminFieldClass */
+export const adminInputCls = adminFieldClass;
+
+interface AdminInputProps extends React.ComponentProps<typeof Input> {
   label: string;
   error?: string;
   hint?: string;
 }
 
-export function AdminInput({ label, error, hint, className, ...props }: AdminInputProps) {
+export function AdminInput({ label, error, hint, className, id, ...props }: AdminInputProps) {
+  const fieldId = id ?? props.name;
   return (
     <AdminFormField label={label} required={props.required} error={error} hint={hint}>
-      <input
+      <Input
+        id={fieldId}
         {...props}
-        className={cn(adminInputCls, error && "border-[var(--error)]", className)}
+        className={cn(adminFieldClass, error && "border-[var(--error)]", className)}
       />
     </AdminFormField>
   );
 }
 
-interface AdminTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+interface AdminTextareaProps extends React.ComponentProps<typeof Textarea> {
   label: string;
   error?: string;
   hint?: string;
@@ -66,24 +83,36 @@ export function AdminTextarea({
   hint,
   rows = 3,
   className,
+  id,
   ...props
 }: AdminTextareaProps) {
+  const fieldId = id ?? props.name;
   return (
     <AdminFormField label={label} required={props.required} error={error} hint={hint}>
-      <textarea
+      <Textarea
+        id={fieldId}
         rows={rows}
         {...props}
-        className={cn(adminInputCls, "resize-y", error && "border-[var(--error)]", className)}
+        className={cn(adminFieldClass, "resize-y", error && "border-[var(--error)]", className)}
       />
     </AdminFormField>
   );
 }
 
-interface AdminSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+interface AdminSelectProps {
   label: string;
   error?: string;
   hint?: string;
   options: { value: string; label: string }[];
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  onValueChange?: (value: string) => void;
+  disabled?: boolean;
+  required?: boolean;
+  className?: string;
+  name?: string;
+  id?: string;
+  placeholder?: string;
 }
 
 export function AdminSelect({
@@ -91,41 +120,78 @@ export function AdminSelect({
   error,
   hint,
   options,
+  value = "",
+  onChange,
+  onValueChange,
+  disabled,
+  required,
   className,
-  ...props
+  id,
+  name,
+  placeholder,
 }: AdminSelectProps) {
+  const fieldId = id ?? name;
+
+  const handleValueChange = (next: string) => {
+    onValueChange?.(next);
+    onChange?.({
+      target: { value: next, name: name ?? "" },
+    } as React.ChangeEvent<HTMLSelectElement>);
+  };
+
   return (
-    <AdminFormField label={label} required={props.required} error={error} hint={hint}>
-      <select
-        {...props}
-        className={cn(adminInputCls, error && "border-[var(--error)]", className)}
-      >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+    <AdminFormField label={label} required={required} error={error} hint={hint}>
+      <Select value={value} onValueChange={handleValueChange} disabled={disabled} name={name}>
+        <SelectTrigger
+          id={fieldId}
+          className={cn(adminFieldClass, error && "border-[var(--error)]", className)}
+        >
+          <SelectValue placeholder={placeholder ?? "اختر..."} />
+        </SelectTrigger>
+        <SelectContent className="border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] text-white">
+          {options.map((opt) => (
+            <SelectItem
+              key={opt.value}
+              value={opt.value}
+              className="focus:bg-[var(--brand-gray-700)] focus:text-white"
+            >
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </AdminFormField>
   );
 }
 
-interface AdminCheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface AdminCheckboxProps extends Omit<React.ComponentProps<typeof Checkbox>, "onChange"> {
   label: string;
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
 }
 
-export function AdminCheckbox({ label, className, ...props }: AdminCheckboxProps) {
+export function AdminCheckbox({ label, className, checked, onChange, ...props }: AdminCheckboxProps) {
   return (
-    <label className="flex cursor-pointer items-center gap-2 text-sm text-white">
-      <input
-        type="checkbox"
-        {...props}
+    <div className="flex items-center gap-2">
+      <Checkbox
+        id={props.id ?? props.name}
+        checked={checked}
+        onCheckedChange={(state) => {
+          onChange?.({
+            target: { checked: state === true },
+          } as React.ChangeEvent<HTMLInputElement>);
+        }}
         className={cn(
-          "h-4 w-4 rounded border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] accent-[var(--brand-red)]",
-          className
+          "border-[var(--brand-gray-700)] data-[state=checked]:bg-[var(--brand-red)] data-[state=checked]:border-[var(--brand-red)]",
+          className,
         )}
+        {...props}
       />
-      {label}
-    </label>
+      <Label
+        htmlFor={props.id ?? props.name}
+        className="cursor-pointer text-sm font-normal text-white"
+      >
+        {label}
+      </Label>
+    </div>
   );
 }

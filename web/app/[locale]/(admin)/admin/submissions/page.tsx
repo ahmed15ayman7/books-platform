@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { Eye, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { adminFieldClass } from "@/components/admin/admin-form-field";
+import { Textarea } from "@/components/ui/textarea";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminSearch, AdminPagination, AdminStatusBadge } from "@/components/admin/admin-table";
@@ -256,12 +258,12 @@ export default function AdminSubmissionsPage() {
 
             {modal.item.status === "pending" && (
               <div className="mt-5 space-y-3">
-                <textarea
+                <Textarea
                   placeholder="سبب الرفض (مطلوب عند الرفض)"
                   value={modal.rejectReason}
                   onChange={(e) => setModal((p) => ({ ...p, rejectReason: e.target.value }))}
                   rows={3}
-                  className="w-full rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] px-3 py-2 text-sm text-white focus:outline-none"
+                  className={adminFieldClass}
                 />
                 <div className="flex gap-2">
                   <Button

@@ -46,12 +46,13 @@ export function BookCarousel({ books, locale, className }: BookCarouselProps) {
           {books.map((book, i) => (
             <div
               key={book.id}
-              className="min-w-0 shrink-0 basis-1/2 sm:basis-1/3 lg:basis-1/4 xl:basis-1/5"
+              className="flex min-w-0 shrink-0 basis-1/2 sm:basis-1/3 lg:basis-1/4 xl:basis-1/5"
             >
               <BookCard
                 {...book}
                 locale={locale}
                 isNew={i < 4}
+                className="h-full w-full"
               />
             </div>
           ))}

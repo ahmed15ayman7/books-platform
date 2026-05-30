@@ -28,6 +28,10 @@ import {
 import { can, loadAdminSession } from "@/lib/admin/permissions-client";
 import { usePasskeyGate } from "@/lib/admin/use-passkey-gate";
 import { PasskeyGateDialog } from "@/components/admin/passkey-gate-dialog";
+import { adminFieldClass } from "@/components/admin/admin-form-field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 
 interface AdminUserRow {
@@ -357,63 +361,75 @@ export default function AdminUsersPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               {!editingId && (
                 <div>
-                  <label className="mb-1 block text-xs text-[var(--brand-gray-400)]">البريد *</label>
-                  <input
+                  <Label className="mb-1 text-xs text-[var(--brand-gray-400)]">البريد *</Label>
+                  <Input
                     type="email"
                     required
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="w-full rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] px-3 py-2 text-sm text-white"
+                    className={adminFieldClass}
                     dir="ltr"
                   />
                 </div>
               )}
               <div>
-                <label className="mb-1 block text-xs text-[var(--brand-gray-400)]">
+                <Label className="mb-1 text-xs text-[var(--brand-gray-400)]">
                   {editingId ? "كلمة مرور جديدة (اختياري)" : "كلمة المرور *"}
-                </label>
-                <input
+                </Label>
+                <Input
                   type="password"
                   required={!editingId}
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  className="w-full rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] px-3 py-2 text-sm text-white"
+                  className={adminFieldClass}
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-xs text-[var(--brand-gray-400)]">الاسم الكامل *</label>
-                <input
+                <Label className="mb-1 text-xs text-[var(--brand-gray-400)]">الاسم الكامل *</Label>
+                <Input
                   type="text"
                   required
                   value={form.fullName}
                   onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-                  className="w-full rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] px-3 py-2 text-sm text-white"
+                  className={adminFieldClass}
                 />
               </div>
             </div>
 
             {isSuper && (
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
+              <div className="flex items-center gap-2 text-sm">
+                <Checkbox
+                  id="isSuperAdmin"
                   checked={form.isSuperAdmin}
-                  onChange={(e) => setForm({ ...form, isSuperAdmin: e.target.checked, permissions: e.target.checked ? [] : form.permissions })}
-                  className="accent-[var(--brand-red)]"
+                  onCheckedChange={(checked) =>
+                    setForm({
+                      ...form,
+                      isSuperAdmin: checked === true,
+                      permissions: checked === true ? [] : form.permissions,
+                    })
+                  }
+                  className="border-[var(--brand-gray-600)] data-[state=checked]:bg-[var(--brand-red)]"
                 />
-                مدير رئيسي (كل الصلاحيات)
-              </label>
+                <Label htmlFor="isSuperAdmin" className="cursor-pointer font-normal text-white">
+                  مدير رئيسي (كل الصلاحيات)
+                </Label>
+              </div>
             )}
 
             {editingId && (
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
+              <div className="flex items-center gap-2 text-sm">
+                <Checkbox
+                  id="isActive"
                   checked={form.isActive}
-                  onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-                  className="accent-[var(--brand-red)]"
+                  onCheckedChange={(checked) =>
+                    setForm({ ...form, isActive: checked === true })
+                  }
+                  className="border-[var(--brand-gray-600)] data-[state=checked]:bg-[var(--brand-red)]"
                 />
-                الحساب نشط
-              </label>
+                <Label htmlFor="isActive" className="cursor-pointer font-normal text-white">
+                  الحساب نشط
+                </Label>
+              </div>
             )}
 
             {!form.isSuperAdmin && (
@@ -424,26 +440,30 @@ export default function AdminUsersPage() {
                   const allOn = keys.every((k) => form.permissions.includes(k));
                   return (
                     <div key={group.id} className="border-b border-[var(--brand-gray-800)] pb-3 last:border-0">
-                      <label className="mb-2 flex cursor-pointer items-center gap-2 text-sm font-medium">
-                        <input
-                          type="checkbox"
+                      <div className="mb-2 flex cursor-pointer items-center gap-2 text-sm font-medium">
+                        <Checkbox
+                          id={`group-${group.id}`}
                           checked={allOn}
-                          onChange={() => toggleGroup(keys)}
-                          className="accent-[var(--brand-red)]"
+                          onCheckedChange={() => toggleGroup(keys)}
+                          className="border-[var(--brand-gray-600)] data-[state=checked]:bg-[var(--brand-red)]"
                         />
-                        {group.labelAr}
-                      </label>
+                        <Label htmlFor={`group-${group.id}`} className="cursor-pointer font-medium text-white">
+                          {group.labelAr}
+                        </Label>
+                      </div>
                       <div className="mr-6 flex flex-wrap gap-3">
                         {group.permissions.map((p) => (
-                          <label key={p.key} className="flex cursor-pointer items-center gap-1.5 text-xs text-[var(--brand-gray-400)]">
-                            <input
-                              type="checkbox"
+                          <div key={p.key} className="flex cursor-pointer items-center gap-1.5 text-xs text-[var(--brand-gray-400)]">
+                            <Checkbox
+                              id={`perm-${p.key}`}
                               checked={form.permissions.includes(p.key)}
-                              onChange={() => togglePermission(p.key)}
-                              className="accent-[var(--brand-red)]"
+                              onCheckedChange={() => togglePermission(p.key)}
+                              className="border-[var(--brand-gray-600)] data-[state=checked]:bg-[var(--brand-red)]"
                             />
-                            {p.labelAr}
-                          </label>
+                            <Label htmlFor={`perm-${p.key}`} className="cursor-pointer font-normal">
+                              {p.labelAr}
+                            </Label>
+                          </div>
                         ))}
                       </div>
                     </div>

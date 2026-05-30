@@ -1,11 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { createSubmissionSchema } from "@/lib/validation/submission.schema";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CheckCircle, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +33,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
     reset,
     watch,
@@ -34,10 +46,11 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
 
   async function checkEligibility(checkEmail: string) {
     if (!checkEmail || !checkEmail.includes("@")) return;
-    const emailVal = checkEmail;
     try {
-      const res = await fetch(`/api/v1/submissions/check-eligibility?email=${encodeURIComponent(emailVal)}`);
-      const data = await res.json() as { data: { isEligibleForFree: boolean } };
+      const res = await fetch(
+        `/api/v1/submissions/check-eligibility?email=${encodeURIComponent(checkEmail)}`,
+      );
+      const data = (await res.json()) as { data: { isEligibleForFree: boolean } };
       setIsFirstFree(data.data.isEligibleForFree);
     } catch {
       // silent
@@ -79,8 +92,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
-      {/* Honeypot */}
-      <input
+      <Input
         type="text"
         className="sr-only"
         tabIndex={-1}
@@ -90,7 +102,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <FormField label={t("authorName")} error={errors.authorName?.message} required>
-          <input
+          <Input
             type="text"
             className={inputClass(!!errors.authorName)}
             placeholder={isAr ? "الاسم الكامل" : "Full name"}
@@ -99,11 +111,11 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
         </FormField>
 
         <FormField label={t("email")} error={errors.authorEmail?.message} required>
-          <input
+          <Input
             type="email"
             className={inputClass(!!errors.authorEmail)}
             placeholder="email@example.com"
-                {...register("authorEmail", {
+            {...register("authorEmail", {
               onBlur: (e: React.FocusEvent<HTMLInputElement>) => checkEligibility(e.target.value),
             })}
           />
@@ -121,7 +133,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
       </div>
 
       <FormField label={t("phone")} error={errors.authorPhone?.message}>
-        <input
+        <Input
           type="tel"
           className={inputClass(!!errors.authorPhone)}
           placeholder="+966 5x xxx xxxx"
@@ -130,7 +142,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
       </FormField>
 
       <FormField label={t("bio")} error={errors.authorBio?.message}>
-        <textarea
+        <Textarea
           rows={2}
           className={inputClass(!!errors.authorBio)}
           placeholder={isAr ? "نبذة مختصرة عن المؤلف" : "Brief author bio"}
@@ -139,7 +151,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
       </FormField>
 
       <FormField label={t("bookTitle")} error={errors.bookTitle?.message} required>
-        <input
+        <Input
           type="text"
           className={inputClass(!!errors.bookTitle)}
           placeholder={isAr ? "عنوان الكتاب" : "Book title"}
@@ -148,7 +160,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
       </FormField>
 
       <FormField label={t("bookSummary")} error={errors.bookSummary?.message} required>
-        <textarea
+        <Textarea
           rows={4}
           className={inputClass(!!errors.bookSummary)}
           placeholder={isAr ? "ملخص الكتاب (50 حرف على الأقل)" : "Book summary (min. 50 chars)"}
@@ -158,19 +170,33 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <FormField label={t("bookLanguage")} error={errors.bookLanguage?.message} required>
-          <select className={inputClass(!!errors.bookLanguage)} {...register("bookLanguage")}>
-            <option value="">{isAr ? "اختر اللغة" : "Select language"}</option>
-            <option value="ar">{isAr ? "العربية" : "Arabic"}</option>
-            <option value="en">{isAr ? "الإنجليزية" : "English"}</option>
-            <option value="fr">{isAr ? "الفرنسية" : "French"}</option>
-            <option value="de">{isAr ? "الألمانية" : "German"}</option>
-            <option value="es">{isAr ? "الإسبانية" : "Spanish"}</option>
-            <option value="other">{isAr ? "أخرى" : "Other"}</option>
-          </select>
+          <Controller
+            name="bookLanguage"
+            control={control}
+            render={({ field }) => (
+              <Select
+                value={field.value || "_empty"}
+                onValueChange={(v) => field.onChange(v === "_empty" ? "" : v)}
+              >
+                <SelectTrigger className={inputClass(!!errors.bookLanguage)}>
+                  <SelectValue placeholder={isAr ? "اختر اللغة" : "Select language"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_empty">{isAr ? "اختر اللغة" : "Select language"}</SelectItem>
+                  <SelectItem value="ar">{isAr ? "العربية" : "Arabic"}</SelectItem>
+                  <SelectItem value="en">{isAr ? "الإنجليزية" : "English"}</SelectItem>
+                  <SelectItem value="fr">{isAr ? "الفرنسية" : "French"}</SelectItem>
+                  <SelectItem value="de">{isAr ? "الألمانية" : "German"}</SelectItem>
+                  <SelectItem value="es">{isAr ? "الإسبانية" : "Spanish"}</SelectItem>
+                  <SelectItem value="other">{isAr ? "أخرى" : "Other"}</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
         </FormField>
 
         <FormField label={t("bookCategory")} error={errors.bookCategory?.message}>
-          <input
+          <Input
             type="text"
             className={inputClass(!!errors.bookCategory)}
             placeholder={isAr ? "تقنية، رواية، دراسات..." : "Technology, Novel, Studies..."}
@@ -179,7 +205,6 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
         </FormField>
       </div>
 
-      {/* File upload notes */}
       <div className="rounded-lg bg-[var(--brand-gray-50)] border border-[var(--brand-gray-200)] p-4">
         <div className="flex items-center gap-2 text-sm text-[var(--brand-gray-600)]">
           <Upload className="h-4 w-4 flex-shrink-0 text-[var(--brand-red)]" aria-hidden="true" />
@@ -191,18 +216,22 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
         </div>
       </div>
 
-      {/* Allow free download */}
-      <div className="flex items-start gap-3">
-        <input
-          type="checkbox"
-          id="allowFreeDownload"
-          className="mt-1 h-4 w-4 rounded border-[var(--brand-gray-300)] text-[var(--brand-red)] focus:ring-[var(--brand-red)]"
-          {...register("allowFreeDownload")}
-        />
-        <label htmlFor="allowFreeDownload" className="text-sm text-[var(--brand-gray-700)] cursor-pointer">
-          {t("allowFreeDownload")}
-        </label>
-      </div>
+      <Controller
+        name="allowFreeDownload"
+        control={control}
+        render={({ field }) => (
+          <div className="flex items-start gap-3">
+            <Checkbox
+              id="allowFreeDownload"
+              checked={field.value}
+              onCheckedChange={field.onChange}
+            />
+            <Label htmlFor="allowFreeDownload" className="cursor-pointer text-sm text-[var(--brand-gray-700)]">
+              {t("allowFreeDownload")}
+            </Label>
+          </div>
+        )}
+      />
 
       {status === "error" && (
         <div className="rounded-md bg-[var(--error-soft)] border border-[var(--error)] p-3 text-sm text-[var(--error)]">
@@ -219,12 +248,10 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
 
 function inputClass(hasError: boolean) {
   return cn(
-    "w-full rounded-md border bg-white px-4 py-2.5 text-sm",
-    "placeholder:text-[var(--brand-gray-400)]",
-    "focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)] focus:border-transparent",
+    "w-full bg-white",
     hasError
-      ? "border-[var(--error)] focus:ring-[var(--error)]"
-      : "border-[var(--brand-gray-300)]"
+      ? "border-[var(--error)] focus-visible:ring-[var(--error)]"
+      : "border-[var(--brand-gray-300)]",
   );
 }
 
@@ -241,10 +268,10 @@ function FormField({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-sm font-medium text-[var(--brand-gray-700)]">
+      <Label className="text-sm font-medium text-[var(--brand-gray-700)]">
         {label}
         {required && <span className="ms-1 text-[var(--error)]">*</span>}
-      </label>
+      </Label>
       {children}
       {error && (
         <p className="text-xs text-[var(--error)]" role="alert">

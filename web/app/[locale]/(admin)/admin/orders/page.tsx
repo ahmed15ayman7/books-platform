@@ -23,6 +23,15 @@ import {
   AdminGridCardFooter,
 } from "@/components/admin/admin-data-grid";
 import { AdminListView } from "@/components/admin/admin-list-view";
+import { adminFieldClass } from "@/components/admin/admin-form-field";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 interface Order {
   id: string;
@@ -235,15 +244,24 @@ export default function AdminOrdersPage() {
               <div className="flex justify-between items-center">
                 <dt className="text-[var(--brand-gray-400)]">الحالة</dt>
                 <dd>
-                  <select
+                  <Select
                     value={detail.status}
-                    onChange={(e) => { void updateStatus(detail.id, e.target.value); setDetail({ ...detail, status: e.target.value }); }}
-                    className="rounded border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] px-2 py-1 text-xs text-white"
+                    onValueChange={(s) => {
+                      void updateStatus(detail.id, s);
+                      setDetail({ ...detail, status: s });
+                    }}
                   >
-                    {["PENDING","COMPLETED","REFUNDED","CANCELLED"].map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
+                    <SelectTrigger className={cn(adminFieldClass, "h-8 w-[140px] text-xs")}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] text-white">
+                      {["PENDING", "COMPLETED", "REFUNDED", "CANCELLED"].map((s) => (
+                        <SelectItem key={s} value={s} className="text-xs focus:bg-[var(--brand-gray-700)]">
+                          {s}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </dd>
               </div>
             </dl>

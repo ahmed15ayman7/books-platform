@@ -2,10 +2,16 @@
 
 import { LayoutGrid, List } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { adminFieldClass } from "@/components/admin/admin-form-field";
 import type { AdminViewMode } from "@/lib/admin/list-query";
-
-const selectCls =
-  "rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] px-3 py-2 text-sm text-white focus:border-[var(--brand-red)] focus:outline-none min-w-[140px]";
 
 export interface AdminSelectOption {
   value: string;
@@ -28,22 +34,27 @@ export function AdminFilterSelect({
   className,
 }: AdminFilterSelectProps) {
   return (
-    <label className={cn("flex flex-col gap-1", className)}>
-      <span className="text-[10px] font-medium uppercase tracking-wide text-[var(--brand-gray-500)]">
+    <div className={cn("flex flex-col gap-1", className)}>
+      <Label className="text-[10px] font-medium uppercase tracking-wide text-[var(--brand-gray-500)]">
         {label}
-      </span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={selectCls}
-      >
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-    </label>
+      </Label>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger className={cn(adminFieldClass, "min-w-[140px] h-9")}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] text-white">
+          {options.map((o) => (
+            <SelectItem
+              key={o.value}
+              value={o.value}
+              className="focus:bg-[var(--brand-gray-700)] focus:text-white"
+            >
+              {o.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }
 
@@ -56,18 +67,27 @@ interface AdminSortSelectProps {
 
 export function AdminSortSelect({ value, onChange, options, className }: AdminSortSelectProps) {
   return (
-    <label className={cn("flex flex-col gap-1", className)}>
-      <span className="text-[10px] font-medium uppercase tracking-wide text-[var(--brand-gray-500)]">
+    <div className={cn("flex flex-col gap-1", className)}>
+      <Label className="text-[10px] font-medium uppercase tracking-wide text-[var(--brand-gray-500)]">
         ترتيب حسب
-      </span>
-      <select value={value} onChange={(e) => onChange(e.target.value)} className={selectCls}>
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-    </label>
+      </Label>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger className={cn(adminFieldClass, "min-w-[140px] h-9")}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] text-white">
+          {options.map((o) => (
+            <SelectItem
+              key={o.value}
+              value={o.value}
+              className="focus:bg-[var(--brand-gray-700)] focus:text-white"
+            >
+              {o.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }
 
