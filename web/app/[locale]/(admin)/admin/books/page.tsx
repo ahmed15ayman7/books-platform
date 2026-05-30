@@ -13,6 +13,7 @@ import {
   AdminPagination,
   AdminStatusBadge,
 } from "@/components/admin/admin-table";
+import { BookDeleteButton } from "./[id]/book-delete-button";
 
 interface AdminBook {
   id: string;
@@ -70,7 +71,7 @@ export default function AdminBooksPage() {
       label: "العنوان (EN)",
       className: "max-w-[200px] truncate font-medium",
       render: (row: AdminBook) => (
-        <span className="truncate block max-w-[200px]">{row.nameEn}</span>
+        <span className="block max-w-[200px] truncate">{row.nameEn}</span>
       ),
     },
     {
@@ -78,7 +79,7 @@ export default function AdminBooksPage() {
       label: "العنوان (AR)",
       className: "max-w-[200px]",
       render: (row: AdminBook) => (
-        <span className="truncate block max-w-[200px] text-[var(--brand-gray-300)]">
+        <span className="block max-w-[200px] truncate text-[var(--brand-gray-300)]">
           {row.nameAr ?? "—"}
         </span>
       ),
@@ -96,7 +97,7 @@ export default function AdminBooksPage() {
                 ? "مرشح"
                 : row.translationStatus === "PARTIAL"
                   ? "مرشح"
-                : "مترجم"
+                  : "مترجم"
           }
         />
       ),
@@ -115,15 +116,34 @@ export default function AdminBooksPage() {
       render: (row: AdminBook) => (
         <div className="flex items-center gap-1">
           <Link href={`/${locale}/admin/books/${row.id}`} aria-label="عرض">
-            <Button size="icon" variant="ghost" className="h-8 w-8 text-[var(--brand-gray-400)] hover:text-white">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 text-[var(--brand-gray-400)] hover:text-white"
+            >
               <Eye className="h-4 w-4" />
             </Button>
           </Link>
-          <Link href={`/${locale}/admin/books/${row.id}/edit`} aria-label="تعديل">
-            <Button size="icon" variant="ghost" className="h-8 w-8 text-[var(--brand-gray-400)] hover:text-white">
+          <Link
+            href={`/${locale}/admin/books/${row.id}/edit`}
+            aria-label="تعديل"
+          >
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 text-[var(--brand-gray-400)] hover:text-white"
+            >
               <Pencil className="h-4 w-4" />
             </Button>
           </Link>
+          <BookDeleteButton
+            bookId={row.id}
+            bookTitle={row.nameAr ?? row.nameEn}
+            locale={locale}
+            variant="icon"
+            onDeleted={() => void loadBooks()}
+            isBooksPage={true}
+          />
         </div>
       ),
     },
@@ -138,7 +158,10 @@ export default function AdminBooksPage() {
           <div className="flex items-center gap-2">
             <AdminSearch
               value={search}
-              onChange={(v) => { setSearch(v); setPage(1); }}
+              onChange={(v) => {
+                setSearch(v);
+                setPage(1);
+              }}
               onSubmit={() => void loadBooks()}
               placeholder="بحث بالعنوان..."
             />
@@ -159,7 +182,13 @@ export default function AdminBooksPage() {
         emptyMessage="لا توجد كتب — ابدأ بإضافة كتاب جديد"
       />
 
-      <AdminPagination page={page} totalPages={totalPages} onPage={setPage} total={total} pageSize={20} />
+      <AdminPagination
+        page={page}
+        totalPages={totalPages}
+        onPage={setPage}
+        total={total}
+        pageSize={20}
+      />
     </div>
   );
 }
