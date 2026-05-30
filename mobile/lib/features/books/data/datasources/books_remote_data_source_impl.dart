@@ -67,4 +67,14 @@ class BooksRemoteDataSourceImpl {
         .toList();
     return right(similar);
   }
+
+  Future<Either<Failure, List<Book>>> getBooksByPublisherId(
+    String publisherId,
+  ) async {
+    final books = BooksMockData.books
+        .map((r) => r.toEntity())
+        .where((b) => b.publisherId == publisherId)
+        .toList();
+    return right(books);
+  }
 }

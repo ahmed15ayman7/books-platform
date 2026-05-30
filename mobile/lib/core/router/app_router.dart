@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../features/articles/presentation/cubit/article_detail_cubit/article_detail_cubit.dart';
 import '../../features/articles/presentation/cubit/articles_list_cubit/articles_list_cubit.dart';
+import '../../features/articles/presentation/pages/article_detail_screen.dart';
 import '../../features/articles/presentation/pages/articles_screen.dart';
 import '../../features/books/presentation/cubit/book_detail_cubit/book_detail_cubit.dart';
 import '../../features/books/presentation/cubit/catalog_cubit/catalog_cubit.dart';
 import '../../features/books/presentation/cubit/home_content_cubit/home_content_cubit.dart';
 import '../../features/books/presentation/pages/book_detail_screen.dart';
 import '../../features/books/presentation/pages/catalog_screen.dart';
+import '../../features/books/presentation/pages/category_books_screen.dart';
 import '../../features/books/presentation/pages/home_screen.dart';
 import '../../features/cart/presentation/pages/cart_screen.dart';
 import '../../features/onboarding/presentation/pages/language_screen.dart';
 import '../../features/onboarding/presentation/pages/onboarding_screen.dart';
 import '../../features/onboarding/presentation/pages/splash_screen.dart';
 import '../../features/publish/presentation/pages/publish_screen.dart';
+import '../../features/publishers/presentation/cubit/publisher_detail_cubit/publisher_detail_cubit.dart';
 import '../../features/publishers/presentation/cubit/publishers_list_cubit/publishers_list_cubit.dart';
+import '../../features/publishers/presentation/pages/publisher_detail_screen.dart';
 import '../../features/publishers/presentation/pages/publishers_screen.dart';
 import '../../features/search/presentation/cubit/search_cubit.dart';
 import '../../features/search/presentation/pages/search_screen.dart';
@@ -22,6 +27,8 @@ import '../di/injection_container.dart';
 import 'app_routes.dart';
 import 'args/article_detail_args.dart';
 import 'args/book_detail_args.dart';
+import 'args/category_books_args.dart';
+import 'args/publisher_detail_args.dart';
 
 class AppRouter {
   AppRouter._();
@@ -93,11 +100,38 @@ class AppRouter {
           ),
         );
 
+      case AppRoutes.categoryBooks:
+        final args = settings.arguments as CategoryBooksArgs?;
+        if (args == null) return _unknown(settings);
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider(
+            create: (_) => getIt<CatalogCubit>(),
+            child: CategoryBooksScreen(args: args),
+          ),
+        );
+
+      case AppRoutes.publisherDetail:
+        final args = settings.arguments as PublisherDetailArgs?;
+        if (args == null) return _unknown(settings);
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider(
+            create: (_) => getIt<PublisherDetailCubit>(),
+            child: PublisherDetailScreen(args: args),
+          ),
+        );
+
       case AppRoutes.articleDetail:
         final args = settings.arguments as ArticleDetailArgs?;
         if (args == null) return _unknown(settings);
-        // ArticleDetailScreen can be added in a follow-up sprint
-        return _unknown(settings);
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider(
+            create: (_) => getIt<ArticleDetailCubit>(),
+            child: ArticleDetailScreen(args: args),
+          ),
+        );
 
       case AppRoutes.search:
         return MaterialPageRoute(

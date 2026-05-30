@@ -46,4 +46,10 @@ class BooksRepositoryImpl implements BooksRepository {
     String categorySlug,
   ) =>
       _remote.getSimilarBooks(bookId, categorySlug);
+
+  @override
+  Future<Either<Failure, List<Book>>> getBooksByPublisherId(
+    String publisherId,
+  ) =>
+      _remote.getBooksByPublisherId(publisherId);
 }

@@ -6,12 +6,14 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/router/args/book_detail_args.dart';
+import '../../../../core/router/args/category_books_args.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_bar_widget.dart';
 import '../../../../core/widgets/app_loading_indicator.dart';
 import '../../../../core/widgets/bottom_nav_widget.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/section_header_widget.dart';
+import '../../domain/entities/category.dart';
 import '../../domain/entities/publisher_summary.dart';
 import '../cubit/home_content_cubit/home_content_cubit.dart';
 import '../cubit/home_content_cubit/home_content_state.dart';
@@ -74,6 +76,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.of(ctx).pushNamed(AppRoutes.books),
                     onPublisher: () =>
                         Navigator.of(ctx).pushNamed(AppRoutes.publishers),
+                    onCategoryTap: (cat) => Navigator.of(ctx).pushNamed(
+                      AppRoutes.categoryBooks,
+                      arguments: CategoryBooksArgs(
+                        slug: cat.slug,
+                        nameAr: cat.nameAr,
+                        nameEn: cat.nameEn,
+                      ),
+                    ),
                   ),
                 _ => const SizedBox.shrink(),
               },
@@ -113,6 +123,7 @@ class _Body extends StatelessWidget {
     required this.onBookTap,
     required this.onBrowse,
     required this.onPublisher,
+    required this.onCategoryTap,
   });
 
   final HomeContentSuccess state;
@@ -120,6 +131,7 @@ class _Body extends StatelessWidget {
   final void Function(String id, String titleAr) onBookTap;
   final VoidCallback onBrowse;
   final VoidCallback onPublisher;
+  final void Function(Category) onCategoryTap;
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +177,7 @@ class _Body extends StatelessWidget {
                           nameAr: c.nameAr,
                           nameEn: c.nameEn,
                           locale: locale,
-                          onTap: onBrowse,
+                          onTap: () => onCategoryTap(c),
                         ),
                       ),
                     )

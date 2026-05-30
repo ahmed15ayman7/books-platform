@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/router/args/publisher_detail_args.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/widgets/app_bar_widget.dart';
@@ -70,6 +71,13 @@ class _PublishersScreenState extends State<PublishersScreen> {
                         ctx.read<PublishersListCubit>().filterByCountry(
                               c == activeCountry ? null : c,
                             ),
+                    onPublisherTap: (p) => Navigator.of(ctx).pushNamed(
+                      AppRoutes.publisherDetail,
+                      arguments: PublisherDetailArgs(
+                        slug: p.id,
+                        name: p.name,
+                      ),
+                    ),
                   ),
                 _ => const SizedBox.shrink(),
               },
@@ -108,12 +116,14 @@ class _Body extends StatelessWidget {
     required this.activeCountry,
     required this.locale,
     required this.onCountryTap,
+    required this.onPublisherTap,
   });
   final List<Publisher> publishers;
   final List<String> countries;
   final String? activeCountry;
   final String locale;
   final ValueChanged<String> onCountryTap;
+  final ValueChanged<Publisher> onPublisherTap;
 
   @override
   Widget build(BuildContext context) {
@@ -188,6 +198,7 @@ class _Body extends StatelessWidget {
             child: _PublisherCard(
               publisher: publishers[i],
               locale: locale,
+              onTap: () => onPublisherTap(publishers[i]),
             ),
           ),
         ),
@@ -235,9 +246,14 @@ class _CountryChip extends StatelessWidget {
 }
 
 class _PublisherCard extends StatelessWidget {
-  const _PublisherCard({required this.publisher, required this.locale});
+  const _PublisherCard({
+    required this.publisher,
+    required this.locale,
+    required this.onTap,
+  });
   final Publisher publisher;
   final String locale;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -247,7 +263,9 @@ class _PublisherCard extends StatelessWidget {
         .take(2)
         .map((w) => w.isNotEmpty ? w[0] : '')
         .join();
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       padding: EdgeInsetsDirectional.all(14.r),
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -346,6 +364,7 @@ class _PublisherCard extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

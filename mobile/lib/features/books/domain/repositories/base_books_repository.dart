@@ -26,4 +26,6 @@ abstract class BooksRepository {
     String bookId,
     String categorySlug,
   );
+
+  Future<Either<Failure, List<Book>>> getBooksByPublisherId(String publisherId);
 }
