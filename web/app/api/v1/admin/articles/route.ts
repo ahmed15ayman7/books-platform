@@ -4,6 +4,7 @@ import { z } from "zod";
 import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { buildOrderBy, parseSortParam } from "@/lib/admin/list-query";
 
 const createSchema = z.object({
   title: z.string().min(1).max(500),
@@ -27,18 +28,27 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
     const limit = Math.min(50, parseInt(searchParams.get("limit") ?? "20", 10));
     const search = searchParams.get("search") ?? undefined;
+    const status = searchParams.get("status") ?? undefined;
+    const channel = searchParams.get("channel") ?? undefined;
+    const { sortBy, sortOrder } = parseSortParam(searchParams.get("sort"), "updatedAt");
     const skip = (page - 1) * limit;
 
-    const where = search
-      ? { OR: [{ title: { contains: search, mode: "insensitive" as const } }] }
-      : {};
+    const where = {
+      ...(status && status !== "all" ? { status } : {}),
+      ...(channel && channel !== "all" ? { channel } : {}),
+      ...(search
+        ? { OR: [{ title: { contains: search, mode: "insensitive" as const } }] }
+        : {}),
+    };
+
+    const articleSortFields = ["updatedAt", "createdAt", "title", "date"] as const;
 
     const [articles, total] = await Promise.all([
       db.article.findMany({
         where,
         skip,
         take: limit,
-        orderBy: { updatedAt: "desc" },
+        orderBy: buildOrderBy(sortBy, sortOrder, articleSortFields, "updatedAt"),
         select: {
           id: true,
           title: true,
@@ -46,6 +56,7 @@ export async function GET(request: NextRequest) {
           status: true,
           date: true,
           slug: true,
+          imageUrl: true,
           createdAt: true,
           updatedAt: true,
         },

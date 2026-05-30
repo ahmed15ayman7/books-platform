@@ -1,13 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Plus, Pencil, Shield, UserX, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { AdminTable, AdminStatusBadge } from "@/components/admin/admin-table";
+import { AdminSearch, AdminStatusBadge } from "@/components/admin/admin-table";
+import { useAdminViewMode } from "@/lib/admin/use-admin-view-mode";
+import { AdminListToolbar, AdminSortSelect } from "@/components/admin/admin-list-controls";
+import {
+  AdminGridCard,
+  AdminGridCardBody,
+  AdminGridCardFooter,
+} from "@/components/admin/admin-data-grid";
+import { AdminListView } from "@/components/admin/admin-list-view";
+import { sortClientList } from "@/lib/admin/client-list-sort";
 import {
   adminCreatedAtColumn,
   adminUpdatedAtColumn,
@@ -60,8 +69,11 @@ export default function AdminUsersPage() {
   const [passkeyOpen, setPasskeyOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => Promise<void>) | null>(null);
 
+  const { viewMode, setViewMode } = useAdminViewMode("users");
   const [users, setUsers] = useState<AdminUserRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("createdAt:desc");
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -84,6 +96,27 @@ export default function AdminUsersPage() {
   useEffect(() => {
     void loadUsers();
   }, [loadUsers]);
+
+  const displayedUsers = useMemo(() => {
+    const filtered = search.trim()
+      ? users.filter(
+          (u) =>
+            u.fullName.toLowerCase().includes(search.toLowerCase()) ||
+            u.email.toLowerCase().includes(search.toLowerCase()),
+        )
+      : users;
+    return sortClientList(
+      filtered,
+      sort,
+      {
+        fullName: (u) => u.fullName,
+        email: (u) => u.email,
+        createdAt: (u) => u.createdAt,
+        updatedAt: (u) => u.updatedAt,
+      },
+      "createdAt",
+    );
+  }, [users, search, sort]);
 
   function openCreate() {
     setEditingId(null);
@@ -214,6 +247,55 @@ export default function AdminUsersPage() {
     );
   }
 
+  const rowActions = (row: AdminUserRow) => (
+    <div className="flex items-center gap-1">
+      <Link href={`/${locale}/admin/users/${row.id}`}>
+        <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="سجل الدخول">
+          <History className="h-4 w-4" />
+        </Button>
+      </Link>
+      {can(PERMISSIONS.users.update) && (
+        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEdit(row)} aria-label="تعديل">
+          <Pencil className="h-4 w-4" />
+        </Button>
+      )}
+      {can(PERMISSIONS.users.delete) && row.isActive && row.id !== session?.id && (
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-8 w-8 text-red-400 hover:text-red-300"
+          onClick={() => void deactivateUser(row.id, row.fullName)}
+          aria-label="تعطيل"
+        >
+          <UserX className="h-4 w-4" />
+        </Button>
+      )}
+    </div>
+  );
+
+  const renderCard = (row: AdminUserRow) => (
+    <AdminGridCard>
+      <AdminGridCardBody>
+        <div className="flex items-start gap-2">
+          <h3 className="font-semibold text-white">{row.fullName}</h3>
+          {row.isSuperAdmin && (
+            <span className="rounded bg-[var(--brand-red-soft)] px-1.5 py-0.5 text-[10px] text-[var(--brand-red)]">
+              رئيسي
+            </span>
+          )}
+        </div>
+        <p className="text-xs text-[var(--brand-gray-500)]" dir="ltr">
+          {row.email}
+        </p>
+        <AdminStatusBadge
+          status={row.isActive ? "published" : "draft"}
+          customLabel={row.isActive ? "نشط" : "معطّل"}
+        />
+      </AdminGridCardBody>
+      <AdminGridCardFooter>{rowActions(row)}</AdminGridCardFooter>
+    </AdminGridCard>
+  );
+
   const columns = [
     {
       key: "fullName",
@@ -244,36 +326,7 @@ export default function AdminUsersPage() {
     },
     adminCreatedAtColumn<AdminUserRow>(),
     adminUpdatedAtColumn<AdminUserRow>(),
-    {
-      key: "actions",
-      label: "",
-      headerClassName: "w-28",
-      render: (row: AdminUserRow) => (
-        <div className="flex items-center gap-1">
-          <Link href={`/${locale}/admin/users/${row.id}`}>
-            <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="سجل الدخول">
-              <History className="h-4 w-4" />
-            </Button>
-          </Link>
-          {can(PERMISSIONS.users.update) && (
-            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEdit(row)} aria-label="تعديل">
-              <Pencil className="h-4 w-4" />
-            </Button>
-          )}
-          {can(PERMISSIONS.users.delete) && row.isActive && row.id !== session?.id && (
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 text-red-400 hover:text-red-300"
-              onClick={() => void deactivateUser(row.id, row.fullName)}
-              aria-label="تعطيل"
-            >
-              <UserX className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      ),
-    },
+    { key: "actions", label: "", headerClassName: "w-28", render: rowActions },
   ];
 
   return (
@@ -282,12 +335,15 @@ export default function AdminUsersPage() {
         title="مديرو النظام"
         subtitle="إنشاء حسابات وتحديد صلاحيات كل مدير"
         actions={
-          can(PERMISSIONS.users.create) ? (
-            <Button size="sm" className="gap-1.5" onClick={openCreate}>
-              <Plus className="h-4 w-4" />
-              مدير جديد
-            </Button>
-          ) : undefined
+          <div className="flex items-center gap-2">
+            <AdminSearch value={search} onChange={setSearch} placeholder="بحث..." />
+            {can(PERMISSIONS.users.create) && (
+              <Button size="sm" className="gap-1.5" onClick={openCreate}>
+                <Plus className="h-4 w-4" />
+                مدير جديد
+              </Button>
+            )}
+          </div>
         }
       />
 
@@ -410,11 +466,29 @@ export default function AdminUsersPage() {
         </div>
       )}
 
-      <AdminTable
+      <AdminListToolbar
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        sort={
+          <AdminSortSelect
+            value={sort}
+            onChange={setSort}
+            options={[
+              { value: "createdAt:desc", label: "الأحدث" },
+              { value: "fullName:asc", label: "الاسم أ–ي" },
+              { value: "updatedAt:desc", label: "آخر تحديث" },
+            ]}
+          />
+        }
+      />
+
+      <AdminListView
+        viewMode={viewMode}
         columns={columns}
-        data={users}
+        data={displayedUsers}
         loading={loading}
         emptyMessage="لا يوجد مديرون — أضف مديراً جديداً"
+        renderCard={renderCard}
       />
 
       <PasskeyGateDialog

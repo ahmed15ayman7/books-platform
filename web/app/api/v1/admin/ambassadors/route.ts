@@ -4,6 +4,7 @@ import { z } from "zod";
 import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { buildOrderBy, parseSortParam } from "@/lib/admin/list-query";
 
 const createSchema = z.object({
   name: z.string().min(1).max(200),
@@ -21,23 +22,36 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
     const limit = Math.min(50, parseInt(searchParams.get("limit") ?? "20", 10));
     const search = searchParams.get("search") ?? undefined;
+    const status = searchParams.get("status") ?? undefined;
+    const { sortBy, sortOrder } = parseSortParam(searchParams.get("sort"), "createdAt");
     const skip = (page - 1) * limit;
 
-    const where = search
+    const statusMap: Record<string, string> = {
+      active: "ACTIVE",
+      inactive: "PAUSED",
+      pending: "PENDING",
+    };
+
+    const where = {
+      ...(status && status !== "all" ? { status: statusMap[status] ?? status.toUpperCase() } : {}),
+      ...(search
       ? {
           OR: [
             { displayName: { contains: search, mode: "insensitive" as const } },
             { user: { email: { contains: search, mode: "insensitive" as const } } },
           ],
         }
-      : {};
+        : {}),
+    };
+
+    const ambassadorSortFields = ["createdAt", "updatedAt"] as const;
 
     const [rows, total] = await Promise.all([
       db.ambassador.findMany({
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: "desc" },
+        orderBy: buildOrderBy(sortBy, sortOrder, ambassadorSortFields, "createdAt"),
         include: {
           user: { select: { email: true } },
           _count: { select: { links: true, commissions: true } },

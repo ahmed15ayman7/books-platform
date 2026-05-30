@@ -5,11 +5,20 @@ import { Plus, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminPagination, AdminStatusBadge } from "@/components/admin/admin-table";
+import { appendListParams } from "@/lib/admin/list-query";
+import { useAdminViewMode } from "@/lib/admin/use-admin-view-mode";
 import {
-  AdminTable,
-  AdminPagination,
-  AdminStatusBadge,
-} from "@/components/admin/admin-table";
+  AdminFilterSelect,
+  AdminListToolbar,
+  AdminSortSelect,
+} from "@/components/admin/admin-list-controls";
+import {
+  AdminGridCard,
+  AdminGridCardBody,
+  AdminGridCardFooter,
+} from "@/components/admin/admin-data-grid";
+import { AdminListView } from "@/components/admin/admin-list-view";
 import {
   adminCreatedAtColumn,
   adminUpdatedAtColumn,
@@ -51,6 +60,7 @@ const emptyForm = {
 };
 
 export default function AdminB2BPage() {
+  const { viewMode, setViewMode } = useAdminViewMode("b2b");
   const [subscriptions, setSubscriptions] = useState<B2BSubscription[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -60,11 +70,14 @@ export default function AdminB2BPage() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [sort, setSort] = useState("createdAt:desc");
+  const [isActive, setIsActive] = useState("all");
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
       const q = new URLSearchParams({ page: String(page), limit: "20" });
+      appendListParams(q, { sort, isActive });
       const res = await fetch(`/api/v1/admin/b2b?${q}`, { headers: adminAuthHeaders() });
       const data = await res.json() as { success: boolean; data?: B2BSubscription[]; pagination?: { totalPages: number; total: number } };
       if (data.success && data.data) {
@@ -75,7 +88,7 @@ export default function AdminB2BPage() {
     } finally {
       setLoading(false);
     }
-  }, [page]);
+  }, [page, sort, isActive]);
 
   useEffect(() => { void load(); }, [load]);
 
@@ -101,6 +114,46 @@ export default function AdminB2BPage() {
 
   const set = (k: keyof typeof emptyForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((p) => ({ ...p, [k]: e.target.value }));
+
+  const editBtn = (row: B2BSubscription) => (
+    <Button
+      size="sm"
+      variant="outline"
+      className="gap-1 text-xs"
+      onClick={() => {
+        setEditingId(row.id);
+        setForm({
+          clientName: row.clientName,
+          clientEmail: row.clientEmail,
+          packageType: row.packageType,
+          startDate: new Date(row.startDate).toISOString().split("T")[0] ?? "",
+          endDate: new Date(row.endDate).toISOString().split("T")[0] ?? "",
+          notes: "",
+        });
+      }}
+    >
+      <Pencil className="h-3 w-3" />
+    </Button>
+  );
+
+  const renderCard = (row: B2BSubscription) => (
+    <AdminGridCard>
+      <AdminGridCardBody>
+        <h3 className="font-semibold text-white">{row.clientName}</h3>
+        <p className="text-xs text-[var(--brand-gray-500)]" dir="ltr">
+          {row.clientEmail}
+        </p>
+        <p className="text-xs text-[var(--brand-gray-400)]">
+          {packageOptions.find((p) => p.value === row.packageType)?.label ?? row.packageType}
+        </p>
+        <AdminStatusBadge status={row.status.toLowerCase()} />
+        <p className="text-[10px] text-[var(--brand-gray-600)]">
+          ينتهي {new Date(row.endDate).toLocaleDateString("ar-EG")}
+        </p>
+      </AdminGridCardBody>
+      <AdminGridCardFooter>{editBtn(row)}</AdminGridCardFooter>
+    </AdminGridCard>
+  );
 
   const columns = [
     {
@@ -138,31 +191,7 @@ export default function AdminB2BPage() {
     },
     adminCreatedAtColumn<B2BSubscription>(),
     adminUpdatedAtColumn<B2BSubscription>(),
-    {
-      key: "actions",
-      label: "",
-      headerClassName: "w-16",
-      render: (row: B2BSubscription) => (
-        <Button
-          size="sm"
-          variant="outline"
-          className="gap-1 text-xs"
-          onClick={() => {
-            setEditingId(row.id);
-            setForm({
-              clientName: row.clientName,
-              clientEmail: row.clientEmail,
-              packageType: row.packageType,
-              startDate: new Date(row.startDate).toISOString().split("T")[0] ?? "",
-              endDate: new Date(row.endDate).toISOString().split("T")[0] ?? "",
-              notes: "",
-            });
-          }}
-        >
-          <Pencil className="h-3 w-3" />
-        </Button>
-      ),
-    },
+    { key: "actions", label: "", headerClassName: "w-16", render: editBtn },
   ];
 
   return (
@@ -193,7 +222,47 @@ export default function AdminB2BPage() {
         </AdminCard>
 
         <div className="lg:col-span-2">
-          <AdminTable columns={columns} data={subscriptions} loading={loading} emptyMessage="لا توجد اشتراكات بعد" />
+          <AdminListToolbar
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            filters={
+              <AdminFilterSelect
+                label="الحالة"
+                value={isActive}
+                onChange={(v) => {
+                  setIsActive(v);
+                  setPage(1);
+                }}
+                options={[
+                  { value: "all", label: "الكل" },
+                  { value: "true", label: "نشط" },
+                  { value: "false", label: "معطّل" },
+                ]}
+              />
+            }
+            sort={
+              <AdminSortSelect
+                value={sort}
+                onChange={(v) => {
+                  setSort(v);
+                  setPage(1);
+                }}
+                options={[
+                  { value: "createdAt:desc", label: "الأحدث" },
+                  { value: "endsAt:asc", label: "ينتهي قريباً" },
+                  { value: "endsAt:desc", label: "ينتهي لاحقاً" },
+                ]}
+              />
+            }
+          />
+          <AdminListView
+            viewMode={viewMode}
+            columns={columns}
+            data={subscriptions}
+            loading={loading}
+            emptyMessage="لا توجد اشتراكات بعد"
+            renderCard={renderCard}
+          />
           <AdminPagination page={page} totalPages={totalPages} onPage={setPage} total={total} pageSize={20} />
         </div>
       </div>

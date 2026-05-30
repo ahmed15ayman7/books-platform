@@ -4,6 +4,7 @@ import { z } from "zod";
 import { apiSuccess, apiCreated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { buildOrderBy, parseSortParam } from "@/lib/admin/list-query";
 
 const createSchema = z.object({
   name: z.string().min(1).max(200),
@@ -17,8 +18,12 @@ export async function GET(request: NextRequest) {
   if (isErrorResponse(auth)) return auth;
 
   try {
+    const { searchParams } = request.nextUrl;
+    const { sortBy, sortOrder } = parseSortParam(searchParams.get("sort"), "name");
+    const categorySortFields = ["name", "updatedAt", "createdAt"] as const;
+
     const categories = await db.productCategory.findMany({
-      orderBy: { name: "asc" },
+      orderBy: buildOrderBy(sortBy, sortOrder, categorySortFields, "name"),
       include: { _count: { select: { products: true } } },
     });
 

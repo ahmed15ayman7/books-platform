@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { apiPaginated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { buildOrderBy, parseSortParam } from "@/lib/admin/list-query";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth(request, "ADMIN", PERMISSIONS.submissions.view);
@@ -13,9 +14,13 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
     const limit = Math.min(50, parseInt(searchParams.get("limit") ?? "20", 10));
     const search = searchParams.get("search") ?? undefined;
+    const status = searchParams.get("status") ?? undefined;
+    const { sortBy, sortOrder } = parseSortParam(searchParams.get("sort"), "updatedAt");
     const skip = (page - 1) * limit;
 
-    const where = search
+    const where = {
+      ...(status && status !== "all" ? { status } : {}),
+      ...(search
       ? {
           OR: [
             { title: { contains: search, mode: "insensitive" as const } },
@@ -24,14 +29,17 @@ export async function GET(request: NextRequest) {
             { authorLastName: { contains: search, mode: "insensitive" as const } },
           ],
         }
-      : {};
+        : {}),
+    };
+
+    const submissionSortFields = ["updatedAt", "createdAt", "date"] as const;
 
     const [rows, total] = await Promise.all([
       db.publishBookSubmission.findMany({
         where,
         skip,
         take: limit,
-        orderBy: { updatedAt: "desc" },
+        orderBy: buildOrderBy(sortBy, sortOrder, submissionSortFields, "updatedAt"),
         select: {
           id: true,
           title: true,

@@ -5,6 +5,11 @@ import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { notDeleted, withCreate } from "@/lib/admin/audit-fields";
+import {
+  parseOptionalBool,
+  parseSortParam,
+  productListOrderBy,
+} from "@/lib/admin/list-query";
 
 const createBookSchema = z.object({
   nameEn: z.string().min(1).max(300),
@@ -38,10 +43,20 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
     const limit = Math.min(50, parseInt(searchParams.get("limit") ?? "20", 10));
     const search = searchParams.get("search") ?? undefined;
+    const sortParam = searchParams.get("sort");
+    const { sortBy, sortOrder } = parseSortParam(sortParam, "updatedAt");
+    const published = parseOptionalBool(searchParams.get("published"));
+    const featured = parseOptionalBool(searchParams.get("featured"));
+    const translationStatus = searchParams.get("translationStatus") ?? undefined;
     const skip = (page - 1) * limit;
 
     const where = {
       ...notDeleted,
+      ...(published !== undefined ? { published } : {}),
+      ...(featured !== undefined ? { featured } : {}),
+      ...(translationStatus && translationStatus !== "all"
+        ? { translationStatus }
+        : {}),
       ...(search
         ? {
             OR: [
@@ -57,7 +72,7 @@ export async function GET(request: NextRequest) {
         where,
         skip,
         take: limit,
-        orderBy: { position: "desc" },
+        orderBy: productListOrderBy(sortBy, sortOrder),
         include: {
           publisher: { select: { title: true, slug: true } },
           primaryCategory: { select: { name: true, nameAr: true } },
