@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { z } from "zod";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
+import { PERMISSIONS } from "@/lib/auth/permissions";
 
 const updateSchema = z.object({
   clientName: z.string().min(1).max(300).optional(),
@@ -16,7 +17,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.b2b.update);
   if (isErrorResponse(auth)) return auth;
 
   const { id } = await params;

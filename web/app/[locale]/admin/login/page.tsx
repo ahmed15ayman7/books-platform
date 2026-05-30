@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { BookOpen, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { saveAdminSession } from "@/lib/admin/permissions-client";
+import type { Permission } from "@/lib/auth/permissions";
 
 export default function AdminLoginPage() {
   const params = useParams<{ locale?: string }>();
@@ -29,11 +31,37 @@ export default function AdminLoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json() as { success: boolean; data?: { accessToken: string }; error?: { code: string; message: string } };
+      const data = await res.json() as {
+        success: boolean;
+        data?: {
+          accessToken: string;
+          user: {
+            id: string;
+            email: string;
+            fullName: string;
+            role: string;
+            isSuperAdmin?: boolean;
+            permissions?: Permission[];
+          };
+        };
+        error?: { code: string; message: string };
+      };
 
       if (res.ok && data.success && data.data) {
-        // Store access token in cookie for middleware
+        if (data.data.user.role !== "ADMIN") {
+          setStatus("error");
+          setErrorMsg(isAr ? "هذا الحساب غير مصرح له بدخول لوحة التحكم" : "This account cannot access the admin panel");
+          return;
+        }
         document.cookie = `access_token=${data.data.accessToken}; path=/; max-age=900; samesite=strict`;
+        saveAdminSession({
+          id: data.data.user.id,
+          email: data.data.user.email,
+          fullName: data.data.user.fullName,
+          role: data.data.user.role,
+          isSuperAdmin: Boolean(data.data.user.isSuperAdmin),
+          permissions: data.data.user.permissions ?? [],
+        });
         router.push(`/${locale}/admin/dashboard`);
       } else {
         setStatus("error");

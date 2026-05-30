@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { z } from "zod";
 import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
+import { PERMISSIONS } from "@/lib/auth/permissions";
 
 const PACKAGE_NAMES: Record<string, string> = {
   BIBLIOGRAPHIC: "الببليوغرافيا",
@@ -39,7 +40,7 @@ async function getOrCreatePlan(packageType: string) {
 }
 
 export async function GET(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.b2b.view);
   if (isErrorResponse(auth)) return auth;
 
   try {
@@ -87,7 +88,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.b2b.create);
   if (isErrorResponse(auth)) return auth;
 
   try {

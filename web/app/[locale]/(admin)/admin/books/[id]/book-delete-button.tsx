@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { Trash2, Loader2, AlertTriangle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
+import { can } from "@/lib/admin/permissions-client";
+import { PERMISSIONS } from "@/lib/auth/permissions";
 
 interface BookDeleteButtonProps {
   bookId: string;
@@ -16,6 +18,8 @@ interface BookDeleteButtonProps {
 }
 
 export function BookDeleteButton({ bookId, bookTitle, locale, variant = "text", onDeleted, isBooksPage = false }: BookDeleteButtonProps) {
+  if (!can(PERMISSIONS.books.delete)) return null;
+
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");

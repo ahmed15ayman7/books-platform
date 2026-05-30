@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { z } from "zod";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
+import { PERMISSIONS } from "@/lib/auth/permissions";
 
 interface RouteParams { params: Promise<{ id: string }> }
 
@@ -23,7 +24,7 @@ const updateSchema = z.object({
 }).passthrough();
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.books.view);
   if (isErrorResponse(auth)) return auth;
 
   try {
@@ -44,7 +45,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.books.update);
   if (isErrorResponse(auth)) return auth;
 
   try {
@@ -70,7 +71,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 }
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.books.delete);
   if (isErrorResponse(auth)) return auth;
 
   try {

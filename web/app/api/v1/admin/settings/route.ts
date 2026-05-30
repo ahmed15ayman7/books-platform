@@ -2,11 +2,12 @@ import { type NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
+import { PERMISSIONS } from "@/lib/auth/permissions";
 
 const SETTINGS_KEY = "platform_settings";
 
 export async function GET(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.settings.view);
   if (isErrorResponse(auth)) return auth;
 
   try {
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.settings.update);
   if (isErrorResponse(auth)) return auth;
 
   try {
