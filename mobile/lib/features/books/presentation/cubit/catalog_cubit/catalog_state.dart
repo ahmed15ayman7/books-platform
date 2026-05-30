@@ -1,0 +1,32 @@
+import 'package:equatable/equatable.dart';
+
+import '../../../domain/entities/book.dart';
+
+sealed class CatalogState extends Equatable {
+  const CatalogState();
+  @override
+  List<Object?> get props => const [];
+}
+
+final class CatalogInitial extends CatalogState {
+  const CatalogInitial();
+}
+
+final class CatalogLoading extends CatalogState {
+  const CatalogLoading();
+}
+
+final class CatalogSuccess extends CatalogState {
+  const CatalogSuccess({required this.books, this.hasMore = false});
+  final List<Book> books;
+  final bool hasMore;
+  @override
+  List<Object?> get props => [books, hasMore];
+}
+
+final class CatalogError extends CatalogState {
+  const CatalogError(this.message);
+  final String message;
+  @override
+  List<Object?> get props => [message];
+}

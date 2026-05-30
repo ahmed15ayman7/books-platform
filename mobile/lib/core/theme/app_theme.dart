@@ -49,23 +49,23 @@ class AppTheme {
           contentPadding:
               EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(14.r),
             borderSide: BorderSide.none,
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(14.r),
             borderSide: BorderSide.none,
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(14.r),
             borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(14.r),
             borderSide: const BorderSide(color: AppColors.error),
           ),
           focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(14.r),
             borderSide: const BorderSide(color: AppColors.error, width: 1.5),
           ),
           hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
@@ -74,9 +74,9 @@ class AppTheme {
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
             foregroundColor: AppColors.surface,
-            minimumSize: Size.fromHeight(48.h),
+            minimumSize: Size.fromHeight(52.h),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(24.r),
             ),
             textStyle: AppTextStyles.titleMedium,
             elevation: 0,
@@ -85,10 +85,10 @@ class AppTheme {
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.primary,
-            minimumSize: Size.fromHeight(48.h),
+            minimumSize: Size.fromHeight(52.h),
             side: const BorderSide(color: AppColors.primary),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(24.r),
             ),
             textStyle: AppTextStyles.titleMedium,
           ),
@@ -102,7 +102,7 @@ class AppTheme {
           color: AppColors.cardBackground,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(28.r),
           ),
           margin: EdgeInsets.zero,
         ),
@@ -111,7 +111,7 @@ class AppTheme {
             foregroundColor: AppColors.primary,
             textStyle: AppTextStyles.titleMedium,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(24.r),
             ),
           ),
         ),
@@ -119,13 +119,13 @@ class AppTheme {
           backgroundColor: AppColors.surface,
           surfaceTintColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28.r)),
           ),
         ),
         snackBarTheme: SnackBarThemeData(
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(14.r),
           ),
         ),
       );

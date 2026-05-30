@@ -10,3 +10,13 @@ const int kDefaultPageSize = 20;
 
 const String kTokenKey = 'auth_token';
 const String kUserKey = 'auth_user';
+
+// Border radius tokens (raw dp — use with .r in build methods)
+const double kRadiusSm = 8.0;
+const double kRadiusMd = 14.0;
+const double kRadiusLg = 18.0;
+const double kRadiusXl = 24.0;
+const double kRadius2xl = 28.0;
+
+// Storage keys (onboarding)
+const String kOnboardingDoneKey = 'onboarding_done';
