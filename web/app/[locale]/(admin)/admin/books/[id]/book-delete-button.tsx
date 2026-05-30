@@ -10,9 +10,12 @@ interface BookDeleteButtonProps {
   bookId: string;
   bookTitle: string;
   locale: string;
+  variant?: "icon" | "text";
+  onDeleted?: () => void;
+  isBooksPage?: boolean;
 }
 
-export function BookDeleteButton({ bookId, bookTitle, locale }: BookDeleteButtonProps) {
+export function BookDeleteButton({ bookId, bookTitle, locale, variant = "text", onDeleted, isBooksPage = false }: BookDeleteButtonProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
@@ -37,8 +40,12 @@ export function BookDeleteButton({ bookId, bookTitle, locale }: BookDeleteButton
         }
 
         setOpen(false);
-        router.push(`/${locale}/admin/books`);
-        router.refresh();
+        if (isBooksPage) {
+          router.refresh();
+        } else {
+          router.push(`/${locale}/admin/books`);
+        }
+        onDeleted?.();
       } catch {
         setError("حدث خطأ في الاتصال");
       }
@@ -57,7 +64,7 @@ export function BookDeleteButton({ bookId, bookTitle, locale }: BookDeleteButton
         }}
       >
         <Trash2 className="h-4 w-4" />
-        حذف
+        {variant === "text" ? "حذف" : null}
       </Button>
 
       {open && (
