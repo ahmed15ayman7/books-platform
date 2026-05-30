@@ -1,21 +1,20 @@
 import { type NextRequest } from "next/server";
 import { generateRegistrationOptions } from "@simplewebauthn/server";
 import { db } from "@/lib/db";
-import { apiSuccess } from "@/lib/api-client/response";
 import { requireAdminAuth, isAdminAuthError } from "@/lib/auth/rbac";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { getWebAuthnRpId, getWebAuthnRpName } from "@/lib/auth/webauthn-config";
 import { signPasskeyChallenge } from "@/lib/auth/passkey-challenge";
-
+import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 export async function POST(request: NextRequest) {
   const auth = await requireAdminAuth(request, PERMISSIONS.passkey.manage);
-  if (isAdminAuthError(auth)) return auth;
+  if (isAdminAuthError(auth)) return ApiErrors.unauthorized();
 
   const user = await db.user.findUnique({
     where: { id: auth.userId },
     select: { email: true, fullName: true },
   });
-  if (!user) return auth;
+  if (!user) return ApiErrors.notFound("User not found");
 
   const existing = await db.userPasskey.findMany({
     where: { userId: auth.userId },
