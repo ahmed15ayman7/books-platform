@@ -45,8 +45,9 @@ class FeaturedBookHeroWidget extends StatelessWidget {
           ),
           child: Padding(
             padding: EdgeInsetsDirectional.all(18.r),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Cover thumbnail
                 SizedBox(
@@ -155,6 +156,7 @@ class FeaturedBookHeroWidget extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }
