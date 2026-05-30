@@ -385,13 +385,10 @@ class _HeroCover extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _GlassButton(
-                    icon: Transform.scale(
-                      scaleX: isRtl ? 1 : -1,
-                      child: Icon(
-                        Icons.chevron_right_rounded,
-                        color: Colors.white,
-                        size: 20.r,
-                      ),
+                    icon: Icon(
+                      isRtl ? Icons.chevron_right_rounded : Icons.chevron_left_rounded,
+                      color: Colors.white,
+                      size: 20.r,
                     ),
                     onTap: onBack,
                   ),

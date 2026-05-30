@@ -76,7 +76,7 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
                       crossAxisCount: 2,
                       crossAxisSpacing: 12.w,
                       mainAxisSpacing: 14.h,
-                      childAspectRatio: 0.52,
+                      childAspectRatio: 0.46,
                     ),
                     itemCount: books.length,
                     itemBuilder: (_, i) => BookCardWidget(

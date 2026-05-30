@@ -172,7 +172,7 @@ class _DetailBody extends StatelessWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: 12.w,
                 mainAxisSpacing: 14.h,
-                childAspectRatio: 0.52,
+                childAspectRatio: 0.46,
               ),
               delegate: SliverChildBuilderDelegate(
                 (_, i) => BookCardWidget(

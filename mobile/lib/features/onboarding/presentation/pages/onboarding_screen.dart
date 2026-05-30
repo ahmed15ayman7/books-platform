@@ -2,11 +2,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/constants/app_constants.dart';
-import '../../../../core/di/injection_container.dart';
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/storage/secure_storage_helper.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class _Slide {
@@ -82,7 +81,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _finish() async {
-    await getIt<SecureStorageHelper>().saveString(kOnboardingDoneKey, '1');
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(kOnboardingDoneKey, true);
     if (!mounted) return;
     Navigator.of(context).pushReplacementNamed(AppRoutes.home);
   }
@@ -203,14 +203,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   : (locale == 'ar' ? 'التالي' : 'Next'),
                             ),
                             SizedBox(width: 8.w),
-                            Transform.scale(
-                              scaleX: locale == 'ar' ? -1 : 1,
-                              child: Icon(
-                                isLast
-                                    ? Icons.check_rounded
-                                    : Icons.chevron_right_rounded,
-                                size: 18.r,
-                              ),
+                            Icon(
+                              isLast
+                                  ? Icons.check_rounded
+                                  : (locale == 'ar'
+                                      ? Icons.chevron_left_rounded
+                                      : Icons.chevron_right_rounded),
+                              size: 18.r,
                             ),
                           ],
                         ),

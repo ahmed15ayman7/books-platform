@@ -127,8 +127,7 @@ class _LanguageCard extends StatelessWidget {
             SizedBox(width: 16.w),
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                    isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     label,
@@ -149,7 +148,7 @@ class _LanguageCard extends StatelessWidget {
               ),
             ),
             Icon(
-              Icons.chevron_right_rounded,
+              isRtl ? Icons.chevron_left_rounded : Icons.chevron_right_rounded,
               color: AppColors.primary,
               size: 24.r,
             ),

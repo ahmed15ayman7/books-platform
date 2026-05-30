@@ -136,13 +136,12 @@ class FeaturedBookHeroWidget extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(width: 4.w),
-                              Transform.scale(
-                                scaleX: locale == 'ar' ? -1 : 1,
-                                child: Icon(
-                                  Icons.chevron_right_rounded,
-                                  size: 15.r,
-                                  color: Colors.white,
-                                ),
+                              Icon(
+                                locale == 'ar'
+                                    ? Icons.chevron_left_rounded
+                                    : Icons.chevron_right_rounded,
+                                size: 15.r,
+                                color: Colors.white,
                               ),
                             ],
                           ),

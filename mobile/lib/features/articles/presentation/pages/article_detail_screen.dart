@@ -223,6 +223,7 @@ class _HeroHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isRtl = context.locale.languageCode == 'ar';
     return SizedBox(
       height: 230.h,
       child: Stack(
@@ -312,7 +313,9 @@ class _HeroHeader extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Icon(
-                  Icons.arrow_back_ios_new_rounded,
+                  isRtl
+                      ? Icons.arrow_forward_ios_rounded
+                      : Icons.arrow_back_ios_new_rounded,
                   color: Colors.white,
                   size: 18.r,
                 ),

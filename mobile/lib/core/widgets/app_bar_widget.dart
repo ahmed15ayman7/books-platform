@@ -187,13 +187,10 @@ class _BackButton extends StatelessWidget {
           border: Border.all(color: AppColors.divider),
           borderRadius: BorderRadius.circular(999),
         ),
-        child: Transform.scale(
-          scaleX: isRtl ? -1 : 1,
-          child: Icon(
-            Icons.chevron_right_rounded,
-            size: 20.r,
-            color: AppColors.textPrimary,
-          ),
+        child: Icon(
+          isRtl ? Icons.chevron_right_rounded : Icons.chevron_left_rounded,
+          size: 20.r,
+          color: AppColors.textPrimary,
         ),
       ),
     );
