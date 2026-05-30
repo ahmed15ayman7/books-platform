@@ -47,13 +47,10 @@ class SectionHeaderWidget extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: 2.w),
-                  Transform.scale(
-                    scaleX: isRtl ? -1 : 1,
-                    child: Icon(
-                      Icons.chevron_right,
-                      size: 15.r,
-                      color: AppColors.primary,
-                    ),
+                  Icon(
+                    isRtl ? Icons.chevron_left : Icons.chevron_right,
+                    size: 15.r,
+                    color: AppColors.primary,
                   ),
                 ],
               ),

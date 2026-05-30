@@ -117,7 +117,9 @@ class _PublishScreenState extends State<PublishScreen> {
                               borderRadius: BorderRadius.circular(24.r),
                             ),
                             child: Icon(
-                              Icons.chevron_left_rounded,
+                              ar
+                                  ? Icons.chevron_right_rounded
+                                  : Icons.chevron_left_rounded,
                               size: 22.r,
                               color: AppColors.textPrimary,
                             ),
@@ -141,12 +143,11 @@ class _PublishScreenState extends State<PublishScreen> {
                               ),
                               if (_step < _steps.length - 1) ...[
                                 SizedBox(width: 8.w),
-                                Transform.scale(
-                                  scaleX: ar ? -1 : 1,
-                                  child: Icon(
-                                    Icons.chevron_right_rounded,
-                                    size: 18.r,
-                                  ),
+                                Icon(
+                                  ar
+                                      ? Icons.chevron_left_rounded
+                                      : Icons.chevron_right_rounded,
+                                  size: 18.r,
                                 ),
                               ],
                             ],

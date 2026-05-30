@@ -39,8 +39,8 @@ class BookCoverWidget extends StatelessWidget {
         child: Stack(
           children: [
             // Spine (trailing edge strip)
-            Positioned(
-              right: 0,
+            PositionedDirectional(
+              end: 0,
               top: 0,
               bottom: 0,
               child: Container(

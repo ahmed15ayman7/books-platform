@@ -4,11 +4,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/constants/app_constants.dart';
-import '../../../../core/di/injection_container.dart';
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/storage/secure_storage_helper.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -38,11 +37,11 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _navigate() async {
     await Future.delayed(kSplashDuration);
     if (!mounted) return;
-    final storage = getIt<SecureStorageHelper>();
-    final done = await storage.getString(kOnboardingDoneKey);
+    final prefs = await SharedPreferences.getInstance();
+    final done = prefs.getBool(kOnboardingDoneKey) ?? false;
     if (!mounted) return;
     Navigator.of(context).pushReplacementNamed(
-      done != null ? AppRoutes.home : AppRoutes.language,
+      done ? AppRoutes.home : AppRoutes.language,
     );
   }
 
