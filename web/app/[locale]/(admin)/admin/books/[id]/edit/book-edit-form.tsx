@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Save, Loader2, CheckCircle2, AlertCircle, X } from "lucide-react";
-import { updateBook, type BookEditData } from "./actions";
+import { createBook, updateBook, type BookEditData } from "./actions";
 import { cn } from "@/lib/utils";
 
 /* ─── Types ─────────────────────────────────────────────────────────── */
@@ -12,10 +12,21 @@ interface Category   { id: string; name: string; nameAr: string | null; slug: st
 interface Author     { id: string; name: string; nameAr: string | null; slug: string }
 
 interface BookEditFormProps {
-  book: BookEditData & { id: string };
+  bookId?: string;
+  locale: string;
+  initial: BookEditData;
   publishers: Publisher[];
   categories: Category[];
   authors: Author[];
+}
+
+function slugify(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 const sectionCardCls =
@@ -159,43 +170,21 @@ function MultiSelect({
 }
 
 /* ─── Main form ──────────────────────────────────────────────────────── */
-export function BookEditForm({ book, publishers, categories, authors }: BookEditFormProps) {
+export function BookEditForm({
+  bookId,
+  locale,
+  initial,
+  publishers,
+  categories,
+  authors,
+}: BookEditFormProps) {
   const router = useRouter();
+  const isCreate = !bookId;
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Form state — mirrors BookEditData
-  const [form, setForm] = useState<BookEditData>({
-    nameEn: book.nameEn,
-    nameAr: book.nameAr,
-    slug: book.slug,
-    isbn: book.isbn,
-    imageUrl: book.imageUrl,
-    language: book.language,
-    publicationYear: book.publicationYear,
-    country: book.country,
-    pageCount: book.pageCount,
-    edition: book.edition,
-    dimensions: book.dimensions,
-    translationStatus: book.translationStatus,
-    purchaseOption: book.purchaseOption,
-    price: book.price,
-    currency: book.currency,
-    referralLink: book.referralLink,
-    shortDesc: book.shortDesc,
-    shortDescAr: book.shortDescAr,
-    description: book.description,
-    descriptionAr: book.descriptionAr,
-    notes: book.notes,
-    published: book.published,
-    featured: book.featured,
-    inStock: book.inStock,
-    publisherId: book.publisherId,
-    primaryCategoryId: book.primaryCategoryId,
-    categoryIds: book.categoryIds,
-    authorIds: book.authorIds,
-  });
+  const [form, setForm] = useState<BookEditData>(initial);
 
   function set<K extends keyof BookEditData>(key: K, value: BookEditData[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -204,11 +193,22 @@ export function BookEditForm({ book, publishers, categories, authors }: BookEdit
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("idle");
+
+    const payload: BookEditData = {
+      ...form,
+      slug: form.slug.trim() || slugify(form.nameEn),
+    };
+
     startTransition(async () => {
       try {
-        await updateBook(book.id, form);
-        setStatus("success");
-        setTimeout(() => setStatus("idle"), 3000);
+        if (bookId) {
+          await updateBook(bookId, payload);
+          setStatus("success");
+          setTimeout(() => setStatus("idle"), 3000);
+        } else {
+          const result = await createBook(payload);
+          router.push(`/${locale}/admin/books/${result.id}`);
+        }
       } catch (err) {
         setStatus("error");
         setErrorMsg(err instanceof Error ? err.message : "حدث خطأ غير متوقع");
@@ -219,7 +219,7 @@ export function BookEditForm({ book, publishers, categories, authors }: BookEdit
   return (
     <form onSubmit={handleSubmit} className="space-y-6" dir="rtl">
       {/* ── Status banner ───────────────────────────────────────── */}
-      {status === "success" && (
+      {status === "success" && !isCreate && (
         <div className="flex items-center gap-2 rounded-xl border border-green-800/50 bg-green-950/40 px-4 py-3 text-sm text-green-400">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           تم حفظ التغييرات بنجاح
@@ -457,7 +457,7 @@ export function BookEditForm({ book, publishers, categories, authors }: BookEdit
             className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand-red)] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-red)]/90 disabled:opacity-60"
           >
             {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            حفظ التغييرات
+            {isCreate ? "إنشاء الكتاب" : "حفظ التغييرات"}
           </button>
         </div>
       </div>

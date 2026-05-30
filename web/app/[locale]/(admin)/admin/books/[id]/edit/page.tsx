@@ -72,8 +72,9 @@ export default async function BookEditPage({ params }: Props) {
 
       <div className="mx-auto max-w-5xl">
         <BookEditForm
-          book={{
-            id: book.id,
+          bookId={book.id}
+          locale={locale}
+          initial={{
             nameEn: book.nameEn,
             nameAr: book.nameAr ?? "",
             slug: book.slug,
