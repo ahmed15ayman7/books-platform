@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/di/injection_container.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/router/args/book_detail_args.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -11,6 +12,7 @@ import '../../../../core/widgets/app_loading_indicator.dart';
 import '../../../../core/widgets/book_cover_widget.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/translation_status_badge.dart';
+import '../../../cart/presentation/cubit/cart_cubit.dart';
 import '../../domain/entities/book.dart';
 import '../cubit/book_detail_cubit/book_detail_cubit.dart';
 import '../cubit/book_detail_cubit/book_detail_state.dart';
@@ -60,8 +62,10 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
               onToggleExpand: () =>
                   setState(() => _expanded = !_expanded),
               onToggleSave: () => setState(() => _saved = !_saved),
-              onAddCart: () =>
-                  Navigator.of(ctx).pushNamed(AppRoutes.cart),
+              onAddCart: () {
+                getIt<CartCubit>().addItem(book);
+                Navigator.of(ctx).pushNamed(AppRoutes.cart);
+              },
               onBookTap: (b) => Navigator.of(ctx).pushReplacementNamed(
                 AppRoutes.bookDetail,
                 arguments: BookDetailArgs(slug: b.id, titleAr: b.titleAr),

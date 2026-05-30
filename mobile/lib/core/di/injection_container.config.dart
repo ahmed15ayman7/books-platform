@@ -16,6 +16,14 @@ import 'package:booksplatform/core/network/api_manager.dart' as _i473;
 import 'package:booksplatform/core/network/connectivity_helper.dart' as _i403;
 import 'package:booksplatform/core/network/dio_factory.dart' as _i339;
 import 'package:booksplatform/core/storage/secure_storage_helper.dart' as _i759;
+import 'package:booksplatform/features/articles/data/datasources/articles_remote_data_source_impl.dart'
+    as _i652;
+import 'package:booksplatform/features/articles/data/repositories/articles_repository_impl.dart'
+    as _i653;
+import 'package:booksplatform/features/articles/domain/repositories/base_articles_repository.dart'
+    as _i657;
+import 'package:booksplatform/features/articles/presentation/cubit/article_detail_cubit/article_detail_cubit.dart'
+    as _i165;
 import 'package:booksplatform/features/articles/presentation/cubit/articles_list_cubit/articles_list_cubit.dart'
     as _i556;
 import 'package:booksplatform/features/books/data/datasources/books_remote_data_source_impl.dart'
@@ -38,6 +46,8 @@ import 'package:booksplatform/features/publishers/data/repositories/publishers_r
     as _i1006;
 import 'package:booksplatform/features/publishers/domain/repositories/base_publishers_repository.dart'
     as _i674;
+import 'package:booksplatform/features/publishers/presentation/cubit/publisher_detail_cubit/publisher_detail_cubit.dart'
+    as _i618;
 import 'package:booksplatform/features/publishers/presentation/cubit/publishers_list_cubit/publishers_list_cubit.dart'
     as _i935;
 import 'package:booksplatform/features/search/presentation/cubit/search_cubit.dart'
@@ -66,6 +76,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i403.ConnectivityHelper>(
       () => _i403.ConnectivityHelper(),
     );
+    gh.lazySingleton<_i652.ArticlesRemoteDataSourceImpl>(
+      () => _i652.ArticlesRemoteDataSourceImpl(),
+    );
     gh.lazySingleton<_i481.BooksRemoteDataSourceImpl>(
       () => _i481.BooksRemoteDataSourceImpl(),
     );
@@ -81,6 +94,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i759.SecureStorageHelper>(
       () => _i759.SecureStorageHelper(gh<_i558.FlutterSecureStorage>()),
     );
+    gh.lazySingleton<_i657.ArticlesRepository>(
+      () => _i653.ArticlesRepositoryImpl(
+        gh<_i652.ArticlesRemoteDataSourceImpl>(),
+      ),
+    );
     gh.factory<_i935.PublishersListCubit>(
       () => _i935.PublishersListCubit(gh<_i674.PublishersRepository>()),
     );
@@ -92,6 +110,15 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i517.SnackBarHelper>(
       () => _i517.SnackBarHelper(gh<_i409.GlobalKey<_i409.NavigatorState>>()),
+    );
+    gh.factory<_i165.ArticleDetailCubit>(
+      () => _i165.ArticleDetailCubit(gh<_i657.ArticlesRepository>()),
+    );
+    gh.factory<_i618.PublisherDetailCubit>(
+      () => _i618.PublisherDetailCubit(
+        gh<_i674.PublishersRepository>(),
+        gh<_i407.BooksRepository>(),
+      ),
     );
     gh.factory<_i974.BookDetailCubit>(
       () => _i974.BookDetailCubit(gh<_i407.BooksRepository>()),

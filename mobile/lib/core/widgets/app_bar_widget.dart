@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../features/cart/presentation/cubit/cart_cubit.dart';
+import '../di/injection_container.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_shadows.dart';
 
@@ -17,7 +20,6 @@ class AppBarWidget extends StatelessWidget {
     this.onBack,
     this.onSearch,
     this.onCart,
-    this.cartCount = 0,
     this.trailing,
     this.currentLocale = 'ar',
     this.onLocaleChanged,
@@ -30,7 +32,6 @@ class AppBarWidget extends StatelessWidget {
   final VoidCallback? onBack;
   final VoidCallback? onSearch;
   final VoidCallback? onCart;
-  final int cartCount;
   final Widget? trailing;
   final String currentLocale;
   final ValueChanged<String>? onLocaleChanged;
@@ -73,7 +74,7 @@ class AppBarWidget extends StatelessWidget {
               ],
               if (onCart != null) ...[
                 SizedBox(width: 8.w),
-                _CartButton(onTap: onCart!, count: cartCount),
+                _CartButton(onTap: onCart!),
               ],
             ],
           ),
@@ -293,56 +294,61 @@ class _IconButton extends StatelessWidget {
 
 // ── Cart icon with badge ──────────────────────────────────────────────────
 class _CartButton extends StatelessWidget {
-  const _CartButton({required this.onTap, required this.count});
+  const _CartButton({required this.onTap});
   final VoidCallback onTap;
-  final int count;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            width: 38.r,
-            height: 38.r,
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              border: Border.all(color: AppColors.divider),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Icon(
-              Icons.shopping_bag_outlined,
-              size: 20.r,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          if (count > 0)
-            PositionedDirectional(
-              top: -3,
-              end: -3,
-              child: Container(
-                constraints: BoxConstraints(minWidth: 17.r, minHeight: 17.r),
-                padding: EdgeInsets.symmetric(horizontal: 3.w),
+    return BlocBuilder<CartCubit, CartState>(
+      bloc: getIt<CartCubit>(),
+      builder: (context, cartState) {
+        final count = cartState.totalCount;
+        return GestureDetector(
+          onTap: onTap,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                width: 38.r,
+                height: 38.r,
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  color: AppColors.surface,
+                  border: Border.all(color: AppColors.divider),
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: Center(
-                  child: Text(
-                    '$count',
-                    style: GoogleFonts.inter(
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                child: Icon(
+                  Icons.shopping_bag_outlined,
+                  size: 20.r,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              if (count > 0)
+                PositionedDirectional(
+                  top: -3,
+                  end: -3,
+                  child: Container(
+                    constraints: BoxConstraints(minWidth: 17.r, minHeight: 17.r),
+                    padding: EdgeInsets.symmetric(horizontal: 3.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '$count',
+                        style: GoogleFonts.inter(
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-        ],
-      ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
