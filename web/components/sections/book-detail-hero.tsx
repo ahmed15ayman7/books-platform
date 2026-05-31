@@ -8,7 +8,7 @@ import type { Locale } from "@/lib/i18n";
 
 /** Fixed cover size for all books on detail page (4:3) */
 export const BOOK_DETAIL_COVER_WIDTH = 360;
-export const BOOK_DETAIL_COVER_HEIGHT = Math.round((BOOK_DETAIL_COVER_WIDTH * 3) / 4);
+export const BOOK_DETAIL_COVER_HEIGHT = Math.round((BOOK_DETAIL_COVER_WIDTH * 3) / 2);
 
 interface Category {
   id: string;
