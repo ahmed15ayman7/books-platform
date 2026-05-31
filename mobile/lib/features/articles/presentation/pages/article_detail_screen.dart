@@ -45,19 +45,24 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: BlocBuilder<ArticleDetailCubit, ArticleDetailState>(
-        builder: (ctx, state) => switch (state) {
-          ArticleDetailLoading() ||
-          ArticleDetailInitial() =>
-            const Center(child: AppLoadingIndicator()),
-          ArticleDetailError(:final message) => Center(
-              child: ErrorStateWidget(
-                message: message,
-                onRetry: () =>
-                    ctx.read<ArticleDetailCubit>().load(widget.args.id),
-              ),
-            ),
-          ArticleDetailSuccess(:final article) => Column(
-              children: [
+        builder: (ctx, state) {
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: switch (state) {
+              ArticleDetailLoading() ||
+              ArticleDetailInitial() =>
+                const Center(key: ValueKey('loading'), child: AppLoadingIndicator()),
+              ArticleDetailError(:final message) => Center(
+                  key: const ValueKey('error'),
+                  child: ErrorStateWidget(
+                    message: message,
+                    onRetry: () =>
+                        ctx.read<ArticleDetailCubit>().load(widget.args.id),
+                  ),
+                ),
+              ArticleDetailSuccess(:final article) => Column(
+                  key: const ValueKey('success'),
+                  children: [
                 Expanded(
                   child: _ArticleBody(
                     article: article,
@@ -79,6 +84,8 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
                 ),
               ],
             ),
+            },
+          );
         },
       ),
     );

@@ -12,6 +12,8 @@ class HomeContentCubit extends Cubit<HomeContentState> {
 
   final BooksRepository _repo;
 
+  Future<void> refresh() => load();
+
   Future<void> load() async {
     emit(const HomeContentLoading());
 

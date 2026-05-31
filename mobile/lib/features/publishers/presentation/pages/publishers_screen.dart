@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/router/args/publisher_detail_args.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/widgets/app_bar_widget.dart';
-import '../../../../core/widgets/app_loading_indicator.dart';
 import '../../../../core/widgets/bottom_nav_widget.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../domain/entities/publisher.dart';
@@ -48,38 +48,48 @@ class _PublishersScreenState extends State<PublishersScreen> {
           ),
           Expanded(
             child: BlocBuilder<PublishersListCubit, PublishersListState>(
-              builder: (ctx, state) => switch (state) {
-                PublishersListLoading() =>
-                  const Center(child: AppLoadingIndicator()),
-                PublishersListError(:final message) => Center(
-                    child: ErrorStateWidget(
-                      message: message,
-                      onRetry: () => ctx.read<PublishersListCubit>().load(),
-                    ),
-                  ),
-                PublishersListSuccess(
-                  :final publishers,
-                  :final countries,
-                  :final activeCountry,
-                ) =>
-                  _Body(
-                    publishers: publishers,
-                    countries: countries,
-                    activeCountry: activeCountry,
-                    locale: locale,
-                    onCountryTap: (c) =>
-                        ctx.read<PublishersListCubit>().filterByCountry(
-                              c == activeCountry ? null : c,
-                            ),
-                    onPublisherTap: (p) => Navigator.of(ctx).pushNamed(
-                      AppRoutes.publisherDetail,
-                      arguments: PublisherDetailArgs(
-                        slug: p.id,
-                        name: p.name,
+              builder: (ctx, state) {
+                return AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: switch (state) {
+                    PublishersListLoading() =>
+                      const _PublishersShimmer(key: ValueKey('loading')),
+                    PublishersListError(:final message) => Center(
+                        key: const ValueKey('error'),
+                        child: ErrorStateWidget(
+                          message: message,
+                          onRetry: () =>
+                              ctx.read<PublishersListCubit>().load(),
+                        ),
                       ),
-                    ),
-                  ),
-                _ => const SizedBox.shrink(),
+                    PublishersListSuccess(
+                      :final publishers,
+                      :final countries,
+                      :final activeCountry,
+                    ) =>
+                      _Body(
+                        key: const ValueKey('success'),
+                        publishers: publishers,
+                        countries: countries,
+                        activeCountry: activeCountry,
+                        locale: locale,
+                        onCountryTap: (c) =>
+                            ctx.read<PublishersListCubit>().filterByCountry(
+                                  c == activeCountry ? null : c,
+                                ),
+                        onPublisherTap: (p) => Navigator.of(ctx).pushNamed(
+                          AppRoutes.publisherDetail,
+                          arguments: PublisherDetailArgs(
+                            slug: p.id,
+                            name: p.name,
+                          ),
+                        ),
+                        onRefresh: () =>
+                            ctx.read<PublishersListCubit>().refresh(),
+                      ),
+                    _ => const SizedBox.shrink(key: ValueKey('initial')),
+                  },
+                );
               },
             ),
           ),
@@ -111,12 +121,14 @@ class _PublishersScreenState extends State<PublishersScreen> {
 
 class _Body extends StatelessWidget {
   const _Body({
+    super.key,
     required this.publishers,
     required this.countries,
     required this.activeCountry,
     required this.locale,
     required this.onCountryTap,
     required this.onPublisherTap,
+    required this.onRefresh,
   });
   final List<Publisher> publishers;
   final List<String> countries;
@@ -124,11 +136,16 @@ class _Body extends StatelessWidget {
   final String locale;
   final ValueChanged<String> onCountryTap;
   final ValueChanged<Publisher> onPublisherTap;
+  final Future<void> Function() onRefresh;
 
   @override
   Widget build(BuildContext context) {
     final ar = locale == 'ar';
-    return CustomScrollView(
+    return RefreshIndicator(
+      onRefresh: onRefresh,
+      color: AppColors.primary,
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
         // Search bar (visual only — future enhancement)
         SliverToBoxAdapter(
@@ -204,6 +221,7 @@ class _Body extends StatelessWidget {
         ),
         SliverToBoxAdapter(child: SizedBox(height: 24.h)),
       ],
+      ),
     );
   }
 }
@@ -365,6 +383,85 @@ class _PublisherCard extends StatelessWidget {
         ],
       ),
     ),
+    );
+  }
+}
+
+class _PublisherCardShimmer extends StatelessWidget {
+  const _PublisherCardShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: AppColors.shimmerBase,
+      highlightColor: AppColors.shimmerHighlight,
+      child: Container(
+        padding: EdgeInsetsDirectional.all(14.r),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 54.r,
+              height: 54.r,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+            ),
+            SizedBox(width: 14.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 14.h,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4.r),
+                    ),
+                  ),
+                  SizedBox(height: 6.h),
+                  Container(
+                    height: 11.h,
+                    width: 120.w,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4.r),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Container(
+              height: 28.h,
+              width: 70.w,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(999),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PublishersShimmer extends StatelessWidget {
+  const _PublishersShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      padding: EdgeInsetsDirectional.fromSTEB(16.w, 14.h, 16.w, 24.h),
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 6,
+      separatorBuilder: (_, _) => SizedBox(height: 12.h),
+      itemBuilder: (_, _) => const _PublisherCardShimmer(),
     );
   }
 }

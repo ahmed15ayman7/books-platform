@@ -42,19 +42,24 @@ class _PublisherDetailScreenState extends State<PublisherDetailScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: BlocBuilder<PublisherDetailCubit, PublisherDetailState>(
-        builder: (ctx, state) => switch (state) {
-          PublisherDetailLoading() ||
-          PublisherDetailInitial() =>
-            const Center(child: AppLoadingIndicator()),
-          PublisherDetailError(:final message) => Center(
-              child: ErrorStateWidget(
-                message: message,
-                onRetry: () =>
-                    ctx.read<PublisherDetailCubit>().load(widget.args.slug),
-              ),
-            ),
-          PublisherDetailSuccess(:final publisher, :final books) => Column(
-              children: [
+        builder: (ctx, state) {
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: switch (state) {
+              PublisherDetailLoading() ||
+              PublisherDetailInitial() =>
+                const Center(key: ValueKey('loading'), child: AppLoadingIndicator()),
+              PublisherDetailError(:final message) => Center(
+                  key: const ValueKey('error'),
+                  child: ErrorStateWidget(
+                    message: message,
+                    onRetry: () =>
+                        ctx.read<PublisherDetailCubit>().load(widget.args.slug),
+                  ),
+                ),
+              PublisherDetailSuccess(:final publisher, :final books) => Column(
+                  key: const ValueKey('success'),
+                  children: [
                 AppBarWidget(
                   variant: AppBarVariant.title,
                   title: publisher.name,
@@ -87,6 +92,8 @@ class _PublisherDetailScreenState extends State<PublisherDetailScreen> {
                 ),
               ],
             ),
+            },
+          );
         },
       ),
     );

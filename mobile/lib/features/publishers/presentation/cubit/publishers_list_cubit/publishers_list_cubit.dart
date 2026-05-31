@@ -12,6 +12,8 @@ class PublishersListCubit extends Cubit<PublishersListState> {
   final PublishersRepository _repo;
   String? _activeCountry;
 
+  Future<void> refresh() => load();
+
   Future<void> load() async {
     emit(const PublishersListLoading());
 

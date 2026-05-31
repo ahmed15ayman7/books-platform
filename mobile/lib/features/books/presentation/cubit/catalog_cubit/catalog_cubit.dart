@@ -17,6 +17,8 @@ class CatalogCubit extends Cubit<CatalogState> {
   TranslationStatus? _activeStatus;
   SortOrder _sort = SortOrder.newest;
 
+  Future<void> refresh() => _fetch();
+
   Future<void> load() => _fetch();
 
   Future<void> applyFilter({

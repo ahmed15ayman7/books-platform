@@ -42,36 +42,47 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: BlocBuilder<BookDetailCubit, BookDetailState>(
-        builder: (ctx, state) => switch (state) {
-          BookDetailLoading() =>
-            const Center(child: AppLoadingIndicator()),
-          BookDetailError(:final message) => Center(
-              child: ErrorStateWidget(
-                message: message,
-                onRetry: () =>
-                    ctx.read<BookDetailCubit>().load(widget.args.slug),
-              ),
-            ),
-          BookDetailSuccess(:final book, :final similarBooks) =>
-            _DetailBody(
-              book: book,
-              similarBooks: similarBooks,
-              locale: locale,
-              expanded: _expanded,
-              saved: _saved,
-              onToggleExpand: () =>
-                  setState(() => _expanded = !_expanded),
-              onToggleSave: () => setState(() => _saved = !_saved),
-              onAddCart: () {
-                getIt<CartCubit>().addItem(book);
-                Navigator.of(ctx).pushNamed(AppRoutes.cart);
-              },
-              onBookTap: (b) => Navigator.of(ctx).pushReplacementNamed(
-                AppRoutes.bookDetail,
-                arguments: BookDetailArgs(slug: b.id, titleAr: b.titleAr),
-              ),
-            ),
-          _ => const SizedBox.shrink(),
+        builder: (ctx, state) {
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: switch (state) {
+              BookDetailLoading() => const Center(
+                  key: ValueKey('loading'),
+                  child: AppLoadingIndicator(),
+                ),
+              BookDetailError(:final message) => Center(
+                  key: const ValueKey('error'),
+                  child: ErrorStateWidget(
+                    message: message,
+                    onRetry: () =>
+                        ctx.read<BookDetailCubit>().load(widget.args.slug),
+                  ),
+                ),
+              BookDetailSuccess(:final book, :final similarBooks) =>
+                KeyedSubtree(
+                  key: const ValueKey('success'),
+                  child: _DetailBody(
+                  book: book,
+                  similarBooks: similarBooks,
+                  locale: locale,
+                  expanded: _expanded,
+                  saved: _saved,
+                  onToggleExpand: () =>
+                      setState(() => _expanded = !_expanded),
+                  onToggleSave: () => setState(() => _saved = !_saved),
+                  onAddCart: () {
+                    getIt<CartCubit>().addItem(book);
+                    Navigator.of(ctx).pushNamed(AppRoutes.cart);
+                  },
+                  onBookTap: (b) => Navigator.of(ctx).pushReplacementNamed(
+                    AppRoutes.bookDetail,
+                    arguments: BookDetailArgs(slug: b.id, titleAr: b.titleAr),
+                  ),
+                  ),
+                ),
+              _ => const SizedBox.shrink(key: ValueKey('initial')),
+            },
+          );
         },
       ),
     );

@@ -9,11 +9,11 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/router/args/book_detail_args.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_bar_widget.dart';
-import '../../../../core/widgets/app_loading_indicator.dart';
 import '../../../../core/widgets/bottom_nav_widget.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../cubit/catalog_cubit/catalog_cubit.dart';
 import '../cubit/catalog_cubit/catalog_state.dart';
+import '../widgets/book_card_shimmer.dart';
 import '../widgets/book_card_widget.dart';
 
 class CatalogScreen extends StatefulWidget {
@@ -88,37 +88,50 @@ class _CatalogScreenState extends State<CatalogScreen> {
           // Book grid
           Expanded(
             child: BlocBuilder<CatalogCubit, CatalogState>(
-              builder: (ctx, state) => switch (state) {
-                CatalogLoading() =>
-                  const Center(child: AppLoadingIndicator()),
-                CatalogError(:final message) => Center(
-                    child: ErrorStateWidget(
-                      message: message,
-                      onRetry: () => ctx.read<CatalogCubit>().load(),
-                    ),
-                  ),
-                CatalogSuccess(:final books) => GridView.builder(
-                    padding: EdgeInsetsDirectional.all(16.r),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12.w,
-                      mainAxisSpacing: 14.h,
-                      childAspectRatio: 0.46,
-                    ),
-                    itemCount: books.length,
-                    itemBuilder: (_, i) => BookCardWidget(
-                      book: books[i],
-                      locale: locale,
-                      onTap: () => Navigator.of(ctx).pushNamed(
-                        AppRoutes.bookDetail,
-                        arguments: BookDetailArgs(
-                          slug: books[i].id,
-                          titleAr: books[i].titleAr,
+              builder: (ctx, state) {
+                return AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: switch (state) {
+                    CatalogLoading() =>
+                      const _CatalogShimmer(key: ValueKey('loading')),
+                    CatalogError(:final message) => Center(
+                        key: const ValueKey('error'),
+                        child: ErrorStateWidget(
+                          message: message,
+                          onRetry: () => ctx.read<CatalogCubit>().load(),
                         ),
                       ),
-                    ),
-                  ),
-                _ => const SizedBox.shrink(),
+                    CatalogSuccess(:final books) => RefreshIndicator(
+                        key: const ValueKey('success'),
+                        onRefresh: () => ctx.read<CatalogCubit>().refresh(),
+                        color: AppColors.primary,
+                        child: GridView.builder(
+                          padding: EdgeInsetsDirectional.all(16.r),
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 12.w,
+                            mainAxisSpacing: 14.h,
+                            childAspectRatio: 0.46,
+                          ),
+                          itemCount: books.length,
+                          itemBuilder: (_, i) => BookCardWidget(
+                            book: books[i],
+                            locale: locale,
+                            onTap: () => Navigator.of(ctx).pushNamed(
+                              AppRoutes.bookDetail,
+                              arguments: BookDetailArgs(
+                                slug: books[i].id,
+                                titleAr: books[i].titleAr,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    _ => const SizedBox.shrink(key: ValueKey('initial')),
+                  },
+                );
               },
             ),
           ),
@@ -237,6 +250,26 @@ class _Chip extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _CatalogShimmer extends StatelessWidget {
+  const _CatalogShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      padding: EdgeInsetsDirectional.all(16.r),
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12.w,
+        mainAxisSpacing: 14.h,
+        childAspectRatio: 0.46,
+      ),
+      itemCount: 6,
+      itemBuilder: (_, _) => const BookCardShimmer(),
     );
   }
 }

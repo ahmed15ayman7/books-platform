@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/router/args/book_detail_args.dart';
 import '../../../../core/router/args/category_books_args.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_bar_widget.dart';
-import '../../../../core/widgets/app_loading_indicator.dart';
 import '../../../../core/widgets/bottom_nav_widget.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/section_header_widget.dart';
@@ -17,6 +17,7 @@ import '../../domain/entities/category.dart';
 import '../../domain/entities/publisher_summary.dart';
 import '../cubit/home_content_cubit/home_content_cubit.dart';
 import '../cubit/home_content_cubit/home_content_state.dart';
+import '../widgets/book_card_shimmer.dart';
 import '../widgets/book_card_widget.dart';
 import '../widgets/featured_book_hero_widget.dart';
 
@@ -59,33 +60,42 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Expanded(
             child: BlocBuilder<HomeContentCubit, HomeContentState>(
-              builder: (ctx, state) => switch (state) {
-                HomeContentLoading() =>
-                  const Center(child: AppLoadingIndicator()),
-                HomeContentError(:final message) => Center(
-                    child: ErrorStateWidget(
-                      message: message,
-                      onRetry: () => ctx.read<HomeContentCubit>().load(),
-                    ),
-                  ),
-                HomeContentSuccess() => _Body(
-                    state: state,
-                    locale: locale,
-                    onBookTap: (id, title) => _openBook(ctx, id, title),
-                    onBrowse: () =>
-                        Navigator.of(ctx).pushNamed(AppRoutes.books),
-                    onPublisher: () =>
-                        Navigator.of(ctx).pushNamed(AppRoutes.publishers),
-                    onCategoryTap: (cat) => Navigator.of(ctx).pushNamed(
-                      AppRoutes.categoryBooks,
-                      arguments: CategoryBooksArgs(
-                        slug: cat.slug,
-                        nameAr: cat.nameAr,
-                        nameEn: cat.nameEn,
+              builder: (ctx, state) {
+                return AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: switch (state) {
+                    HomeContentLoading() =>
+                      const _HomeShimmer(key: ValueKey('loading')),
+                    HomeContentError(:final message) => Center(
+                        key: const ValueKey('error'),
+                        child: ErrorStateWidget(
+                          message: message,
+                          onRetry: () => ctx.read<HomeContentCubit>().load(),
+                        ),
                       ),
-                    ),
-                  ),
-                _ => const SizedBox.shrink(),
+                    HomeContentSuccess() => _Body(
+                        key: const ValueKey('success'),
+                        state: state,
+                        locale: locale,
+                        onBookTap: (id, title) => _openBook(ctx, id, title),
+                        onBrowse: () =>
+                            Navigator.of(ctx).pushNamed(AppRoutes.books),
+                        onPublisher: () =>
+                            Navigator.of(ctx).pushNamed(AppRoutes.publishers),
+                        onCategoryTap: (cat) => Navigator.of(ctx).pushNamed(
+                          AppRoutes.categoryBooks,
+                          arguments: CategoryBooksArgs(
+                            slug: cat.slug,
+                            nameAr: cat.nameAr,
+                            nameEn: cat.nameEn,
+                          ),
+                        ),
+                        onRefresh: () =>
+                            ctx.read<HomeContentCubit>().refresh(),
+                      ),
+                    _ => const SizedBox.shrink(key: ValueKey('initial')),
+                  },
+                );
               },
             ),
           ),
@@ -118,12 +128,14 @@ class _HomeScreenState extends State<HomeScreen> {
 // ── Body ──────────────────────────────────────────────────────────────────
 class _Body extends StatelessWidget {
   const _Body({
+    super.key,
     required this.state,
     required this.locale,
     required this.onBookTap,
     required this.onBrowse,
     required this.onPublisher,
     required this.onCategoryTap,
+    required this.onRefresh,
   });
 
   final HomeContentSuccess state;
@@ -132,12 +144,17 @@ class _Body extends StatelessWidget {
   final VoidCallback onBrowse;
   final VoidCallback onPublisher;
   final void Function(Category) onCategoryTap;
+  final Future<void> Function() onRefresh;
 
   @override
   Widget build(BuildContext context) {
     final ar = locale == 'ar';
-    return CustomScrollView(
-      slivers: [
+    return RefreshIndicator(
+      onRefresh: onRefresh,
+      color: AppColors.primary,
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
         // Featured hero
         if (state.featured.isNotEmpty)
           SliverToBoxAdapter(
@@ -304,6 +321,7 @@ class _Body extends StatelessWidget {
 
         SliverToBoxAdapter(child: SizedBox(height: 16.h)),
       ],
+      ),
     );
   }
 }
@@ -541,6 +559,193 @@ class _NewsletterStrip extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ── Shimmer skeletons ─────────────────────────────────────────────────────
+
+class _HomeShimmer extends StatelessWidget {
+  const _HomeShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      physics: const NeverScrollableScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _FeaturedHeroShimmer(),
+          SizedBox(height: 26.h),
+          const _ShimmerSection(),
+          SizedBox(height: 26.h),
+          const _ShimmerSection(),
+          Padding(
+            padding: EdgeInsetsDirectional.fromSTEB(16.w, 28.h, 16.w, 6.h),
+            child: Shimmer.fromColors(
+              baseColor: AppColors.shimmerBase,
+              highlightColor: AppColors.shimmerHighlight,
+              child: Container(
+                height: 120.h,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24.r),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 16.h),
+        ],
+      ),
+    );
+  }
+}
+
+class _FeaturedHeroShimmer extends StatelessWidget {
+  const _FeaturedHeroShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsetsDirectional.fromSTEB(16.w, 16.h, 16.w, 8.h),
+      child: Shimmer.fromColors(
+        baseColor: AppColors.shimmerBase,
+        highlightColor: AppColors.shimmerHighlight,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(26.r),
+          ),
+          padding: EdgeInsetsDirectional.all(18.r),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  width: 96.w,
+                  child: AspectRatio(
+                    aspectRatio: 3 / 4,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 14.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 10.h,
+                            width: 90.w,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4.r),
+                            ),
+                          ),
+                          SizedBox(height: 7.h),
+                          Container(
+                            height: 16.h,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4.r),
+                            ),
+                          ),
+                          SizedBox(height: 5.h),
+                          Container(
+                            height: 16.h,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4.r),
+                            ),
+                          ),
+                          SizedBox(height: 5.h),
+                          Container(
+                            height: 16.h,
+                            width: 120.w,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4.r),
+                            ),
+                          ),
+                          SizedBox(height: 9.h),
+                          Container(
+                            height: 24.h,
+                            width: 90.w,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsetsDirectional.only(top: 12.h),
+                        height: 36.h,
+                        width: 130.w,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ShimmerSection extends StatelessWidget {
+  const _ShimmerSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsetsDirectional.fromSTEB(16.w, 0, 16.w, 12.h),
+          child: Shimmer.fromColors(
+            baseColor: AppColors.shimmerBase,
+            highlightColor: AppColors.shimmerHighlight,
+            child: Container(
+              height: 18.h,
+              width: 140.w,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4.r),
+              ),
+            ),
+          ),
+        ),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsetsDirectional.fromSTEB(16.w, 0, 16.w, 4.h),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BookCardShimmer(width: 150.w),
+              SizedBox(width: 12.w),
+              BookCardShimmer(width: 150.w),
+              SizedBox(width: 12.w),
+              BookCardShimmer(width: 150.w),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

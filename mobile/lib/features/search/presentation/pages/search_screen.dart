@@ -10,6 +10,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/widgets/app_loading_indicator.dart';
 import '../../../../core/widgets/book_cover_widget.dart';
+import '../../../../core/widgets/error_state_widget.dart';
 import '../../domain/entities/search_result.dart';
 import '../cubit/search_cubit.dart';
 import '../cubit/search_state.dart';
@@ -126,34 +127,47 @@ class _SearchScreenState extends State<SearchScreen> {
           // Results area
           Expanded(
             child: BlocBuilder<SearchCubit, SearchState>(
-              builder: (ctx, state) => switch (state) {
-                SearchInitial() => _RecentChips(locale: locale),
-                SearchLoading() =>
-                  const Center(child: AppLoadingIndicator()),
-                SearchSuccess(:final results) => _ResultsList(
-                    results: results,
-                    locale: locale,
-                    onBookTap: (b) => Navigator.of(ctx).pushNamed(
-                      AppRoutes.bookDetail,
-                      arguments: BookDetailArgs(slug: b.id, titleAr: b.titleAr),
-                    ),
-                  ),
-                SearchEmpty(:final query) => _NoResults(
-                    query: query,
-                    locale: locale,
-                    onSuggestion: (s) {
-                      _controller.text = s;
-                      ctx.read<SearchCubit>().onQueryChanged(s);
-                    },
-                  ),
-                SearchError(:final message) => Center(
-                    child: Text(
-                      message,
-                      style: GoogleFonts.tajawal(
-                        color: AppColors.textSecondary,
+              builder: (ctx, state) {
+                return AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: switch (state) {
+                    SearchInitial() => KeyedSubtree(
+                        key: const ValueKey('initial'),
+                        child: _RecentChips(locale: locale),
                       ),
-                    ),
-                  ),
+                    SearchLoading() => const Center(
+                        key: ValueKey('loading'),
+                        child: AppLoadingIndicator(),
+                      ),
+                    SearchSuccess(:final results) => KeyedSubtree(
+                        key: const ValueKey('success'),
+                        child: _ResultsList(
+                          results: results,
+                          locale: locale,
+                          onBookTap: (b) => Navigator.of(ctx).pushNamed(
+                            AppRoutes.bookDetail,
+                            arguments:
+                                BookDetailArgs(slug: b.id, titleAr: b.titleAr),
+                          ),
+                        ),
+                      ),
+                    SearchEmpty(:final query) => KeyedSubtree(
+                        key: const ValueKey('empty'),
+                        child: _NoResults(
+                          query: query,
+                          locale: locale,
+                          onSuggestion: (s) {
+                            _controller.text = s;
+                            ctx.read<SearchCubit>().onQueryChanged(s);
+                          },
+                        ),
+                      ),
+                    SearchError(:final message) => Center(
+                        key: const ValueKey('error'),
+                        child: ErrorStateWidget(message: message),
+                      ),
+                  },
+                );
               },
             ),
           ),

@@ -90,6 +90,11 @@ class ArticlesListCubit extends Cubit<ArticlesListState> {
     ],
   };
 
+  Future<void> refresh() => switch (state) {
+        ArticlesListSuccess(:final activeChannel) => load(channel: activeChannel),
+        _ => load(),
+      };
+
   Future<void> load({String channel = 'harvest'}) async {
     emit(const ArticlesListLoading());
     await Future.delayed(const Duration(milliseconds: 300));
