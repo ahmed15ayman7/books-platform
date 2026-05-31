@@ -1,7 +1,7 @@
 import { type NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { z } from "zod";
-import { apiSuccess, apiCreated, ApiErrors } from "@/lib/api-client/response";
+import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { nextAuthorTermId } from "@/lib/admin/legacy-ids";
@@ -21,40 +21,59 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = request.nextUrl;
+    const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
+    const limit = Math.min(50, parseInt(searchParams.get("limit") ?? "20", 10));
+    const skip = (page - 1) * limit;
     const { sortBy, sortOrder } = parseSortParam(searchParams.get("sort"), "name");
     const search = searchParams.get("search")?.trim();
     const authorSortFields = ["name", "updatedAt", "createdAt"] as const;
 
-    const authors = await db.author.findMany({
-      where: {
-        spamFlag: null,
-        ...(search
-          ? {
-              OR: [
-                { name: { contains: search, mode: "insensitive" } },
-                { nameAr: { contains: search, mode: "insensitive" } },
-                { slug: { contains: search, mode: "insensitive" } },
-              ],
-            }
-          : {}),
-      },
-      orderBy: buildOrderBy(sortBy, sortOrder, authorSortFields, "name"),
-      include: { _count: { select: { products: true } } },
-    });
+    const where = {
+      spamFlag: null,
+      ...(search
+        ? {
+            OR: [
+              { name: { contains: search, mode: "insensitive" as const } },
+              { nameAr: { contains: search, mode: "insensitive" as const } },
+              { slug: { contains: search, mode: "insensitive" as const } },
+            ],
+          }
+        : {}),
+    };
 
-    const data = authors.map((a) => ({
+    const [rows, total] = await Promise.all([
+      db.author.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: buildOrderBy(sortBy, sortOrder, authorSortFields, "name"),
+        include: { _count: { select: { products: true } } },
+      }),
+      db.author.count({ where }),
+    ]);
+
+    const data = rows.map((a) => ({
       id: a.id,
       name: a.name,
       nameAr: a.nameAr,
       slug: a.slug,
       bio: a.bio,
       bioAr: a.bioAr,
-      createdAt: a.createdAt,
-      updatedAt: a.updatedAt,
+      createdAt: a.createdAt.toISOString(),
+      updatedAt: a.updatedAt.toISOString(),
       _count: a._count,
     }));
 
-    return apiSuccess(data);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+
+    return apiPaginated(data, {
+      page,
+      limit,
+      total,
+      totalPages,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
+    });
   } catch (error) {
     console.error("[GET /api/v1/admin/authors]", error);
     return ApiErrors.internal();
