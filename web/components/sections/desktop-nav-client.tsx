@@ -241,7 +241,7 @@ function ArticlesDropdown({
       <p className="px-4 pb-1 pt-1 text-[10px] font-bold uppercase tracking-widest text-white/30">
         {isAr ? "القنوات" : "Channels"}
       </p>
-      {channels.map((item) => (
+      {/* {channels.map((item) => (
         <Link
           key={item.href}
           href={item.href}
@@ -251,7 +251,7 @@ function ArticlesDropdown({
         >
           {item.label}
         </Link>
-      ))}
+      ))} */}
 
       {categories.length > 0 && (
         <>
