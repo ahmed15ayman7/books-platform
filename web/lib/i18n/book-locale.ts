@@ -7,6 +7,8 @@ export interface BookLocalizedFields {
   shortDescAr?: string | null;
   description?: string | null;
   descriptionAr?: string | null;
+  edition?: string | null;
+  editionAr?: string | null;
 }
 
 /** Primary display title for the active UI locale */
@@ -46,6 +48,17 @@ export function localizedBookDescription(
   const isAr = locale === "ar";
   const ar = book.descriptionAr?.trim();
   const en = book.description?.trim();
+  if (isAr) return ar ?? en ?? null;
+  return en ?? ar ?? null;
+}
+
+export function localizedBookEdition(
+  book: BookLocalizedFields,
+  locale: Locale | string
+): string | null {
+  const isAr = locale === "ar";
+  const ar = book.editionAr?.trim();
+  const en = book.edition?.trim();
   if (isAr) return ar ?? en ?? null;
   return en ?? ar ?? null;
 }

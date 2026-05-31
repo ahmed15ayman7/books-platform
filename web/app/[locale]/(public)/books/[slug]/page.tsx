@@ -11,6 +11,7 @@ import type { Locale } from "@/lib/i18n";
 import {
   localizedBookAlternateName,
   localizedBookDescription,
+  localizedBookEdition,
   localizedBookName,
   localizedBookShortDesc,
 } from "@/lib/i18n/book-locale";
@@ -136,7 +137,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             publicationYear={book.publicationYear}
             country={book.country}
             pageCount={book.pageCount}
-            edition={book.edition}
+            edition={localizedBookEdition(book, locale)}
             dimensions={book.dimensions}
             translationStatus={book.translationStatus}
             notes={book.notes}

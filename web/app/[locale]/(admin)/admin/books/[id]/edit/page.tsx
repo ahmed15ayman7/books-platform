@@ -85,6 +85,7 @@ export default async function BookEditPage({ params }: Props) {
             country: book.country ?? "",
             pageCount: book.pageCount?.toString() ?? "",
             edition: book.edition ?? "",
+            editionAr: book.editionAr ?? "",
             dimensions: book.dimensions ?? "",
             translationStatus: book.translationStatus,
             purchaseOption: book.purchaseOption,

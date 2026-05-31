@@ -128,7 +128,7 @@ export function BookDetailHero({
   );
 
   const coverColumn = (
-    <div className="mx-auto flex w-full max-w-[280px] flex-col gap-4 lg:mx-0 lg:w-[280px] lg:shrink-0">
+    <div className="mx-auto flex w-full max-w-[280px] flex-col gap-4 sm:mx-0 lg:w-[280px] lg:shrink-0">
       <div
         className="relative overflow-hidden rounded-xl bg-[var(--brand-gray-100)] shadow-md ring-1 ring-[var(--brand-gray-200)]"
         style={{ width: BOOK_DETAIL_COVER_WIDTH, height: BOOK_DETAIL_COVER_HEIGHT }}
@@ -177,22 +177,18 @@ export function BookDetailHero({
   );
 
   return (
-    <section
-      dir={isAr ? "rtl" : "ltr"}
-      className="overflow-hidden rounded-2xl border border-[var(--brand-gray-200)] bg-white shadow-[var(--shadow-soft-lg)]"
-    >
-      <div className="grid grid-cols-1 gap-8 p-6 md:p-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
-        {isAr ? (
-          <>
-            {coverColumn}
-            {summaryColumn}
-          </>
-        ) : (
-          <>
-            {summaryColumn}
-            {coverColumn}
-          </>
-        )}
+    <section className="overflow-hidden rounded-2xl border border-[var(--brand-gray-200)] bg-white shadow-[var(--shadow-soft-lg)]">
+      {/*
+        لا نضع dir=rtl على الـ grid — يعكس ترتيب الأعمدة ويوسّع الفراغ بين الملخص والغلاف.
+        العربي: ملخص يسار (1fr) + غلاف يمين (280px) مع نص RTL داخل عمود الملخص.
+      */}
+      <div className="grid grid-cols-1 gap-8 p-6 md:p-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start lg:gap-10">
+        <div dir={isAr ? "rtl" : "ltr"} className="min-w-0">
+          {summaryColumn}
+        </div>
+        <div className="min-w-0 lg:justify-self-start">
+          {coverColumn}
+        </div>
       </div>
     </section>
   );

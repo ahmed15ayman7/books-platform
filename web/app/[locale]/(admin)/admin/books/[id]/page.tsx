@@ -217,7 +217,8 @@ export default async function AdminBookViewPage({ params }: Props) {
               <DetailRow label="سنة النشر" value={book.publicationYear?.toString()} />
               <DetailRow label="بلد النشر" value={book.country} />
               <DetailRow label="عدد الصفحات" value={book.pageCount?.toString()} />
-              <DetailRow label="الطبعة" value={book.edition} />
+              <DetailRow label="الطبعة (EN)" value={book.edition} />
+              <DetailRow label="الطبعة (AR)" value={book.editionAr} />
               <DetailRow label="المقاسات" value={book.dimensions} />
               <DetailRow label="دار النشر" value={book.publisher?.title} />
               <DetailRow

@@ -184,6 +184,7 @@ model Product {
   country             String?
   pageCount           Int?             @map("page_count")
   edition             String?
+  editionAr           String?          @map("edition_ar")
   dimensions          String?
   published           Boolean          @default(true)
   featured            Boolean          @default(false)

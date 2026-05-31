@@ -21,6 +21,7 @@ const emptyBook: BookEditData = {
   country: "",
   pageCount: "",
   edition: "",
+  editionAr: "",
   dimensions: "",
   translationStatus: "NOT_TRANSLATED",
   purchaseOption: "NOT_AVAILABLE",

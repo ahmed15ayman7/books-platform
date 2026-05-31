@@ -16,6 +16,7 @@ export interface BookEditData {
   country: string;
   pageCount: string;
   edition: string;
+  editionAr: string;
   dimensions: string;
   translationStatus: string;
   purchaseOption: string;
@@ -68,6 +69,8 @@ export async function updateBook(id: string, data: BookEditData): Promise<BookAc
       publicationYear,
       pageCount,
       price,
+      edition,
+      editionAr,
       ...rest
     } = data;
 
@@ -81,6 +84,8 @@ export async function updateBook(id: string, data: BookEditData): Promise<BookAc
         ...rest,
         nameEn,
         slug,
+        edition: edition.trim() || null,
+        editionAr: editionAr.trim() || null,
         publicationYear: parsedYear && !isNaN(parsedYear) ? parsedYear : null,
         pageCount: parsedPages && !isNaN(parsedPages) ? parsedPages : null,
         price: parsedPrice !== null && !isNaN(parsedPrice) ? parsedPrice : null,
@@ -131,6 +136,8 @@ export async function createBook(data: BookEditData): Promise<BookActionResult> 
       publicationYear,
       pageCount,
       price,
+      edition,
+      editionAr,
       ...rest
     } = data;
 
@@ -145,6 +152,8 @@ export async function createBook(data: BookEditData): Promise<BookActionResult> 
         nameEn,
         slug,
         originalId,
+        edition: edition.trim() || null,
+        editionAr: editionAr.trim() || null,
         publicationYear: parsedYear && !isNaN(parsedYear) ? parsedYear : null,
         pageCount: parsedPages && !isNaN(parsedPages) ? parsedPages : null,
         price: parsedPrice !== null && !isNaN(parsedPrice) ? parsedPrice : null,

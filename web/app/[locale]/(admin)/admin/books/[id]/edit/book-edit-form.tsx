@@ -346,8 +346,26 @@ export function BookEditForm({
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="edition">الطبعة</FieldLabel>
-          <Input id="edition" className={fieldCls} value={form.edition} onChange={(e) => set("edition", e.target.value)} placeholder="مثال: الطبعة الثالثة" />
+          <FieldLabel htmlFor="edition">الطبعة (إنجليزي)</FieldLabel>
+          <Input
+            id="edition"
+            className={fieldCls}
+            value={form.edition}
+            onChange={(e) => set("edition", e.target.value)}
+            placeholder="e.g. 3rd edition"
+            dir="ltr"
+          />
+        </Field>
+
+        <Field>
+          <FieldLabel htmlFor="editionAr">الطبعة (عربي)</FieldLabel>
+          <Input
+            id="editionAr"
+            className={fieldCls}
+            value={form.editionAr}
+            onChange={(e) => set("editionAr", e.target.value)}
+            placeholder="مثال: الطبعة الثالثة"
+          />
         </Field>
 
         <Field>
