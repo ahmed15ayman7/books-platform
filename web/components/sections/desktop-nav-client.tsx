@@ -230,7 +230,7 @@ function ArticlesDropdown({
 }) {
   const isAr = locale === "ar";
   const base = `/${locale}`;
-
+console.log(channels);
   return (
     <div
       className="absolute top-full start-0 z-50 mt-1 min-w-[280px] max-h-[70vh] overflow-y-auto animate-scale-in rounded-2xl border border-[var(--brand-gray-700)] bg-[#141414] py-2 shadow-2xl"
