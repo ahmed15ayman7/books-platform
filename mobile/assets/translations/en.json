@@ -39,5 +39,142 @@
   "welcome_back": "Welcome back!",
   "language": "Language",
   "english": "English",
-  "arabic": "العربية"
+  "arabic": "العربية",
+
+  "common": {
+    "all": "All",
+    "see_all": "All",
+    "next": "Next",
+    "back": "Back",
+    "book": "Book",
+    "books": "books",
+    "publisher": "Publisher",
+    "publishers": "publishers",
+    "featured": "Featured",
+    "new_badge": "New",
+    "about": "About",
+    "no_internet": "No internet connection"
+  },
+
+  "cart": {
+    "title": "Cart",
+    "books_unit": "books",
+    "empty_title": "Cart is empty",
+    "empty_subtitle": "Add books from the catalog to start an order.",
+    "browse_books": "Browse Books",
+    "subtotal": "Subtotal",
+    "service_fee": "Service fee",
+    "total": "Total",
+    "checkout": "Checkout",
+    "checkout_note": "Guest checkout · payment gateway TBD"
+  },
+
+  "books": {
+    "title": "Books",
+    "books_unit": "books",
+    "empty": "No books",
+    "sort": {
+      "newest": "Newest",
+      "oldest": "Oldest"
+    },
+    "status": {
+      "all": "All",
+      "nominated": "Nominated",
+      "translated": "Translated"
+    }
+  },
+
+  "home": {
+    "browse_by_category": "Browse by Category",
+    "newly_released": "Newly Released",
+    "translated_books": "Translated Books",
+    "top_publishers": "Top Publishers",
+    "newsletter_title": "Subscribe to our newsletter",
+    "newsletter_email_hint": "Your email",
+    "newsletter_subscribe": "Subscribe"
+  },
+
+  "book_detail": {
+    "description": "Book Description",
+    "add_to_cart": "Add to Cart",
+    "saved": "Saved",
+    "save_to_wishlist": "Save to Wishlist",
+    "similar_books": "Similar Books",
+    "publisher": "Publisher",
+    "country": "Country",
+    "original_language": "Original Language",
+    "pages": "Pages",
+    "edition": "Edition",
+    "read_more": "Read more",
+    "show_less": "Show less"
+  },
+
+  "publishers": {
+    "title": "Publishers",
+    "publishers_unit": "publishers",
+    "search_hint": "Search publishers…",
+    "all_countries": "All",
+    "about": "About",
+    "their_books": "Their Books",
+    "no_books": "No books yet",
+    "no_publishers": "No publishers found"
+  },
+
+  "articles": {
+    "title": "Articles",
+    "empty": "No articles yet",
+    "featured": "Featured",
+    "min_read": "min read",
+    "min": "min",
+    "related": "Related Articles"
+  },
+
+  "article_detail": {
+    "comments": "Comments",
+    "comment_hint": "Add a comment...",
+    "video_badge": "This article includes a video"
+  },
+
+  "search": {
+    "hint": "Search books and publishers…",
+    "recent_searches": "Recent searches",
+    "no_results_prefix": "No results for",
+    "suggestions_title": "Try one of these suggestions:",
+    "book_label": "Book",
+    "publisher_label": "Publisher"
+  },
+
+  "publish": {
+    "title": "Publish Your Book",
+    "promo": "First book is free!",
+    "submit": "Submit book",
+    "next": "Next",
+    "ready_title": "Ready to submit",
+    "author_name_label": "Full name",
+    "author_name_hint": "Your full name",
+    "email_label": "Email",
+    "phone_label": "Phone",
+    "bio_label": "Author bio",
+    "bio_hint": "A short bio about you…",
+    "book_title_label": "Book title",
+    "book_title_hint": "Your book title",
+    "summary_label": "Book summary",
+    "summary_hint": "Summary of your book…",
+    "category_label": "Category",
+    "category_hint": "Choose category",
+    "upload_label": "Upload book file (PDF)",
+    "promo_subtitle": "Subsequent books carry a small fee",
+    "success_description": "We'll review your book and contact you within 5 business days.\nSubject to editorial approval."
+  },
+
+  "categories": {
+    "ideas_and_policies": "Ideas & Policies",
+    "social_studies": "Social Studies",
+    "philosophies_and_cultures": "Philosophies & Cultures",
+    "economy_and_development": "Economy & Development",
+    "languages_and_literature": "Languages & Literature",
+    "technologies_and_sciences": "Technologies & Sciences",
+    "religions_and_beliefs": "Religions & Beliefs",
+    "other": "Other"
+  }
 }

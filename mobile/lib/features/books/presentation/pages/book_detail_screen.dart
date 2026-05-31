@@ -115,10 +115,8 @@ class _DetailBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ar = locale == 'ar';
     return CustomScrollView(
       slivers: [
-        // Hero cover
         SliverToBoxAdapter(
           child: _HeroCover(
             book: book,
@@ -126,206 +124,225 @@ class _DetailBody extends StatelessWidget {
             onBack: () => Navigator.of(context).pop(),
           ),
         ),
-
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(16.w, 16.h, 16.w, 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Badges + price row
-                Row(
-                  children: [
-                    TranslationStatusBadge(status: book.status, locale: locale),
-                    SizedBox(width: 8.w),
-                    Container(
-                      padding: EdgeInsetsDirectional.fromSTEB(
-                          11.w, 3.h, 11.w, 3.h),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        border: Border.all(color: AppColors.divider),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        ar
-                            ? _catNameAr(book.categorySlug)
-                            : _catNameEn(book.categorySlug),
-                        style: GoogleFonts.tajawal(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      '\$${book.price.toStringAsFixed(2)}',
-                      style: GoogleFonts.cairo(
-                        fontSize: 20.sp,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16.h),
-
-                // Biblio table
-                _BiblioTable(book: book, locale: locale),
-                SizedBox(height: 20.h),
-
-                // Description
-                Text(
-                  ar ? 'وصف الكتاب' : 'Book Description',
-                  style: GoogleFonts.cairo(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  book.descriptionAr,
-                  style: GoogleFonts.tajawal(
-                    fontSize: 14.5.sp,
-                    color: AppColors.textSecondary,
-                    height: 1.8,
-                  ),
-                  maxLines: expanded ? null : 3,
-                  overflow:
-                      expanded ? TextOverflow.visible : TextOverflow.ellipsis,
-                ),
-                TextButton(
-                  onPressed: onToggleExpand,
-                  style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                  child: Text(
-                    ar
-                        ? (expanded ? 'عرض أقل' : 'قراءة المزيد')
-                        : (expanded ? 'Show less' : 'Read more'),
-                    style: GoogleFonts.cairo(
-                      fontSize: 13.5.sp,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 18.h),
-
-                // Action buttons
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: onAddCart,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.shopping_bag_outlined),
-                        SizedBox(width: 8.w),
-                        Text(
-                          '${ar ? 'أضف إلى السلة' : 'Add to Cart'} · \$${book.price.toStringAsFixed(2)}',
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10.h),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: onToggleSave,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          saved
-                              ? Icons.favorite_rounded
-                              : Icons.favorite_border_rounded,
-                          color: AppColors.primary,
-                        ),
-                        SizedBox(width: 8.w),
-                        Text(
-                          saved
-                              ? (ar ? 'تم الحفظ' : 'Saved')
-                              : (ar ? 'حفظ في القائمة' : 'Save to Wishlist'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: 26.h),
-              ],
+            child: _BookInfoSection(
+              book: book,
+              locale: locale,
+              expanded: expanded,
+              saved: saved,
+              onToggleExpand: onToggleExpand,
+              onToggleSave: onToggleSave,
+              onAddCart: onAddCart,
             ),
           ),
         ),
-
-        // Similar books
-        if (similarBooks.isNotEmpty) ...[
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsetsDirectional.only(bottom: 12.h),
-              child: Text(
-                ar ? '  كتب مشابهة' : '  Similar Books',
-                style: GoogleFonts.cairo(
-                  fontSize: 19.sp,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ),
+        if (similarBooks.isNotEmpty)
+          _SimilarBooksSection(
+            books: similarBooks,
+            locale: locale,
+            onBookTap: onBookTap,
           ),
-          SliverToBoxAdapter(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding:
-                  EdgeInsetsDirectional.fromSTEB(16.w, 0, 16.w, 4.h),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: similarBooks
-                    .map(
-                      (b) => Padding(
-                        padding: EdgeInsetsDirectional.only(end: 12.w),
-                        child: BookCardWidget(
-                          book: b,
-                          locale: locale,
-                          width: 140.w,
-                          onTap: () => onBookTap(b),
-                        ),
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-          ),
-        ],
         SliverToBoxAdapter(child: SizedBox(height: 24.h)),
       ],
     );
   }
+}
 
-  String _catNameAr(String slug) => switch (slug) {
-        'ideas-and-policies' => 'أفكار وسياسات',
-        'social-studies' => 'دراسات اجتماعية',
-        'philosophies-and-cultures' => 'فلسفات وثقافات',
-        'economy-and-development' => 'اقتصاد وتنمية',
-        'languages-and-literature' => 'لغات وآداب',
-        'technologies-and-sciences' => 'تقنيات وعلوم',
-        'religions-and-beliefs' => 'أديان وعقائد',
-        _ => 'أخرى',
-      };
+class _BookInfoSection extends StatelessWidget {
+  const _BookInfoSection({
+    required this.book,
+    required this.locale,
+    required this.expanded,
+    required this.saved,
+    required this.onToggleExpand,
+    required this.onToggleSave,
+    required this.onAddCart,
+  });
 
-  String _catNameEn(String slug) => switch (slug) {
-        'ideas-and-policies' => 'Ideas & Policies',
-        'social-studies' => 'Social Studies',
-        'philosophies-and-cultures' => 'Philosophies & Cultures',
-        'economy-and-development' => 'Economy & Development',
-        'languages-and-literature' => 'Languages & Literature',
-        'technologies-and-sciences' => 'Technologies & Sciences',
-        'religions-and-beliefs' => 'Religions & Beliefs',
-        _ => 'Other',
+  final Book book;
+  final String locale;
+  final bool expanded;
+  final bool saved;
+  final VoidCallback onToggleExpand;
+  final VoidCallback onToggleSave;
+  final VoidCallback onAddCart;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            TranslationStatusBadge(status: book.status, locale: locale),
+            SizedBox(width: 8.w),
+            Container(
+              padding: EdgeInsetsDirectional.fromSTEB(11.w, 3.h, 11.w, 3.h),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                border: Border.all(color: AppColors.divider),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text(
+                _categoryName(book.categorySlug),
+                style: GoogleFonts.tajawal(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+            const Spacer(),
+            Text(
+              '\$${book.price.toStringAsFixed(2)}',
+              style: GoogleFonts.cairo(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w800,
+                color: AppColors.primary,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 16.h),
+        _BiblioTable(book: book, locale: locale),
+        SizedBox(height: 20.h),
+        Text(
+          'book_detail.description'.tr(),
+          style: GoogleFonts.cairo(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        SizedBox(height: 8.h),
+        Text(
+          book.descriptionAr,
+          style: GoogleFonts.tajawal(
+            fontSize: 14.5.sp,
+            color: AppColors.textSecondary,
+            height: 1.8,
+          ),
+          maxLines: expanded ? null : 3,
+          overflow: expanded ? TextOverflow.visible : TextOverflow.ellipsis,
+        ),
+        TextButton(
+          onPressed: onToggleExpand,
+          style: TextButton.styleFrom(padding: EdgeInsets.zero),
+          child: Text(
+            expanded ? 'book_detail.show_less'.tr() : 'book_detail.read_more'.tr(),
+            style: GoogleFonts.cairo(
+              fontSize: 13.5.sp,
+              fontWeight: FontWeight.w700,
+              color: AppColors.primary,
+            ),
+          ),
+        ),
+        SizedBox(height: 18.h),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: onAddCart,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.shopping_bag_outlined),
+                SizedBox(width: 8.w),
+                Text('${'book_detail.add_to_cart'.tr()} · \$${book.price.toStringAsFixed(2)}'),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(height: 10.h),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton(
+            onPressed: onToggleSave,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  saved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                  color: AppColors.primary,
+                ),
+                SizedBox(width: 8.w),
+                Text(saved ? 'book_detail.saved'.tr() : 'book_detail.save_to_wishlist'.tr()),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(height: 26.h),
+      ],
+    );
+  }
+
+  String _categoryName(String slug) => switch (slug) {
+        'ideas-and-policies' => 'categories.ideas_and_policies'.tr(),
+        'social-studies' => 'categories.social_studies'.tr(),
+        'philosophies-and-cultures' => 'categories.philosophies_and_cultures'.tr(),
+        'economy-and-development' => 'categories.economy_and_development'.tr(),
+        'languages-and-literature' => 'categories.languages_and_literature'.tr(),
+        'technologies-and-sciences' => 'categories.technologies_and_sciences'.tr(),
+        'religions-and-beliefs' => 'categories.religions_and_beliefs'.tr(),
+        _ => 'categories.other'.tr(),
       };
 }
 
-// ── Hero cover ────────────────────────────────────────────────────────────
+class _SimilarBooksSection extends StatelessWidget {
+  const _SimilarBooksSection({
+    required this.books,
+    required this.locale,
+    required this.onBookTap,
+  });
+
+  final List<Book> books;
+  final String locale;
+  final ValueChanged<Book> onBookTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsetsDirectional.only(bottom: 12.h),
+            child: Text(
+              '  ${'book_detail.similar_books'.tr()}',
+              style: GoogleFonts.cairo(
+                fontSize: 19.sp,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsetsDirectional.fromSTEB(16.w, 0, 16.w, 4.h),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: books
+                  .map(
+                    (b) => Padding(
+                      padding: EdgeInsetsDirectional.only(end: 12.w),
+                      child: BookCardWidget(
+                        book: b,
+                        locale: locale,
+                        width: 140.w,
+                        onTap: () => onBookTap(b),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _HeroCover extends StatelessWidget {
   const _HeroCover({
     required this.book,
@@ -489,15 +506,15 @@ class _BiblioTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final ar = locale == 'ar';
     final rows = [
-      (ar ? 'الناشر' : 'Publisher', book.publisher),
+      ('book_detail.publisher'.tr(), book.publisher),
       (
-        ar ? 'البلد' : 'Country',
+        'book_detail.country'.tr(),
         '${book.countryFlag} ${ar ? book.countryAr : book.countryEn}'
       ),
-      (ar ? 'اللغة الأصلية' : 'Original Language', book.originalLanguage),
-      (ar ? 'عدد الصفحات' : 'Pages', '${book.pages}'),
-      (ar ? 'الطبعة' : 'Edition', book.edition),
-      (ar ? 'ISBN' : 'ISBN', book.isbn),
+      ('book_detail.original_language'.tr(), book.originalLanguage),
+      ('book_detail.pages'.tr(), '${book.pages}'),
+      ('book_detail.edition'.tr(), book.edition),
+      ('ISBN', book.isbn),
     ];
     return Container(
       decoration: BoxDecoration(

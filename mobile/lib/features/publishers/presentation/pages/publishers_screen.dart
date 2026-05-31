@@ -33,15 +33,14 @@ class _PublishersScreenState extends State<PublishersScreen> {
   @override
   Widget build(BuildContext context) {
     final locale = context.locale.languageCode;
-    final ar = locale == 'ar';
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Column(
         children: [
           AppBarWidget(
             variant: AppBarVariant.title,
-            title: ar ? 'الناشرون' : 'Publishers',
-            subtitle: '665 ${ar ? 'دار نشر' : 'publishers'}',
+            title: 'publishers.title'.tr(),
+            subtitle: '665 ${'publishers.publishers_unit'.tr()}',
             currentLocale: locale,
             onCart: () => Navigator.of(context).pushNamed(AppRoutes.cart),
             onLocaleChanged: (l) => context.setLocale(Locale(l)),
@@ -140,7 +139,6 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ar = locale == 'ar';
     return RefreshIndicator(
       onRefresh: onRefresh,
       color: AppColors.primary,
@@ -169,7 +167,7 @@ class _Body extends StatelessWidget {
                   ),
                   SizedBox(width: 10.w),
                   Text(
-                    ar ? 'ابحث عن دار نشر…' : 'Search publishers…',
+                    'publishers.search_hint'.tr(),
                     style: GoogleFonts.tajawal(
                       fontSize: 14.sp,
                       color: AppColors.textHint,
@@ -188,7 +186,7 @@ class _Body extends StatelessWidget {
             child: Row(
               children: [
                 _CountryChip(
-                  label: ar ? 'الكل' : 'All',
+                  label: 'publishers.all_countries'.tr(),
                   active: activeCountry == null,
                   onTap: () => onCountryTap(''),
                 ),
@@ -342,7 +340,7 @@ class _PublisherCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
-                          ar ? 'مُميَّز' : 'Featured',
+                          'common.featured'.tr(),
                           style: GoogleFonts.tajawal(
                             fontSize: 10.sp,
                             fontWeight: FontWeight.w700,
@@ -372,7 +370,7 @@ class _PublisherCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(999),
             ),
             child: Text(
-              '${publisher.bookCount} ${ar ? 'كتاب' : 'books'}',
+              '${publisher.bookCount} ${'common.books'.tr()}',
               style: GoogleFonts.cairo(
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w700,

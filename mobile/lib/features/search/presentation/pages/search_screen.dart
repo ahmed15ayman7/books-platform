@@ -184,7 +184,6 @@ class _RecentChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ar = locale == 'ar';
     final recent = ['هارفارد', 'فلسفة', 'ماركيز'];
     return Padding(
       padding: EdgeInsetsDirectional.fromSTEB(16.w, 16.h, 16.w, 4.h),
@@ -192,7 +191,7 @@ class _RecentChips extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            ar ? 'عمليات بحث حديثة' : 'Recent searches',
+            'search.recent_searches'.tr(),
             style: GoogleFonts.cairo(
               fontSize: 13.sp,
               fontWeight: FontWeight.w700,
@@ -324,7 +323,7 @@ class _ResultsList extends StatelessWidget {
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
-                        ar ? 'كتاب' : 'Book',
+                        'search.book_label'.tr(),
                         style: GoogleFonts.tajawal(
                           fontSize: 10.5.sp,
                           fontWeight: FontWeight.w700,
@@ -383,7 +382,7 @@ class _ResultsList extends StatelessWidget {
                         ),
                         SizedBox(height: 3.h),
                         Text(
-                          '${publisher.countryFlag} ${publisher.bookCount} ${ar ? 'كتاب' : 'books'}',
+                          '${publisher.countryFlag} ${publisher.bookCount} ${'common.books'.tr()}',
                           style: GoogleFonts.inter(
                             fontSize: 11.5.sp,
                             color: AppColors.textSecondary,
@@ -400,7 +399,7 @@ class _ResultsList extends StatelessWidget {
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
-                      ar ? 'ناشر' : 'Publisher',
+                      'search.publisher_label'.tr(),
                       style: GoogleFonts.tajawal(
                         fontSize: 10.5.sp,
                         fontWeight: FontWeight.w700,
@@ -430,7 +429,6 @@ class _NoResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ar = locale == 'ar';
     final suggestions = ['فلسفة', 'اقتصاد', 'Harvard'];
     return Padding(
       padding: EdgeInsetsDirectional.all(32.r),
@@ -452,7 +450,7 @@ class _NoResults extends StatelessWidget {
           ),
           SizedBox(height: 18.h),
           Text(
-            '${ar ? 'لا نتائج لـ' : 'No results for'} «$query»',
+            '${'search.no_results_prefix'.tr()} «$query»',
             style: GoogleFonts.cairo(
               fontSize: 17.sp,
               fontWeight: FontWeight.w800,
@@ -462,7 +460,7 @@ class _NoResults extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
           Text(
-            ar ? 'جرّب إحدى هذه الاقتراحات:' : 'Try one of these suggestions:',
+            'search.suggestions_title'.tr(),
             style: GoogleFonts.tajawal(
               fontSize: 13.sp,
               color: AppColors.textSecondary,

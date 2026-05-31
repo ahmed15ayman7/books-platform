@@ -35,14 +35,13 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
   @override
   Widget build(BuildContext context) {
     final locale = context.locale.languageCode;
-    final ar = locale == 'ar';
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Column(
         children: [
           AppBarWidget(
             variant: AppBarVariant.title,
-            title: ar ? 'المقالات' : 'Articles',
+            title: 'articles.title'.tr(),
             currentLocale: locale,
             onCart: () => Navigator.of(context).pushNamed(AppRoutes.cart),
             onLocaleChanged: (l) => context.setLocale(Locale(l)),
@@ -221,7 +220,7 @@ class _Body extends StatelessWidget {
             child: Center(
               child: EmptyStateWidget(
                 icon: Icons.article_outlined,
-                title: ar ? 'لا مقالات بعد' : 'No articles yet',
+                title: 'articles.empty'.tr(),
                 subtitle: ar
                     ? 'لم تُنشر مقالات في هذا القسم بعد. عُد قريباً.'
                     : 'No articles in this section yet. Check back soon.',
@@ -273,7 +272,6 @@ class _FeaturedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ar = locale == 'ar';
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -312,7 +310,7 @@ class _FeaturedCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
-                      ar ? 'مميز' : 'Featured',
+                      'articles.featured'.tr(),
                       style: GoogleFonts.cairo(
                         fontSize: 11.sp,
                         fontWeight: FontWeight.w700,
@@ -359,7 +357,7 @@ class _FeaturedCard extends StatelessWidget {
                   ),
                   SizedBox(height: 9.h),
                   Text(
-                    '${article.date} · ${article.readMinutes} ${ar ? 'د قراءة' : 'min read'}',
+                    '${article.date} · ${article.readMinutes} ${'articles.min_read'.tr()}',
                     style: GoogleFonts.inter(
                       fontSize: 11.5.sp,
                       color: AppColors.textHint,
@@ -387,7 +385,6 @@ class _ArticleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ar = locale == 'ar';
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -447,7 +444,7 @@ class _ArticleRow extends StatelessWidget {
                   ),
                   SizedBox(height: 5.h),
                   Text(
-                    '${article.date} · ${article.readMinutes} ${ar ? 'د' : 'min'}',
+                    '${article.date} · ${article.readMinutes} ${'articles.min'.tr()}',
                     style: GoogleFonts.inter(
                       fontSize: 11.sp,
                       color: AppColors.textHint,

@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 
@@ -37,14 +38,9 @@ class BooksRemoteDataSourceImpl {
   }
 
   Future<Either<Failure, Book>> getBookBySlug(String slug) async {
-    try {
-      final book = BooksMockData.books
-          .firstWhere((r) => r.id == slug)
-          .toEntity();
-      return right(book);
-    } catch (_) {
-      return left(const ServerFailure(404, 'Book not found'));
-    }
+    final record = BooksMockData.books.firstWhereOrNull((r) => r.id == slug);
+    if (record == null) return left(const ServerFailure(404, 'Book not found'));
+    return right(record.toEntity());
   }
 
   Future<Either<Failure, List<Category>>> getCategories() async {

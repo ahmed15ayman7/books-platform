@@ -11,15 +11,16 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/widgets/app_bar_widget.dart';
 import '../../../../core/widgets/app_loading_indicator.dart';
+import '../../../../core/widgets/book_cover_widget.dart';
 import '../../../../core/widgets/bottom_nav_widget.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/section_header_widget.dart';
-import '../../../books/domain/entities/book.dart';
-import '../../../books/presentation/widgets/book_card_widget.dart';
+import '../../../../core/widgets/translation_status_badge.dart';
+import '../../domain/entities/publisher.dart';
+import '../../domain/entities/publisher_book.dart';
 import '../cubit/publisher_detail_cubit/publisher_detail_cubit.dart';
 import '../cubit/publisher_detail_cubit/publisher_detail_state.dart';
-import '../../domain/entities/publisher.dart';
 
 class PublisherDetailScreen extends StatefulWidget {
   const PublisherDetailScreen({super.key, required this.args});
@@ -76,10 +77,7 @@ class _PublisherDetailScreenState extends State<PublisherDetailScreen> {
                     locale: locale,
                     onBookTap: (book) => Navigator.of(ctx).pushNamed(
                       AppRoutes.bookDetail,
-                      arguments: BookDetailArgs(
-                        slug: book.id,
-                        titleAr: book.titleAr,
-                      ),
+                      arguments: BookDetailArgs(slug: book.id, titleAr: book.titleAr),
                     ),
                   ),
                 ),
@@ -113,7 +111,6 @@ class _PublisherDetailScreenState extends State<PublisherDetailScreen> {
   }
 }
 
-// ── Detail body ───────────────────────────────────────────────────────────
 class _DetailBody extends StatelessWidget {
   const _DetailBody({
     required this.publisher,
@@ -123,9 +120,9 @@ class _DetailBody extends StatelessWidget {
   });
 
   final Publisher publisher;
-  final List<Book> books;
+  final List<PublisherBook> books;
   final String locale;
-  final ValueChanged<Book> onBookTap;
+  final ValueChanged<PublisherBook> onBookTap;
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +135,7 @@ class _DetailBody extends StatelessWidget {
             child: Padding(
               padding: EdgeInsetsDirectional.fromSTEB(16.w, 20.h, 16.w, 0),
               child: SectionHeaderWidget(
-                title: ar ? 'حول الناشر' : 'About',
+                title: 'publishers.about'.tr(),
               ),
             ),
           ),
@@ -160,7 +157,7 @@ class _DetailBody extends StatelessWidget {
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(16.w, 24.h, 16.w, 0),
             child: SectionHeaderWidget(
-              title: ar ? 'كتبهم' : 'Their Books',
+              title: 'publishers.their_books'.tr(),
             ),
           ),
         ),
@@ -168,7 +165,7 @@ class _DetailBody extends StatelessWidget {
           SliverFillRemaining(
             child: EmptyStateWidget(
               icon: Icons.menu_book_outlined,
-              title: ar ? 'لا توجد كتب' : 'No books yet',
+              title: 'publishers.no_books'.tr(),
             ),
           )
         else
@@ -182,7 +179,7 @@ class _DetailBody extends StatelessWidget {
                 childAspectRatio: 0.46,
               ),
               delegate: SliverChildBuilderDelegate(
-                (_, i) => BookCardWidget(
+                (_, i) => _PublisherBookCard(
                   book: books[i],
                   locale: locale,
                   onTap: () => onBookTap(books[i]),
@@ -280,7 +277,7 @@ class _PublisherHeader extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  '${publisher.bookCount} ${ar ? 'كتاب' : 'books'}',
+                  '${publisher.bookCount} ${'common.books'.tr()}',
                   style: GoogleFonts.inter(
                     fontSize: 11.sp,
                     fontWeight: FontWeight.w700,
@@ -291,6 +288,110 @@ class _PublisherHeader extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _PublisherBookCard extends StatelessWidget {
+  const _PublisherBookCard({
+    required this.book,
+    required this.onTap,
+    this.locale = 'ar',
+  });
+
+  final PublisherBook book;
+  final VoidCallback onTap;
+  final String locale;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(24.r),
+          border: Border.all(color: AppColors.divider),
+          boxShadow: AppShadows.soft,
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AspectRatio(
+              aspectRatio: 3 / 4,
+              child: Stack(
+                children: [
+                  BookCoverWidget(
+                    coverColors: book.coverColors,
+                    titleAr: book.titleAr,
+                    titleEn: book.titleEn,
+                    publisher: book.publisher,
+                  ),
+                  if (book.isNew)
+                    PositionedDirectional(
+                      top: 8.h,
+                      start: 8.w,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 3.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          'common.new_badge'.tr(),
+                          style: GoogleFonts.tajawal(
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsetsDirectional.all(11.r),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    locale == 'ar' ? book.titleAr : book.titleEn,
+                    style: GoogleFonts.cairo(
+                      fontSize: 14.5.sp,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      height: 1.45,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    book.publisher,
+                    style: GoogleFonts.inter(
+                      fontSize: 11.5.sp,
+                      color: AppColors.textSecondary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 5.h),
+                  TranslationStatusBadge(
+                    status: book.status,
+                    small: true,
+                    locale: locale,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

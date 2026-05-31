@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 
@@ -100,12 +101,8 @@ class PublishersRemoteDataSourceImpl {
   }
 
   Future<Either<Failure, Publisher>> getPublisherBySlug(String slug) async {
-    try {
-      return right(
-        _mockPublishers.firstWhere((p) => p.id == slug).toEntity(),
-      );
-    } catch (_) {
-      return left(const ServerFailure(404, 'Publisher not found'));
-    }
+    final record = _mockPublishers.firstWhereOrNull((p) => p.id == slug);
+    if (record == null) return left(const ServerFailure(404, 'Publisher not found'));
+    return right(record.toEntity());
   }
 }

@@ -105,7 +105,6 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
   }
 }
 
-// ── Article body ──────────────────────────────────────────────────────────
 class _ArticleBody extends StatelessWidget {
   const _ArticleBody({
     required this.article,
@@ -125,12 +124,9 @@ class _ArticleBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
-        // Hero header
         SliverToBoxAdapter(
           child: _HeroHeader(article: article, onBack: onBack),
         ),
-
-        // Title + byline
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(16.w, 20.h, 16.w, 0),
@@ -153,7 +149,6 @@ class _ArticleBody extends StatelessWidget {
           ),
         ),
 
-        // Video badge
         if (article.hasVideo)
           SliverToBoxAdapter(
             child: Padding(
@@ -162,7 +157,6 @@ class _ArticleBody extends StatelessWidget {
             ),
           ),
 
-        // Body paragraphs
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(16.w, 18.h, 16.w, 0),
@@ -173,7 +167,6 @@ class _ArticleBody extends StatelessWidget {
           ),
         ),
 
-        // Comment section
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(16.w, 28.h, 16.w, 0),
@@ -184,13 +177,12 @@ class _ArticleBody extends StatelessWidget {
           ),
         ),
 
-        // Related articles
         if (article.relatedArticles.isNotEmpty) ...[
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsetsDirectional.fromSTEB(16.w, 28.h, 16.w, 0),
               child: SectionHeaderWidget(
-                title: locale == 'ar' ? 'مقالات ذات صلة' : 'Related Articles',
+                title: 'articles.related'.tr(),
               ),
             ),
           ),
@@ -222,7 +214,6 @@ class _ArticleBody extends StatelessWidget {
   }
 }
 
-// ── Hero header (230h gradient with floating back) ─────────────────────────
 class _HeroHeader extends StatelessWidget {
   const _HeroHeader({required this.article, required this.onBack});
   final ArticleDetail article;
@@ -332,7 +323,6 @@ class _HeroHeader extends StatelessWidget {
   }
 }
 
-// ── Author byline ─────────────────────────────────────────────────────────
 class _Byline extends StatelessWidget {
   const _Byline({required this.article, required this.locale});
   final ArticleDetail article;
@@ -397,7 +387,7 @@ class _Byline extends StatelessWidget {
                   ),
                   SizedBox(width: 6.w),
                   Text(
-                    '${article.readMinutes} ${locale == 'ar' ? 'دقائق' : 'min'}',
+                    '${article.readMinutes} ${'articles.min'.tr()}',
                     style: GoogleFonts.inter(
                       fontSize: 11.sp,
                       color: AppColors.textHint,
@@ -413,7 +403,6 @@ class _Byline extends StatelessWidget {
   }
 }
 
-// ── Video badge ───────────────────────────────────────────────────────────
 class _VideoBadge extends StatelessWidget {
   const _VideoBadge({required this.locale});
   final String locale;
@@ -433,7 +422,7 @@ class _VideoBadge extends StatelessWidget {
               color: Colors.white, size: 20.r),
           SizedBox(width: 8.w),
           Text(
-            locale == 'ar' ? 'يتضمن هذا المقال مقطع فيديو' : 'This article includes a video',
+            'article_detail.video_badge'.tr(),
             style: GoogleFonts.tajawal(
               fontSize: 13.sp,
               color: Colors.white,
@@ -445,7 +434,6 @@ class _VideoBadge extends StatelessWidget {
   }
 }
 
-// ── Body paragraphs + pull quote ──────────────────────────────────────────
 class _BodyContent extends StatelessWidget {
   const _BodyContent({required this.paragraphs, this.pullQuote});
   final List<String> paragraphs;
@@ -512,7 +500,6 @@ class _PullQuote extends StatelessWidget {
   }
 }
 
-// ── Comment section ───────────────────────────────────────────────────────
 class _CommentSection extends StatelessWidget {
   const _CommentSection({required this.locale, required this.controller});
   final String locale;
@@ -525,7 +512,7 @@ class _CommentSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          ar ? 'التعليقات' : 'Comments',
+          'article_detail.comments'.tr(),
           style: GoogleFonts.cairo(
             fontSize: 17.sp,
             fontWeight: FontWeight.w800,
@@ -539,7 +526,7 @@ class _CommentSection extends StatelessWidget {
               child: TextField(
                 controller: controller,
                 decoration: InputDecoration(
-                  hintText: ar ? 'أضف تعليقك...' : 'Add a comment...',
+                  hintText: 'article_detail.comment_hint'.tr(),
                   hintStyle: GoogleFonts.tajawal(
                     fontSize: 13.sp,
                     color: AppColors.textHint,
@@ -575,7 +562,6 @@ class _CommentSection extends StatelessWidget {
           ],
         ),
         SizedBox(height: 16.h),
-        // Placeholder comment thread
         _MockComment(
           initials: 'م',
           name: ar ? 'محمد العتيبي' : 'Mohammed',
@@ -683,7 +669,6 @@ class _MockComment extends StatelessWidget {
   }
 }
 
-// ── Related article card ──────────────────────────────────────────────────
 class _RelatedCard extends StatelessWidget {
   const _RelatedCard({
     required this.article,
@@ -751,7 +736,7 @@ class _RelatedCard extends StatelessWidget {
                     ),
                     SizedBox(height: 4.h),
                     Text(
-                      '${article.readMinutes} ${locale == 'ar' ? 'دقائق' : 'min'}',
+                      '${article.readMinutes} ${'articles.min'.tr()}',
                       style: GoogleFonts.inter(
                         fontSize: 10.sp,
                         color: AppColors.textHint,

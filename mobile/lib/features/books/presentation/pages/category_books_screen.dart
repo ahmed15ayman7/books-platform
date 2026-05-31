@@ -70,10 +70,7 @@ class _CategoryBooksScreenState extends State<CategoryBooksScreen> {
                       EmptyStateWidget(
                         key: const ValueKey('empty'),
                         icon: Icons.menu_book_outlined,
-                        title: ar ? 'لا توجد كتب' : 'No books',
-                        subtitle: ar
-                            ? 'لا توجد كتب في هذه الفئة بعد'
-                            : 'No books in this category yet',
+                        title: 'books.empty'.tr(),
                       ),
                     CatalogSuccess(:final books) => RefreshIndicator(
                         key: const ValueKey('success'),

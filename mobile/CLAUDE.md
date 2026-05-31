@@ -115,6 +115,7 @@ Features with both mutations and reads must use separate cubits to prevent state
 | Use case | `@injectable` | Factory |
 | Cubit | `@injectable` | Factory |
 | `DialogHelper`, `SnackBarHelper` | `@lazySingleton` | Lifetime |
+| `CartCubit` | `@lazySingleton` | Lifetime — **exception**: global cart state shared by `AppBarWidget` badge and `CartScreen`. Access via `getIt<CartCubit>()`; provide in `CartScreen` with `BlocProvider.value(value: getIt<CartCubit>())`. |
 
 Both forms come from the `injectable` package: `@lazySingleton` is the no-arg const shorthand for `@LazySingleton()`; `@LazySingleton(as: Repo)` is used when binding a concrete class to an interface. Use whichever fits — they are not inconsistent.
 

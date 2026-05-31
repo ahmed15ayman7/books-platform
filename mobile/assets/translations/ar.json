@@ -39,5 +39,142 @@
   "welcome_back": "مرحبا بعودتك!",
   "language": "اللغة",
   "english": "English",
-  "arabic": "العربية"
+  "arabic": "العربية",
+
+  "common": {
+    "all": "الكل",
+    "see_all": "عرض الكل",
+    "next": "التالي",
+    "back": "رجوع",
+    "book": "كتاب",
+    "books": "كتاب",
+    "publisher": "ناشر",
+    "publishers": "دار نشر",
+    "featured": "مميز",
+    "new_badge": "جديد",
+    "about": "عن",
+    "no_internet": "لا يوجد اتصال بالإنترنت"
+  },
+
+  "cart": {
+    "title": "السلة",
+    "books_unit": "كتاب",
+    "empty_title": "السلة فارغة",
+    "empty_subtitle": "أضِف كتباً من الكتالوج لتبدأ الطلب.",
+    "browse_books": "تصفح الكتب",
+    "subtotal": "المجموع الفرعي",
+    "service_fee": "رسوم الخدمة",
+    "total": "الإجمالي",
+    "checkout": "إتمام الشراء",
+    "checkout_note": "الدفع بدون حساب · بوابة الدفع تُحدَّد لاحقاً"
+  },
+
+  "books": {
+    "title": "الكتب",
+    "books_unit": "كتاب",
+    "empty": "لا توجد كتب",
+    "sort": {
+      "newest": "الأحدث",
+      "oldest": "الأقدم"
+    },
+    "status": {
+      "all": "الكل",
+      "nominated": "مرشح للترجمة",
+      "translated": "مترجم"
+    }
+  },
+
+  "home": {
+    "browse_by_category": "تصفح حسب التصنيف",
+    "newly_released": "صدر حديثًا",
+    "translated_books": "الكتب المترجمة",
+    "top_publishers": "أبرز الناشرين",
+    "newsletter_title": "اشترك في نشرتنا البريدية",
+    "newsletter_email_hint": "بريدك الإلكتروني",
+    "newsletter_subscribe": "اشترك"
+  },
+
+  "book_detail": {
+    "description": "وصف الكتاب",
+    "add_to_cart": "أضف إلى السلة",
+    "saved": "تم الحفظ",
+    "save_to_wishlist": "حفظ في القائمة",
+    "similar_books": "كتب مشابهة",
+    "publisher": "الناشر",
+    "country": "البلد",
+    "original_language": "اللغة الأصلية",
+    "pages": "عدد الصفحات",
+    "edition": "الطبعة",
+    "read_more": "قراءة المزيد",
+    "show_less": "عرض أقل"
+  },
+
+  "publishers": {
+    "title": "الناشرون",
+    "publishers_unit": "دار نشر",
+    "search_hint": "ابحث عن دار نشر…",
+    "all_countries": "الكل",
+    "about": "حول الناشر",
+    "their_books": "كتبهم",
+    "no_books": "لا توجد كتب",
+    "no_publishers": "لا يوجد ناشرون"
+  },
+
+  "articles": {
+    "title": "المقالات",
+    "empty": "لا مقالات بعد",
+    "featured": "مميز",
+    "min_read": "د قراءة",
+    "min": "د",
+    "related": "مقالات ذات صلة"
+  },
+
+  "article_detail": {
+    "comments": "التعليقات",
+    "comment_hint": "أضف تعليقك...",
+    "video_badge": "يتضمن هذا المقال مقطع فيديو"
+  },
+
+  "search": {
+    "hint": "ابحث في الكتب والناشرين…",
+    "recent_searches": "عمليات بحث حديثة",
+    "no_results_prefix": "لا نتائج لـ",
+    "suggestions_title": "جرّب إحدى هذه الاقتراحات:",
+    "book_label": "كتاب",
+    "publisher_label": "ناشر"
+  },
+
+  "publish": {
+    "title": "انشر كتابك",
+    "promo": "كتابك الأول مجاناً!",
+    "submit": "إرسال الكتاب",
+    "next": "التالي",
+    "ready_title": "جاهز للإرسال",
+    "author_name_label": "الاسم الكامل",
+    "author_name_hint": "اكتب اسمك الكامل",
+    "email_label": "البريد الإلكتروني",
+    "phone_label": "رقم الهاتف",
+    "bio_label": "نبذة عنك",
+    "bio_hint": "نبذة مختصرة عنك وعن أعمالك…",
+    "book_title_label": "عنوان الكتاب",
+    "book_title_hint": "عنوان كتابك",
+    "summary_label": "ملخص الكتاب",
+    "summary_hint": "نبذة عن محتوى الكتاب…",
+    "category_label": "التصنيف",
+    "category_hint": "اختر التصنيف",
+    "upload_label": "رفع ملف الكتاب (PDF)",
+    "promo_subtitle": "الكتب التالية برسوم نشر رمزية",
+    "success_description": "سنراجع كتابك ونتواصل معك خلال 5 أيام عمل.\nيخضع النشر لموافقة فريق التحرير."
+  },
+
+  "categories": {
+    "ideas_and_policies": "أفكار وسياسات",
+    "social_studies": "دراسات اجتماعية",
+    "philosophies_and_cultures": "فلسفات وثقافات",
+    "economy_and_development": "اقتصاد وتنمية",
+    "languages_and_literature": "لغات وآداب",
+    "technologies_and_sciences": "تقنيات وعلوم",
+    "religions_and_beliefs": "أديان وعقائد",
+    "other": "أخرى"
+  }
 }

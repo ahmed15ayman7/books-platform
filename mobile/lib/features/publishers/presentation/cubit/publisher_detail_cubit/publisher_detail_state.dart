@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import 'package:booksplatform/features/books/domain/entities/book.dart';
 import '../../../domain/entities/publisher.dart';
+import '../../../domain/entities/publisher_book.dart';
 
 sealed class PublisherDetailState extends Equatable {
   const PublisherDetailState();
@@ -20,7 +20,7 @@ final class PublisherDetailLoading extends PublisherDetailState {
 final class PublisherDetailSuccess extends PublisherDetailState {
   const PublisherDetailSuccess({required this.publisher, required this.books});
   final Publisher publisher;
-  final List<Book> books;
+  final List<PublisherBook> books;
   @override
   List<Object?> get props => [publisher, books];
 }

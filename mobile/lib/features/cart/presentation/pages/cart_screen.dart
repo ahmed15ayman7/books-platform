@@ -21,7 +21,6 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final locale = context.locale.languageCode;
-    final ar = locale == 'ar';
     return BlocProvider.value(
       value: getIt<CartCubit>(),
       child: Scaffold(
@@ -31,9 +30,9 @@ class CartScreen extends StatelessWidget {
             children: [
               AppBarWidget(
                 variant: AppBarVariant.title,
-                title: ar ? 'السلة' : 'Cart',
+                title: 'cart.title'.tr(),
                 subtitle: state.totalCount > 0
-                    ? '${state.totalCount} ${ar ? 'كتاب' : 'books'}'
+                    ? '${state.totalCount} ${'cart.books_unit'.tr()}'
                     : null,
                 showBack: true,
                 currentLocale: locale,
@@ -44,11 +43,9 @@ class CartScreen extends StatelessWidget {
                     ? Center(
                         child: EmptyStateWidget(
                           icon: Icons.shopping_bag_outlined,
-                          title: ar ? 'السلة فارغة' : 'Cart is empty',
-                          subtitle: ar
-                              ? 'أضِف كتباً من الكتالوج لتبدأ الطلب.'
-                              : 'Add books from the catalog to start an order.',
-                          actionLabel: ar ? 'تصفح الكتب' : 'Browse Books',
+                          title: 'cart.empty_title'.tr(),
+                          subtitle: 'cart.empty_subtitle'.tr(),
+                          actionLabel: 'cart.browse_books'.tr(),
                           onAction: () =>
                               Navigator.of(ctx).pushReplacementNamed(
                             AppRoutes.books,
@@ -298,12 +295,12 @@ class _SummaryCard extends StatelessWidget {
       child: Column(
         children: [
           _SRow(
-            label: ar ? 'المجموع الفرعي' : 'Subtotal',
+            label: 'cart.subtotal'.tr(),
             value: '\$${state.subtotal.toStringAsFixed(2)}',
           ),
           SizedBox(height: 5.h),
           _SRow(
-            label: ar ? 'رسوم الخدمة' : 'Service fee',
+            label: 'cart.service_fee'.tr(),
             value: '\$${state.serviceFee.toStringAsFixed(2)}',
           ),
           Padding(
@@ -316,7 +313,7 @@ class _SummaryCard extends StatelessWidget {
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
-                ar ? 'الإجمالي' : 'Total',
+                'cart.total'.tr(),
                 style: GoogleFonts.cairo(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w800,
@@ -338,14 +335,12 @@ class _SummaryCard extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {},
-              child: Text(ar ? 'إتمام الشراء' : 'Checkout'),
+              child: Text('cart.checkout'.tr()),
             ),
           ),
           SizedBox(height: 10.h),
           Text(
-            ar
-                ? 'الدفع بدون حساب · بوابة الدفع تُحدَّد لاحقاً'
-                : 'Guest checkout · payment gateway TBD',
+            'cart.checkout_note'.tr(),
             style: GoogleFonts.inter(
               fontSize: 11.sp,
               color: AppColors.textHint,

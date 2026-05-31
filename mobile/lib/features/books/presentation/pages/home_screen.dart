@@ -13,6 +13,7 @@ import '../../../../core/widgets/app_bar_widget.dart';
 import '../../../../core/widgets/bottom_nav_widget.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/section_header_widget.dart';
+import '../../domain/entities/book.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/publisher_summary.dart';
 import '../cubit/home_content_cubit/home_content_cubit.dart';
@@ -148,179 +149,205 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ar = locale == 'ar';
     return RefreshIndicator(
       onRefresh: onRefresh,
       color: AppColors.primary,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-        // Featured hero
-        if (state.featured.isNotEmpty)
-          SliverToBoxAdapter(
-            child: FeaturedBookHeroWidget(
-              book: state.featured.first,
+          if (state.featured.isNotEmpty)
+            SliverToBoxAdapter(
+              child: FeaturedBookHeroWidget(
+                book: state.featured.first,
+                locale: locale,
+                onTap: () => onBookTap(state.featured.first.id, state.featured.first.titleAr),
+              ),
+            ),
+          if (state.categories.isNotEmpty)
+            _CategoriesSection(
+              categories: state.categories,
               locale: locale,
-              onTap: () => onBookTap(
-                state.featured.first.id,
-                state.featured.first.titleAr,
-              ),
+              onSeeAll: onBrowse,
+              onCategoryTap: onCategoryTap,
             ),
-          ),
-
-        // Categories
-        if (state.categories.isNotEmpty) ...[
+          if (state.freshBooks.isNotEmpty)
+            _BooksCarouselSection(
+              title: 'home.newly_released'.tr(),
+              books: state.freshBooks,
+              locale: locale,
+              onSeeAll: onBrowse,
+              onBookTap: onBookTap,
+            ),
+          if (state.translatedBooks.isNotEmpty)
+            _BooksCarouselSection(
+              title: 'home.translated_books'.tr(),
+              books: state.translatedBooks,
+              locale: locale,
+              onSeeAll: onBrowse,
+              onBookTap: onBookTap,
+            ),
+          if (state.topPublishers.isNotEmpty)
+            _PublishersSection(
+              publishers: state.topPublishers,
+              locale: locale,
+              onSeeAll: onPublisher,
+            ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsetsDirectional.only(top: 14.h, bottom: 12.h),
-              child: SectionHeaderWidget(
-                title: ar ? 'تصفح حسب التصنيف' : 'Browse by Category',
-                onSeeAll: onBrowse,
-                seeAllLabel: ar ? 'عرض الكل' : 'All',
-              ),
+              padding: EdgeInsetsDirectional.fromSTEB(16.w, 28.h, 16.w, 6.h),
+              child: _NewsletterStrip(locale: locale),
             ),
           ),
-          SliverToBoxAdapter(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding:
-                  EdgeInsetsDirectional.fromSTEB(16.w, 0, 16.w, 4.h),
-              child: Row(
-                children: state.categories
-                    .map(
-                      (c) => Padding(
-                        padding: EdgeInsetsDirectional.only(end: 10.w),
-                        child: _CategoryChip(
-                          nameAr: c.nameAr,
-                          nameEn: c.nameEn,
-                          locale: locale,
-                          onTap: () => onCategoryTap(c),
-                        ),
+          SliverToBoxAdapter(child: SizedBox(height: 16.h)),
+        ],
+      ),
+    );
+  }
+}
+
+class _CategoriesSection extends StatelessWidget {
+  const _CategoriesSection({
+    required this.categories,
+    required this.locale,
+    required this.onSeeAll,
+    required this.onCategoryTap,
+  });
+
+  final List<Category> categories;
+  final String locale;
+  final VoidCallback onSeeAll;
+  final void Function(Category) onCategoryTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsetsDirectional.only(top: 14.h, bottom: 12.h),
+            child: SectionHeaderWidget(
+              title: 'home.browse_by_category'.tr(),
+              onSeeAll: onSeeAll,
+              seeAllLabel: 'common.see_all'.tr(),
+            ),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsetsDirectional.fromSTEB(16.w, 0, 16.w, 4.h),
+            child: Row(
+              children: categories
+                  .map(
+                    (c) => Padding(
+                      padding: EdgeInsetsDirectional.only(end: 10.w),
+                      child: _CategoryChip(
+                        nameAr: c.nameAr,
+                        nameEn: c.nameEn,
+                        locale: locale,
+                        onTap: () => onCategoryTap(c),
                       ),
-                    )
-                    .toList(),
-              ),
+                    ),
+                  )
+                  .toList(),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
 
-        // Newly released
-        if (state.freshBooks.isNotEmpty) ...[
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsetsDirectional.only(top: 26.h, bottom: 12.h),
-              child: SectionHeaderWidget(
-                title: ar ? 'صدر حديثًا' : 'Newly Released',
-                onSeeAll: onBrowse,
-              ),
-            ),
+class _BooksCarouselSection extends StatelessWidget {
+  const _BooksCarouselSection({
+    required this.title,
+    required this.books,
+    required this.locale,
+    required this.onSeeAll,
+    required this.onBookTap,
+  });
+
+  final String title;
+  final List<Book> books;
+  final String locale;
+  final VoidCallback onSeeAll;
+  final void Function(String id, String titleAr) onBookTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsetsDirectional.only(top: 26.h, bottom: 12.h),
+            child: SectionHeaderWidget(title: title, onSeeAll: onSeeAll),
           ),
-          SliverToBoxAdapter(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding:
-                  EdgeInsetsDirectional.fromSTEB(16.w, 0, 16.w, 4.h),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: state.freshBooks
-                    .map(
-                      (b) => Padding(
-                        padding: EdgeInsetsDirectional.only(end: 12.w),
-                        child: BookCardWidget(
-                          book: b,
-                          locale: locale,
-                          width: 150.w,
-                          onTap: () => onBookTap(b.id, b.titleAr),
-                        ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsetsDirectional.fromSTEB(16.w, 0, 16.w, 4.h),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: books
+                  .map(
+                    (b) => Padding(
+                      padding: EdgeInsetsDirectional.only(end: 12.w),
+                      child: BookCardWidget(
+                        book: b,
+                        locale: locale,
+                        width: 150.w,
+                        onTap: () => onBookTap(b.id, b.titleAr),
                       ),
-                    )
-                    .toList(),
-              ),
+                    ),
+                  )
+                  .toList(),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
 
-        // Translated books
-        if (state.translatedBooks.isNotEmpty) ...[
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsetsDirectional.only(top: 26.h, bottom: 12.h),
-              child: SectionHeaderWidget(
-                title: ar ? 'الكتب المترجمة' : 'Translated Books',
-                onSeeAll: onBrowse,
-              ),
+class _PublishersSection extends StatelessWidget {
+  const _PublishersSection({
+    required this.publishers,
+    required this.locale,
+    required this.onSeeAll,
+  });
+
+  final List<PublisherSummary> publishers;
+  final String locale;
+  final VoidCallback onSeeAll;
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsetsDirectional.only(top: 26.h, bottom: 12.h),
+            child: SectionHeaderWidget(
+              title: 'home.top_publishers'.tr(),
+              onSeeAll: onSeeAll,
             ),
           ),
-          SliverToBoxAdapter(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding:
-                  EdgeInsetsDirectional.fromSTEB(16.w, 0, 16.w, 4.h),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: state.translatedBooks
-                    .map(
-                      (b) => Padding(
-                        padding: EdgeInsetsDirectional.only(end: 12.w),
-                        child: BookCardWidget(
-                          book: b,
-                          locale: locale,
-                          width: 150.w,
-                          onTap: () => onBookTap(b.id, b.titleAr),
-                        ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsetsDirectional.fromSTEB(16.w, 0, 16.w, 4.h),
+            child: Row(
+              children: publishers
+                  .map(
+                    (p) => Padding(
+                      padding: EdgeInsetsDirectional.only(end: 10.w),
+                      child: _PublisherPill(
+                        publisher: p,
+                        locale: locale,
+                        onTap: onSeeAll,
                       ),
-                    )
-                    .toList(),
-              ),
+                    ),
+                  )
+                  .toList(),
             ),
           ),
         ],
-
-        // Top publishers
-        if (state.topPublishers.isNotEmpty) ...[
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsetsDirectional.only(top: 26.h, bottom: 12.h),
-              child: SectionHeaderWidget(
-                title: ar ? 'أبرز الناشرين' : 'Top Publishers',
-                onSeeAll: onPublisher,
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding:
-                  EdgeInsetsDirectional.fromSTEB(16.w, 0, 16.w, 4.h),
-              child: Row(
-                children: state.topPublishers
-                    .map(
-                      (p) => Padding(
-                        padding: EdgeInsetsDirectional.only(end: 10.w),
-                        child: _PublisherPill(
-                          publisher: p,
-                          locale: locale,
-                          onTap: onPublisher,
-                        ),
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-          ),
-        ],
-
-        // Newsletter strip
-        SliverToBoxAdapter(
-          child: Padding(
-            padding:
-                EdgeInsetsDirectional.fromSTEB(16.w, 28.h, 16.w, 6.h),
-            child: _NewsletterStrip(locale: locale),
-          ),
-        ),
-
-        SliverToBoxAdapter(child: SizedBox(height: 16.h)),
-      ],
       ),
     );
   }
@@ -493,7 +520,7 @@ class _NewsletterStrip extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            ar ? 'اشترك في نشرتنا البريدية' : 'Subscribe to our newsletter',
+            'home.newsletter_title'.tr(),
             style: GoogleFonts.cairo(
               fontSize: 17.sp,
               fontWeight: FontWeight.w800,
@@ -526,7 +553,7 @@ class _NewsletterStrip extends StatelessWidget {
                   ),
                   alignment: AlignmentDirectional.centerStart,
                   child: Text(
-                    ar ? 'بريدك الإلكتروني' : 'Your email',
+                    'home.newsletter_email_hint'.tr(),
                     style: GoogleFonts.tajawal(
                       fontSize: 13.sp,
                       color: Colors.white.withValues(alpha: 0.6),
@@ -545,7 +572,7 @@ class _NewsletterStrip extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      ar ? 'اشترك' : 'Subscribe',
+                      'home.newsletter_subscribe'.tr(),
                       style: GoogleFonts.cairo(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w700,

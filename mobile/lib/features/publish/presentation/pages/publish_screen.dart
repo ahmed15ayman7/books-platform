@@ -41,7 +41,7 @@ class _PublishScreenState extends State<PublishScreen> {
         children: [
           AppBarWidget(
             variant: AppBarVariant.title,
-            title: ar ? 'انشر كتابك' : 'Publish Your Book',
+            title: 'publish.title'.tr(),
             showBack: true,
             currentLocale: locale,
             onLocaleChanged: (l) => context.setLocale(Locale(l)),
@@ -63,94 +63,15 @@ class _PublishScreenState extends State<PublishScreen> {
                   if (_step == 1) _BookStep(locale: locale),
                   if (_step == 2) _SuccessStep(locale: locale),
                   SizedBox(height: 16.h),
-                  // "First book free" promo
-                  Container(
-                    padding: EdgeInsetsDirectional.all(16.r),
-                    decoration: BoxDecoration(
-                      color: AppColors.brandRedSoft,
-                      border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.2),
-                      ),
-                      borderRadius: BorderRadius.circular(16.r),
-                    ),
-                    child: Row(
-                      children: [
-                        const Text('🎉', style: TextStyle(fontSize: 22)),
-                        SizedBox(width: 11.w),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              ar ? 'كتابك الأول مجاناً!' : 'First book is free!',
-                              style: GoogleFonts.cairo(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            Text(
-                              ar
-                                  ? 'الكتب التالية برسوم نشر رمزية'
-                                  : 'Subsequent books carry a small fee',
-                              style: GoogleFonts.tajawal(
-                                fontSize: 11.5.sp,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+                  const _PromoSection(),
                   SizedBox(height: 18.h),
-                  // Nav buttons
-                  Row(
-                    children: [
-                      if (_step > 0) ...[
-                        GestureDetector(
-                          onTap: _back,
-                          child: Container(
-                            width: 52.r,
-                            height: 52.r,
-                            decoration: BoxDecoration(
-                              color: AppColors.inputFill,
-                              borderRadius: BorderRadius.circular(24.r),
-                            ),
-                            child: Icon(
-                              Icons.arrow_back_rounded,
-                              size: 22.r,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 10.w),
-                      ],
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _step < _steps.length - 1
-                              ? _next
-                              : () => Navigator.of(context)
-                                  .pushReplacementNamed(AppRoutes.home),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                _step == _steps.length - 1
-                                    ? (ar ? 'إرسال الكتاب' : 'Submit book')
-                                    : (ar ? 'التالي' : 'Next'),
-                              ),
-                              if (_step < _steps.length - 1) ...[
-                                SizedBox(width: 8.w),
-                                Icon(
-                                  Icons.chevron_right_rounded,
-                                  size: 18.r,
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                  _NavigationSection(
+                    step: _step,
+                    totalSteps: _steps.length,
+                    onBack: _back,
+                    onPrimary: _step < _steps.length - 1
+                        ? _next
+                        : () => Navigator.of(context).pushReplacementNamed(AppRoutes.home),
                   ),
                   SizedBox(height: 16.h),
                 ],
@@ -182,7 +103,101 @@ class _PublishScreenState extends State<PublishScreen> {
   }
 }
 
-// ── Step indicator ────────────────────────────────────────────────────────
+class _PromoSection extends StatelessWidget {
+  const _PromoSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsetsDirectional.all(16.r),
+      decoration: BoxDecoration(
+        color: AppColors.brandRedSoft,
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Row(
+        children: [
+          const Text('🎉', style: TextStyle(fontSize: 22)),
+          SizedBox(width: 11.w),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'publish.promo'.tr(),
+                style: GoogleFonts.cairo(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.primary,
+                ),
+              ),
+              Text(
+                'publish.promo_subtitle'.tr(),
+                style: GoogleFonts.tajawal(
+                  fontSize: 11.5.sp,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NavigationSection extends StatelessWidget {
+  const _NavigationSection({
+    required this.step,
+    required this.totalSteps,
+    required this.onBack,
+    required this.onPrimary,
+  });
+
+  final int step;
+  final int totalSteps;
+  final VoidCallback onBack;
+  final VoidCallback onPrimary;
+
+  @override
+  Widget build(BuildContext context) {
+    final isLast = step == totalSteps - 1;
+    return Row(
+      children: [
+        if (step > 0) ...[
+          GestureDetector(
+            onTap: onBack,
+            child: Container(
+              width: 52.r,
+              height: 52.r,
+              decoration: BoxDecoration(
+                color: AppColors.inputFill,
+                borderRadius: BorderRadius.circular(24.r),
+              ),
+              child: Icon(Icons.arrow_back_rounded, size: 22.r, color: AppColors.textPrimary),
+            ),
+          ),
+          SizedBox(width: 10.w),
+        ],
+        Expanded(
+          child: ElevatedButton(
+            onPressed: onPrimary,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(isLast ? 'publish.submit'.tr() : 'publish.next'.tr()),
+                if (!isLast) ...[
+                  SizedBox(width: 8.w),
+                  Icon(Icons.chevron_right_rounded, size: 18.r),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _StepIndicator extends StatelessWidget {
   const _StepIndicator({required this.step, required this.labels});
   final int step;
@@ -328,29 +343,28 @@ class _AuthorStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ar = locale == 'ar';
     return Column(
       children: [
         _formField(
-          ar ? 'الاسم الكامل' : 'Full name',
-          ar ? 'اكتب اسمك الكامل' : 'Your full name',
+          'publish.author_name_label'.tr(),
+          'publish.author_name_hint'.tr(),
           required: true,
           locale: locale,
         ),
         _formField(
-          ar ? 'البريد الإلكتروني' : 'Email',
+          'publish.email_label'.tr(),
           'name@example.com',
           required: true,
           locale: locale,
         ),
         _formField(
-          ar ? 'رقم الهاتف' : 'Phone',
+          'publish.phone_label'.tr(),
           '+20 1XX XXX XXXX',
           locale: locale,
         ),
         _formField(
-          ar ? 'نبذة عنك' : 'Author bio',
-          ar ? 'نبذة مختصرة عنك وعن أعمالك…' : 'A short bio about you…',
+          'publish.bio_label'.tr(),
+          'publish.bio_hint'.tr(),
           multiline: true,
           locale: locale,
         ),
@@ -366,25 +380,24 @@ class _BookStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ar = locale == 'ar';
     return Column(
       children: [
         _formField(
-          ar ? 'عنوان الكتاب' : 'Book title',
-          ar ? 'عنوان كتابك' : 'Your book title',
+          'publish.book_title_label'.tr(),
+          'publish.book_title_hint'.tr(),
           required: true,
           locale: locale,
         ),
         _formField(
-          ar ? 'ملخص الكتاب' : 'Book summary',
-          ar ? 'نبذة عن محتوى الكتاب…' : 'Summary of your book…',
+          'publish.summary_label'.tr(),
+          'publish.summary_hint'.tr(),
           required: true,
           multiline: true,
           locale: locale,
         ),
         _formField(
-          ar ? 'التصنيف' : 'Category',
-          ar ? 'اختر التصنيف' : 'Choose category',
+          'publish.category_label'.tr(),
+          'publish.category_hint'.tr(),
           required: true,
           locale: locale,
         ),
@@ -405,7 +418,7 @@ class _BookStep extends StatelessWidget {
               Icon(Icons.upload_file_outlined, size: 26.r, color: AppColors.primary),
               SizedBox(height: 8.h),
               Text(
-                ar ? 'رفع ملف الكتاب (PDF)' : 'Upload book file (PDF)',
+                'publish.upload_label'.tr(),
                 style: GoogleFonts.cairo(
                   fontSize: 13.5.sp,
                   fontWeight: FontWeight.w700,
@@ -427,7 +440,6 @@ class _SuccessStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ar = locale == 'ar';
     return Padding(
       padding: EdgeInsetsDirectional.symmetric(vertical: 16.h),
       child: Column(
@@ -444,7 +456,7 @@ class _SuccessStep extends StatelessWidget {
           ),
           SizedBox(height: 18.h),
           Text(
-            ar ? 'جاهز للإرسال' : 'Ready to submit',
+            'publish.ready_title'.tr(),
             style: GoogleFonts.cairo(
               fontSize: 18.sp,
               fontWeight: FontWeight.w800,
@@ -453,9 +465,7 @@ class _SuccessStep extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
           Text(
-            ar
-                ? 'سنراجع كتابك ونتواصل معك خلال 5 أيام عمل.\nيخضع النشر لموافقة فريق التحرير.'
-                : "We'll review your book and contact you within 5 business days.\nSubject to editorial approval.",
+            'publish.success_description'.tr(),
             textAlign: TextAlign.center,
             style: GoogleFonts.tajawal(
               fontSize: 14.sp,

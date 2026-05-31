@@ -46,15 +46,14 @@ class _CatalogScreenState extends State<CatalogScreen> {
   @override
   Widget build(BuildContext context) {
     final locale = context.locale.languageCode;
-    final ar = locale == 'ar';
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Column(
         children: [
           AppBarWidget(
             variant: AppBarVariant.title,
-            title: ar ? 'الكتب' : 'Books',
-            subtitle: '4,654 ${ar ? 'كتاب' : 'books'}',
+            title: 'books.title'.tr(),
+            subtitle: '4,654 ${'books.books_unit'.tr()}',
             currentLocale: locale,
             onSearch: () =>
                 Navigator.of(context).pushNamed(AppRoutes.search),
@@ -178,26 +177,25 @@ class _FilterRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ar = locale == 'ar';
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: EdgeInsetsDirectional.fromSTEB(16.w, 12.h, 16.w, 4.h),
       child: Row(
         children: [
           _Chip(
-            label: ar ? 'الكل' : 'All',
+            label: 'books.status.all'.tr(),
             active: activeStatus == null,
             onTap: () {},
           ),
           SizedBox(width: 8.w),
           _Chip(
-            label: ar ? 'مرشح للترجمة' : 'Nominated',
+            label: 'books.status.nominated'.tr(),
             active: activeStatus == TranslationStatus.nominated,
             onTap: () => onStatusTap(TranslationStatus.nominated),
           ),
           SizedBox(width: 8.w),
           _Chip(
-            label: ar ? 'مترجم' : 'Translated',
+            label: 'books.status.translated'.tr(),
             active: activeStatus == TranslationStatus.translated,
             onTap: () => onStatusTap(TranslationStatus.translated),
           ),
@@ -205,13 +203,13 @@ class _FilterRow extends StatelessWidget {
           Container(width: 1, height: 24.h, color: AppColors.divider),
           SizedBox(width: 8.w),
           _Chip(
-            label: ar ? 'الأحدث' : 'Newest',
+            label: 'books.sort.newest'.tr(),
             active: newest,
             onTap: () => onSortTap(true),
           ),
           SizedBox(width: 8.w),
           _Chip(
-            label: ar ? 'الأقدم' : 'Oldest',
+            label: 'books.sort.oldest'.tr(),
             active: !newest,
             onTap: () => onSortTap(false),
           ),

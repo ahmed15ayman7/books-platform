@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -63,7 +64,7 @@ class BookCardWidget extends StatelessWidget {
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
-                          locale == 'ar' ? 'جديد' : 'New',
+                          'common.new_badge'.tr(),
                           style: GoogleFonts.tajawal(
                             fontSize: 10.sp,
                             fontWeight: FontWeight.w700,
@@ -82,9 +83,7 @@ class BookCardWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    locale == 'ar'
-                        ? _categoryName(book.categorySlug, true)
-                        : _categoryName(book.categorySlug, false),
+                    _categoryName(book.categorySlug),
                     style: GoogleFonts.tajawal(
                       fontSize: 11.sp,
                       fontWeight: FontWeight.w700,
@@ -128,19 +127,14 @@ class BookCardWidget extends StatelessWidget {
     );
   }
 
-  String _categoryName(String slug, bool ar) => switch (slug) {
-        'ideas-and-policies' => ar ? 'أفكار وسياسات' : 'Ideas & Policies',
-        'social-studies' => ar ? 'دراسات اجتماعية' : 'Social Studies',
-        'philosophies-and-cultures' =>
-          ar ? 'فلسفات وثقافات' : 'Philosophies & Cultures',
-        'economy-and-development' =>
-          ar ? 'اقتصاد وتنمية' : 'Economy & Development',
-        'languages-and-literature' =>
-          ar ? 'لغات وآداب' : 'Languages & Literature',
-        'technologies-and-sciences' =>
-          ar ? 'تقنيات وعلوم' : 'Technologies & Sciences',
-        'religions-and-beliefs' =>
-          ar ? 'أديان وعقائد' : 'Religions & Beliefs',
-        _ => ar ? 'أخرى' : 'Other',
+  String _categoryName(String slug) => switch (slug) {
+        'ideas-and-policies' => 'categories.ideas_and_policies'.tr(),
+        'social-studies' => 'categories.social_studies'.tr(),
+        'philosophies-and-cultures' => 'categories.philosophies_and_cultures'.tr(),
+        'economy-and-development' => 'categories.economy_and_development'.tr(),
+        'languages-and-literature' => 'categories.languages_and_literature'.tr(),
+        'technologies-and-sciences' => 'categories.technologies_and_sciences'.tr(),
+        'religions-and-beliefs' => 'categories.religions_and_beliefs'.tr(),
+        _ => 'categories.other'.tr(),
       };
 }
