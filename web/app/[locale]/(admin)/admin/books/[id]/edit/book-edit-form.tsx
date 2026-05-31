@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Save, Loader2, CheckCircle2, AlertCircle, X } from "lucide-react";
 import { createBook, updateBook, type BookEditData } from "./actions";
 import { adminFieldClass } from "@/components/admin/admin-form-field";
+import { AdminMarkdownHint } from "@/components/admin/admin-markdown-hint";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -508,23 +509,53 @@ export function BookEditForm({
         </div>
         <div className="grid grid-cols-1 gap-5 p-5 lg:grid-cols-2">
           <Field>
-            <FieldLabel htmlFor="shortDescAr">وصف قصير — عربي</FieldLabel>
-            <Textarea id="shortDescAr" className={cn(fieldCls, "min-h-[100px] resize-y")} value={form.shortDescAr} onChange={(e) => set("shortDescAr", e.target.value)} placeholder="ملخص قصير بالعربية…" />
+            <FieldLabel htmlFor="shortDescAr">مقتطف قصير — عربي</FieldLabel>
+            <Textarea
+              id="shortDescAr"
+              className={cn(fieldCls, "min-h-[100px] resize-y")}
+              value={form.shortDescAr}
+              onChange={(e) => set("shortDescAr", e.target.value)}
+              placeholder="جملة أو فقرتان تظهران فوق الملخص في صفحة الكتاب…"
+            />
           </Field>
 
           <Field>
-            <FieldLabel htmlFor="shortDesc">وصف قصير — إنجليزي</FieldLabel>
-            <Textarea id="shortDesc" className={cn(fieldCls, "min-h-[100px] resize-y")} value={form.shortDesc} onChange={(e) => set("shortDesc", e.target.value)} placeholder="Short description in English…" dir="ltr" />
+            <FieldLabel htmlFor="shortDesc">مقتطف قصير — إنجليزي</FieldLabel>
+            <Textarea
+              id="shortDesc"
+              className={cn(fieldCls, "min-h-[100px] resize-y")}
+              value={form.shortDesc}
+              onChange={(e) => set("shortDesc", e.target.value)}
+              placeholder="Short lead text shown above the summary…"
+              dir="ltr"
+            />
+          </Field>
+
+          <Field className="lg:col-span-2">
+            <AdminMarkdownHint />
           </Field>
 
           <Field>
-            <FieldLabel htmlFor="descriptionAr">الوصف الكامل — عربي</FieldLabel>
-            <Textarea id="descriptionAr" className={cn(fieldCls, "min-h-[160px] resize-y")} value={form.descriptionAr} onChange={(e) => set("descriptionAr", e.target.value)} placeholder="الوصف الكامل للكتاب بالعربية…" />
+            <FieldLabel htmlFor="descriptionAr">ملخص الكتاب (Markdown) — عربي</FieldLabel>
+            <Textarea
+              id="descriptionAr"
+              className={cn(fieldCls, "min-h-[220px] resize-y font-mono text-[13px]")}
+              value={form.descriptionAr}
+              onChange={(e) => set("descriptionAr", e.target.value)}
+              placeholder={"## فكرة الكتاب\n\n**كلمة مفتاحية** مهمة في السياق…\n\n- نقطة أولى\n- نقطة ثانية"}
+            />
           </Field>
 
           <Field>
-            <FieldLabel htmlFor="description">الوصف الكامل — إنجليزي</FieldLabel>
-            <Textarea id="description" className={cn(fieldCls, "min-h-[160px] resize-y")} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Full description in English…" dir="ltr" />
+            <FieldLabel htmlFor="description">ملخص الكتاب (Markdown) — إنجليزي</FieldLabel>
+            <Textarea
+              id="description"
+              className={cn(fieldCls, "min-h-[220px] resize-y font-mono text-[13px]")}
+              value={form.description}
+              onChange={(e) => set("description", e.target.value)}
+              placeholder={"## About this book\n\n**Keyword** highlighted in context…\n\n- First point\n- Second point"}
+              dir="ltr"
+            />
           </Field>
 
           <Field className="lg:col-span-2">
