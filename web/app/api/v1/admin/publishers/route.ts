@@ -95,6 +95,7 @@ export async function POST(request: NextRequest) {
 
     const {
       name,
+      nameEn,
       description,
       descriptionEn,
       websiteUrl,
@@ -116,6 +117,7 @@ export async function POST(request: NextRequest) {
       data: {
         originalId,
         title: name,
+        imageTitle: nameEn?.trim() || null,
         content: description ?? null,
         excerpt: descriptionEn ?? null,
         websiteUrl: websiteUrl || null,

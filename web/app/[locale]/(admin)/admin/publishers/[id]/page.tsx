@@ -154,6 +154,7 @@ export default function AdminPublisherEditPage() {
               label="الاسم (إنجليزي)"
               value={form.nameEn}
               onChange={(e) => set("nameEn")(e.target.value)}
+              dir="ltr"
             />
             <AdminInput
               label="الدولة"
@@ -193,6 +194,7 @@ export default function AdminPublisherEditPage() {
               rows={4}
               value={form.descriptionEn}
               onChange={(e) => set("descriptionEn")(e.target.value)}
+              dir="ltr"
             />
           </div>
         </AdminCard>

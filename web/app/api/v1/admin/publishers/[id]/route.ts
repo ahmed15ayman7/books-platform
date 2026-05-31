@@ -40,13 +40,13 @@ export async function GET(
       id: publisher.id,
       slug: publisher.slug,
       name: publisher.title,
-      nameEn: "",
+      nameEn: publisher.imageTitle ?? "",
       country: publisher.countries[0]?.name ?? "",
       websiteUrl: publisher.websiteUrl ?? "",
       contactEmail: publisher.contactEmail ?? "",
       description: publisher.content ?? "",
-      descriptionEn: "",
-      imageUrl: publisher.imageFeatured ?? "",
+      descriptionEn: publisher.excerpt ?? "",
+      imageUrl: publisher.imageFeatured ?? publisher.imageUrl ?? "",
       status: publisher.status,
       sponsored: publisher.sponsored !== null,
       createdAt: publisher.createdAt,
@@ -71,13 +71,25 @@ export async function PATCH(
     const parsed = updateSchema.safeParse(body);
     if (!parsed.success) return ApiErrors.badRequest("Validation failed", parsed.error.issues);
 
-    const { name, description, websiteUrl, contactEmail, imageUrl, status, sponsored } = parsed.data;
+    const {
+      name,
+      nameEn,
+      description,
+      descriptionEn,
+      websiteUrl,
+      contactEmail,
+      imageUrl,
+      status,
+      sponsored,
+    } = parsed.data;
 
     const publisher = await db.publisher.update({
       where: { id },
       data: {
         ...(name !== undefined && { title: name }),
-        ...(description !== undefined && { content: description }),
+        ...(nameEn !== undefined && { imageTitle: nameEn.trim() || null }),
+        ...(description !== undefined && { content: description || null }),
+        ...(descriptionEn !== undefined && { excerpt: descriptionEn || null }),
         ...(websiteUrl !== undefined && { websiteUrl: websiteUrl || null }),
         ...(contactEmail !== undefined && { contactEmail: contactEmail || null }),
         ...(imageUrl !== undefined && { imageFeatured: imageUrl || null }),
