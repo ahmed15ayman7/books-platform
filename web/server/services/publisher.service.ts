@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { notDeleted } from "@/lib/admin/audit-fields";
 import { PAGINATION } from "@/lib/utils/constants";
 
 export interface PublisherFilters {
@@ -6,6 +7,22 @@ export interface PublisherFilters {
   limit?: number;
   country?: string;
   search?: string;
+}
+
+const publishedBookOnPlatform = {
+  some: {
+    published: true,
+    ...notDeleted,
+  },
+} as const;
+
+function mapPublisherImage<T extends { imageUrl: string | null; imageFeatured: string | null }>(
+  pub: T,
+) {
+  return {
+    ...pub,
+    imageUrl: pub.imageUrl ?? pub.imageFeatured ?? null,
+  };
 }
 
 export const PublisherService = {
@@ -35,7 +52,6 @@ export const PublisherService = {
         skip,
         take: limit,
         orderBy: [
-          // Sponsored publishers first
           { sponsored: { priority: "desc" } },
           { title: "asc" },
         ],
@@ -44,6 +60,7 @@ export const PublisherService = {
           title: true,
           slug: true,
           imageUrl: true,
+          imageFeatured: true,
           excerpt: true,
           countries: {
             select: { id: true, name: true, nameAr: true, slug: true },
@@ -57,14 +74,15 @@ export const PublisherService = {
       db.publisher.count({ where }),
     ]);
 
-    const publishersWithMeta = publishers.map((pub) => ({
-      ...pub,
-      booksCount: pub._count.products,
-      isSponsored:
-        pub.sponsored?.isActive === true && pub.sponsored.endsAt > new Date(),
-      _count: undefined,
-      sponsored: undefined,
-    }));
+    const publishersWithMeta = publishers.map((pub) => {
+      const mapped = mapPublisherImage(pub);
+      return {
+        ...mapped,
+        booksCount: pub._count.products,
+        isSponsored:
+          pub.sponsored?.isActive === true && pub.sponsored.endsAt > new Date(),
+      };
+    });
 
     return {
       publishers: publishersWithMeta,
@@ -80,13 +98,21 @@ export const PublisherService = {
   },
 
   async getBySlug(slug: string) {
-    return db.publisher.findFirst({
-      where: { slug, status: "publish" },
+    const row = await db.publisher.findFirst({
+      where: {
+        slug,
+        OR: [{ status: "publish" }, { products: publishedBookOnPlatform }],
+      },
       include: {
         countries: true,
         sponsored: true,
       },
     });
+    if (!row) return null;
+    return {
+      ...mapPublisherImage(row),
+      excerpt: row.excerpt ?? row.content?.slice(0, 500) ?? null,
+    };
   },
 
   async getPublisherBooks(slug: string, page = 1, limit = 12) {
@@ -94,12 +120,30 @@ export const PublisherService = {
       where: { slug },
       select: { id: true },
     });
-    if (!publisher) return { books: [], pagination: { page: 1, limit, total: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false } };
+    if (!publisher) {
+      return {
+        books: [],
+        pagination: {
+          page: 1,
+          limit,
+          total: 0,
+          totalPages: 0,
+          hasNextPage: false,
+          hasPrevPage: false,
+        },
+      };
+    }
+
+    const bookWhere = {
+      publisherId: publisher.id,
+      published: true,
+      ...notDeleted,
+    };
 
     const skip = (page - 1) * limit;
     const [books, total] = await Promise.all([
       db.product.findMany({
-        where: { publisherId: publisher.id, published: true },
+        where: bookWhere,
         skip,
         take: limit,
         orderBy: { position: "desc" },
@@ -113,7 +157,7 @@ export const PublisherService = {
           primaryCategory: { select: { name: true, nameAr: true } },
         },
       }),
-      db.product.count({ where: { publisherId: publisher.id, published: true } }),
+      db.product.count({ where: bookWhere }),
     ]);
 
     return {
@@ -133,6 +177,17 @@ export const PublisherService = {
     return db.country.findMany({
       orderBy: { name: "asc" },
       select: { id: true, name: true, nameAr: true, slug: true },
+    });
+  },
+
+  async listSlugsForSitemap(limit = 2000) {
+    return db.publisher.findMany({
+      where: {
+        products: publishedBookOnPlatform,
+      },
+      select: { slug: true, updatedAt: true },
+      take: limit,
+      orderBy: { updatedAt: "desc" },
     });
   },
 };

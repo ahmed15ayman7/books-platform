@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
@@ -20,9 +20,10 @@ import {
   adminCreatedAtColumn,
   adminUpdatedAtColumn,
 } from "@/components/admin/admin-timestamps";
-import { AdminCard } from "@/components/admin/admin-card";
-import { AdminInput, AdminTextarea, AdminSlugInput } from "@/components/admin/admin-form-field";
-import { autoSlugFromEnglish } from "@/lib/admin/slugify";
+import {
+  AuthorFormDialog,
+  type AuthorFormValues,
+} from "@/components/admin/author-form-dialog";
 
 interface Author {
   id: string;
@@ -36,20 +37,10 @@ interface Author {
   updatedAt: string;
 }
 
-interface AuthorForm {
-  name: string;
-  nameAr: string;
-  slug: string;
-  bio: string;
-  bioAr: string;
-}
-
-const emptyForm: AuthorForm = { name: "", nameAr: "", slug: "", bio: "", bioAr: "" };
 const PAGE_SIZE = 20;
 
 export default function AdminAuthorsPage() {
   const { viewMode, setViewMode } = useAdminViewMode("authors");
-  const formRef = useRef<HTMLDivElement>(null);
 
   const [authors, setAuthors] = useState<Author[]>([]);
   const [search, setSearch] = useState("");
@@ -58,11 +49,10 @@ export default function AdminAuthorsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<AuthorForm>(emptyForm);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
   const [listError, setListError] = useState("");
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingAuthor, setEditingAuthor] = useState<AuthorFormValues | null>(null);
 
   const canCreate = can(PERMISSIONS.authors.create);
   const canUpdate = can(PERMISSIONS.authors.update);
@@ -106,60 +96,23 @@ export default function AdminAuthorsPage() {
 
   const resetPage = () => setPage(1);
 
+  function openCreate() {
+    if (!canCreate) return;
+    setEditingAuthor(null);
+    setDialogOpen(true);
+  }
+
   function openEdit(author: Author) {
     if (!canUpdate) return;
-    setEditingId(author.id);
-    setForm({
+    setEditingAuthor({
+      id: author.id,
       name: author.name,
       nameAr: author.nameAr ?? "",
       slug: author.slug,
       bio: author.bio ?? "",
       bioAr: author.bioAr ?? "",
     });
-    setError("");
-    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  function startCreate() {
-    if (!canCreate) return;
-    setEditingId(null);
-    setForm(emptyForm);
-    setError("");
-    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (editingId ? !canUpdate : !canCreate) return;
-
-    setSaving(true);
-    setError("");
-    try {
-      const url = editingId ? `/api/v1/admin/authors/${editingId}` : "/api/v1/admin/authors";
-      const res = await fetch(url, {
-        method: editingId ? "PATCH" : "POST",
-        headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name.trim(),
-          nameAr: form.nameAr.trim() || undefined,
-          slug: form.slug.trim(),
-          bio: form.bio.trim() || undefined,
-          bioAr: form.bioAr.trim() || undefined,
-        }),
-      });
-      const data = (await res.json()) as { success: boolean; error?: { message: string } };
-      if (!res.ok || !data.success) {
-        setError(data.error?.message ?? "فشل الحفظ");
-        return;
-      }
-      setForm(emptyForm);
-      setEditingId(null);
-      await load();
-    } catch {
-      setError("حدث خطأ في الاتصال");
-    } finally {
-      setSaving(false);
-    }
+    setDialogOpen(true);
   }
 
   async function handleDelete(row: Author) {
@@ -182,9 +135,9 @@ export default function AdminAuthorsPage() {
         setListError(data.error?.message ?? "فشل حذف المؤلف");
         return;
       }
-      if (editingId === row.id) {
-        setEditingId(null);
-        setForm(emptyForm);
+      if (editingAuthor?.id === row.id) {
+        setDialogOpen(false);
+        setEditingAuthor(null);
       }
       if (authors.length === 1 && page > 1) {
         setPage((p) => p - 1);
@@ -196,9 +149,6 @@ export default function AdminAuthorsPage() {
     }
   }
 
-  const set = (k: keyof AuthorForm) => (v: string) =>
-    setForm((p) => ({ ...p, [k]: v }));
-
   const rowActions = (row: Author) => (
     <div className="flex items-center gap-1">
       {canUpdate && (
@@ -207,7 +157,6 @@ export default function AdminAuthorsPage() {
           variant="outline"
           className="gap-1 text-xs"
           onClick={() => openEdit(row)}
-          aria-label="تعديل"
         >
           <Pencil className="h-3 w-3" />
           تعديل
@@ -219,7 +168,6 @@ export default function AdminAuthorsPage() {
           variant="outline"
           className="gap-1 border-[var(--error)]/40 text-[var(--error)] text-xs hover:bg-[var(--error)]/10"
           onClick={() => void handleDelete(row)}
-          aria-label="حذف"
         >
           <Trash2 className="h-3 w-3" />
           حذف
@@ -274,15 +222,13 @@ export default function AdminAuthorsPage() {
       : []),
   ];
 
-  const showForm = canCreate || canUpdate;
-
   return (
     <div className="text-white">
       <AdminPageHeader
         title="المؤلفون"
         subtitle="إدارة مؤلفي الكتب"
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <AdminSearch
               value={search}
               onChange={(v) => {
@@ -293,7 +239,7 @@ export default function AdminAuthorsPage() {
               placeholder="بحث بالاسم أو Slug..."
             />
             {canCreate && (
-              <Button size="sm" className="gap-1.5" onClick={startCreate}>
+              <Button size="sm" className="gap-1.5" onClick={openCreate}>
                 <Plus className="h-4 w-4" />
                 مؤلف جديد
               </Button>
@@ -308,117 +254,51 @@ export default function AdminAuthorsPage() {
         </p>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {showForm && (
-          <div ref={formRef} className="lg:col-span-1">
-            <AdminCard title={editingId ? "تعديل المؤلف" : "إضافة مؤلف"}>
-              <form onSubmit={handleSubmit} className="space-y-3">
-                <AdminInput
-                  label="الاسم (EN) *"
-                  value={form.name}
-                  onChange={(e) => {
-                    const name = e.target.value;
-                    setForm((p) => ({
-                      ...p,
-                      name,
-                      slug: autoSlugFromEnglish(name, p.slug, p.name),
-                    }));
-                  }}
-                  dir="ltr"
-                  required
-                  disabled={!!editingId && !canUpdate}
-                />
-                <AdminInput
-                  label="الاسم (AR)"
-                  value={form.nameAr}
-                  onChange={(e) => set("nameAr")(e.target.value)}
-                  disabled={!!editingId && !canUpdate}
-                />
-                <AdminSlugInput
-                  label="Slug *"
-                  value={form.slug}
-                  onChange={(e) => set("slug")(e.target.value)}
-                  required
-                  disabled={!!editingId && !canUpdate}
-                />
-                <AdminTextarea
-                  label="نبذة (EN)"
-                  value={form.bio}
-                  onChange={(e) => set("bio")(e.target.value)}
-                  rows={3}
-                  dir="ltr"
-                  disabled={!!editingId && !canUpdate}
-                />
-                <AdminTextarea
-                  label="نبذة (AR)"
-                  value={form.bioAr}
-                  onChange={(e) => set("bioAr")(e.target.value)}
-                  rows={3}
-                  disabled={!!editingId && !canUpdate}
-                />
-                {error && <p className="text-xs text-[var(--error)]">{error}</p>}
-                <div className="flex gap-2 pt-1">
-                  {(editingId ? canUpdate : canCreate) && (
-                    <Button type="submit" size="sm" disabled={saving}>
-                      {saving ? "..." : editingId ? "تحديث" : "إضافة"}
-                    </Button>
-                  )}
-                  {editingId && (
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setEditingId(null);
-                        setForm(emptyForm);
-                        setError("");
-                      }}
-                    >
-                      إلغاء
-                    </Button>
-                  )}
-                </div>
-              </form>
-            </AdminCard>
-          </div>
-        )}
+      <AdminListToolbar
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        sort={
+          <AdminSortSelect
+            value={sort}
+            onChange={(v) => {
+              setSort(v);
+              resetPage();
+            }}
+            options={[
+              { value: "name:asc", label: "الاسم أ–ي" },
+              { value: "updatedAt:desc", label: "آخر تحديث" },
+              { value: "createdAt:desc", label: "الأحدث" },
+            ]}
+          />
+        }
+      />
 
-        <div className={showForm ? "lg:col-span-2" : "lg:col-span-3"}>
-          <AdminListToolbar
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            sort={
-              <AdminSortSelect
-                value={sort}
-                onChange={(v) => {
-                  setSort(v);
-                  resetPage();
-                }}
-                options={[
-                  { value: "name:asc", label: "الاسم أ–ي" },
-                  { value: "updatedAt:desc", label: "آخر تحديث" },
-                  { value: "createdAt:desc", label: "الأحدث" },
-                ]}
-              />
-            }
-          />
-          <AdminListView
-            viewMode={viewMode}
-            columns={columns}
-            data={authors}
-            loading={loading}
-            emptyMessage="لا يوجد مؤلفون بعد"
-            renderCard={renderCard}
-          />
-          <AdminPagination
-            page={page}
-            totalPages={totalPages}
-            onPage={setPage}
-            total={total}
-            pageSize={PAGE_SIZE}
-          />
-        </div>
-      </div>
+      <AdminListView
+        viewMode={viewMode}
+        columns={columns}
+        data={authors}
+        loading={loading}
+        emptyMessage="لا يوجد مؤلفون بعد"
+        renderCard={renderCard}
+        onRowClick={canUpdate ? openEdit : undefined}
+      />
+
+      <AdminPagination
+        page={page}
+        totalPages={totalPages}
+        onPage={setPage}
+        total={total}
+        pageSize={PAGE_SIZE}
+      />
+
+      {(canCreate || canUpdate) && (
+        <AuthorFormDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          author={editingAuthor}
+          onSaved={() => void load()}
+        />
+      )}
     </div>
   );
 }

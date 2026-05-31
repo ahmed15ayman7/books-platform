@@ -7,7 +7,7 @@ import { BookSummaryMarkdown } from "@/lib/markdown/book-summary-markdown";
 import type { Locale } from "@/lib/i18n";
 
 /** Fixed cover size for all books on detail page (4:3) */
-export const BOOK_DETAIL_COVER_WIDTH = 280;
+export const BOOK_DETAIL_COVER_WIDTH = 360;
 export const BOOK_DETAIL_COVER_HEIGHT = Math.round((BOOK_DETAIL_COVER_WIDTH * 3) / 4);
 
 interface Category {
@@ -128,10 +128,14 @@ export function BookDetailHero({
   );
 
   const coverColumn = (
-    <div className="mx-auto flex w-full max-w-[280px] flex-col gap-4 sm:mx-0 lg:w-[280px] lg:shrink-0">
+    <div className="mx-auto flex w-full max-w-sm flex-col gap-4 sm:max-w-none sm:mx-0 lg:w-[360px] lg:shrink-0">
       <div
-        className="relative overflow-hidden rounded-xl bg-[var(--brand-gray-100)] shadow-md ring-1 ring-[var(--brand-gray-200)]"
-        style={{ width: BOOK_DETAIL_COVER_WIDTH, height: BOOK_DETAIL_COVER_HEIGHT }}
+        className="relative mx-auto overflow-hidden rounded-xl bg-[var(--brand-gray-100)] shadow-md ring-1 ring-[var(--brand-gray-200)] sm:mx-0"
+        style={{
+          width: BOOK_DETAIL_COVER_WIDTH,
+          height: BOOK_DETAIL_COVER_HEIGHT,
+          maxWidth: "100%",
+        }}
       >
         {imageUrl ? (
           <Image
@@ -182,7 +186,7 @@ export function BookDetailHero({
         لا نضع dir=rtl على الـ grid — يعكس ترتيب الأعمدة ويوسّع الفراغ بين الملخص والغلاف.
         العربي: ملخص يسار (1fr) + غلاف يمين (280px) مع نص RTL داخل عمود الملخص.
       */}
-      <div className="grid grid-cols-1 gap-8 p-6 md:p-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start lg:gap-10">
+      <div className="grid grid-cols-1 gap-8 p-6 md:p-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start lg:gap-10">
         <div dir={isAr ? "rtl" : "ltr"} className="min-w-0">
           {summaryColumn}
         </div>

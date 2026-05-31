@@ -151,7 +151,13 @@ export default async function PublisherDetailPage({
 
         {books.length === 0 ? (
           <div className="py-20 text-center text-[var(--brand-gray-500)]">
-            {isAr ? "لا توجد كتب متاحة" : "No books available"}
+            <p>{isAr ? "لا توجد كتب منشورة لهذا الناشر" : "No published books for this publisher"}</p>
+            <Link
+              href={`/${locale}/publishers`}
+              className="mt-4 inline-block text-sm text-[var(--brand-red)] hover:underline"
+            >
+              {isAr ? "تصفح كل الناشرين" : "Browse all publishers"}
+            </Link>
           </div>
         ) : (
           <>

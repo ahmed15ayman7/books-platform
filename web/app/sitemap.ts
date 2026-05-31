@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
 import { getSiteUrl } from "@/lib/seo/site";
+import { AuthorService } from "@/server/services/author.service";
+import { PublisherService } from "@/server/services/publisher.service";
 
 const LOCALES = ["ar", "en"] as const;
 
@@ -43,7 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return staticEntries;
   }
 
-  const [books, categories, articles] = await Promise.all([
+  const [books, categories, articles, authors, publishers] = await Promise.all([
     db.product
       .findMany({
         where: { published: true },
@@ -66,6 +68,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         orderBy: { date: "desc" },
       })
       .catch(() => [] as { slug: string; date: Date | null }[]),
+    AuthorService.listSlugsForSitemap().catch(() => [] as { slug: string; updatedAt: Date }[]),
+    PublisherService.listSlugsForSitemap().catch(() => [] as { slug: string; updatedAt: Date }[]),
   ]);
 
   const bookEntries: MetadataRoute.Sitemap = LOCALES.flatMap((locale) =>
@@ -95,5 +99,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   );
 
-  return [...staticEntries, ...bookEntries, ...categoryEntries, ...articleEntries];
+  const authorEntries: MetadataRoute.Sitemap = LOCALES.flatMap((locale) =>
+    authors.map((author) => ({
+      url: `${base}/${locale}/authors/${author.slug}`,
+      lastModified: author.updatedAt ?? now,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
+  );
+
+  const publisherEntries: MetadataRoute.Sitemap = LOCALES.flatMap((locale) =>
+    publishers.map((publisher) => ({
+      url: `${base}/${locale}/publishers/${publisher.slug}`,
+      lastModified: publisher.updatedAt ?? now,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
+  );
+
+  return [
+    ...staticEntries,
+    ...bookEntries,
+    ...categoryEntries,
+    ...articleEntries,
+    ...authorEntries,
+    ...publisherEntries,
+  ];
 }

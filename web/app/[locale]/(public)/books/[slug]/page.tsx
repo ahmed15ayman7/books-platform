@@ -34,10 +34,13 @@ export default async function BookDetailPage({ params }: BookPageProps) {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("books");
 
-  const [book, similarBooks] = await Promise.all([
+  const [book, similarResult] = await Promise.all([
     BookService.getBySlug(slug).catch(() => null),
-    BookService.getSimilar(slug, 6).catch(() => []),
+    BookService.getSimilar(slug, 12).catch(() => ({ books: [], isGeneralFallback: false })),
   ]);
+
+  const similarBooks = similarResult.books;
+  const similarBooksGeneral = similarResult.isGeneralFallback;
 
   if (!book) notFound();
 
@@ -151,9 +154,12 @@ export default async function BookDetailPage({ params }: BookPageProps) {
 
           {similarBooks.length > 0 && (
             <section aria-labelledby="similar-books-heading">
-              <div className="mb-6 flex items-end justify-between">
-                <SectionHeading id="similar-books-heading" title={t("similarBooks")} />
-              </div>
+              <SectionHeading
+                id="similar-books-heading"
+                title={t("similarBooks")}
+                subtitle={similarBooksGeneral ? t("similarBooksGeneral") : undefined}
+                className="mb-6"
+              />
               <BookCarousel books={similarBooks} locale={locale} />
             </section>
           )}

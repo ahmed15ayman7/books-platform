@@ -97,6 +97,7 @@
     "notAvailable": "Not Available for Purchase",
     "addToWishlist": "Add to Wishlist",
     "similarBooks": "Similar Books",
+    "similarBooksGeneral": "Suggestions from other books on the platform",
     "translationStatus": {
       "NOT_TRANSLATED": "Not Translated",
       "NOMINATED": "Recommended for Translation",

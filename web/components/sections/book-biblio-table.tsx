@@ -138,7 +138,7 @@ export function BookBiblioTable({
           {authors.map((author) => (
             <Link
               key={author.id}
-              href={`/${locale}/books?author=${author.slug}`}
+              href={`/${locale}/authors/${author.slug}`}
               className="font-medium text-[var(--brand-red)] hover:underline"
             >
               {isAr && author.nameAr ? author.nameAr : author.name}
@@ -377,6 +377,14 @@ export function BookBiblioTable({
             <p className="px-5 py-4 text-base leading-relaxed text-[var(--brand-gray-700)]">
               {bioText}
             </p>
+            <div className="border-t border-[var(--brand-gray-200)] px-5 py-3">
+              <Link
+                href={`/${locale}/authors/${author.slug}`}
+                className="text-sm font-medium text-[var(--brand-red)] hover:underline"
+              >
+                {isAr ? "عرض كل كتب المؤلف" : "View all books by this author"}
+              </Link>
+            </div>
           </div>
         );
       })}

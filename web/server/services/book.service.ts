@@ -141,6 +141,7 @@ export const BookService = {
             title: true,
             slug: true,
             imageUrl: true,
+            imageFeatured: true,
             websiteUrl: true,
             address: true,
             countries: { select: { name: true, nameAr: true }, take: 1 },
@@ -159,35 +160,103 @@ export const BookService = {
     });
   },
 
-  async getSimilar(slug: string, limit = 6) {
-    const book = await db.product.findFirst({
-      where: { slug, ...notDeleted },
-      select: { primaryCategoryId: true, id: true },
-    });
-
-    if (!book) return [];
-
-    return db.product.findMany({
-      where: {
-        ...notDeleted,
-        published: true,
-        primaryCategoryId: book.primaryCategoryId,
-        id: { not: book.id },
+  async getSimilar(slug: string, limit = 12) {
+    const similarSelect = {
+      id: true,
+      slug: true,
+      nameEn: true,
+      nameAr: true,
+      imageUrl: true,
+      translationStatus: true,
+      primaryCategory: {
+        select: { nameAr: true, name: true, slug: true },
       },
-      take: limit,
-      orderBy: { position: "desc" },
+    } as const;
+
+    type SimilarBook = {
+      id: string;
+      slug: string;
+      nameEn: string;
+      nameAr: string | null;
+      imageUrl: string | null;
+      translationStatus: string;
+      primaryCategory: { nameAr: string | null; name: string; slug: string } | null;
+    };
+
+    const source = await db.product.findFirst({
+      where: { slug, ...notDeleted },
       select: {
         id: true,
-        slug: true,
-        nameEn: true,
-        nameAr: true,
-        imageUrl: true,
-        translationStatus: true,
-        primaryCategory: {
-          select: { nameAr: true, name: true, slug: true },
-        },
+        primaryCategoryId: true,
+        publisherId: true,
+        categories: { select: { id: true } },
+        authors: { select: { id: true } },
+        tags: { select: { id: true } },
       },
     });
+
+    if (!source) return { books: [], isGeneralFallback: false };
+
+    const collected = new Map<string, SimilarBook>();
+    let isGeneralFallback = false;
+
+    const baseWhere = {
+      ...notDeleted,
+      published: true,
+      id: { not: source.id },
+    };
+
+    const fetchMore = async (extraWhere: Record<string, unknown>) => {
+      if (collected.size >= limit) return;
+      const excludeIds = [source.id, ...collected.keys()];
+      const rows = await db.product.findMany({
+        where: {
+          ...baseWhere,
+          id: { notIn: excludeIds },
+          ...extraWhere,
+        },
+        take: limit - collected.size,
+        orderBy: { position: "desc" },
+        select: similarSelect,
+      });
+      for (const row of rows) collected.set(row.id, row);
+    };
+
+    if (source.primaryCategoryId) {
+      await fetchMore({ primaryCategoryId: source.primaryCategoryId });
+    }
+
+    const categoryIds = source.categories.map((c) => c.id);
+    if (categoryIds.length > 0 && collected.size < limit) {
+      await fetchMore({ categories: { some: { id: { in: categoryIds } } } });
+    }
+
+    if (source.publisherId && collected.size < limit) {
+      await fetchMore({ publisherId: source.publisherId });
+    }
+
+    const authorIds = source.authors.map((a) => a.id);
+    if (authorIds.length > 0 && collected.size < limit) {
+      await fetchMore({ authors: { some: { id: { in: authorIds } } } });
+    }
+
+    const tagIds = source.tags.map((t) => t.id);
+    if (tagIds.length > 0 && collected.size < limit) {
+      await fetchMore({ tags: { some: { id: { in: tagIds } } } });
+    }
+
+    const sizeAfterSemantic = collected.size;
+
+    if (collected.size < limit) {
+      await fetchMore({ featured: true });
+    }
+    if (collected.size < limit) {
+      await fetchMore({});
+    }
+
+    isGeneralFallback = sizeAfterSemantic === 0 && collected.size > 0;
+
+    return { books: [...collected.values()], isGeneralFallback };
   },
 
   async getCategories() {
