@@ -20,7 +20,8 @@ import {
   adminUpdatedAtColumn,
 } from "@/components/admin/admin-timestamps";
 import { AdminCard } from "@/components/admin/admin-card";
-import { AdminInput, AdminCheckbox } from "@/components/admin/admin-form-field";
+import { AdminInput, AdminCheckbox, AdminSlugInput } from "@/components/admin/admin-form-field";
+import { autoSlugFromEnglish } from "@/lib/admin/slugify";
 
 interface Category {
   id: string;
@@ -214,7 +215,15 @@ export default function AdminCategoriesPage() {
             <AdminInput
               label="الاسم (EN) *"
               value={form.name}
-              onChange={(e) => set("name")(e.target.value)}
+              onChange={(e) => {
+                const name = e.target.value;
+                setForm((p) => ({
+                  ...p,
+                  name,
+                  slug: autoSlugFromEnglish(name, p.slug, p.name),
+                }));
+              }}
+              dir="ltr"
               required
             />
             <AdminInput
@@ -222,12 +231,11 @@ export default function AdminCategoriesPage() {
               value={form.nameAr}
               onChange={(e) => set("nameAr")(e.target.value)}
             />
-            <AdminInput
+            <AdminSlugInput
               label="Slug *"
               value={form.slug}
               onChange={(e) => set("slug")(e.target.value)}
               required
-              dir="ltr"
             />
             <AdminCheckbox
               label="نشط"

@@ -10,7 +10,7 @@ import { AdminEntityCombobox } from "@/components/admin/admin-entity-combobox";
 import { CreateAuthorDialog } from "@/components/admin/create-author-dialog";
 import { CreatePublisherDialog } from "@/components/admin/create-publisher-dialog";
 import { CreateCategoryDialog } from "@/components/admin/create-category-dialog";
-import { slugify } from "@/lib/admin/slugify";
+import { slugify, autoSlugFromEnglish, AUTO_SLUG_HINT } from "@/lib/admin/slugify";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -227,27 +227,18 @@ export function BookEditForm({
         return;
       }
       if (result.id) {
-        router.push(`/${locale}/admin/books/${result.id}`);
+        setStatus("success");
+        setTimeout(() => {
+          router.push(`/${locale}/admin/books/${result.id}`);
+        }, 1500);
       }
     });
   }
 
+  const successMessage = isCreate ? "تم إنشاء الكتاب بنجاح" : "تم حفظ التغييرات بنجاح";
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6" dir="rtl">
-      {/* ── Status banner ───────────────────────────────────────── */}
-      {status === "success" && !isCreate && (
-        <div className="flex items-center gap-2 rounded-xl border border-green-800/50 bg-green-950/40 px-4 py-3 text-sm text-green-400">
-          <CheckCircle2 className="h-4 w-4 shrink-0" />
-          تم حفظ التغييرات بنجاح
-        </div>
-      )}
-      {status === "error" && (
-        <div className="flex items-center gap-2 rounded-xl border border-red-800/50 bg-red-950/40 px-4 py-3 text-sm text-red-400">
-          <AlertCircle className="h-4 w-4 shrink-0" />
-          {errorMsg}
-        </div>
-      )}
-
       {/* ── 1. Book Identity ─────────────────────────────────────── */}
       <SectionCard title="بيانات الكتاب الأساسية">
         <Field className="sm:col-span-2">
@@ -257,12 +248,34 @@ export function BookEditForm({
 
         <Field className="sm:col-span-2">
           <FieldLabel htmlFor="nameEn" required>الاسم بالإنجليزية</FieldLabel>
-          <Input id="nameEn" className={fieldCls} value={form.nameEn} onChange={(e) => set("nameEn", e.target.value)} placeholder="Book name in English" dir="ltr" />
+          <Input
+            id="nameEn"
+            className={fieldCls}
+            value={form.nameEn}
+            onChange={(e) => {
+              const nameEn = e.target.value;
+              setForm((prev) => ({
+                ...prev,
+                nameEn,
+                slug: autoSlugFromEnglish(nameEn, prev.slug, prev.nameEn),
+              }));
+            }}
+            placeholder="Book name in English"
+            dir="ltr"
+          />
         </Field>
 
         <Field className="sm:col-span-2">
           <FieldLabel htmlFor="slug" required>الرابط المختصر (Slug)</FieldLabel>
-          <Input id="slug" className={fieldCls} value={form.slug} onChange={(e) => set("slug", e.target.value)} placeholder="book-slug-url" dir="ltr" />
+          <Input
+            id="slug"
+            className={fieldCls}
+            value={form.slug}
+            onChange={(e) => set("slug", e.target.value)}
+            placeholder="book-slug-url"
+            dir="ltr"
+          />
+          <p className="mt-1 text-[11px] text-[var(--brand-gray-500)]">{AUTO_SLUG_HINT}</p>
         </Field>
 
         <Field className="sm:col-span-2">
@@ -539,6 +552,26 @@ export function BookEditForm({
           </Field>
         </div>
       </div>
+
+      {/* ── Status (أسفل النموذج) ─────────────────────────────────── */}
+      {status === "success" && (
+        <div
+          role="status"
+          className="flex items-center gap-2 rounded-xl border border-green-800/50 bg-green-950/40 px-4 py-3 text-sm text-green-400"
+        >
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          {successMessage}
+        </div>
+      )}
+      {status === "error" && (
+        <div
+          role="alert"
+          className="flex items-center gap-2 rounded-xl border border-red-800/50 bg-red-950/40 px-4 py-3 text-sm text-red-400"
+        >
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          {errorMsg}
+        </div>
+      )}
 
       {/* ── Save bar ─────────────────────────────────────────────── */}
       <div className="sticky bottom-0 flex items-center justify-between gap-3 rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)] px-5 py-3 shadow-lg">

@@ -93,7 +93,16 @@ export async function POST(request: NextRequest) {
     const parsed = createSchema.safeParse(body);
     if (!parsed.success) return ApiErrors.badRequest("Validation failed", parsed.error.issues);
 
-    const { name, description, websiteUrl, contactEmail, imageUrl, status } = parsed.data;
+    const {
+      name,
+      description,
+      descriptionEn,
+      websiteUrl,
+      contactEmail,
+      imageUrl,
+      status,
+      sponsored,
+    } = parsed.data;
 
     const { nextPublisherOriginalId } = await import("@/lib/admin/legacy-ids");
     const originalId = await nextPublisherOriginalId();
@@ -108,6 +117,7 @@ export async function POST(request: NextRequest) {
         originalId,
         title: name,
         content: description ?? null,
+        excerpt: descriptionEn ?? null,
         websiteUrl: websiteUrl || null,
         contactEmail: contactEmail || null,
         imageFeatured: imageUrl || null,
@@ -116,11 +126,27 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    if (sponsored) {
+      await db.sponsoredPublisher.create({
+        data: {
+          publisherId: publisher.id,
+          priority: 0,
+          startsAt: new Date(),
+          endsAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+          amountPaid: 0,
+        },
+      });
+    }
+
     await db.auditLog.create({
       data: { userId: auth.payload.userId, action: "CREATE_PUBLISHER", entity: "Publisher", entityId: publisher.id },
     });
 
-    return apiCreated({ ...publisher, name: publisher.title, sponsored: false });
+    return apiCreated({
+      ...publisher,
+      name: publisher.title,
+      sponsored: sponsored ?? false,
+    });
   } catch (error) {
     console.error("[POST /api/v1/admin/publishers]", error);
     return ApiErrors.internal();

@@ -9,16 +9,45 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { adminFieldClass } from "@/components/admin/admin-form-field";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
+import {
+  AdminInput,
+  AdminTextarea,
+  AdminSelect,
+  AdminCheckbox,
+} from "@/components/admin/admin-form-field";
 
 export interface PublisherOption {
   id: string;
   title: string;
   slug: string;
 }
+
+interface PublisherFormState {
+  name: string;
+  nameEn: string;
+  country: string;
+  websiteUrl: string;
+  contactEmail: string;
+  description: string;
+  descriptionEn: string;
+  imageUrl: string;
+  status: string;
+  sponsored: boolean;
+}
+
+const emptyForm: PublisherFormState = {
+  name: "",
+  nameEn: "",
+  country: "",
+  websiteUrl: "",
+  contactEmail: "",
+  description: "",
+  descriptionEn: "",
+  imageUrl: "",
+  status: "publish",
+  sponsored: false,
+};
 
 interface CreatePublisherDialogProps {
   open: boolean;
@@ -33,21 +62,24 @@ export function CreatePublisherDialog({
   initialName = "",
   onCreated,
 }: CreatePublisherDialogProps) {
-  const [name, setName] = useState(initialName);
+  const [form, setForm] = useState<PublisherFormState>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (open) {
-      setName(initialName);
+      setForm({ ...emptyForm, name: initialName.trim() });
       setError("");
     }
   }, [open, initialName]);
 
+  const set = (key: keyof PublisherFormState) => (value: string | boolean) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim()) {
-      setError("اسم دار النشر مطلوب");
+    if (!form.name.trim()) {
+      setError("اسم دار النشر (عربي) مطلوب");
       return;
     }
     setSaving(true);
@@ -56,11 +88,11 @@ export function CreatePublisherDialog({
       const res = await fetch("/api/v1/admin/publishers", {
         method: "POST",
         headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), status: "publish" }),
+        body: JSON.stringify(form),
       });
       const data = await res.json() as {
         success: boolean;
-        data?: { id: string; title?: string; slug?: string };
+        data?: { id: string; title?: string; name?: string; slug?: string };
         error?: { message: string };
       };
       if (!res.ok || !data.success || !data.data) {
@@ -69,11 +101,11 @@ export function CreatePublisherDialog({
       }
       onCreated({
         id: data.data.id,
-        title: data.data.title ?? name.trim(),
+        title: data.data.title ?? data.data.name ?? form.name.trim(),
         slug: data.data.slug ?? "",
       });
       onOpenChange(false);
-      setName("");
+      setForm(emptyForm);
     } catch {
       setError("حدث خطأ في الاتصال");
     } finally {
@@ -83,17 +115,110 @@ export function CreatePublisherDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-[var(--brand-gray-700)] bg-[var(--brand-gray-900)] text-white sm:max-w-md">
+      <DialogContent className="max-h-[90vh] overflow-y-auto border-[var(--brand-gray-700)] bg-[var(--brand-gray-900)] text-white sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>دار نشر جديدة</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <Label className="text-[var(--brand-gray-300)]">اسم دار النشر *</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} className={adminFieldClass} />
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--brand-gray-500)]">
+              البيانات الأساسية
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <AdminInput
+                label="الاسم (عربي) *"
+                value={form.name}
+                onChange={(e) => set("name")(e.target.value)}
+                required
+              />
+              <AdminInput
+                label="الاسم (إنجليزي)"
+                value={form.nameEn}
+                onChange={(e) => set("nameEn")(e.target.value)}
+                dir="ltr"
+              />
+              <AdminInput
+                label="الدولة"
+                value={form.country}
+                onChange={(e) => set("country")(e.target.value)}
+              />
+              <AdminInput
+                label="رابط الموقع"
+                type="url"
+                value={form.websiteUrl}
+                onChange={(e) => set("websiteUrl")(e.target.value)}
+                dir="ltr"
+              />
+              <AdminInput
+                label="البريد الإلكتروني للتواصل"
+                type="email"
+                value={form.contactEmail}
+                onChange={(e) => set("contactEmail")(e.target.value)}
+                dir="ltr"
+              />
+              <AdminInput
+                label="رابط صورة الغلاف"
+                type="url"
+                value={form.imageUrl}
+                onChange={(e) => set("imageUrl")(e.target.value)}
+                dir="ltr"
+              />
+            </div>
+            {form.imageUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={form.imageUrl}
+                alt=""
+                className="mt-2 h-20 w-auto rounded border border-[var(--brand-gray-700)] object-contain"
+              />
+            )}
           </div>
+
+          <div>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--brand-gray-500)]">
+              الوصف
+            </p>
+            <div className="space-y-3">
+              <AdminTextarea
+                label="الوصف (عربي)"
+                rows={4}
+                value={form.description}
+                onChange={(e) => set("description")(e.target.value)}
+              />
+              <AdminTextarea
+                label="الوصف (إنجليزي)"
+                rows={4}
+                value={form.descriptionEn}
+                onChange={(e) => set("descriptionEn")(e.target.value)}
+                dir="ltr"
+              />
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--brand-gray-500)]">
+              الإعدادات
+            </p>
+            <div className="flex flex-wrap items-end gap-4">
+              <AdminSelect
+                label="حالة النشر"
+                value={form.status}
+                onChange={(e) => set("status")(e.target.value)}
+                options={[
+                  { value: "publish", label: "منشور" },
+                  { value: "draft", label: "مسودة" },
+                ]}
+              />
+              <AdminCheckbox
+                label="ناشر مموّل (Sponsored)"
+                checked={form.sponsored}
+                onChange={(e) => set("sponsored")(e.target.checked)}
+              />
+            </div>
+          </div>
+
           {error && <p className="text-xs text-[var(--error)]">{error}</p>}
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               إلغاء
             </Button>

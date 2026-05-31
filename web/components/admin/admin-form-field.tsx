@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AUTO_SLUG_HINT } from "@/lib/admin/slugify";
 
 interface AdminFormFieldProps {
   label: string;
@@ -69,6 +70,15 @@ export function AdminInput({ label, error, hint, className, id, ...props }: Admi
       />
     </AdminFormField>
   );
+}
+
+interface AdminSlugInputProps extends Omit<AdminInputProps, "hint"> {
+  hint?: string;
+}
+
+/** Slug field with default hint about auto-generation from English name. */
+export function AdminSlugInput({ hint = AUTO_SLUG_HINT, dir = "ltr", ...props }: AdminSlugInputProps) {
+  return <AdminInput hint={hint} dir={dir} {...props} />;
 }
 
 interface AdminTextareaProps extends React.ComponentProps<typeof Textarea> {

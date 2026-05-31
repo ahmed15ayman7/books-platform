@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { nextProductOriginalId } from "@/lib/admin/legacy-ids";
+import { slugify } from "@/lib/admin/slugify";
 import { revalidatePath } from "next/cache";
 
 export interface BookEditData {
@@ -169,11 +170,3 @@ export async function createBook(data: BookEditData): Promise<BookActionResult> 
   }
 }
 
-function slugify(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}

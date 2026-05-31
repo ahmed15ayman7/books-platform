@@ -20,7 +20,8 @@ import {
   adminUpdatedAtColumn,
 } from "@/components/admin/admin-timestamps";
 import { AdminCard } from "@/components/admin/admin-card";
-import { AdminInput, AdminTextarea } from "@/components/admin/admin-form-field";
+import { AdminInput, AdminTextarea, AdminSlugInput } from "@/components/admin/admin-form-field";
+import { autoSlugFromEnglish } from "@/lib/admin/slugify";
 
 interface Author {
   id: string;
@@ -219,7 +220,15 @@ export default function AdminAuthorsPage() {
             <AdminInput
               label="الاسم (EN) *"
               value={form.name}
-              onChange={(e) => set("name")(e.target.value)}
+              onChange={(e) => {
+                const name = e.target.value;
+                setForm((p) => ({
+                  ...p,
+                  name,
+                  slug: autoSlugFromEnglish(name, p.slug, p.name),
+                }));
+              }}
+              dir="ltr"
               required
             />
             <AdminInput
@@ -227,12 +236,11 @@ export default function AdminAuthorsPage() {
               value={form.nameAr}
               onChange={(e) => set("nameAr")(e.target.value)}
             />
-            <AdminInput
+            <AdminSlugInput
               label="Slug *"
               value={form.slug}
               onChange={(e) => set("slug")(e.target.value)}
               required
-              dir="ltr"
             />
             <AdminTextarea
               label="نبذة (EN)"

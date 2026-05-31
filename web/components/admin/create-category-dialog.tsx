@@ -9,12 +9,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { adminFieldClass } from "@/components/admin/admin-form-field";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
-import { slugify } from "@/lib/admin/slugify";
+import { slugify, autoSlugFromEnglish } from "@/lib/admin/slugify";
+import { AdminInput, AdminSlugInput } from "@/components/admin/admin-form-field";
 import type { EntityOption } from "@/components/admin/admin-entity-combobox";
+
+interface CategoryFormState {
+  name: string;
+  nameAr: string;
+  slug: string;
+}
+
+const emptyForm: CategoryFormState = { name: "", nameAr: "", slug: "" };
 
 interface CreateCategoryDialogProps {
   open: boolean;
@@ -29,26 +35,31 @@ export function CreateCategoryDialog({
   initialName = "",
   onCreated,
 }: CreateCategoryDialogProps) {
-  const [name, setName] = useState(initialName);
-  const [nameAr, setNameAr] = useState("");
-  const [slug, setSlug] = useState(initialName ? slugify(initialName) : "");
+  const [form, setForm] = useState<CategoryFormState>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (open) {
-      setName(initialName);
-      setSlug(initialName ? slugify(initialName) : "");
+      const seed = initialName.trim();
+      setForm({
+        name: seed,
+        nameAr: "",
+        slug: seed ? slugify(seed) : "",
+      });
       setError("");
     }
   }, [open, initialName]);
+
+  const set = (key: keyof CategoryFormState) => (value: string) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError("");
-    const finalSlug = slug.trim() || slugify(name) || slugify(nameAr);
-    if (!name.trim()) {
+    const finalSlug = form.slug.trim() || slugify(form.name);
+    if (!form.name.trim()) {
       setError("الاسم بالإنجليزية مطلوب");
       setSaving(false);
       return;
@@ -63,8 +74,8 @@ export function CreateCategoryDialog({
         method: "POST",
         headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: name.trim(),
-          nameAr: nameAr.trim() || undefined,
+          name: form.name.trim(),
+          nameAr: form.nameAr.trim() || undefined,
           slug: finalSlug,
           active: true,
         }),
@@ -85,9 +96,7 @@ export function CreateCategoryDialog({
         slug: data.data.slug,
       });
       onOpenChange(false);
-      setName("");
-      setNameAr("");
-      setSlug("");
+      setForm(emptyForm);
     } catch {
       setError("حدث خطأ في الاتصال");
     } finally {
@@ -102,26 +111,30 @@ export function CreateCategoryDialog({
           <DialogTitle>تصنيف جديد</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-3">
-          <div>
-            <Label className="text-[var(--brand-gray-300)]">الاسم (EN) *</Label>
-            <Input
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-                if (!slug || slug === slugify(name)) setSlug(slugify(e.target.value));
-              }}
-              className={adminFieldClass}
-              dir="ltr"
-            />
-          </div>
-          <div>
-            <Label className="text-[var(--brand-gray-300)]">الاسم (AR)</Label>
-            <Input value={nameAr} onChange={(e) => setNameAr(e.target.value)} className={adminFieldClass} />
-          </div>
-          <div>
-            <Label className="text-[var(--brand-gray-300)]">Slug</Label>
-            <Input value={slug} onChange={(e) => setSlug(e.target.value)} className={adminFieldClass} dir="ltr" />
-          </div>
+          <AdminInput
+            label="الاسم (EN) *"
+            value={form.name}
+            onChange={(e) => {
+              const name = e.target.value;
+              setForm((prev) => ({
+                ...prev,
+                name,
+                slug: autoSlugFromEnglish(name, prev.slug, prev.name),
+              }));
+            }}
+            dir="ltr"
+            required
+          />
+          <AdminInput
+            label="الاسم (AR)"
+            value={form.nameAr}
+            onChange={(e) => set("nameAr")(e.target.value)}
+          />
+          <AdminSlugInput
+            label="Slug"
+            value={form.slug}
+            onChange={(e) => set("slug")(e.target.value)}
+          />
           {error && <p className="text-xs text-[var(--error)]">{error}</p>}
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
