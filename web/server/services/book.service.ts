@@ -139,6 +139,8 @@ export const BookService = {
           select: {
             id: true,
             title: true,
+            name: true,
+            nameAr: true,
             slug: true,
             imageUrl: true,
             imageFeatured: true,
@@ -315,8 +317,11 @@ export const BookService = {
             select: {
               id: true,
               title: true,
+              name: true,
+              nameAr: true,
               slug: true,
               imageUrl: true,
+              imageFeatured: true,
             },
           },
         },
@@ -389,6 +394,8 @@ export const BookService = {
         select: {
           id: true,
           title: true,
+          name: true,
+          nameAr: true,
           slug: true,
           imageFeatured: true,
           imageUrl: true,
@@ -427,6 +434,8 @@ export const BookService = {
       publisherGrid: topPublishers.map((p) => ({
         id: p.id,
         title: p.title,
+        name: p.name,
+        nameAr: p.nameAr,
         slug: p.slug,
         imageUrl: p.imageFeatured ?? p.imageUrl,
         websiteUrl: p.websiteUrl,

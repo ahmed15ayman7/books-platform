@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PublisherPageProps): Promise<
     title: displayName,
     description: displayDesc ?? (locale === "ar" ? `ناشر ${displayName}` : `Publisher ${displayName}`),
     imageUrl: publisher.imageUrl,
-    keywords: [publisher.title, locale === "ar" ? "ناشرون" : "publishers"],
+    keywords: [displayName, locale === "ar" ? "ناشرون" : "publishers"],
   });
 }
 
@@ -85,7 +85,7 @@ export default async function PublisherDetailPage({
               {publisher.imageUrl ? (
                 <Image
                   src={publisher.imageUrl}
-                  alt={publisher.title}
+                  alt={displayName}
                   width={80}
                   height={80}
                   className="h-full w-full object-contain"

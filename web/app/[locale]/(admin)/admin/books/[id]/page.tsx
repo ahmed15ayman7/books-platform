@@ -355,7 +355,7 @@ export default async function AdminBookViewPage({ params }: Props) {
                   <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-muted)]">
                     <Image
                       src={book.publisher.imageUrl}
-                      alt={book.publisher.title}
+                      alt={book.publisher.nameAr ?? book.publisher.name ?? book.publisher.title}
                       fill
                       className="object-contain"
                       sizes="96px"
@@ -364,14 +364,22 @@ export default async function AdminBookViewPage({ params }: Props) {
                   </div>
                 )}
                 <div className="flex-1">
-                  <h3 className="text-base font-bold text-[var(--admin-text)]">{book.publisher.title}</h3>
+                  <h3 className="text-base font-bold text-[var(--admin-text)]">
+                    {book.publisher.nameAr ?? book.publisher.name ?? book.publisher.title}
+                  </h3>
+                  {(book.publisher.nameAr || book.publisher.name) && (
+                    <p className="mt-1 text-sm text-[var(--admin-text-muted)]" dir="ltr">
+                      {book.publisher.name}
+                      {book.publisher.nameAr && book.publisher.name ? ` · ${book.publisher.nameAr}` : null}
+                    </p>
+                  )}
                   <p className="mt-1 text-xs text-[var(--admin-text-subtle)]" dir="ltr">
                     /{book.publisher.slug}
                   </p>
 
-                  {book.publisher.excerpt?.trim() && (
+                  {(book.publisher.contentAr?.trim() || book.publisher.content?.trim()) && (
                     <p className="mt-3 whitespace-pre-wrap text-sm text-[var(--admin-text-muted)]">
-                      {book.publisher.excerpt}
+                      {book.publisher.contentAr?.trim() || book.publisher.content}
                     </p>
                   )}
 

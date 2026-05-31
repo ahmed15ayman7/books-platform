@@ -25,7 +25,7 @@ import {
 import { cn } from "@/lib/utils";
 
 /* ─── Types ─────────────────────────────────────────────────────────── */
-interface Publisher  { id: string; title: string; slug: string }
+interface Publisher  { id: string; title: string; name: string; nameAr?: string | null; slug: string }
 interface Category   { id: string; name: string; nameAr: string | null; slug: string }
 interface Author     { id: string; name: string; nameAr: string | null; slug: string }
 
@@ -165,7 +165,7 @@ export function BookEditForm({
   }));
   const publisherOptions = publishersList.map((p) => ({
     id: p.id,
-    name: p.title,
+    name: p.nameAr ?? p.name ?? p.title,
     slug: p.slug,
   }));
   const categoryOptions = categoriesList.map((c) => ({
@@ -636,7 +636,16 @@ export function BookEditForm({
         onOpenChange={setPublisherDialogOpen}
         initialName={createQuery}
         onCreated={(publisher) => {
-          setPublishersList((prev) => [...prev, publisher]);
+          setPublishersList((prev) => [
+            ...prev,
+            {
+              id: publisher.id,
+              title: publisher.title,
+              name: publisher.title,
+              nameAr: publisher.title,
+              slug: publisher.slug,
+            },
+          ]);
           set("publisherId", publisher.id);
         }}
       />

@@ -15,6 +15,7 @@ import {
   localizedBookName,
   localizedBookShortDesc,
 } from "@/lib/i18n/book-locale";
+import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
 import { bookSeoMetadata } from "@/lib/seo/metadata";
 
 interface BookPageProps {
@@ -79,7 +80,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
     isbn: book.isbn,
     inLanguage: book.language,
     publisher: book.publisher
-      ? { "@type": "Organization", name: book.publisher.title }
+      ? { "@type": "Organization", name: localizedPublisherName(book.publisher, locale) }
       : undefined,
     image: book.imageUrl,
     description: description?.slice(0, 500),

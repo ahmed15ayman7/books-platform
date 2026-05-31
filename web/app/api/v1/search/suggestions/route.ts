@@ -20,9 +20,16 @@ export async function GET(request: NextRequest) {
         select: { slug: true, nameEn: true, nameAr: true },
       }),
       db.publisher.findMany({
-        where: { status: "publish", title: condition },
+        where: {
+          status: "publish",
+          OR: [
+            { title: condition },
+            { name: condition },
+            { nameAr: condition },
+          ],
+        },
         take: 3,
-        select: { slug: true, title: true },
+        select: { slug: true, title: true, name: true, nameAr: true },
       }),
     ]);
 
@@ -35,8 +42,8 @@ export async function GET(request: NextRequest) {
       })),
       ...publishers.map((p) => ({
         type: "publisher",
-        label: p.title,
-        labelEn: p.title,
+        label: p.nameAr ?? p.name ?? p.title,
+        labelEn: p.name || p.title,
         slug: p.slug,
       })),
     ].slice(0, limit);

@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Locale } from "@/lib/i18n";
+import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
 
 interface Category {
   id: string;
@@ -27,7 +28,9 @@ interface Author {
 }
 
 interface Publisher {
-  title: string;
+  title?: string;
+  name?: string;
+  nameAr?: string | null;
   slug: string;
   websiteUrl?: string | null;
   address?: string | null;
@@ -159,7 +162,7 @@ export function BookBiblioTable({
             href={`/${locale}/publishers/${publisher.slug}`}
             className="font-medium text-[var(--brand-red)] hover:underline"
           >
-            {publisher.title}
+            {localizedPublisherName(publisher, locale)}
           </Link>
           {publisher.websiteUrl && (
             <a

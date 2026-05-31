@@ -17,12 +17,12 @@ import { AdminTimestamps } from "@/components/admin/admin-timestamps";
 
 interface PublisherForm {
   name: string;
-  nameEn: string;
+  nameAr: string;
   country: string;
   websiteUrl: string;
   contactEmail: string;
-  description: string;
-  descriptionEn: string;
+  content: string;
+  contentAr: string;
   imageUrl: string;
   status: string;
   sponsored: boolean;
@@ -30,12 +30,12 @@ interface PublisherForm {
 
 const empty: PublisherForm = {
   name: "",
-  nameEn: "",
+  nameAr: "",
   country: "",
   websiteUrl: "",
   contactEmail: "",
-  description: "",
-  descriptionEn: "",
+  content: "",
+  contentAr: "",
   imageUrl: "",
   status: "publish",
   sponsored: false,
@@ -67,12 +67,12 @@ export default function AdminPublisherEditPage() {
         const d = data.data;
         setForm({
           name: String(d.name ?? ""),
-          nameEn: String(d.nameEn ?? ""),
+          nameAr: String(d.nameAr ?? ""),
           country: String(d.country ?? ""),
           websiteUrl: String(d.websiteUrl ?? ""),
           contactEmail: String(d.contactEmail ?? ""),
-          description: String(d.description ?? ""),
-          descriptionEn: String(d.descriptionEn ?? ""),
+          content: String(d.content ?? ""),
+          contentAr: String(d.contentAr ?? ""),
           imageUrl: String(d.imageUrl ?? ""),
           status: String(d.status ?? "publish"),
           sponsored: Boolean(d.sponsored),
@@ -91,6 +91,10 @@ export default function AdminPublisherEditPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!form.nameAr.trim() && !form.name.trim()) {
+      setError("أدخل اسم الناشر بالعربية أو الإنجليزية");
+      return;
+    }
     setSaving(true);
     setError("");
     setSuccess(false);
@@ -146,14 +150,14 @@ export default function AdminPublisherEditPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <AdminInput
               label="الاسم (عربي)"
-              value={form.name}
-              onChange={(e) => set("name")(e.target.value)}
+              value={form.nameAr}
+              onChange={(e) => set("nameAr")(e.target.value)}
               required
             />
             <AdminInput
               label="الاسم (إنجليزي)"
-              value={form.nameEn}
-              onChange={(e) => set("nameEn")(e.target.value)}
+              value={form.name}
+              onChange={(e) => set("name")(e.target.value)}
               dir="ltr"
             />
             <AdminInput
@@ -166,17 +170,20 @@ export default function AdminPublisherEditPage() {
               type="url"
               value={form.websiteUrl}
               onChange={(e) => set("websiteUrl")(e.target.value)}
+              dir="ltr"
             />
             <AdminInput
               label="البريد الإلكتروني للتواصل"
               type="email"
               value={form.contactEmail}
               onChange={(e) => set("contactEmail")(e.target.value)}
+              dir="ltr"
             />
             <AdminInput
               label="رابط صورة الغلاف"
               value={form.imageUrl}
               onChange={(e) => set("imageUrl")(e.target.value)}
+              dir="ltr"
             />
           </div>
         </AdminCard>
@@ -186,14 +193,14 @@ export default function AdminPublisherEditPage() {
             <AdminTextarea
               label="الوصف (عربي)"
               rows={4}
-              value={form.description}
-              onChange={(e) => set("description")(e.target.value)}
+              value={form.contentAr}
+              onChange={(e) => set("contentAr")(e.target.value)}
             />
             <AdminTextarea
               label="الوصف (إنجليزي)"
               rows={4}
-              value={form.descriptionEn}
-              onChange={(e) => set("descriptionEn")(e.target.value)}
+              value={form.content}
+              onChange={(e) => set("content")(e.target.value)}
               dir="ltr"
             />
           </div>

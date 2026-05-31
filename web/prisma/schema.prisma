@@ -248,7 +248,10 @@ model Publisher {
   id               String     @id @default(cuid())
   originalId       Int        @unique @map("original_id")
   title            String
+  name             String     @default("")
+  nameAr           String?    @map("name_ar")
   content          String?    @db.Text
+  contentAr        String?    @map("content_ar") @db.Text
   excerpt          String?    @db.Text
   date             DateTime?
   postType         String?    @map("post_type")

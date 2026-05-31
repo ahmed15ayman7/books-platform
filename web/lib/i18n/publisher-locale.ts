@@ -1,11 +1,12 @@
 import type { Locale } from "@/lib/i18n";
 
-/** Publisher bilingual fields (DB mapping: title/imageTitle, content/excerpt). */
 export interface PublisherLocalizedFields {
-  title: string;
-  imageTitle?: string | null;
+  name?: string | null;
+  nameAr?: string | null;
   content?: string | null;
-  excerpt?: string | null;
+  contentAr?: string | null;
+  /** @deprecated Legacy fallback */
+  title?: string;
 }
 
 export function localizedPublisherName(
@@ -13,9 +14,23 @@ export function localizedPublisherName(
   locale: Locale | string,
 ): string {
   const isAr = locale === "ar";
-  if (isAr) return publisher.title;
-  const en = publisher.imageTitle?.trim();
-  return en || publisher.title;
+  const ar = publisher.nameAr?.trim();
+  const en = publisher.name?.trim();
+  const legacy = publisher.title?.trim();
+  if (isAr) return ar ?? en ?? legacy ?? "";
+  return en ?? ar ?? legacy ?? "";
+}
+
+export function localizedPublisherAlternateName(
+  publisher: PublisherLocalizedFields,
+  locale: Locale | string,
+): string | null {
+  const isAr = locale === "ar";
+  const ar = publisher.nameAr?.trim();
+  const en = publisher.name?.trim();
+  if (isAr && en) return en;
+  if (!isAr && ar) return ar;
+  return null;
 }
 
 export function localizedPublisherDescription(
@@ -23,8 +38,8 @@ export function localizedPublisherDescription(
   locale: Locale | string,
 ): string | null {
   const isAr = locale === "ar";
-  const ar = publisher.content?.trim();
-  const en = publisher.excerpt?.trim();
+  const ar = publisher.contentAr?.trim();
+  const en = publisher.content?.trim();
   if (isAr) return ar ?? en ?? null;
   return en ?? ar ?? null;
 }

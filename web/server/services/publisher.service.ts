@@ -42,7 +42,11 @@ export const PublisherService = {
         countries: { some: { slug: country } },
       }),
       ...(search && {
-        title: { contains: search, mode: "insensitive" as const },
+        OR: [
+          { title: { contains: search, mode: "insensitive" as const } },
+          { name: { contains: search, mode: "insensitive" as const } },
+          { nameAr: { contains: search, mode: "insensitive" as const } },
+        ],
       }),
     };
 
@@ -58,9 +62,13 @@ export const PublisherService = {
         select: {
           id: true,
           title: true,
+          name: true,
+          nameAr: true,
           slug: true,
           imageUrl: true,
           imageFeatured: true,
+          content: true,
+          contentAr: true,
           excerpt: true,
           countries: {
             select: { id: true, name: true, nameAr: true, slug: true },
@@ -109,10 +117,7 @@ export const PublisherService = {
       },
     });
     if (!row) return null;
-    return {
-      ...mapPublisherImage(row),
-      excerpt: row.excerpt ?? row.content?.slice(0, 500) ?? null,
-    };
+    return mapPublisherImage(row);
   },
 
   async getPublisherBooks(slug: string, page = 1, limit = 12) {

@@ -14,6 +14,7 @@ import { BooksPagination } from "@/components/sections/books-pagination";
 import { Input } from "@/components/ui/input";
 import { Globe } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
+import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -146,6 +147,8 @@ interface PublisherListingCardProps {
   publisher: {
     id: string;
     title: string;
+    name: string;
+    nameAr?: string | null;
     slug: string;
     imageUrl?: string | null;
     booksCount: number;
@@ -157,6 +160,7 @@ interface PublisherListingCardProps {
 
 function PublisherListingCard({ publisher, locale }: PublisherListingCardProps) {
   const isAr = locale === "ar";
+  const displayName = localizedPublisherName(publisher, locale);
   const country = publisher.countries[0];
 
   return (
@@ -174,7 +178,7 @@ function PublisherListingCard({ publisher, locale }: PublisherListingCardProps) 
         {publisher.imageUrl ? (
           <CardMediaImage
             src={publisher.imageUrl}
-            alt={publisher.title}
+            alt={displayName}
             objectFit="contain"
             sizes="(max-width: 640px) 50vw, 20vw"
           />
@@ -187,7 +191,7 @@ function PublisherListingCard({ publisher, locale }: PublisherListingCardProps) 
 
       <div className="flex flex-1 flex-col gap-1 p-4">
         <h3 className="text-xs font-semibold text-[var(--brand-gray-900)] group-hover:text-[var(--brand-red)] line-clamp-2">
-          {publisher.title}
+          {displayName}
         </h3>
 
         {country && (

@@ -4,15 +4,16 @@ import { z } from "zod";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { publisherBilingualDbData } from "@/lib/admin/publisher-fields";
 
 const updateSchema = z.object({
-  name: z.string().min(1).max(300).optional(),
-  nameEn: z.string().max(300).optional(),
+  name: z.string().max(300).optional(),
+  nameAr: z.string().max(300).optional(),
   country: z.string().max(100).optional(),
   websiteUrl: z.string().url().optional().or(z.literal("")),
   contactEmail: z.string().email().optional().or(z.literal("")),
-  description: z.string().optional(),
-  descriptionEn: z.string().optional(),
+  content: z.string().optional(),
+  contentAr: z.string().optional(),
   imageUrl: z.string().url().optional().or(z.literal("")),
   status: z.enum(["publish", "draft"]).optional(),
   sponsored: z.boolean().optional(),
@@ -39,13 +40,13 @@ export async function GET(
     return apiSuccess({
       id: publisher.id,
       slug: publisher.slug,
-      name: publisher.title,
-      nameEn: publisher.imageTitle ?? "",
+      name: publisher.name,
+      nameAr: publisher.nameAr ?? "",
       country: publisher.countries[0]?.name ?? "",
       websiteUrl: publisher.websiteUrl ?? "",
       contactEmail: publisher.contactEmail ?? "",
-      description: publisher.content ?? "",
-      descriptionEn: publisher.excerpt ?? "",
+      content: publisher.content ?? "",
+      contentAr: publisher.contentAr ?? "",
       imageUrl: publisher.imageFeatured ?? publisher.imageUrl ?? "",
       status: publisher.status,
       sponsored: publisher.sponsored !== null,
@@ -71,11 +72,14 @@ export async function PATCH(
     const parsed = updateSchema.safeParse(body);
     if (!parsed.success) return ApiErrors.badRequest("Validation failed", parsed.error.issues);
 
+    const existing = await db.publisher.findUnique({ where: { id } });
+    if (!existing) return ApiErrors.notFound("Publisher");
+
     const {
       name,
-      nameEn,
-      description,
-      descriptionEn,
+      nameAr,
+      content,
+      contentAr,
       websiteUrl,
       contactEmail,
       imageUrl,
@@ -83,13 +87,23 @@ export async function PATCH(
       sponsored,
     } = parsed.data;
 
+    const bilingual =
+      name !== undefined ||
+      nameAr !== undefined ||
+      content !== undefined ||
+      contentAr !== undefined
+        ? publisherBilingualDbData({
+            name: name ?? existing.name,
+            nameAr: nameAr ?? existing.nameAr ?? "",
+            content: content !== undefined ? content : (existing.content ?? ""),
+            contentAr: contentAr !== undefined ? contentAr : (existing.contentAr ?? ""),
+          })
+        : null;
+
     const publisher = await db.publisher.update({
       where: { id },
       data: {
-        ...(name !== undefined && { title: name }),
-        ...(nameEn !== undefined && { imageTitle: nameEn.trim() || null }),
-        ...(description !== undefined && { content: description || null }),
-        ...(descriptionEn !== undefined && { excerpt: descriptionEn || null }),
+        ...(bilingual ?? {}),
         ...(websiteUrl !== undefined && { websiteUrl: websiteUrl || null }),
         ...(contactEmail !== undefined && { contactEmail: contactEmail || null }),
         ...(imageUrl !== undefined && { imageFeatured: imageUrl || null }),
@@ -120,7 +134,7 @@ export async function PATCH(
       data: { userId: auth.payload.userId, action: "UPDATE_PUBLISHER", entity: "Publisher", entityId: id },
     });
 
-    return apiSuccess({ ...publisher, name: publisher.title });
+    return apiSuccess(publisher);
   } catch (error) {
     console.error("[PATCH /api/v1/admin/publishers/:id]", error);
     return ApiErrors.internal();

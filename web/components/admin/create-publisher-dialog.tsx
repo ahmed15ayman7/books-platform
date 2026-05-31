@@ -25,12 +25,12 @@ export interface PublisherOption {
 
 interface PublisherFormState {
   name: string;
-  nameEn: string;
+  nameAr: string;
   country: string;
   websiteUrl: string;
   contactEmail: string;
-  description: string;
-  descriptionEn: string;
+  content: string;
+  contentAr: string;
   imageUrl: string;
   status: string;
   sponsored: boolean;
@@ -38,12 +38,12 @@ interface PublisherFormState {
 
 const emptyForm: PublisherFormState = {
   name: "",
-  nameEn: "",
+  nameAr: "",
   country: "",
   websiteUrl: "",
   contactEmail: "",
-  description: "",
-  descriptionEn: "",
+  content: "",
+  contentAr: "",
   imageUrl: "",
   status: "publish",
   sponsored: false,
@@ -68,7 +68,7 @@ export function CreatePublisherDialog({
 
   useEffect(() => {
     if (open) {
-      setForm({ ...emptyForm, name: initialName.trim() });
+      setForm({ ...emptyForm, nameAr: initialName.trim() });
       setError("");
     }
   }, [open, initialName]);
@@ -78,8 +78,8 @@ export function CreatePublisherDialog({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.name.trim()) {
-      setError("اسم دار النشر (عربي) مطلوب");
+    if (!form.nameAr.trim() && !form.name.trim()) {
+      setError("اسم دار النشر (عربي أو إنجليزي) مطلوب");
       return;
     }
     setSaving(true);
@@ -92,7 +92,7 @@ export function CreatePublisherDialog({
       });
       const data = await res.json() as {
         success: boolean;
-        data?: { id: string; title?: string; name?: string; slug?: string };
+        data?: { id: string; title?: string; nameAr?: string; name?: string; slug?: string };
         error?: { message: string };
       };
       if (!res.ok || !data.success || !data.data) {
@@ -101,7 +101,7 @@ export function CreatePublisherDialog({
       }
       onCreated({
         id: data.data.id,
-        title: data.data.title ?? data.data.name ?? form.name.trim(),
+        title: data.data.title ?? data.data.nameAr ?? data.data.name ?? form.nameAr.trim(),
         slug: data.data.slug ?? "",
       });
       onOpenChange(false);
@@ -121,20 +121,20 @@ export function CreatePublisherDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--brand-gray-500)]">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--admin-text-subtle)]">
               البيانات الأساسية
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               <AdminInput
                 label="الاسم (عربي) *"
-                value={form.name}
-                onChange={(e) => set("name")(e.target.value)}
+                value={form.nameAr}
+                onChange={(e) => set("nameAr")(e.target.value)}
                 required
               />
               <AdminInput
                 label="الاسم (إنجليزي)"
-                value={form.nameEn}
-                onChange={(e) => set("nameEn")(e.target.value)}
+                value={form.name}
+                onChange={(e) => set("name")(e.target.value)}
                 dir="ltr"
               />
               <AdminInput
@@ -169,34 +169,34 @@ export function CreatePublisherDialog({
               <img
                 src={form.imageUrl}
                 alt=""
-                className="mt-2 h-20 w-auto rounded border border-[var(--brand-gray-700)] object-contain"
+                className="mt-2 h-20 w-auto rounded border border-[var(--admin-border)] object-contain"
               />
             )}
           </div>
 
           <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--brand-gray-500)]">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--admin-text-subtle)]">
               الوصف
             </p>
             <div className="space-y-3">
               <AdminTextarea
                 label="الوصف (عربي)"
                 rows={4}
-                value={form.description}
-                onChange={(e) => set("description")(e.target.value)}
+                value={form.contentAr}
+                onChange={(e) => set("contentAr")(e.target.value)}
               />
               <AdminTextarea
                 label="الوصف (إنجليزي)"
                 rows={4}
-                value={form.descriptionEn}
-                onChange={(e) => set("descriptionEn")(e.target.value)}
+                value={form.content}
+                onChange={(e) => set("content")(e.target.value)}
                 dir="ltr"
               />
             </div>
           </div>
 
           <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--brand-gray-500)]">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--admin-text-subtle)]">
               الإعدادات
             </p>
             <div className="flex flex-wrap items-end gap-4">

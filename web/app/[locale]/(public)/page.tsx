@@ -19,6 +19,7 @@ import { PublisherCard } from "@/components/sections/publisher-card";
 import { Button } from "@/components/ui/button";
 import { PenTool, Library, PenLine, Building2 } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
+import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
 import {
   AnimatedSection,
   FadeIn,
@@ -103,7 +104,17 @@ export default async function HomePage() {
         ];
 
   const { newlyReleased, translated, nominated, publishers, publisherGrid = [], categorySections } = homeBooks as typeof homeBooks & {
-    publisherGrid?: Array<{ id: string; title: string; slug: string; imageUrl: string | null; websiteUrl: string | null; country: string | null; bookCount: number }>;
+    publisherGrid?: Array<{
+      id: string;
+      title: string;
+      name: string;
+      nameAr?: string | null;
+      slug: string;
+      imageUrl: string | null;
+      websiteUrl: string | null;
+      country: string | null;
+      bookCount: number;
+    }>;
   };
 
   type ArticleSnippet = {
@@ -319,7 +330,7 @@ export default async function HomePage() {
                 <StaggerItem key={pub.id}>
                   <PublisherCard
                     id={pub.id}
-                    title={pub.title}
+                    title={localizedPublisherName(pub, locale)}
                     slug={pub.slug}
                     imageUrl={pub.imageUrl}
                     websiteUrl={pub.websiteUrl}

@@ -31,7 +31,7 @@ export default async function BookEditPage({ params }: Props) {
     }),
     db.publisher.findMany({
       where: { status: "publish" },
-      select: { id: true, title: true, slug: true },
+      select: { id: true, title: true, name: true, nameAr: true, slug: true },
       orderBy: { title: "asc" },
     }),
     db.productCategory.findMany({
