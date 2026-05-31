@@ -20,7 +20,7 @@ screens or business logic — only the infrastructure layer.
 - UI utilities: flutter_screenutil, flutter_svg, cached_network_image, shimmer
 - Connectivity: connectivity_plus
 - Equality: equatable
-- Localization & formatting: intl
+- Localization & formatting: intl, easy_localization
 - Other: url_launcher, cupertino_icons, flutter_launcher_icons
 
 ---
@@ -336,7 +336,7 @@ These three widgets live in `lib/core/widgets/` and are used by every feature's
   Throws `FormatException` (caught by `ApiManager` as `UnexpectedFailure`) when the
   top-level response is not a JSON object or `data` is null.
   For void endpoints (logout, delete) bypass entirely: `fromJson: (_) => unit`.
-  See feature guide §9 for usage patterns.
+  See feature guide §10 for usage patterns.
 
 **Routing:**
 
@@ -377,6 +377,40 @@ These three widgets live in `lib/core/widgets/` and are used by every feature's
   the switch — every null-guard on a missing/invalid args cast delegates to it,
   keeping all route cases consistent.
 
+**Localization:**
+
+- `assets/translations/ar.json` and `assets/translations/en.json`
+  Translation key–value JSON files. Keys are dot-separated namespaced strings
+  (e.g. `home.title`, `auth.loginButton`). Both files live under `assets/translations/`
+  and must be declared in `pubspec.yaml` under `flutter.assets` as the directory entry:
+  ```yaml
+  flutter:
+    assets:
+      - assets/translations/
+  ```
+  Start each file with `{}` — features populate keys as they are built.
+  Never hardcode user-visible strings in screens or widgets; always use a translation key.
+
+- Reading a translated string in a widget:
+  ```dart
+  import 'package:easy_localization/easy_localization.dart';
+  Text('home.title'.tr())
+  ```
+
+- Switching locale at runtime (e.g. in the language-selection screen):
+  ```dart
+  context.setLocale(const Locale('ar'));
+  ```
+
+- Reading the current locale code (use only for content branching — e.g. `book.titleAr` vs
+  `book.titleEn`; never for directional icon or padding decisions):
+  ```dart
+  final locale = context.locale.languageCode; // 'ar' or 'en'
+  ```
+
+- The scaffold generates no `lib/core/l10n/` folder and no generated `.dart` files.
+  `easy_localization` loads JSON at runtime; no code-gen step is required.
+
 **Storage:**
 
 - `lib/core/storage/secure_storage_helper.dart`
@@ -413,19 +447,35 @@ These three widgets live in `lib/core/widgets/` and are used by every feature's
 - `lib/main.dart`
   Strict initialization order:
     1. WidgetsFlutterBinding.ensureInitialized()
-    2. await initializeDateFormatting('en')
-    3. await initializeDateFormatting('ar')
-    4. await configureDependencies()
-    5. runApp(const MyApp())
-  MyApp is a StatelessWidget returning ScreenUtilInit(
+    2. await EasyLocalization.ensureInitialized()
+    3. await initializeDateFormatting('en')
+    4. await initializeDateFormatting('ar')
+    5. await configureDependencies()
+    6. runApp(
+         EasyLocalization(
+           supportedLocales: const [Locale('ar'), Locale('en')],
+           path: 'assets/translations',
+           fallbackLocale: const Locale('ar'),
+           child: const MyApp(),
+         ),
+       )
+  MyApp is a StatelessWidget. Its `build` receives a `context` that already has the
+  `EasyLocalization` provider above it, so it returns:
+  ScreenUtilInit(
     designSize: Size(kDesignWidth, kDesignHeight),
     builder: (context, child) => MaterialApp(
       navigatorKey: getIt<GlobalKey<NavigatorState>>(),
       theme: AppTheme.lightTheme,
       onGenerateRoute: AppRouter.generateRoute,
       initialRoute: AppRoutes.splash,
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
     )
   ).
+  The three `context.*` properties wire `easy_localization` into Flutter's locale system
+  so that `Directionality`, `Localizations`, and locale-aware widgets all update when
+  `context.setLocale(...)` is called. Omitting any of them silently breaks locale switching.
   No top-level `navigatorKey` import — the key is pulled from `getIt`
   (safe because `configureDependencies()` is awaited before `runApp`).
   No feature logic. No hardcoded strings. No colors. No sizes.
@@ -457,7 +507,7 @@ These three widgets live in `lib/core/widgets/` and are used by every feature's
    `AppRouter.generateRoute` casts `settings.arguments` to the typed class with a
    null guard (null → `_unknown(settings)`), never to `Map`.
    Args live in core so both feature and non-feature callers can import without
-   cross-feature dependency violations. See feature guide §8 for full pattern.
+   cross-feature dependency violations. See feature guide §9 for full pattern.
 
 6. **Null token on public routes:** AuthInterceptor skips the Authorization
    header silently when token is null. It does not throw, redirect, or log.
@@ -496,6 +546,21 @@ These three widgets live in `lib/core/widgets/` and are used by every feature's
     `T Function(Object? json)`, never `dynamic`. Callers cast explicitly at the
     boundary. ApiManager's `badResponse` branch with a null statusCode returns
     `UnexpectedFailure`, not `ServerFailure(0, ...)`.
+
+14. **EasyLocalization initialization and wiring:** Three distinct requirements must
+    all be satisfied or locale switching silently breaks:
+    - `await EasyLocalization.ensureInitialized()` must run in `main()` before
+      `configureDependencies()` and before `runApp`. It reads the cached locale from
+      shared preferences; skipping it causes the app to always start in the fallback locale.
+    - `runApp` must receive an `EasyLocalization(supportedLocales, path, fallbackLocale, child)`
+      widget as root so the provider is above `MyApp` in the widget tree.
+    - `MaterialApp` must declare `localizationsDelegates: context.localizationDelegates`,
+      `supportedLocales: context.supportedLocales`, and `locale: context.locale`.
+      Without these, Flutter's own `Directionality` widget never updates when
+      `context.setLocale(...)` is called, so RTL/LTR switching has no visual effect.
+    Note: `EasyLocalization.ensureInitialized()` internally calls
+    `WidgetsFlutterBinding.ensureInitialized()`; calling it explicitly first is still
+    recommended for clarity.
 
 ---
 

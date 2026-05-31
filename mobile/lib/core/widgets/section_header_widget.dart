@@ -18,7 +18,6 @@ class SectionHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isRtl = Directionality.of(context) == TextDirection.rtl;
     return Padding(
       padding: EdgeInsetsDirectional.symmetric(horizontal: 16.w),
       child: Row(
@@ -48,7 +47,7 @@ class SectionHeaderWidget extends StatelessWidget {
                   ),
                   SizedBox(width: 2.w),
                   Icon(
-                    isRtl ? Icons.chevron_left : Icons.chevron_right,
+                    Icons.chevron_right,
                     size: 15.r,
                     color: AppColors.primary,
                   ),

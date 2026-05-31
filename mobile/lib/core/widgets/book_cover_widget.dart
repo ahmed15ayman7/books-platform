@@ -25,8 +25,8 @@ class BookCoverWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gradient = LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
+      begin: AlignmentDirectional.topStart,
+      end: AlignmentDirectional.bottomEnd,
       colors: coverColors.length >= 2
           ? [coverColors[1], coverColors[0]]
           : [AppColors.secondary, AppColors.primary],

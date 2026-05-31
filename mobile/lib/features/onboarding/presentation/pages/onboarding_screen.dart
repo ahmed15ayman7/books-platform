@@ -206,9 +206,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             Icon(
                               isLast
                                   ? Icons.check_rounded
-                                  : (locale == 'ar'
-                                      ? Icons.chevron_left_rounded
-                                      : Icons.chevron_right_rounded),
+                                  : Icons.chevron_right_rounded,
                               size: 18.r,
                             ),
                           ],

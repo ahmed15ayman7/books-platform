@@ -207,8 +207,8 @@ class _PublisherHeader extends StatelessWidget {
       width: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          begin: AlignmentDirectional.topStart,
+          end: AlignmentDirectional.bottomEnd,
           colors: [AppColors.secondary, Color(0xFF2C2C2C)],
         ),
         boxShadow: AppShadows.softLg,

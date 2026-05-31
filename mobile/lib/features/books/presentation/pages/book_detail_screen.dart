@@ -105,7 +105,6 @@ class _DetailBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ar = locale == 'ar';
-    final isRtl = locale == 'ar';
     return CustomScrollView(
       slivers: [
         // Hero cover
@@ -113,7 +112,6 @@ class _DetailBody extends StatelessWidget {
           child: _HeroCover(
             book: book,
             locale: locale,
-            isRtl: isRtl,
             onBack: () => Navigator.of(context).pop(),
           ),
         ),
@@ -321,12 +319,10 @@ class _HeroCover extends StatelessWidget {
   const _HeroCover({
     required this.book,
     required this.locale,
-    required this.isRtl,
     required this.onBack,
   });
   final Book book;
   final String locale;
-  final bool isRtl;
   final VoidCallback onBack;
 
   @override
@@ -340,8 +336,8 @@ class _HeroCover extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                  begin: AlignmentDirectional.topStart,
+                  end: AlignmentDirectional.bottomEnd,
                   colors: book.coverColors.length >= 2
                       ? [book.coverColors[1], book.coverColors[0]]
                       : [AppColors.secondary, AppColors.primary],
@@ -386,7 +382,7 @@ class _HeroCover extends StatelessWidget {
                 children: [
                   _GlassButton(
                     icon: Icon(
-                      isRtl ? Icons.chevron_right_rounded : Icons.chevron_left_rounded,
+                      Icons.arrow_back_rounded,
                       color: Colors.white,
                       size: 20.r,
                     ),

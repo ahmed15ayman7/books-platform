@@ -223,7 +223,6 @@ class _HeroHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isRtl = context.locale.languageCode == 'ar';
     return SizedBox(
       height: 230.h,
       child: Stack(
@@ -313,9 +312,7 @@ class _HeroHeader extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Icon(
-                  isRtl
-                      ? Icons.arrow_forward_ios_rounded
-                      : Icons.arrow_back_ios_new_rounded,
+                  Icons.arrow_back_rounded,
                   color: Colors.white,
                   size: 18.r,
                 ),
@@ -714,8 +711,8 @@ class _RelatedCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: article.coverColors,
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                      begin: AlignmentDirectional.topStart,
+                      end: AlignmentDirectional.bottomEnd,
                     ),
                   ),
                   child: article.hasVideo

@@ -34,7 +34,6 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     final locale = context.locale.languageCode;
     final ar = locale == 'ar';
-    final isRtl = locale == 'ar';
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Column(
@@ -53,9 +52,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
                   child: Icon(
-                    isRtl
-                        ? Icons.chevron_right_rounded
-                        : Icons.chevron_left_rounded,
+                    Icons.arrow_back_rounded,
                     size: 22.r,
                     color: AppColors.textPrimary,
                   ),

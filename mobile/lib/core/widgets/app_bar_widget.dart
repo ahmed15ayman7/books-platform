@@ -176,7 +176,6 @@ class _BackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isRtl = Directionality.of(context) == TextDirection.rtl;
     return GestureDetector(
       onTap: onBack ?? () => Navigator.of(context).pop(),
       child: Container(
@@ -188,7 +187,7 @@ class _BackButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(999),
         ),
         child: Icon(
-          isRtl ? Icons.chevron_right_rounded : Icons.chevron_left_rounded,
+          Icons.arrow_back_rounded,
           size: 20.r,
           color: AppColors.textPrimary,
         ),

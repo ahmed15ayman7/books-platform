@@ -342,7 +342,73 @@ unhandled state variants at compile time.
 
 ---
 
-## 5. Response Model Rules
+## 5. Directional UI — RTL/LTR
+
+This app targets AR (RTL) and EN (LTR). Every UI value that has a direction must use
+Flutter's direction-aware primitive. Never write `isRtl`/`locale == 'ar'` ternaries to
+choose between two hardcoded directional values — that pattern is fragile, clutters
+callers, and breaks if locale detection changes.
+
+### Rule: use direction-aware primitives everywhere
+
+| Hardcoded (wrong) | Direction-aware (correct) |
+|---|---|
+| `EdgeInsets.only(left: …)` | `EdgeInsetsDirectional.only(start: …)` |
+| `EdgeInsets.only(right: …)` | `EdgeInsetsDirectional.only(end: …)` |
+| `Alignment.centerLeft / centerRight` | `AlignmentDirectional.centerStart / centerEnd` |
+| `Alignment.topLeft / bottomRight` | `AlignmentDirectional.topStart / bottomEnd` |
+| `Positioned(left: …)` | `PositionedDirectional(start: …)` |
+| `TextAlign.left` | `TextAlign.start` |
+| `TextAlign.right` | `TextAlign.end` |
+
+**Vertical-only values are direction-neutral** — `Alignment.topCenter/bottomCenter`,
+`EdgeInsets.symmetric(vertical: …)` — and need no change.
+
+### Directional icons — never ternary
+
+Flutter's Material icon set bakes `matchTextDirection` into the `IconData` of standard
+directional icons. The `Icon` widget reads `Directionality.of(context)` internally and
+mirrors the glyph automatically — no logic needed in the caller.
+
+```dart
+// ❌ Fragile — isRtl / locale variable pollutes every caller
+Icon(isRtl ? Icons.chevron_left_rounded : Icons.chevron_right_rounded)
+Icon(locale == 'ar' ? Icons.chevron_left_rounded : Icons.chevron_right_rounded)
+
+// ✅ The icon mirrors automatically — no caller logic
+Icon(Icons.chevron_right_rounded)  // forward / next / see-all
+Icon(Icons.arrow_back_rounded)     // back button
+Icon(Icons.arrow_forward_rounded)  // go-forward (full arrow variant)
+```
+
+**Icon → intent mapping:**
+
+| Icon | Meaning | In RTL renders as |
+|---|---|---|
+| `Icons.chevron_right_rounded` | Forward / next / see-all | ‹ (left-pointing) |
+| `Icons.arrow_back_rounded` | Back / previous | → (right-pointing) |
+| `Icons.arrow_forward_rounded` | Go forward (full arrow) | ← (left-pointing) |
+
+### Exception: explicit-direction cards
+
+When a widget must express the direction of a **specific language** — not the app's
+current direction — (e.g. a language-selection card that must always show ‹ for Arabic
+and › for English regardless of the current locale), override the ambient `Directionality`
+explicitly rather than picking a hardcoded icon:
+
+```dart
+Directionality(
+  textDirection: isRtlLanguage ? TextDirection.rtl : TextDirection.ltr,
+  child: Icon(Icons.chevron_right_rounded),
+)
+```
+
+This is the **only** legitimate reason to override direction on an icon. In all other
+screens and widgets, let ambient `Directionality` do the work.
+
+---
+
+## 6. Response Model Rules
 
 Response models live in `data/models/` and have two responsibilities only:
 1. `fromJson(Map<String, dynamic>)` — deserialize from API JSON
@@ -384,7 +450,7 @@ They are data transfer objects — instantiated once, mapped to entity, then dis
 
 ---
 
-## 6. Request Model Rules
+## 7. Request Model Rules
 
 Request models live in `data/models/` and expose only `toJson()`.
 
@@ -414,7 +480,7 @@ backend explicitly requires null for "clear this field" semantics.
 
 ---
 
-## 7. Error Messages — One Place
+## 8. Error Messages — One Place
 
 > **This file is created during scaffold phase.** `lib/core/network/failure_messages.dart`
 > already exists when you start a feature. Do not recreate it. Import it directly.
@@ -482,7 +548,7 @@ Do not create a feature-level `failure_messages.dart` unless a unique status cod
 
 ---
 
-## 8. Route Args
+## 9. Route Args
 
 Only screens that require navigation parameters have an args class.
 Args classes live in `lib/core/router/args/` — one file per screen:
@@ -542,7 +608,7 @@ Do not add args classes to `app_router.dart` or inside any feature folder.
 
 ---
 
-## 9. ApiEnvelope Unwrapper
+## 10. ApiEnvelope Unwrapper
 
 **Only applies if the backend wraps every response in a general envelope:**
 ```json
@@ -576,7 +642,7 @@ Never pass a void endpoint through `unwrapServiceResult` — it will throw.
 
 ---
 
-## 10. Pre-Ship Checklist
+## 11. Pre-Ship Checklist
 
 Before marking a feature complete, verify every item:
 
@@ -597,6 +663,9 @@ Before marking a feature complete, verify every item:
 - [ ] All error messages go through `failureToMessage()` — no inline string literals
 - [ ] Screens use `BlocListener` for side effects, `BlocBuilder` for rendering
 - [ ] `BlocProvider` is created in `AppRouter`, not inside the screen widget
+- [ ] All directional spacing uses `EdgeInsetsDirectional` — no `EdgeInsets.only(left/right: …)`
+- [ ] Diagonal gradients use `AlignmentDirectional.topStart / bottomEnd` — no `Alignment.topLeft / bottomRight`
+- [ ] Directional icons use standard Material icons (`Icons.chevron_right_rounded`, `Icons.arrow_back_rounded`) with no `isRtl` ternary (see §5)
 
 **DI**
 - [ ] After adding `@injectable` / `@lazySingleton` classes, run:
@@ -608,7 +677,7 @@ Before marking a feature complete, verify every item:
 
 ---
 
-## 11. Anti-Patterns (Do Not Repeat)
+## 12. Anti-Patterns (Do Not Repeat)
 
 The following patterns were found in other projects and features and must not appear
 in this codebase:
@@ -622,3 +691,6 @@ in this codebase:
 | One cubit taking 9 constructor-injected use cases | Fragile DI, god-object cubit, unclear responsibility | Split into action cubit + query cubit |
 | Error string literals inline in data source / cubit | Can't localize, can't change centrally | `failureToMessage()` in one file |
 | Numbered comments (`// 1. Send Friend Request`) | Noise; file structure and method names carry this | Clean code, no redundant comments |
+| `isRtl ? Icons.chevron_left : Icons.chevron_right` ternary | Fragile; pollutes every caller; `isRtl` variable noise throughout the file | Use `Icons.chevron_right_rounded` — `matchTextDirection` is baked into the `IconData`; the `Icon` widget mirrors automatically |
+| `Alignment.topLeft / bottomRight` in gradients | Hard-coded LTR diagonal; gradient does not flip in RTL | `AlignmentDirectional.topStart / bottomEnd` |
+| `EdgeInsets.only(left: …)` for insets | Does not mirror in RTL; content shifts wrong | `EdgeInsetsDirectional.only(start: …)` |
