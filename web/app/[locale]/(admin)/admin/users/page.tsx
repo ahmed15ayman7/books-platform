@@ -245,8 +245,8 @@ export default function AdminUsersPage() {
 
   if (!can(PERMISSIONS.users.view)) {
     return (
-      <div className="text-white p-8">
-        <p className="text-[var(--brand-gray-400)]">ليس لديك صلاحية عرض مديري النظام.</p>
+      <div className="p-8 text-[var(--admin-text)]">
+        <p className="text-[var(--admin-text-muted)]">ليس لديك صلاحية عرض مديري النظام.</p>
       </div>
     );
   }
@@ -281,14 +281,14 @@ export default function AdminUsersPage() {
     <AdminGridCard>
       <AdminGridCardBody>
         <div className="flex items-start gap-2">
-          <h3 className="font-semibold text-white">{row.fullName}</h3>
+          <h3 className="font-semibold text-[var(--admin-text)]">{row.fullName}</h3>
           {row.isSuperAdmin && (
             <span className="rounded bg-[var(--brand-red-soft)] px-1.5 py-0.5 text-[10px] text-[var(--brand-red)]">
               رئيسي
             </span>
           )}
         </div>
-        <p className="text-xs text-[var(--brand-gray-500)]" dir="ltr">
+        <p className="text-xs text-[var(--admin-text-subtle)]" dir="ltr">
           {row.email}
         </p>
         <AdminStatusBadge
@@ -318,7 +318,7 @@ export default function AdminUsersPage() {
     {
       key: "email",
       label: "البريد",
-      className: "text-[var(--brand-gray-400)]",
+      className: "text-[var(--admin-text-muted)]",
       render: (row: AdminUserRow) => <span dir="ltr">{row.email}</span>,
     },
     {
@@ -334,7 +334,7 @@ export default function AdminUsersPage() {
   ];
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader
         title="مديرو النظام"
         subtitle="إنشاء حسابات وتحديد صلاحيات كل مدير"
@@ -352,7 +352,7 @@ export default function AdminUsersPage() {
       />
 
       {showForm && (
-        <div className="mb-6 rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)] p-6">
+        <div className="mb-6 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-6">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-bold">
             <Shield className="h-5 w-5 text-[var(--brand-red)]" />
             {editingId ? "تعديل مدير" : "مدير جديد"}
@@ -361,7 +361,7 @@ export default function AdminUsersPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               {!editingId && (
                 <div>
-                  <Label className="mb-1 text-xs text-[var(--brand-gray-400)]">البريد *</Label>
+                  <Label className="mb-1 text-xs text-[var(--admin-text-muted)]">البريد *</Label>
                   <Input
                     type="email"
                     required
@@ -373,7 +373,7 @@ export default function AdminUsersPage() {
                 </div>
               )}
               <div>
-                <Label className="mb-1 text-xs text-[var(--brand-gray-400)]">
+                <Label className="mb-1 text-xs text-[var(--admin-text-muted)]">
                   {editingId ? "كلمة مرور جديدة (اختياري)" : "كلمة المرور *"}
                 </Label>
                 <Input
@@ -385,7 +385,7 @@ export default function AdminUsersPage() {
                 />
               </div>
               <div className="sm:col-span-2">
-                <Label className="mb-1 text-xs text-[var(--brand-gray-400)]">الاسم الكامل *</Label>
+                <Label className="mb-1 text-xs text-[var(--admin-text-muted)]">الاسم الكامل *</Label>
                 <Input
                   type="text"
                   required
@@ -408,9 +408,9 @@ export default function AdminUsersPage() {
                       permissions: checked === true ? [] : form.permissions,
                     })
                   }
-                  className="border-[var(--brand-gray-600)] data-[state=checked]:bg-[var(--brand-red)]"
+                  className="border-[var(--admin-input-border)] data-[state=checked]:bg-[var(--brand-red)]"
                 />
-                <Label htmlFor="isSuperAdmin" className="cursor-pointer font-normal text-white">
+                <Label htmlFor="isSuperAdmin" className="cursor-pointer font-normal text-[var(--admin-text)]">
                   مدير رئيسي (كل الصلاحيات)
                 </Label>
               </div>
@@ -424,41 +424,41 @@ export default function AdminUsersPage() {
                   onCheckedChange={(checked) =>
                     setForm({ ...form, isActive: checked === true })
                   }
-                  className="border-[var(--brand-gray-600)] data-[state=checked]:bg-[var(--brand-red)]"
+                  className="border-[var(--admin-input-border)] data-[state=checked]:bg-[var(--brand-red)]"
                 />
-                <Label htmlFor="isActive" className="cursor-pointer font-normal text-white">
+                <Label htmlFor="isActive" className="cursor-pointer font-normal text-[var(--admin-text)]">
                   الحساب نشط
                 </Label>
               </div>
             )}
 
             {!form.isSuperAdmin && (
-              <div className="space-y-4 max-h-[420px] overflow-y-auto rounded-lg border border-[var(--brand-gray-800)] p-4">
-                <p className="text-sm font-semibold text-[var(--brand-gray-300)]">الصلاحيات</p>
+              <div className="space-y-4 max-h-[420px] overflow-y-auto rounded-lg border border-[var(--admin-border)] p-4">
+                <p className="text-sm font-semibold text-[var(--admin-text-muted)]">الصلاحيات</p>
                 {PERMISSION_GROUPS.map((group) => {
                   const keys = group.permissions.map((p) => p.key);
                   const allOn = keys.every((k) => form.permissions.includes(k));
                   return (
-                    <div key={group.id} className="border-b border-[var(--brand-gray-800)] pb-3 last:border-0">
+                    <div key={group.id} className="border-b border-[var(--admin-border)] pb-3 last:border-0">
                       <div className="mb-2 flex cursor-pointer items-center gap-2 text-sm font-medium">
                         <Checkbox
                           id={`group-${group.id}`}
                           checked={allOn}
                           onCheckedChange={() => toggleGroup(keys)}
-                          className="border-[var(--brand-gray-600)] data-[state=checked]:bg-[var(--brand-red)]"
+                          className="border-[var(--admin-input-border)] data-[state=checked]:bg-[var(--brand-red)]"
                         />
-                        <Label htmlFor={`group-${group.id}`} className="cursor-pointer font-medium text-white">
+                        <Label htmlFor={`group-${group.id}`} className="cursor-pointer font-medium text-[var(--admin-text)]">
                           {group.labelAr}
                         </Label>
                       </div>
                       <div className="mr-6 flex flex-wrap gap-3">
                         {group.permissions.map((p) => (
-                          <div key={p.key} className="flex cursor-pointer items-center gap-1.5 text-xs text-[var(--brand-gray-400)]">
+                          <div key={p.key} className="flex cursor-pointer items-center gap-1.5 text-xs text-[var(--admin-text-muted)]">
                             <Checkbox
                               id={`perm-${p.key}`}
                               checked={form.permissions.includes(p.key)}
                               onCheckedChange={() => togglePermission(p.key)}
-                              className="border-[var(--brand-gray-600)] data-[state=checked]:bg-[var(--brand-red)]"
+                              className="border-[var(--admin-input-border)] data-[state=checked]:bg-[var(--brand-red)]"
                             />
                             <Label htmlFor={`perm-${p.key}`} className="cursor-pointer font-normal">
                               {p.labelAr}

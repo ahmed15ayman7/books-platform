@@ -53,7 +53,7 @@ export function BookMarketingDialog({
       <Button
         type="button"
         variant="outline"
-        className="gap-2 border-[var(--brand-gray-700)] text-white hover:bg-[var(--brand-gray-800)]"
+        className="gap-2 border-[var(--admin-border-strong)] text-[var(--admin-text)] hover:bg-[var(--admin-hover)]"
         onClick={() => setOpen(true)}
       >
         <Megaphone className="h-4 w-4" />
@@ -67,15 +67,15 @@ export function BookMarketingDialog({
           aria-modal="true"
           aria-labelledby="marketing-dialog-title"
         >
-          <div className="w-full max-w-lg rounded-xl border border-[var(--brand-gray-700)] bg-[var(--brand-gray-900)] shadow-2xl">
-            <div className="flex items-center justify-between border-b border-[var(--brand-gray-800)] px-5 py-4">
-              <h2 id="marketing-dialog-title" className="text-lg font-bold text-white">
+          <div className="w-full max-w-lg rounded-xl border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[var(--admin-border)] px-5 py-4">
+              <h2 id="marketing-dialog-title" className="text-lg font-bold text-[var(--admin-text)]">
                 تسويق الكتاب
               </h2>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-lg p-1 text-[var(--brand-gray-400)] hover:bg-[var(--brand-gray-800)] hover:text-white"
+                className="rounded-lg p-1 text-[var(--admin-text-muted)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-accent)]"
                 aria-label="إغلاق"
               >
                 <X className="h-5 w-5" />
@@ -83,10 +83,10 @@ export function BookMarketingDialog({
             </div>
 
             <div className="space-y-4 p-5">
-              <p className="text-sm text-[var(--brand-gray-400)]">
+              <p className="text-sm text-[var(--admin-text-muted)]">
                 انشر على المنصات المتفق عليها. انسخ النص أو افتح منصة للمشاركة.
               </p>
-              <pre className="max-h-32 overflow-auto whitespace-pre-wrap rounded-lg border border-[var(--brand-gray-800)] bg-[var(--brand-gray-800)] p-3 text-xs text-[var(--brand-gray-200)]">
+              <pre className="max-h-32 overflow-auto whitespace-pre-wrap rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-muted)] p-3 text-xs text-[var(--admin-text-muted)]">
                 {postText}
               </pre>
               <Button type="button" variant="outline" className="w-full gap-2" onClick={() => void copyPost()}>
@@ -105,13 +105,13 @@ export function BookMarketingDialog({
                         key={label}
                         type="button"
                         onClick={() => void copyPost()}
-                        className="flex items-center gap-3 rounded-lg border border-[var(--brand-gray-700)] px-4 py-3 text-sm text-white transition-colors hover:border-[var(--brand-red)] hover:bg-[var(--brand-gray-800)] sm:col-span-2"
+                        className="flex items-center gap-3 rounded-lg border border-[var(--admin-border-strong)] px-4 py-3 text-sm text-[var(--admin-text)] transition-colors hover:border-[var(--brand-red)] hover:bg-[var(--admin-hover)] sm:col-span-2"
                       >
                         <IconInstagram className="h-5 w-5 shrink-0 text-[var(--brand-red)]" />
                         <span className="flex-1 text-start font-medium">
                           Instagram — انسخ النص للصق في التطبيق
                         </span>
-                        <Copy className="h-4 w-4 text-[var(--brand-gray-500)]" />
+                        <Copy className="h-4 w-4 text-[var(--admin-text-subtle)]" />
                       </button>
                     );
                   }
@@ -128,11 +128,11 @@ export function BookMarketingDialog({
                           void copyPost();
                         }
                       }}
-                      className="flex items-center gap-3 rounded-lg border border-[var(--brand-gray-700)] px-4 py-3 text-sm text-white transition-colors hover:border-[var(--brand-red)] hover:bg-[var(--brand-gray-800)]"
+                      className="flex items-center gap-3 rounded-lg border border-[var(--admin-border-strong)] px-4 py-3 text-sm text-[var(--admin-text)] transition-colors hover:border-[var(--brand-red)] hover:bg-[var(--admin-hover)]"
                     >
                       <Icon className="h-5 w-5 shrink-0 text-[var(--brand-red)]" />
                       <span className="flex-1 font-medium">{label}</span>
-                      <ExternalLink className="h-4 w-4 text-[var(--brand-gray-500)]" />
+                      <ExternalLink className="h-4 w-4 text-[var(--admin-text-subtle)]" />
                     </a>
                   );
                 })}

@@ -139,10 +139,10 @@ export default function AdminCategoriesPage() {
   const renderCard = (row: Category) => (
     <AdminGridCard>
       <AdminGridCardBody>
-        <h3 className="font-semibold text-white">{row.nameAr ?? row.name}</h3>
-        {row.nameAr && <p className="text-xs text-[var(--brand-gray-500)]">{row.name}</p>}
-        <code className="text-[10px] text-[var(--brand-gray-600)]">{row.slug}</code>
-        <p className="text-sm text-[var(--brand-gray-400)]">{row._count?.products ?? 0} كتاب</p>
+        <h3 className="font-semibold text-[var(--admin-text)]">{row.nameAr ?? row.name}</h3>
+        {row.nameAr && <p className="text-xs text-[var(--admin-text-subtle)]">{row.name}</p>}
+        <code className="text-[10px] text-[var(--admin-text-subtle)]">{row.slug}</code>
+        <p className="text-sm text-[var(--admin-text-muted)]">{row._count?.products ?? 0} كتاب</p>
         <AdminStatusBadge status={row.active ? "active" : "inactive"} />
       </AdminGridCardBody>
       <AdminGridCardFooter>{rowActions(row)}</AdminGridCardFooter>
@@ -159,21 +159,21 @@ export default function AdminCategoriesPage() {
       key: "nameAr",
       label: "الاسم (AR)",
       render: (row: Category) => (
-        <span className="text-[var(--brand-gray-300)]">{row.nameAr ?? "—"}</span>
+        <span className="text-[var(--admin-text-muted)]">{row.nameAr ?? "—"}</span>
       ),
     },
     {
       key: "slug",
       label: "Slug",
       render: (row: Category) => (
-        <code className="text-xs text-[var(--brand-gray-400)]">{row.slug}</code>
+        <code className="text-xs text-[var(--admin-text-muted)]">{row.slug}</code>
       ),
     },
     {
       key: "products",
       label: "الكتب",
       render: (row: Category) => (
-        <span className="text-[var(--brand-gray-300)]">{row._count?.products ?? 0}</span>
+        <span className="text-[var(--admin-text-muted)]">{row._count?.products ?? 0}</span>
       ),
     },
     {
@@ -189,7 +189,7 @@ export default function AdminCategoriesPage() {
   ];
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader
         title="التصنيفات"
         subtitle="إدارة تصنيفات الكتب السبعة"

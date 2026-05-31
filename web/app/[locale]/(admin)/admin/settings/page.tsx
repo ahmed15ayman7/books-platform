@@ -38,13 +38,13 @@ export default function AdminSettingsPage() {
     : (visibleTabs[0]?.id ?? "platform");
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader
         title="الإعدادات"
         subtitle="إعدادات المنصة، حسابك، والإشعارات"
       />
 
-      <nav className="mb-8 flex flex-wrap gap-2 border-b border-[var(--brand-gray-800)] pb-4">
+      <nav className="mb-8 flex flex-wrap gap-2 border-b border-[var(--admin-border)] pb-4">
         {visibleTabs.map((t) => (
           <Link
             key={t.id}
@@ -53,7 +53,7 @@ export default function AdminSettingsPage() {
               "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
               activeTab === t.id
                 ? "bg-[var(--brand-red)] text-white"
-                : "text-[var(--brand-gray-400)] hover:bg-[var(--brand-gray-800)] hover:text-white"
+                : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-accent)]"
             )}
           >
             {t.label}

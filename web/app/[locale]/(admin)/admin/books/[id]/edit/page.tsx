@@ -48,17 +48,17 @@ export default async function BookEditPage({ params }: Props) {
   if (!book) notFound();
 
   return (
-    <div className="text-white">
-      <div className="mb-6 flex flex-col gap-4 border-b border-[var(--brand-gray-800)] pb-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="text-[var(--admin-text)]">
+      <div className="mb-6 flex flex-col gap-4 border-b border-[var(--admin-border)] pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-4">
           <Link
             href={`/${locale}/admin/books/${id}`}
-            className="flex shrink-0 items-center gap-1.5 text-sm text-[var(--brand-gray-400)] transition-colors hover:text-white"
+            className="flex shrink-0 items-center gap-1.5 text-sm text-[var(--admin-text-muted)] transition-colors hover:text-[var(--admin-accent)]"
           >
             <ChevronLeft className="h-4 w-4" />
             العودة للكتاب
           </Link>
-          <span className="text-[var(--brand-gray-600)]">/</span>
+          <span className="text-[var(--admin-text-subtle)]">/</span>
           <h1 className="truncate text-base font-semibold">
             تعديل: {book.nameAr ?? book.nameEn}
           </h1>

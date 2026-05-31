@@ -117,13 +117,13 @@ export default function AdminPublisherEditPage() {
   const set = (key: keyof PublisherForm) => (v: string | boolean) =>
     setForm((prev) => ({ ...prev, [key]: v }));
 
-  if (loading) return <div className="text-[var(--brand-gray-400)]">جاري التحميل...</div>;
+  if (loading) return <div className="text-[var(--admin-text-muted)]">جاري التحميل...</div>;
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <Link
         href={`/${locale}/admin/publishers`}
-        className="mb-5 inline-flex items-center gap-2 text-sm text-[var(--brand-gray-400)] hover:text-white transition-colors"
+        className="mb-5 inline-flex items-center gap-2 text-sm text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] transition-colors"
       >
         <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
         العودة للناشرين

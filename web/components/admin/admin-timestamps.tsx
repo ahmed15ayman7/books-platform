@@ -17,7 +17,7 @@ export function AdminTimestamps({
 
   if (compact) {
     return (
-      <p className={`text-xs text-[var(--brand-gray-500)] ${className}`}>
+      <p className={`text-xs text-[var(--admin-text-subtle)] ${className}`}>
         {createdAt && <span>أُنشئ: {formatAdminDateTime(createdAt)}</span>}
         {createdAt && updatedAt && <span className="mx-2">·</span>}
         {updatedAt && <span>آخر تحديث: {formatAdminDateTime(updatedAt)}</span>}
@@ -27,15 +27,15 @@ export function AdminTimestamps({
 
   return (
     <dl
-      className={`grid gap-2 rounded-lg border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)] p-4 text-sm sm:grid-cols-2 ${className}`}
+      className={`grid gap-2 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 text-sm sm:grid-cols-2 ${className}`}
     >
       <div>
-        <dt className="text-xs text-[var(--brand-gray-500)]">تاريخ الإنشاء</dt>
-        <dd className="text-white">{formatAdminDateTime(createdAt)}</dd>
+        <dt className="text-xs text-[var(--admin-text-subtle)]">تاريخ الإنشاء</dt>
+        <dd className="text-[var(--admin-text)]">{formatAdminDateTime(createdAt)}</dd>
       </div>
       <div>
-        <dt className="text-xs text-[var(--brand-gray-500)]">آخر تحديث</dt>
-        <dd className="text-white">{formatAdminDateTime(updatedAt)}</dd>
+        <dt className="text-xs text-[var(--admin-text-subtle)]">آخر تحديث</dt>
+        <dd className="text-[var(--admin-text)]">{formatAdminDateTime(updatedAt)}</dd>
       </div>
     </dl>
   );
@@ -45,7 +45,7 @@ export function adminCreatedAtColumn<T extends { createdAt?: Date | string | nul
   return {
     key: "createdAt",
     label: "تاريخ الإنشاء",
-    className: "whitespace-nowrap text-xs text-[var(--brand-gray-400)]",
+    className: "whitespace-nowrap text-xs text-[var(--admin-text-muted)]",
     render: (row: T) => formatAdminDateTime(row.createdAt),
   };
 }
@@ -54,7 +54,7 @@ export function adminUpdatedAtColumn<T extends { updatedAt?: Date | string | nul
   return {
     key: "updatedAt",
     label: "آخر تحديث",
-    className: "whitespace-nowrap text-xs text-[var(--brand-gray-400)]",
+    className: "whitespace-nowrap text-xs text-[var(--admin-text-muted)]",
     render: (row: T) => formatAdminDateTime(row.updatedAt),
   };
 }

@@ -119,7 +119,7 @@ export default function AdminMediaPage() {
       key: "channel",
       label: "القناة",
       render: (row: MediaItem) => (
-        <span className="text-xs text-[var(--brand-gray-300)]">
+        <span className="text-xs text-[var(--admin-text-muted)]">
           {row.channel ? (mediaChannelLabel[row.channel] ?? row.channel) : "—"}
         </span>
       ),
@@ -128,7 +128,7 @@ export default function AdminMediaPage() {
       key: "date",
       label: "التاريخ",
       render: (row: MediaItem) => (
-        <span className="text-xs text-[var(--brand-gray-400)]">
+        <span className="text-xs text-[var(--admin-text-muted)]">
           {row.date ? new Date(row.date).toLocaleDateString("ar-EG") : "—"}
         </span>
       ),
@@ -151,8 +151,8 @@ export default function AdminMediaPage() {
         fallback={<Video className="h-10 w-10" />}
       />
       <AdminGridCardBody>
-        <h3 className="line-clamp-2 font-semibold text-white">{row.title}</h3>
-        <p className="text-xs text-[var(--brand-gray-500)]">
+        <h3 className="line-clamp-2 font-semibold text-[var(--admin-text)]">{row.title}</h3>
+        <p className="text-xs text-[var(--admin-text-subtle)]">
           {row.channel ? (mediaChannelLabel[row.channel] ?? row.channel) : "—"}
         </p>
         <AdminStatusBadge status={row.status === "publish" ? "published" : "draft"} />
@@ -162,7 +162,7 @@ export default function AdminMediaPage() {
   );
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader
         title="الميديا"
         subtitle="إدارة الفيديوهات والبودكاست والمحتوى المرئي"

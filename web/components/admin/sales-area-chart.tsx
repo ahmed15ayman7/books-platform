@@ -17,8 +17,8 @@ const COLORS = {
   revenue: "#b11e2e",
   discount: "#f59e0b",
   orders: "#3b82f6",
-  grid: "#262626",
-  axis: "#6b6b6b",
+  grid: "#e5e5e5",
+  axis: "#525252",
 };
 
 interface Props {
@@ -49,8 +49,8 @@ function ChartTooltip({
   if (!point) return null;
 
   return (
-    <div className="rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-900)] px-3 py-2 text-xs shadow-xl">
-      <p className="mb-1.5 font-medium text-white">
+    <div className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-xs shadow-xl">
+      <p className="mb-1.5 font-medium text-[var(--admin-text)]">
         {fullDateFmt.format(new Date(label))}
       </p>
       <div className="space-y-1">
@@ -62,7 +62,7 @@ function ChartTooltip({
             />
             الإيرادات
           </span>
-          <span className="font-mono font-semibold text-white">
+          <span className="font-mono font-semibold text-[var(--admin-text)]">
             {formatCurrency(point.revenue, currency)}
           </span>
         </p>
@@ -74,7 +74,7 @@ function ChartTooltip({
             />
             الخصومات
           </span>
-          <span className="font-mono font-semibold text-white">
+          <span className="font-mono font-semibold text-[var(--admin-text)]">
             {formatCurrency(point.discount, currency)}
           </span>
         </p>
@@ -86,7 +86,7 @@ function ChartTooltip({
             />
             الطلبات
           </span>
-          <span className="font-mono font-semibold text-white">
+          <span className="font-mono font-semibold text-[var(--admin-text)]">
             {numFmt.format(point.orders)}
           </span>
         </p>
@@ -97,7 +97,7 @@ function ChartTooltip({
 
 function Legend() {
   return (
-    <div className="flex flex-wrap items-center gap-4 text-xs text-[var(--brand-gray-400)]">
+    <div className="flex flex-wrap items-center gap-4 text-xs text-[var(--admin-text-muted)]">
       <span className="flex items-center gap-1.5">
         <span
           className="inline-block h-2.5 w-2.5 rounded-sm"
@@ -132,28 +132,28 @@ export function SalesAreaChart({ data }: Props) {
   );
 
   return (
-    <div className="rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)] p-5">
+    <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-5">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="text-base font-semibold text-white">
+          <h2 className="text-base font-semibold text-[var(--admin-text)]">
             المبيعات والإيرادات
           </h2>
-          <p className="mt-0.5 text-xs text-[var(--brand-gray-500)]">
+          <p className="mt-0.5 text-xs text-[var(--admin-text-subtle)]">
             آخر {numFmt.format(points.length)} يوم
           </p>
         </div>
 
         <div className="grid grid-cols-3 gap-3 sm:gap-5">
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-[var(--brand-gray-500)]">
+            <p className="text-[10px] uppercase tracking-widest text-[var(--admin-text-subtle)]">
               إجمالي الإيرادات
             </p>
-            <p className="mt-0.5 font-mono text-sm font-bold text-white">
+            <p className="mt-0.5 font-mono text-sm font-bold text-[var(--admin-text)]">
               {formatCurrency(totals.revenue, currency)}
             </p>
           </div>
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-[var(--brand-gray-500)]">
+            <p className="text-[10px] uppercase tracking-widest text-[var(--admin-text-subtle)]">
               الخصومات
             </p>
             <p className="mt-0.5 font-mono text-sm font-bold text-[#f59e0b]">
@@ -161,10 +161,10 @@ export function SalesAreaChart({ data }: Props) {
             </p>
           </div>
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-[var(--brand-gray-500)]">
+            <p className="text-[10px] uppercase tracking-widest text-[var(--admin-text-subtle)]">
               عدد الطلبات
             </p>
-            <p className="mt-0.5 font-mono text-sm font-bold text-white">
+            <p className="mt-0.5 font-mono text-sm font-bold text-[var(--admin-text)]">
               {numFmt.format(totals.orders)}
             </p>
           </div>

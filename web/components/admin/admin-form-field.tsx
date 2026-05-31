@@ -34,13 +34,13 @@ export function AdminFormField({
 }: AdminFormFieldProps) {
   return (
     <div className={cn("space-y-1", className)}>
-      <Label className="text-xs font-medium text-[var(--brand-gray-300)]">
+      <Label className="text-xs font-medium text-[var(--admin-text-muted)]">
         {label}
         {required && <span className="ms-0.5 text-[var(--brand-red)]">*</span>}
       </Label>
       {children}
       {hint && !error && (
-        <p className="text-[11px] text-[var(--brand-gray-500)]">{hint}</p>
+        <p className="text-[11px] text-[var(--admin-text-subtle)]">{hint}</p>
       )}
       {error && <p className="text-[11px] text-[var(--error)]">{error}</p>}
     </div>
@@ -48,7 +48,7 @@ export function AdminFormField({
 }
 
 export const adminFieldClass =
-  "border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] text-white placeholder:text-[var(--brand-gray-600)] focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-0";
+  "border-[var(--admin-input-border)] bg-[var(--admin-input-bg)] text-[var(--admin-text)] placeholder:text-[var(--admin-text-subtle)] focus-visible:ring-[var(--admin-accent)] focus-visible:ring-offset-0";
 
 /** @deprecated Use adminFieldClass */
 export const adminInputCls = adminFieldClass;
@@ -158,12 +158,12 @@ export function AdminSelect({
         >
           <SelectValue placeholder={placeholder ?? "اختر..."} />
         </SelectTrigger>
-        <SelectContent className="border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] text-white">
+        <SelectContent className="border-[var(--admin-input-border)] bg-[var(--admin-surface)] text-[var(--admin-text)]">
           {options.map((opt) => (
             <SelectItem
               key={opt.value}
               value={opt.value}
-              className="focus:bg-[var(--brand-gray-700)] focus:text-white"
+              className="focus:bg-[var(--admin-hover)] focus:text-[var(--admin-text)]"
             >
               {opt.label}
             </SelectItem>
@@ -191,14 +191,14 @@ export function AdminCheckbox({ label, className, checked, onChange, ...props }:
           } as React.ChangeEvent<HTMLInputElement>);
         }}
         className={cn(
-          "border-[var(--brand-gray-700)] data-[state=checked]:bg-[var(--brand-red)] data-[state=checked]:border-[var(--brand-red)]",
+          "border-[var(--admin-input-border)] data-[state=checked]:bg-[var(--admin-accent)] data-[state=checked]:border-[var(--admin-accent)]",
           className,
         )}
         {...props}
       />
       <Label
         htmlFor={props.id ?? props.name}
-        className="cursor-pointer text-sm font-normal text-white"
+        className="cursor-pointer text-sm font-normal text-[var(--admin-text)]"
       >
         {label}
       </Label>

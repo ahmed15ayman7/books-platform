@@ -52,7 +52,7 @@ export default function AdminNotificationsPage() {
   ];
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader
         title="الإشعارات"
         subtitle="إرسال إشعارات جماعية لجميع المشتركين"
@@ -64,7 +64,7 @@ export default function AdminNotificationsPage() {
           <form onSubmit={handleSend} className="space-y-4">
             {/* Channel selector */}
             <div>
-              <p className="mb-2 text-xs font-medium text-[var(--brand-gray-300)]">قناة الإرسال</p>
+              <p className="mb-2 text-xs font-medium text-[var(--admin-text-muted)]">قناة الإرسال</p>
               <div className="flex gap-2">
                 {channels.map((ch) => (
                   <button
@@ -74,7 +74,7 @@ export default function AdminNotificationsPage() {
                     className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm transition-colors ${
                       form.channel === ch.value
                         ? "border-[var(--brand-red)] bg-[var(--brand-red)] text-white"
-                        : "border-[var(--brand-gray-700)] text-[var(--brand-gray-400)] hover:border-[var(--brand-gray-600)] hover:text-white"
+                        : "border-[var(--admin-border-strong)] text-[var(--admin-text-muted)] hover:border-[var(--admin-input-border)] hover:text-[var(--admin-accent)]"
                     }`}
                   >
                     <ch.icon className="h-4 w-4" />
@@ -113,17 +113,17 @@ export default function AdminNotificationsPage() {
               ].map((stat) => (
                 <div
                   key={stat.label}
-                  className="rounded-lg bg-[var(--brand-gray-800)] p-4 text-center"
+                  className="rounded-lg bg-[var(--admin-surface-muted)] p-4 text-center"
                 >
                   <p className="text-xl font-black">{stat.value}</p>
-                  <p className="mt-1 text-[11px] text-[var(--brand-gray-400)]">{stat.label}</p>
+                  <p className="mt-1 text-[11px] text-[var(--admin-text-muted)]">{stat.label}</p>
                 </div>
               ))}
             </div>
           </AdminCard>
 
           <AdminCard title="ملاحظات">
-            <ul className="space-y-2 text-sm text-[var(--brand-gray-400)]">
+            <ul className="space-y-2 text-sm text-[var(--admin-text-muted)]">
               <li className="flex items-start gap-2">
                 <Bell className="mt-0.5 h-4 w-4 shrink-0 text-[var(--brand-red)]" />
                 <span>Web Push: يصل للمتصفح حتى عند إغلاق الموقع</span>

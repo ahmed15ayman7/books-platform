@@ -126,7 +126,7 @@ export function NotificationsSettingsTab() {
               }))
             }
           />
-          <p className="text-xs text-[var(--brand-gray-500)]">
+          <p className="text-xs text-[var(--admin-text-subtle)]">
             الإرسال الفعلي عبر Resend/SMTP يُفعّل لاحقاً — حالياً يُسجّل في السجل فقط عند البث.
           </p>
         </div>
@@ -135,15 +135,15 @@ export function NotificationsSettingsTab() {
       <AdminCard title="آخر الإشعارات المرسلة">
         <div className="max-h-64 overflow-y-auto text-sm">
           {logs.length === 0 ? (
-            <p className="text-[var(--brand-gray-500)]">لا سجلات</p>
+            <p className="text-[var(--admin-text-subtle)]">لا سجلات</p>
           ) : (
-            <ul className="divide-y divide-[var(--brand-gray-800)]">
+            <ul className="divide-y divide-[var(--admin-border)]">
               {logs.map((l) => (
                 <li key={l.id} className="py-2">
-                  <span className="text-white">{l.type}</span>
-                  <span className="mx-2 text-[var(--brand-gray-600)]">·</span>
-                  <span className="text-[var(--brand-gray-400)]">{l.subject ?? l.recipient}</span>
-                  <span className="block text-xs text-[var(--brand-gray-500)]">
+                  <span className="text-[var(--admin-text)]">{l.type}</span>
+                  <span className="mx-2 text-[var(--admin-text-subtle)]">·</span>
+                  <span className="text-[var(--admin-text-muted)]">{l.subject ?? l.recipient}</span>
+                  <span className="block text-xs text-[var(--admin-text-subtle)]">
                     {new Date(l.sentAt).toLocaleString("ar-EG")} — {l.status}
                   </span>
                 </li>

@@ -100,11 +100,11 @@ export default function AdminOrdersPage() {
   const renderCard = (row: Order) => (
     <AdminGridCard>
       <AdminGridCardBody>
-        <code className="text-xs text-[var(--brand-gray-500)]">
+        <code className="text-xs text-[var(--admin-text-subtle)]">
           {row.orderNumber ?? row.id.slice(0, 8)}
         </code>
-        <h3 className="font-semibold text-white">{row.buyerName}</h3>
-        <p className="truncate text-xs text-[var(--brand-gray-500)]" dir="ltr">
+        <h3 className="font-semibold text-[var(--admin-text)]">{row.buyerName}</h3>
+        <p className="truncate text-xs text-[var(--admin-text-subtle)]" dir="ltr">
           {row.buyerEmail}
         </p>
         <p className="text-lg font-bold text-[var(--success)]">
@@ -121,7 +121,7 @@ export default function AdminOrdersPage() {
       key: "orderNumber",
       label: "رقم الطلب",
       render: (row: Order) => (
-        <code className="text-xs text-[var(--brand-gray-300)]">{row.orderNumber ?? row.id.slice(0, 8)}</code>
+        <code className="text-xs text-[var(--admin-text-muted)]">{row.orderNumber ?? row.id.slice(0, 8)}</code>
       ),
     },
     {
@@ -130,7 +130,7 @@ export default function AdminOrdersPage() {
       render: (row: Order) => (
         <div>
           <p className="font-medium">{row.buyerName}</p>
-          <p className="text-xs text-[var(--brand-gray-400)]">{row.buyerEmail}</p>
+          <p className="text-xs text-[var(--admin-text-muted)]">{row.buyerEmail}</p>
         </div>
       ),
     },
@@ -159,7 +159,7 @@ export default function AdminOrdersPage() {
   ];
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader
         title="الطلبات"
         subtitle="إدارة طلبات الشراء والمبيعات"
@@ -222,27 +222,27 @@ export default function AdminOrdersPage() {
       {/* Detail modal */}
       {detail && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-md rounded-xl border border-[var(--brand-gray-700)] bg-[var(--brand-gray-900)] p-6">
+          <div className="w-full max-w-md rounded-xl border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] p-6">
             <h2 className="mb-4 text-lg font-bold">تفاصيل الطلب</h2>
             <dl className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <dt className="text-[var(--brand-gray-400)]">رقم الطلب</dt>
+                <dt className="text-[var(--admin-text-muted)]">رقم الطلب</dt>
                 <dd><code className="text-xs">{detail.orderNumber ?? detail.id.slice(0, 8)}</code></dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-[var(--brand-gray-400)]">العميل</dt>
+                <dt className="text-[var(--admin-text-muted)]">العميل</dt>
                 <dd>{detail.buyerName}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-[var(--brand-gray-400)]">البريد</dt>
+                <dt className="text-[var(--admin-text-muted)]">البريد</dt>
                 <dd>{detail.buyerEmail}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-[var(--brand-gray-400)]">المبلغ</dt>
+                <dt className="text-[var(--admin-text-muted)]">المبلغ</dt>
                 <dd className="font-semibold text-[var(--success)]">{Number(detail.totalAmount).toFixed(2)} ج.م</dd>
               </div>
               <div className="flex justify-between items-center">
-                <dt className="text-[var(--brand-gray-400)]">الحالة</dt>
+                <dt className="text-[var(--admin-text-muted)]">الحالة</dt>
                 <dd>
                   <Select
                     value={detail.status}
@@ -254,9 +254,9 @@ export default function AdminOrdersPage() {
                     <SelectTrigger className={cn(adminFieldClass, "h-8 w-[140px] text-xs")}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] text-white">
+                    <SelectContent className="border-[var(--admin-border-strong)] bg-[var(--admin-surface)] text-[var(--admin-text)]">
                       {["PENDING", "COMPLETED", "REFUNDED", "CANCELLED"].map((s) => (
-                        <SelectItem key={s} value={s} className="text-xs focus:bg-[var(--brand-gray-700)]">
+                        <SelectItem key={s} value={s} className="text-xs focus:bg-[var(--admin-hover)]">
                           {s}
                         </SelectItem>
                       ))}

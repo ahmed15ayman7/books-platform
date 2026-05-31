@@ -86,8 +86,8 @@ export function BookDeleteButton({
         variant="outline"
         className={
           variant === "icon"
-            ? "h-9 w-9 border-[var(--brand-gray-700)] p-0 text-red-400 hover:border-red-800/60 hover:bg-red-950/30"
-            : "gap-2 border-[var(--brand-gray-700)] text-red-400 hover:border-red-800/60 hover:bg-red-950/30"
+            ? "h-9 w-9 border-[var(--admin-border-strong)] p-0 text-red-400 hover:border-red-800/60 hover:bg-red-950/30"
+            : "gap-2 border-[var(--admin-border-strong)] text-red-400 hover:border-red-800/60 hover:bg-red-950/30"
         }
         onClick={() => {
           setError("");
@@ -105,17 +105,17 @@ export function BookDeleteButton({
           aria-modal="true"
           aria-labelledby="delete-book-title"
         >
-          <div className="w-full max-w-md rounded-xl border border-[var(--brand-gray-700)] bg-[var(--brand-gray-900)] shadow-2xl">
-            <div className="flex items-start justify-between gap-3 border-b border-[var(--brand-gray-800)] px-5 py-4">
+          <div className="w-full max-w-md rounded-xl border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] shadow-2xl">
+            <div className="flex items-start justify-between gap-3 border-b border-[var(--admin-border)] px-5 py-4">
               <div className="flex items-start gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-950/50 text-red-400">
                   <AlertTriangle className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 id="delete-book-title" className="text-lg font-bold text-white">
+                  <h2 id="delete-book-title" className="text-lg font-bold text-[var(--admin-text)]">
                     تأكيد حذف الكتاب
                   </h2>
-                  <p className="mt-1 text-sm text-[var(--brand-gray-400)]">
+                  <p className="mt-1 text-sm text-[var(--admin-text-muted)]">
                     لا يمكن التراجع عن هذا الإجراء.
                   </p>
                 </div>
@@ -124,7 +124,7 @@ export function BookDeleteButton({
                 type="button"
                 onClick={() => !isPending && setOpen(false)}
                 disabled={isPending}
-                className="rounded-lg p-1 text-[var(--brand-gray-400)] hover:bg-[var(--brand-gray-800)] hover:text-white disabled:opacity-50"
+                className="rounded-lg p-1 text-[var(--admin-text-muted)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-accent)] disabled:opacity-50"
                 aria-label="إغلاق"
               >
                 <X className="h-5 w-5" />
@@ -132,10 +132,10 @@ export function BookDeleteButton({
             </div>
 
             <div className="space-y-4 p-5">
-              <p className="text-sm text-[var(--brand-gray-300)]">
+              <p className="text-sm text-[var(--admin-text-muted)]">
                 هل أنت متأكد من حذف الكتاب التالي؟
               </p>
-              <p className="rounded-lg border border-[var(--brand-gray-800)] bg-[var(--brand-gray-800)] px-3 py-2 text-sm font-medium text-white">
+              <p className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-muted)] px-3 py-2 text-sm font-medium text-[var(--admin-text)]">
                 {bookTitle}
               </p>
 
@@ -149,7 +149,7 @@ export function BookDeleteButton({
                 <Button
                   type="button"
                   variant="outline"
-                  className="border-[var(--brand-gray-700)] text-white hover:bg-[var(--brand-gray-800)]"
+                  className="border-[var(--admin-border-strong)] text-[var(--admin-text)] hover:bg-[var(--admin-hover)]"
                   disabled={isPending}
                   onClick={() => setOpen(false)}
                 >

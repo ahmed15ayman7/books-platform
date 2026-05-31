@@ -128,13 +128,13 @@ export default function AdminArticleEditPage() {
   const set = (k: keyof ArticleForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm((p) => ({ ...p, [k]: e.target.value }));
 
-  if (loading) return <div className="text-[var(--brand-gray-400)]">جاري التحميل...</div>;
+  if (loading) return <div className="text-[var(--admin-text-muted)]">جاري التحميل...</div>;
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <Link
         href={`/${locale}/admin/articles`}
-        className="mb-5 inline-flex items-center gap-2 text-sm text-[var(--brand-gray-400)] hover:text-white transition-colors"
+        className="mb-5 inline-flex items-center gap-2 text-sm text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] transition-colors"
       >
         <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
         العودة للمقالات
@@ -185,7 +185,7 @@ export default function AdminArticleEditPage() {
 
         {/* Language tabs */}
         <AdminCard>
-          <div className="mb-4 flex gap-2 border-b border-[var(--brand-gray-800)] pb-3">
+          <div className="mb-4 flex gap-2 border-b border-[var(--admin-border)] pb-3">
             {(["ar", "en"] as LangTab[]).map((l) => (
               <button
                 key={l}
@@ -194,7 +194,7 @@ export default function AdminArticleEditPage() {
                 className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors ${
                   tab === l
                     ? "bg-[var(--brand-red)] text-white"
-                    : "text-[var(--brand-gray-400)] hover:text-white"
+                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)]"
                 }`}
               >
                 {l === "ar" ? "العربية" : "English"}

@@ -137,8 +137,8 @@ export default function AdminAmbassadorsPage() {
   const renderCard = (row: Ambassador) => (
     <AdminGridCard>
       <AdminGridCardBody>
-        <h3 className="font-semibold text-white">{row.name}</h3>
-        <p className="text-xs text-[var(--brand-gray-500)]" dir="ltr">
+        <h3 className="font-semibold text-[var(--admin-text)]">{row.name}</h3>
+        <p className="text-xs text-[var(--admin-text-subtle)]" dir="ltr">
           {row.email}
         </p>
         <p className="text-lg font-bold text-[var(--warning)]">{row.commissionRate}%</p>
@@ -155,7 +155,7 @@ export default function AdminAmbassadorsPage() {
       render: (row: Ambassador) => (
         <div>
           <p className="font-medium">{row.name}</p>
-          <p className="text-xs text-[var(--brand-gray-400)]">{row.email}</p>
+          <p className="text-xs text-[var(--admin-text-muted)]">{row.email}</p>
         </div>
       ),
     },
@@ -170,7 +170,7 @@ export default function AdminAmbassadorsPage() {
       key: "totalClicks",
       label: "النقرات",
       render: (row: Ambassador) => (
-        <span className="text-[var(--brand-gray-300)]">{row.totalClicks ?? 0}</span>
+        <span className="text-[var(--admin-text-muted)]">{row.totalClicks ?? 0}</span>
       ),
     },
     {
@@ -193,7 +193,7 @@ export default function AdminAmbassadorsPage() {
   ];
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader
         title="السفراء"
         subtitle="إدارة برنامج الإحالة والعمولات"

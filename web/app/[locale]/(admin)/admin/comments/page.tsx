@@ -113,11 +113,11 @@ export default function AdminCommentsPage() {
   const renderCard = (row: Comment) => (
     <AdminGridCard>
       <AdminGridCardBody>
-        <p className="font-semibold text-white">{row.authorName}</p>
-        <p className="text-xs text-[var(--brand-gray-500)]" dir="ltr">
+        <p className="font-semibold text-[var(--admin-text)]">{row.authorName}</p>
+        <p className="text-xs text-[var(--admin-text-subtle)]" dir="ltr">
           {row.authorEmail}
         </p>
-        <p className="line-clamp-3 flex-1 text-sm text-[var(--brand-gray-300)]">{row.body}</p>
+        <p className="line-clamp-3 flex-1 text-sm text-[var(--admin-text-muted)]">{row.body}</p>
         <AdminStatusBadge status={row.status.toLowerCase()} />
       </AdminGridCardBody>
       <AdminGridCardFooter>{rowActions(row)}</AdminGridCardFooter>
@@ -131,7 +131,7 @@ export default function AdminCommentsPage() {
       render: (row: Comment) => (
         <div>
           <p className="font-medium">{row.authorName}</p>
-          <p className="text-xs text-[var(--brand-gray-400)]">{row.authorEmail}</p>
+          <p className="text-xs text-[var(--admin-text-muted)]">{row.authorEmail}</p>
         </div>
       ),
     },
@@ -139,7 +139,7 @@ export default function AdminCommentsPage() {
       key: "body",
       label: "التعليق",
       render: (row: Comment) => (
-        <p className="max-w-xs truncate text-sm text-[var(--brand-gray-300)]">{row.body}</p>
+        <p className="max-w-xs truncate text-sm text-[var(--admin-text-muted)]">{row.body}</p>
       ),
     },
     {
@@ -153,7 +153,7 @@ export default function AdminCommentsPage() {
   ];
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader
         title="التعليقات"
         subtitle="مراجعة وإدارة تعليقات الزوار"

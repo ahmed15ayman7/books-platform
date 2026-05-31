@@ -109,7 +109,7 @@ export default function AdminBooksPage() {
         <Button
           size="icon"
           variant="ghost"
-          className="h-8 w-8 text-[var(--brand-gray-400)] hover:text-white"
+          className="h-8 w-8 text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)]"
         >
           <Eye className="h-4 w-4" />
         </Button>
@@ -118,7 +118,7 @@ export default function AdminBooksPage() {
         <Button
           size="icon"
           variant="ghost"
-          className="h-8 w-8 text-[var(--brand-gray-400)] hover:text-white"
+          className="h-8 w-8 text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)]"
         >
           <Pencil className="h-4 w-4" />
         </Button>
@@ -148,7 +148,7 @@ export default function AdminBooksPage() {
       label: "العنوان (AR)",
       className: "max-w-[200px]",
       render: (row: AdminBook) => (
-        <span className="block max-w-[200px] truncate text-[var(--brand-gray-300)]">
+        <span className="block max-w-[200px] truncate text-[var(--admin-text-muted)]">
           {row.nameAr ?? "—"}
         </span>
       ),
@@ -184,11 +184,11 @@ export default function AdminBooksPage() {
     <AdminGridCard>
       <AdminGridCardMedia src={row.imageUrl} alt={row.nameAr ?? row.nameEn} />
       <AdminGridCardBody>
-        <h3 className="line-clamp-2 font-semibold text-white">
+        <h3 className="line-clamp-2 font-semibold text-[var(--admin-text)]">
           {row.nameAr ?? row.nameEn}
         </h3>
         {row.nameAr && row.nameEn && (
-          <p className="line-clamp-1 text-xs text-[var(--brand-gray-500)]" dir="ltr">
+          <p className="line-clamp-1 text-xs text-[var(--admin-text-subtle)]" dir="ltr">
             {row.nameEn}
           </p>
         )}
@@ -200,10 +200,10 @@ export default function AdminBooksPage() {
           <AdminStatusBadge status={row.published ? "published" : "draft"} />
           {row.featured && <AdminStatusBadge status="nominated" customLabel="مميز" />}
         </div>
-        <p className="mt-auto truncate text-[10px] text-[var(--brand-gray-600)]" dir="ltr">
+        <p className="mt-auto truncate text-[10px] text-[var(--admin-text-subtle)]" dir="ltr">
           /{row.slug}
         </p>
-        <p className="text-[10px] text-[var(--brand-gray-600)]">
+        <p className="text-[10px] text-[var(--admin-text-subtle)]">
           {formatAdminDateTime(row.updatedAt)}
         </p>
       </AdminGridCardBody>
@@ -212,7 +212,7 @@ export default function AdminBooksPage() {
   );
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader
         title="الكتب"
         subtitle="إدارة كتالوج الكتب بجميع التفاصيل"

@@ -115,7 +115,7 @@ export default function AdminArticlesPage() {
       key: "channel",
       label: "القناة",
       render: (row: Article) => (
-        <span className="text-xs text-[var(--brand-gray-300)]">
+        <span className="text-xs text-[var(--admin-text-muted)]">
           {row.channel ? (channelLabel[row.channel] ?? row.channel) : "—"}
         </span>
       ),
@@ -124,7 +124,7 @@ export default function AdminArticlesPage() {
       key: "date",
       label: "التاريخ",
       render: (row: Article) => (
-        <span className="text-xs text-[var(--brand-gray-400)]">
+        <span className="text-xs text-[var(--admin-text-muted)]">
           {row.date ? new Date(row.date).toLocaleDateString("ar-EG") : "—"}
         </span>
       ),
@@ -145,8 +145,8 @@ export default function AdminArticlesPage() {
     <AdminGridCard>
       <AdminGridCardMedia src={row.imageUrl} alt={row.title} fallback={<FileText className="h-10 w-10" />} />
       <AdminGridCardBody>
-        <h3 className="line-clamp-2 font-semibold text-white">{row.title}</h3>
-        <p className="text-xs text-[var(--brand-gray-500)]">
+        <h3 className="line-clamp-2 font-semibold text-[var(--admin-text)]">{row.title}</h3>
+        <p className="text-xs text-[var(--admin-text-subtle)]">
           {row.channel ? (channelLabel[row.channel] ?? row.channel) : "—"}
         </p>
         <AdminStatusBadge status={articleStatus(row.status)} />
@@ -156,7 +156,7 @@ export default function AdminArticlesPage() {
   );
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader
         title="المقالات"
         subtitle="إدارة المقالات التحريرية والميديا"

@@ -141,8 +141,8 @@ export default function AdminHomeSliderPage() {
     <div className="p-8">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">سلايدر الرئيسية</h1>
-          <p className="text-sm text-[var(--brand-gray-400)]">
+          <h1 className="text-2xl font-bold text-[var(--admin-text)]">سلايدر الرئيسية</h1>
+          <p className="text-sm text-[var(--admin-text-muted)]">
             إدارة شرائح الكاروسيل في الصفحة الرئيسية
           </p>
         </div>
@@ -154,8 +154,8 @@ export default function AdminHomeSliderPage() {
 
       <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
         {/* Form */}
-        <div className="rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)] p-6">
-          <h2 className="mb-4 font-semibold text-white">
+        <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-6">
+          <h2 className="mb-4 font-semibold text-[var(--admin-text)]">
             {editingId ? "تعديل الشريحة" : "إضافة شريحة"}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-3">
@@ -168,7 +168,7 @@ export default function AdminHomeSliderPage() {
             <Field label="رابط عند النقر" value={form.linkUrl} onChange={(v) => setForm({ ...form, linkUrl: v })} />
             <div className="flex gap-4">
               <div className="flex-1">
-                <Label className="mb-1 text-xs text-[var(--brand-gray-400)]">الترتيب</Label>
+                <Label className="mb-1 text-xs text-[var(--admin-text-muted)]">الترتيب</Label>
                 <Input
                   type="number"
                   value={form.position}
@@ -176,14 +176,14 @@ export default function AdminHomeSliderPage() {
                   className={adminFieldClass}
                 />
               </div>
-              <div className="flex items-center gap-2 pt-6 text-sm text-white">
+              <div className="flex items-center gap-2 pt-6 text-sm text-[var(--admin-text)]">
                 <Checkbox
                   id="slide-active"
                   checked={form.isActive}
                   onCheckedChange={(checked) =>
                     setForm({ ...form, isActive: checked === true })
                   }
-                  className="border-[var(--brand-gray-600)] data-[state=checked]:bg-[var(--brand-red)]"
+                  className="border-[var(--admin-input-border)] data-[state=checked]:bg-[var(--brand-red)]"
                 />
                 <Label htmlFor="slide-active" className="cursor-pointer font-normal">
                   نشط
@@ -207,29 +207,29 @@ export default function AdminHomeSliderPage() {
         {/* List */}
         <div className="space-y-3">
           {loading ? (
-            <p className="text-[var(--brand-gray-400)]">جاري التحميل...</p>
+            <p className="text-[var(--admin-text-muted)]">جاري التحميل...</p>
           ) : slides.length === 0 ? (
-            <p className="text-[var(--brand-gray-400)]">لا توجد شرائح. أضف شريحة للبدء.</p>
+            <p className="text-[var(--admin-text-muted)]">لا توجد شرائح. أضف شريحة للبدء.</p>
           ) : (
             slides.map((slide) => (
               <div
                 key={slide.id}
-                className="flex gap-4 rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)] p-4"
+                className="flex gap-4 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4"
               >
-                <div className="relative h-20 w-32 flex-shrink-0 overflow-hidden rounded-md bg-[var(--brand-gray-800)]">
+                <div className="relative h-20 w-32 flex-shrink-0 overflow-hidden rounded-md bg-[var(--admin-surface-muted)]">
                   {slide.imageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={slide.imageUrl} alt="" className="h-full w-full object-cover" />
                   ) : (
-                    <ImageIcon className="m-auto h-8 w-8 text-[var(--brand-gray-600)]" />
+                    <ImageIcon className="m-auto h-8 w-8 text-[var(--admin-text-subtle)]" />
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium text-white">{slide.titleAr}</p>
-                  <p className="text-xs text-[var(--brand-gray-500)]">
+                  <p className="truncate font-medium text-[var(--admin-text)]">{slide.titleAr}</p>
+                  <p className="text-xs text-[var(--admin-text-subtle)]">
                     ترتيب {slide.position} · {slide.isActive ? "نشط" : "معطّل"}
                   </p>
-                  <p className="mt-1 text-xs text-[var(--brand-gray-600)]">
+                  <p className="mt-1 text-xs text-[var(--admin-text-subtle)]">
                     أُنشئ: {formatAdminDateTime(slide.createdAt)} · آخر تحديث:{" "}
                     {formatAdminDateTime(slide.updatedAt)}
                   </p>
@@ -238,7 +238,7 @@ export default function AdminHomeSliderPage() {
                   <button
                     type="button"
                     onClick={() => openEdit(slide)}
-                    className="rounded p-2 text-[var(--brand-gray-400)] hover:bg-[var(--brand-gray-800)] hover:text-white"
+                    className="rounded p-2 text-[var(--admin-text-muted)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-accent)]"
                     aria-label="تعديل"
                   >
                     <Pencil className="h-4 w-4" />
@@ -276,7 +276,7 @@ function Field({
 }) {
   return (
     <div>
-      <Label className="mb-1 text-xs text-[var(--brand-gray-400)]">{label}</Label>
+      <Label className="mb-1 text-xs text-[var(--admin-text-muted)]">{label}</Label>
       {multiline ? (
         <Textarea
           value={value}

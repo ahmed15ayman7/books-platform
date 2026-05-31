@@ -35,19 +35,19 @@ export function AdminFilterSelect({
 }: AdminFilterSelectProps) {
   return (
     <div className={cn("flex flex-col gap-1", className)}>
-      <Label className="text-[10px] font-medium uppercase tracking-wide text-[var(--brand-gray-500)]">
+      <Label className="text-[10px] font-medium uppercase tracking-wide text-[var(--admin-text-subtle)]">
         {label}
       </Label>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger className={cn(adminFieldClass, "min-w-[140px] h-9")}>
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] text-white">
+        <SelectContent className="border-[var(--admin-input-border)] bg-[var(--admin-surface)] text-[var(--admin-text)]">
           {options.map((o) => (
             <SelectItem
               key={o.value}
               value={o.value}
-              className="focus:bg-[var(--brand-gray-700)] focus:text-white"
+              className="focus:bg-[var(--admin-hover)] focus:text-[var(--admin-text)]"
             >
               {o.label}
             </SelectItem>
@@ -68,19 +68,19 @@ interface AdminSortSelectProps {
 export function AdminSortSelect({ value, onChange, options, className }: AdminSortSelectProps) {
   return (
     <div className={cn("flex flex-col gap-1", className)}>
-      <Label className="text-[10px] font-medium uppercase tracking-wide text-[var(--brand-gray-500)]">
+      <Label className="text-[10px] font-medium uppercase tracking-wide text-[var(--admin-text-subtle)]">
         ترتيب حسب
       </Label>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger className={cn(adminFieldClass, "min-w-[140px] h-9")}>
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] text-white">
+        <SelectContent className="border-[var(--admin-input-border)] bg-[var(--admin-surface)] text-[var(--admin-text)]">
           {options.map((o) => (
             <SelectItem
               key={o.value}
               value={o.value}
-              className="focus:bg-[var(--brand-gray-700)] focus:text-white"
+              className="focus:bg-[var(--admin-hover)] focus:text-[var(--admin-text)]"
             >
               {o.label}
             </SelectItem>
@@ -99,7 +99,7 @@ interface AdminViewModeToggleProps {
 export function AdminViewModeToggle({ mode, onChange }: AdminViewModeToggleProps) {
   return (
     <div
-      className="flex rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] p-0.5"
+      className="flex rounded-lg border border-[var(--admin-input-border)] bg-[var(--admin-surface-muted)] p-0.5"
       role="group"
       aria-label="طريقة العرض"
     >
@@ -110,7 +110,7 @@ export function AdminViewModeToggle({ mode, onChange }: AdminViewModeToggleProps
           "inline-flex h-8 w-9 items-center justify-center rounded-md transition-colors",
           mode === "table"
             ? "bg-[var(--brand-red)] text-white"
-            : "text-[var(--brand-gray-400)] hover:text-white",
+            : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text)]",
         )}
         aria-pressed={mode === "table"}
         title="جدول"
@@ -124,7 +124,7 @@ export function AdminViewModeToggle({ mode, onChange }: AdminViewModeToggleProps
           "inline-flex h-8 w-9 items-center justify-center rounded-md transition-colors",
           mode === "grid"
             ? "bg-[var(--brand-red)] text-white"
-            : "text-[var(--brand-gray-400)] hover:text-white",
+            : "text-[var(--admin-text-muted)] hover:text-[var(--admin-text)]",
         )}
         aria-pressed={mode === "grid"}
         title="بطاقات"
@@ -153,7 +153,7 @@ export function AdminListToolbar({
   return (
     <div
       className={cn(
-        "mb-4 flex flex-col gap-3 rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)] p-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between",
+        "mb-4 flex flex-col gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between",
         className,
       )}
     >
@@ -165,7 +165,7 @@ export function AdminListToolbar({
       <div className="flex flex-wrap items-end gap-3">
         {sort}
         <div className="flex flex-col gap-1">
-          <span className="text-[10px] font-medium uppercase tracking-wide text-[var(--brand-gray-500)]">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-[var(--admin-text-subtle)]">
             العرض
           </span>
           <AdminViewModeToggle mode={viewMode} onChange={onViewModeChange} />

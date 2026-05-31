@@ -165,6 +165,22 @@
     background-color: var(--brand-red-soft);
     color: var(--brand-red);
   }
+
+  .admin-shell {
+    --admin-bg: var(--brand-gray-50);
+    --admin-surface: var(--brand-white);
+    --admin-surface-muted: var(--brand-gray-100);
+    --admin-text: var(--brand-black);
+    --admin-text-muted: var(--brand-gray-600);
+    --admin-text-subtle: var(--brand-gray-500);
+    --admin-border: var(--brand-gray-200);
+    --admin-border-strong: var(--brand-gray-300);
+    --admin-accent: var(--brand-red);
+    --admin-accent-soft: var(--brand-red-soft);
+    --admin-hover: var(--brand-gray-100);
+    --admin-input-bg: var(--brand-white);
+    --admin-input-border: var(--brand-gray-300);
+  }
 }
 
 @keyframes fade-in-up {

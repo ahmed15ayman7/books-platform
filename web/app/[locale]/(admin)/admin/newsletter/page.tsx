@@ -82,11 +82,11 @@ export default function AdminNewsletterPage() {
   const renderCard = (row: Subscriber) => (
     <AdminGridCard>
       <AdminGridCardBody>
-        <p className="font-semibold text-white" dir="ltr">
+        <p className="font-semibold text-[var(--admin-text)]" dir="ltr">
           {row.email}
         </p>
         <AdminStatusBadge status={row.status.toLowerCase()} />
-        <p className="text-xs text-[var(--brand-gray-500)]">
+        <p className="text-xs text-[var(--admin-text-subtle)]">
           {new Date(row.createdAt).toLocaleDateString("ar-EG")}
         </p>
       </AdminGridCardBody>
@@ -108,7 +108,7 @@ export default function AdminNewsletterPage() {
       key: "createdAt",
       label: "تاريخ الاشتراك",
       render: (row: Subscriber) => (
-        <span className="text-xs text-[var(--brand-gray-400)]">
+        <span className="text-xs text-[var(--admin-text-muted)]">
           {new Date(row.createdAt).toLocaleDateString("ar-EG")}
         </span>
       ),
@@ -116,7 +116,7 @@ export default function AdminNewsletterPage() {
   ];
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader
         title="النشرة البريدية"
         subtitle={`${total.toLocaleString("ar-EG")} مشترك مؤكد`}

@@ -55,9 +55,9 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
     return null;
   }
   return (
-    <div className="border-b border-[var(--brand-gray-800)] py-3 last:border-0">
-      <dt className="mb-1 text-xs font-medium text-[var(--brand-gray-500)]">{label}</dt>
-      <dd className="text-sm text-white">{value}</dd>
+    <div className="border-b border-[var(--admin-border)] py-3 last:border-0">
+      <dt className="mb-1 text-xs font-medium text-[var(--admin-text-subtle)]">{label}</dt>
+      <dd className="text-sm text-[var(--admin-text)]">{value}</dd>
     </div>
   );
 }
@@ -65,11 +65,11 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
 function DescriptionBlock({ title, text }: { title: string; text: string | null }) {
   if (!text?.trim()) return null;
   return (
-    <div className="rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)] p-5">
-      <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-[var(--brand-gray-500)]">
+    <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-5">
+      <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-[var(--admin-text-subtle)]">
         {title}
       </h3>
-      <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--brand-gray-200)]">
+      <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--admin-text-muted)]">
         {text}
       </p>
     </div>
@@ -112,10 +112,10 @@ export default async function AdminBookViewPage({ params }: Props) {
   const publicUrl = absoluteUrl(`/${locale}/books/${book.slug}`);
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <Link
         href={`/${locale}/admin/books`}
-        className="mb-6 inline-flex items-center gap-2 text-sm text-[var(--brand-gray-400)] transition-colors hover:text-white"
+        className="mb-6 inline-flex items-center gap-2 text-sm text-[var(--admin-text-muted)] transition-colors hover:text-[var(--admin-accent)]"
       >
         <ArrowLeft className="h-4 w-4" />
         العودة للقائمة
@@ -131,11 +131,11 @@ export default async function AdminBookViewPage({ params }: Props) {
             className="mt-2"
           />
           {book.nameAr && book.nameEn && book.nameAr !== book.nameEn && (
-            <p className="mt-1 text-sm text-[var(--brand-gray-400)]" dir="ltr">
+            <p className="mt-1 text-sm text-[var(--admin-text-muted)]" dir="ltr">
               {book.nameEn}
             </p>
           )}
-          <p className="mt-2 text-sm text-[var(--brand-gray-500)]" dir="ltr">
+          <p className="mt-2 text-sm text-[var(--admin-text-subtle)]" dir="ltr">
             /books/{book.slug}
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -170,9 +170,9 @@ export default async function AdminBookViewPage({ params }: Props) {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-1">
-          <div className="overflow-hidden rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)]">
+          <div className="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
             {book.imageUrl ? (
-              <div className="relative aspect-[3/4] w-full bg-[var(--brand-gray-800)]">
+              <div className="relative aspect-[3/4] w-full bg-[var(--admin-surface-muted)]">
                 <Image
                   src={book.imageUrl}
                   alt={title}
@@ -183,14 +183,14 @@ export default async function AdminBookViewPage({ params }: Props) {
                 />
               </div>
             ) : (
-              <div className="flex aspect-[3/4] items-center justify-center text-sm text-[var(--brand-gray-500)]">
+              <div className="flex aspect-[3/4] items-center justify-center text-sm text-[var(--admin-text-subtle)]">
                 لا توجد صورة غلاف
               </div>
             )}
           </div>
 
-          <div className="mt-4 rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)] p-4">
-            <h2 className="mb-2 text-xs font-bold uppercase tracking-widest text-[var(--brand-gray-500)]">
+          <div className="mt-4 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4">
+            <h2 className="mb-2 text-xs font-bold uppercase tracking-widest text-[var(--admin-text-subtle)]">
               الرابط العام
             </h2>
             <a
@@ -207,8 +207,8 @@ export default async function AdminBookViewPage({ params }: Props) {
         </div>
 
         <div className="space-y-6 lg:col-span-2">
-          <div className="rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)] px-5">
-            <h2 className="border-b border-[var(--brand-gray-800)] py-3 text-xs font-bold uppercase tracking-widest text-[var(--brand-gray-500)]">
+          <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-5">
+            <h2 className="border-b border-[var(--admin-border)] py-3 text-xs font-bold uppercase tracking-widest text-[var(--admin-text-subtle)]">
               البيانات الببليوغرافية
             </h2>
             <dl>
@@ -294,39 +294,39 @@ export default async function AdminBookViewPage({ params }: Props) {
           <DescriptionBlock title="وصف SEO (Yoast)" text={book.yoastMetadesc} />
 
           {book.authors.length > 0 && (
-            <div className="rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)] p-5">
-              <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-[var(--brand-gray-500)]">
+            <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-5">
+              <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-[var(--admin-text-subtle)]">
                 المؤلفون ({book.authors.length})
               </h2>
               <div className="space-y-4">
                 {book.authors.map((author) => (
                   <div
                     key={author.id}
-                    className="rounded-lg border border-[var(--brand-gray-800)] bg-[var(--brand-gray-950)] p-4"
+                    className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-muted)] p-4"
                   >
                     <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-                      <h3 className="text-sm font-bold text-white">
+                      <h3 className="text-sm font-bold text-[var(--admin-text)]">
                         {author.nameAr ?? author.name}
                       </h3>
                       {author.nameAr && author.name && author.nameAr !== author.name && (
-                        <span className="text-xs text-[var(--brand-gray-400)]" dir="ltr">
+                        <span className="text-xs text-[var(--admin-text-muted)]" dir="ltr">
                           {author.name}
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-[var(--brand-gray-500)]" dir="ltr">
+                    <p className="text-xs text-[var(--admin-text-subtle)]" dir="ltr">
                       /{author.slug}
                     </p>
                     {(author.bioAr?.trim() || author.bio?.trim()) && (
                       <div className="mt-3 space-y-2">
                         {author.bioAr?.trim() && (
-                          <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--brand-gray-200)]">
+                          <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--admin-text-muted)]">
                             {author.bioAr}
                           </p>
                         )}
                         {author.bio?.trim() && (
                           <p
-                            className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--brand-gray-300)]"
+                            className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--admin-text-muted)]"
                             dir="ltr"
                           >
                             {author.bio}
@@ -335,7 +335,7 @@ export default async function AdminBookViewPage({ params }: Props) {
                       </div>
                     )}
                     {author.linkedCount != null && (
-                      <p className="mt-3 text-xs text-[var(--brand-gray-500)]">
+                      <p className="mt-3 text-xs text-[var(--admin-text-subtle)]">
                         كتب مرتبطة: {author.linkedCount}
                       </p>
                     )}
@@ -346,13 +346,13 @@ export default async function AdminBookViewPage({ params }: Props) {
           )}
 
           {book.publisher && (
-            <div className="rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)] p-5">
-              <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-[var(--brand-gray-500)]">
+            <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-5">
+              <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-[var(--admin-text-subtle)]">
                 دار النشر
               </h2>
               <div className="flex flex-col gap-4 sm:flex-row">
                 {book.publisher.imageUrl && (
-                  <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-[var(--brand-gray-800)] bg-[var(--brand-gray-950)]">
+                  <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-muted)]">
                     <Image
                       src={book.publisher.imageUrl}
                       alt={book.publisher.title}
@@ -364,13 +364,13 @@ export default async function AdminBookViewPage({ params }: Props) {
                   </div>
                 )}
                 <div className="flex-1">
-                  <h3 className="text-base font-bold text-white">{book.publisher.title}</h3>
-                  <p className="mt-1 text-xs text-[var(--brand-gray-500)]" dir="ltr">
+                  <h3 className="text-base font-bold text-[var(--admin-text)]">{book.publisher.title}</h3>
+                  <p className="mt-1 text-xs text-[var(--admin-text-subtle)]" dir="ltr">
                     /{book.publisher.slug}
                   </p>
 
                   {book.publisher.excerpt?.trim() && (
-                    <p className="mt-3 whitespace-pre-wrap text-sm text-[var(--brand-gray-200)]">
+                    <p className="mt-3 whitespace-pre-wrap text-sm text-[var(--admin-text-muted)]">
                       {book.publisher.excerpt}
                     </p>
                   )}
@@ -401,15 +401,15 @@ export default async function AdminBookViewPage({ params }: Props) {
                   </div>
 
                   {book.publisher.address?.trim() && (
-                    <p className="mt-3 flex items-start gap-1.5 whitespace-pre-wrap text-sm text-[var(--brand-gray-300)]">
-                      <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--brand-gray-500)]" />
+                    <p className="mt-3 flex items-start gap-1.5 whitespace-pre-wrap text-sm text-[var(--admin-text-muted)]">
+                      <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--admin-text-subtle)]" />
                       {book.publisher.address}
                     </p>
                   )}
                 </div>
               </div>
 
-              <dl className="mt-5 border-t border-[var(--brand-gray-800)] pt-3">
+              <dl className="mt-5 border-t border-[var(--admin-border)] pt-3">
                 <DetailRow
                   label="الدول"
                   value={
@@ -443,11 +443,11 @@ export default async function AdminBookViewPage({ params }: Props) {
               </dl>
 
               {book.publisher.content?.trim() && (
-                <div className="mt-4 border-t border-[var(--brand-gray-800)] pt-4">
-                  <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-[var(--brand-gray-500)]">
+                <div className="mt-4 border-t border-[var(--admin-border)] pt-4">
+                  <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-[var(--admin-text-subtle)]">
                     نبذة عن الدار
                   </h3>
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--brand-gray-200)]">
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--admin-text-muted)]">
                     {book.publisher.content}
                   </p>
                 </div>

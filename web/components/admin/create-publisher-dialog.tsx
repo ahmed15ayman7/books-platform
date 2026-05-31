@@ -115,7 +115,7 @@ export function CreatePublisherDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto border-[var(--brand-gray-700)] bg-[var(--brand-gray-900)] text-white sm:max-w-2xl">
+      <DialogContent className="max-h-[90vh] overflow-y-auto border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text)] sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>دار نشر جديدة</DialogTitle>
         </DialogHeader>

@@ -132,9 +132,9 @@ export default function AdminSubmissionsPage() {
   const renderCard = (row: Submission) => (
     <AdminGridCard>
       <AdminGridCardBody>
-        <h3 className="line-clamp-2 font-semibold text-white">{row.workTitle}</h3>
-        <p className="text-sm text-[var(--brand-gray-400)]">{row.authorName}</p>
-        <p className="text-xs text-[var(--brand-gray-500)]">{workTypeLabel[row.workType] ?? row.workType}</p>
+        <h3 className="line-clamp-2 font-semibold text-[var(--admin-text)]">{row.workTitle}</h3>
+        <p className="text-sm text-[var(--admin-text-muted)]">{row.authorName}</p>
+        <p className="text-xs text-[var(--admin-text-subtle)]">{workTypeLabel[row.workType] ?? row.workType}</p>
         <AdminStatusBadge status={row.status.toLowerCase()} />
       </AdminGridCardBody>
       <AdminGridCardFooter>{rowActions(row)}</AdminGridCardFooter>
@@ -148,7 +148,7 @@ export default function AdminSubmissionsPage() {
       render: (row: Submission) => (
         <div>
           <p className="font-medium">{row.authorName}</p>
-          <p className="text-xs text-[var(--brand-gray-400)]">{row.authorEmail}</p>
+          <p className="text-xs text-[var(--admin-text-muted)]">{row.authorEmail}</p>
         </div>
       ),
     },
@@ -158,7 +158,7 @@ export default function AdminSubmissionsPage() {
       render: (row: Submission) => (
         <div>
           <p className="max-w-[200px] truncate">{row.workTitle}</p>
-          <p className="text-xs text-[var(--brand-gray-400)]">{workTypeLabel[row.workType] ?? row.workType}</p>
+          <p className="text-xs text-[var(--admin-text-muted)]">{workTypeLabel[row.workType] ?? row.workType}</p>
         </div>
       ),
     },
@@ -173,7 +173,7 @@ export default function AdminSubmissionsPage() {
   ];
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader
         title="طلبات النشر"
         subtitle="مراجعة الأعمال المقدمة من الكتّاب"
@@ -235,23 +235,23 @@ export default function AdminSubmissionsPage() {
       {/* Detail Modal */}
       {modal.open && modal.item && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-lg rounded-xl border border-[var(--brand-gray-700)] bg-[var(--brand-gray-900)] p-6">
+          <div className="w-full max-w-lg rounded-xl border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] p-6">
             <h2 className="mb-4 text-lg font-bold">{modal.item.workTitle}</h2>
             <dl className="space-y-2 text-sm">
               <div className="flex gap-3">
-                <dt className="text-[var(--brand-gray-400)] w-28 shrink-0">الكاتب</dt>
+                <dt className="text-[var(--admin-text-muted)] w-28 shrink-0">الكاتب</dt>
                 <dd>{modal.item.authorName}</dd>
               </div>
               <div className="flex gap-3">
-                <dt className="text-[var(--brand-gray-400)] w-28 shrink-0">البريد</dt>
+                <dt className="text-[var(--admin-text-muted)] w-28 shrink-0">البريد</dt>
                 <dd>{modal.item.authorEmail}</dd>
               </div>
               <div className="flex gap-3">
-                <dt className="text-[var(--brand-gray-400)] w-28 shrink-0">نوع العمل</dt>
+                <dt className="text-[var(--admin-text-muted)] w-28 shrink-0">نوع العمل</dt>
                 <dd>{modal.item.workType}</dd>
               </div>
               <div className="flex gap-3">
-                <dt className="text-[var(--brand-gray-400)] w-28 shrink-0">الحالة</dt>
+                <dt className="text-[var(--admin-text-muted)] w-28 shrink-0">الحالة</dt>
                 <dd><AdminStatusBadge status={modal.item.status.toLowerCase()} /></dd>
               </div>
             </dl>

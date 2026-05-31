@@ -110,12 +110,12 @@ export function AdminEntityCombobox({
         className={cn(adminFieldClass, "mb-1")}
       />
 
-      <div className="max-h-48 overflow-y-auto rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)]">
+      <div className="max-h-48 overflow-y-auto rounded-lg border border-[var(--admin-input-border)] bg-[var(--admin-surface)]">
         {showNoMatchCreate && (
           <button
             type="button"
             onClick={() => onCreateNew(q.trim())}
-            className="flex w-full items-center gap-2 border-b border-[var(--brand-gray-700)] bg-[var(--brand-gray-750)] px-3 py-2.5 text-sm font-medium text-[var(--brand-red)] hover:bg-[var(--brand-gray-700)]"
+            className="flex w-full items-center gap-2 border-b border-[var(--admin-border)] bg-[var(--admin-accent-soft)] px-3 py-2.5 text-sm font-medium text-[var(--admin-accent)] hover:bg-[var(--admin-hover)]"
           >
             <Plus className="h-4 w-4 shrink-0" />
             {createLabel}: «{q.trim()}»
@@ -123,7 +123,7 @@ export function AdminEntityCombobox({
         )}
 
         {filtered.length === 0 && !showNoMatchCreate ? (
-          <p className="px-3 py-2 text-xs text-[var(--brand-gray-500)]">{emptyLabel}</p>
+          <p className="px-3 py-2 text-xs text-[var(--admin-text-subtle)]">{emptyLabel}</p>
         ) : (
           filtered.slice(0, 40).map((o) => {
             const isSelected = selectedIds.includes(o.id);
@@ -133,10 +133,10 @@ export function AdminEntityCombobox({
                 type="button"
                 onClick={() => toggleOption(o.id)}
                 className={cn(
-                  "flex w-full items-center justify-between gap-2 border-b border-[var(--brand-gray-700)] px-3 py-2 text-start text-sm last:border-0",
+                  "flex w-full items-center justify-between gap-2 border-b border-[var(--admin-border)] px-3 py-2 text-start text-sm last:border-0",
                   isSelected
-                    ? "bg-[var(--brand-red)]/20 text-white"
-                    : "text-white hover:bg-[var(--brand-gray-700)]",
+                    ? "bg-[var(--admin-accent-soft)] text-[var(--admin-text)]"
+                    : "text-[var(--admin-text)] hover:bg-[var(--admin-hover)]",
                 )}
               >
                 <span className="truncate">{getLabel(o)}</span>
@@ -158,7 +158,7 @@ export function AdminEntityCombobox({
         <button
           type="button"
           onClick={() => onCreateNew(q.trim())}
-          className="sticky bottom-0 flex w-full items-center gap-2 border-t border-[var(--brand-gray-600)] bg-[var(--brand-gray-900)] px-3 py-2.5 text-sm text-[var(--brand-gray-300)] hover:bg-[var(--brand-gray-700)] hover:text-white"
+          className="sticky bottom-0 flex w-full items-center gap-2 border-t border-[var(--admin-border)] bg-[var(--admin-surface-muted)] px-3 py-2.5 text-sm text-[var(--admin-text-muted)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-accent)]"
         >
           <Plus className="h-4 w-4 shrink-0 text-[var(--brand-red)]" />
           {createLabel}

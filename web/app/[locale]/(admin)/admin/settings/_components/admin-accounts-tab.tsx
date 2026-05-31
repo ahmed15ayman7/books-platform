@@ -53,7 +53,7 @@ export function AdminAccountsTab() {
 
   if (!session?.isSuperAdmin) {
     return (
-      <p className="text-sm text-[var(--brand-gray-500)]">
+      <p className="text-sm text-[var(--admin-text-subtle)]">
         هذا القسم متاح للمدير الرئيسي فقط.
       </p>
     );
@@ -62,25 +62,25 @@ export function AdminAccountsTab() {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <AdminCard title="حسابات المديرين">
-        <ul className="divide-y divide-[var(--brand-gray-800)]">
+        <ul className="divide-y divide-[var(--admin-border)]">
           {users.map((u) => (
             <li key={u.id}>
               <button
                 type="button"
                 onClick={() => setSelectedId(u.id)}
-                className={`w-full px-3 py-3 text-start text-sm transition-colors hover:bg-[var(--brand-gray-800)] ${
-                  selectedId === u.id ? "bg-[var(--brand-gray-800)]" : ""
+                className={`w-full px-3 py-3 text-start text-sm transition-colors hover:bg-[var(--admin-hover)] ${
+                  selectedId === u.id ? "bg-[var(--admin-surface-muted)]" : ""
                 }`}
               >
-                <p className="font-medium text-white">
+                <p className="font-medium text-[var(--admin-text)]">
                   {u.fullName}
                   {u.isSuperAdmin && (
                     <span className="ms-2 text-xs text-[var(--brand-red)]">رئيسي</span>
                   )}
                 </p>
-                <p className="text-xs text-[var(--brand-gray-500)]">{u.email}</p>
+                <p className="text-xs text-[var(--admin-text-subtle)]">{u.email}</p>
                 {u.lastLoginAt && (
-                  <p className="mt-1 text-xs text-[var(--brand-gray-600)]">
+                  <p className="mt-1 text-xs text-[var(--admin-text-subtle)]">
                     آخر دخول: {new Date(u.lastLoginAt).toLocaleString("ar-EG")}
                   </p>
                 )}
@@ -94,7 +94,7 @@ export function AdminAccountsTab() {
         {selectedId ? (
           <LoginHistoryTable logs={logs} />
         ) : (
-          <p className="py-8 text-center text-sm text-[var(--brand-gray-500)]">
+          <p className="py-8 text-center text-sm text-[var(--admin-text-subtle)]">
             اختر حساباً لعرض السجل
           </p>
         )}

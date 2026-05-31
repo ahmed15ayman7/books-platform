@@ -139,15 +139,15 @@ export default function AdminB2BPage() {
   const renderCard = (row: B2BSubscription) => (
     <AdminGridCard>
       <AdminGridCardBody>
-        <h3 className="font-semibold text-white">{row.clientName}</h3>
-        <p className="text-xs text-[var(--brand-gray-500)]" dir="ltr">
+        <h3 className="font-semibold text-[var(--admin-text)]">{row.clientName}</h3>
+        <p className="text-xs text-[var(--admin-text-subtle)]" dir="ltr">
           {row.clientEmail}
         </p>
-        <p className="text-xs text-[var(--brand-gray-400)]">
+        <p className="text-xs text-[var(--admin-text-muted)]">
           {packageOptions.find((p) => p.value === row.packageType)?.label ?? row.packageType}
         </p>
         <AdminStatusBadge status={row.status.toLowerCase()} />
-        <p className="text-[10px] text-[var(--brand-gray-600)]">
+        <p className="text-[10px] text-[var(--admin-text-subtle)]">
           ينتهي {new Date(row.endDate).toLocaleDateString("ar-EG")}
         </p>
       </AdminGridCardBody>
@@ -162,7 +162,7 @@ export default function AdminB2BPage() {
       render: (row: B2BSubscription) => (
         <div>
           <p className="font-medium">{row.clientName}</p>
-          <p className="text-xs text-[var(--brand-gray-400)]">{row.clientEmail}</p>
+          <p className="text-xs text-[var(--admin-text-muted)]">{row.clientEmail}</p>
         </div>
       ),
     },
@@ -170,7 +170,7 @@ export default function AdminB2BPage() {
       key: "packageType",
       label: "الحزمة",
       render: (row: B2BSubscription) => (
-        <span className="text-[var(--brand-gray-300)] text-xs">
+        <span className="text-[var(--admin-text-muted)] text-xs">
           {packageOptions.find((p) => p.value === row.packageType)?.label ?? row.packageType}
         </span>
       ),
@@ -184,7 +184,7 @@ export default function AdminB2BPage() {
       key: "endDate",
       label: "تاريخ الانتهاء",
       render: (row: B2BSubscription) => (
-        <span className="text-xs text-[var(--brand-gray-400)]">
+        <span className="text-xs text-[var(--admin-text-muted)]">
           {new Date(row.endDate).toLocaleDateString("ar-EG")}
         </span>
       ),
@@ -195,7 +195,7 @@ export default function AdminB2BPage() {
   ];
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader title="B2B المؤسسي" subtitle="إدارة اشتراكات المؤسسات والمكتبات" />
 
       <div className="grid gap-6 lg:grid-cols-3">

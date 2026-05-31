@@ -37,12 +37,12 @@ export function AdminTopbar() {
   const crumbs = adminIndex >= 0 ? segments.slice(adminIndex) : [];
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)]/95 px-6 backdrop-blur-sm">
+    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[var(--admin-border)] bg-[var(--admin-surface)]/95 px-6 backdrop-blur-sm">
       {/* Breadcrumbs */}
       <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm">
         <Link
           href={`/${locale}/admin/dashboard`}
-          className="flex items-center gap-1 text-[var(--brand-gray-500)] hover:text-white transition-colors"
+          className="flex items-center gap-1 text-[var(--admin-text-subtle)] hover:text-[var(--admin-accent)] transition-colors"
         >
           <Home className="h-3.5 w-3.5" />
         </Link>
@@ -51,12 +51,12 @@ export function AdminTopbar() {
           const isLast = i === crumbs.length - 1;
           return (
             <span key={seg} className="flex items-center gap-1.5">
-              <ChevronRight className="h-3 w-3 text-[var(--brand-gray-700)] rtl:rotate-180" />
+              <ChevronRight className="h-3 w-3 text-[var(--admin-border-strong)] rtl:rotate-180" />
               <span
                 className={
                   isLast
-                    ? "font-medium text-white"
-                    : "text-[var(--brand-gray-500)]"
+                    ? "font-medium text-[var(--admin-text)]"
+                    : "text-[var(--admin-text-subtle)]"
                 }
               >
                 {label}
@@ -70,7 +70,7 @@ export function AdminTopbar() {
       <div className="flex items-center gap-2">
         <button
           aria-label="الإشعارات"
-          className="relative flex h-8 w-8 items-center justify-center rounded-lg text-[var(--brand-gray-400)] hover:bg-[var(--brand-gray-800)] hover:text-white transition-colors"
+          className="relative flex h-8 w-8 items-center justify-center rounded-lg text-[var(--admin-text-muted)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-accent)] transition-colors"
         >
           <Bell className="h-4 w-4" />
         </button>

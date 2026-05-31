@@ -106,7 +106,7 @@ export function CreateCategoryDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-[var(--brand-gray-700)] bg-[var(--brand-gray-900)] text-white sm:max-w-md">
+      <DialogContent className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text)] sm:max-w-md">
         <DialogHeader>
           <DialogTitle>تصنيف جديد</DialogTitle>
         </DialogHeader>
