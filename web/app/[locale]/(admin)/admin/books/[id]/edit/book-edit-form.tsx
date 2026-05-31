@@ -3,7 +3,20 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Save, Loader2, CheckCircle2, AlertCircle, X } from "lucide-react";
-import { updateBook, type BookEditData } from "./actions";
+import { createBook, updateBook, type BookEditData } from "./actions";
+import { adminFieldClass } from "@/components/admin/admin-form-field";
+import { AdminMarkdownHint } from "@/components/admin/admin-markdown-hint";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 /* ─── Types ─────────────────────────────────────────────────────────── */
@@ -12,10 +25,21 @@ interface Category   { id: string; name: string; nameAr: string | null; slug: st
 interface Author     { id: string; name: string; nameAr: string | null; slug: string }
 
 interface BookEditFormProps {
-  book: BookEditData & { id: string };
+  bookId?: string;
+  locale: string;
+  initial: BookEditData;
   publishers: Publisher[];
   categories: Category[];
   authors: Author[];
+}
+
+function slugify(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 const sectionCardCls =
@@ -23,22 +47,50 @@ const sectionCardCls =
 const sectionHeaderCls =
   "border-b border-[var(--brand-gray-800)] bg-[var(--brand-gray-800)] px-5 py-3";
 
-/* ─── Small UI helpers ───────────────────────────────────────────────── */
-const inputCls = [
-  "w-full rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] px-3 py-2 text-sm text-white",
-  "placeholder:text-[var(--brand-gray-500)]",
-  "focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)] focus:border-transparent",
-  "disabled:opacity-50 disabled:cursor-not-allowed",
-].join(" ");
+const fieldCls = adminFieldClass;
 
-const textareaCls = inputCls + " min-h-[100px] resize-y";
-
-function Label({ children, htmlFor, required }: { children: React.ReactNode; htmlFor?: string; required?: boolean }) {
+function FieldLabel({
+  children,
+  htmlFor,
+  required,
+}: {
+  children: React.ReactNode;
+  htmlFor?: string;
+  required?: boolean;
+}) {
   return (
-    <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-medium text-[var(--brand-gray-300)]">
+    <Label
+      htmlFor={htmlFor}
+      className="mb-1.5 block text-sm font-medium text-[var(--brand-gray-300)]"
+    >
       {children}
       {required && <span className="ms-0.5 text-[var(--brand-red)]">*</span>}
-    </label>
+    </Label>
+  );
+}
+
+function BookSelect({
+  id,
+  value,
+  onValueChange,
+  placeholder,
+  children,
+}: {
+  id: string;
+  value: string;
+  onValueChange: (value: string) => void;
+  placeholder?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Select value={value || "_empty"} onValueChange={(v) => onValueChange(v === "_empty" ? "" : v)}>
+      <SelectTrigger id={id} className={fieldCls}>
+        <SelectValue placeholder={placeholder ?? "اختر..."} />
+      </SelectTrigger>
+      <SelectContent className="border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] text-white">
+        {children}
+      </SelectContent>
+    </Select>
   );
 }
 
@@ -58,19 +110,28 @@ function SectionCard({ title, children }: { title: string; children: React.React
 }
 
 function CheckboxField({
-  id, label, checked, onChange,
-}: { id: string; label: string; checked: boolean; onChange: (v: boolean) => void }) {
+  id,
+  label,
+  checked,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
   return (
-    <label htmlFor={id} className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-[var(--brand-gray-700)] px-4 py-3 transition-colors hover:bg-[var(--brand-gray-800)]">
-      <input
+    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-[var(--brand-gray-700)] px-4 py-3 transition-colors hover:bg-[var(--brand-gray-800)]">
+      <Checkbox
         id={id}
-        type="checkbox"
         checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        className="h-4 w-4 rounded accent-[var(--brand-red)]"
+        onCheckedChange={(state) => onChange(state === true)}
+        className="border-[var(--brand-gray-600)] data-[state=checked]:bg-[var(--brand-red)] data-[state=checked]:border-[var(--brand-red)]"
       />
-      <span className="text-sm font-medium text-[var(--brand-gray-300)]">{label}</span>
-    </label>
+      <Label htmlFor={id} className="cursor-pointer text-sm font-medium text-[var(--brand-gray-300)]">
+        {label}
+      </Label>
+    </div>
   );
 }
 
@@ -103,7 +164,7 @@ function MultiSelect({
 
   return (
     <div>
-      <Label htmlFor={id}>{label}</Label>
+      <FieldLabel htmlFor={id}>{label}</FieldLabel>
       {/* Selected chips */}
       {selectedItems.length > 0 && (
         <div className="mb-2 flex flex-wrap gap-1.5">
@@ -125,13 +186,13 @@ function MultiSelect({
         </div>
       )}
       {/* Search */}
-      <input
+      <Input
         id={id}
         type="text"
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder={`ابحث في ${label}…`}
-        className={inputCls + " mb-1"}
+        className={cn(fieldCls, "mb-1")}
       />
       {/* List */}
       <div className="max-h-44 overflow-y-auto rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)]">
@@ -143,11 +204,10 @@ function MultiSelect({
               key={o.id}
               className="flex cursor-pointer items-center gap-2.5 px-3 py-2 text-sm text-white hover:bg-[var(--brand-gray-700)] border-b border-[var(--brand-gray-700)] last:border-0"
             >
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={selected.includes(o.id)}
-                onChange={() => toggle(o.id)}
-                className="h-4 w-4 rounded accent-[var(--brand-red)] shrink-0"
+                onCheckedChange={() => toggle(o.id)}
+                className="shrink-0 border-[var(--brand-gray-600)] data-[state=checked]:bg-[var(--brand-red)] data-[state=checked]:border-[var(--brand-red)]"
               />
               <span className="truncate">{getLabel(o)}</span>
             </label>
@@ -159,43 +219,21 @@ function MultiSelect({
 }
 
 /* ─── Main form ──────────────────────────────────────────────────────── */
-export function BookEditForm({ book, publishers, categories, authors }: BookEditFormProps) {
+export function BookEditForm({
+  bookId,
+  locale,
+  initial,
+  publishers,
+  categories,
+  authors,
+}: BookEditFormProps) {
   const router = useRouter();
+  const isCreate = !bookId;
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Form state — mirrors BookEditData
-  const [form, setForm] = useState<BookEditData>({
-    nameEn: book.nameEn,
-    nameAr: book.nameAr,
-    slug: book.slug,
-    isbn: book.isbn,
-    imageUrl: book.imageUrl,
-    language: book.language,
-    publicationYear: book.publicationYear,
-    country: book.country,
-    pageCount: book.pageCount,
-    edition: book.edition,
-    dimensions: book.dimensions,
-    translationStatus: book.translationStatus,
-    purchaseOption: book.purchaseOption,
-    price: book.price,
-    currency: book.currency,
-    referralLink: book.referralLink,
-    shortDesc: book.shortDesc,
-    shortDescAr: book.shortDescAr,
-    description: book.description,
-    descriptionAr: book.descriptionAr,
-    notes: book.notes,
-    published: book.published,
-    featured: book.featured,
-    inStock: book.inStock,
-    publisherId: book.publisherId,
-    primaryCategoryId: book.primaryCategoryId,
-    categoryIds: book.categoryIds,
-    authorIds: book.authorIds,
-  });
+  const [form, setForm] = useState<BookEditData>(initial);
 
   function set<K extends keyof BookEditData>(key: K, value: BookEditData[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -204,11 +242,22 @@ export function BookEditForm({ book, publishers, categories, authors }: BookEdit
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("idle");
+
+    const payload: BookEditData = {
+      ...form,
+      slug: form.slug.trim() || slugify(form.nameEn),
+    };
+
     startTransition(async () => {
       try {
-        await updateBook(book.id, form);
-        setStatus("success");
-        setTimeout(() => setStatus("idle"), 3000);
+        if (bookId) {
+          await updateBook(bookId, payload);
+          setStatus("success");
+          setTimeout(() => setStatus("idle"), 3000);
+        } else {
+          const result = await createBook(payload);
+          router.push(`/${locale}/admin/books/${result.id}`);
+        }
       } catch (err) {
         setStatus("error");
         setErrorMsg(err instanceof Error ? err.message : "حدث خطأ غير متوقع");
@@ -219,7 +268,7 @@ export function BookEditForm({ book, publishers, categories, authors }: BookEdit
   return (
     <form onSubmit={handleSubmit} className="space-y-6" dir="rtl">
       {/* ── Status banner ───────────────────────────────────────── */}
-      {status === "success" && (
+      {status === "success" && !isCreate && (
         <div className="flex items-center gap-2 rounded-xl border border-green-800/50 bg-green-950/40 px-4 py-3 text-sm text-green-400">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           تم حفظ التغييرات بنجاح
@@ -235,23 +284,23 @@ export function BookEditForm({ book, publishers, categories, authors }: BookEdit
       {/* ── 1. Book Identity ─────────────────────────────────────── */}
       <SectionCard title="بيانات الكتاب الأساسية">
         <Field className="sm:col-span-2">
-          <Label htmlFor="nameAr" required>الاسم بالعربية</Label>
-          <input id="nameAr" className={inputCls} value={form.nameAr} onChange={(e) => set("nameAr", e.target.value)} placeholder="اسم الكتاب بالعربية" />
+          <FieldLabel htmlFor="nameAr" required>الاسم بالعربية</FieldLabel>
+          <Input id="nameAr" className={fieldCls} value={form.nameAr} onChange={(e) => set("nameAr", e.target.value)} placeholder="اسم الكتاب بالعربية" />
         </Field>
 
         <Field className="sm:col-span-2">
-          <Label htmlFor="nameEn" required>الاسم بالإنجليزية</Label>
-          <input id="nameEn" className={inputCls} value={form.nameEn} onChange={(e) => set("nameEn", e.target.value)} placeholder="Book name in English" dir="ltr" />
+          <FieldLabel htmlFor="nameEn" required>الاسم بالإنجليزية</FieldLabel>
+          <Input id="nameEn" className={fieldCls} value={form.nameEn} onChange={(e) => set("nameEn", e.target.value)} placeholder="Book name in English" dir="ltr" />
         </Field>
 
         <Field className="sm:col-span-2">
-          <Label htmlFor="slug" required>الرابط المختصر (Slug)</Label>
-          <input id="slug" className={inputCls} value={form.slug} onChange={(e) => set("slug", e.target.value)} placeholder="book-slug-url" dir="ltr" />
+          <FieldLabel htmlFor="slug" required>الرابط المختصر (Slug)</FieldLabel>
+          <Input id="slug" className={fieldCls} value={form.slug} onChange={(e) => set("slug", e.target.value)} placeholder="book-slug-url" dir="ltr" />
         </Field>
 
         <Field className="sm:col-span-2">
-          <Label htmlFor="imageUrl">رابط صورة الغلاف</Label>
-          <input id="imageUrl" type="url" className={inputCls} value={form.imageUrl} onChange={(e) => set("imageUrl", e.target.value)} placeholder="https://..." dir="ltr" />
+          <FieldLabel htmlFor="imageUrl">رابط صورة الغلاف</FieldLabel>
+          <Input id="imageUrl" type="url" className={fieldCls} value={form.imageUrl} onChange={(e) => set("imageUrl", e.target.value)} placeholder="https://..." dir="ltr" />
           {form.imageUrl && (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={form.imageUrl} alt="cover preview" className="mt-2 h-32 w-auto rounded-lg border border-[var(--brand-gray-700)] object-contain" />
@@ -262,56 +311,81 @@ export function BookEditForm({ book, publishers, categories, authors }: BookEdit
       {/* ── 2. Bibliographic Data ────────────────────────────────── */}
       <SectionCard title="البيانات الببليوغرافية">
         <Field>
-          <Label htmlFor="isbn">ISBN</Label>
-          <input id="isbn" className={inputCls} value={form.isbn} onChange={(e) => set("isbn", e.target.value)} placeholder="978-3-16-148410-0" dir="ltr" />
+          <FieldLabel htmlFor="isbn">ISBN</FieldLabel>
+          <Input id="isbn" className={fieldCls} value={form.isbn} onChange={(e) => set("isbn", e.target.value)} placeholder="978-3-16-148410-0" dir="ltr" />
         </Field>
 
         <Field>
-          <Label htmlFor="language">اللغة الأصلية</Label>
-          <select id="language" className={inputCls} value={form.language} onChange={(e) => set("language", e.target.value)}>
-            <option value="">— اختر اللغة —</option>
-            {[
-              ["ar", "العربية"],["en", "الإنجليزية"],["fr", "الفرنسية"],["de", "الألمانية"],
-              ["es", "الإسبانية"],["it", "الإيطالية"],["zh", "الصينية"],["ja", "اليابانية"],
-              ["ru", "الروسية"],["pt", "البرتغالية"],["tr", "التركية"],["fa", "الفارسية"],["ur", "الأردية"],
-            ].map(([code, name]) => (
-              <option key={code} value={code}>{name} ({code?.toUpperCase()})</option>
+          <FieldLabel htmlFor="language">اللغة الأصلية</FieldLabel>
+          <BookSelect
+            id="language"
+            value={form.language}
+            onValueChange={(v) => set("language", v)}
+            placeholder="— اختر اللغة —"
+          >
+            <SelectItem value="_empty" className="focus:bg-[var(--brand-gray-700)]">
+              — اختر اللغة —
+            </SelectItem>
+            {(
+              [
+                ["ar", "العربية"],
+                ["en", "الإنجليزية"],
+                ["fr", "الفرنسية"],
+                ["de", "الألمانية"],
+                ["es", "الإسبانية"],
+                ["it", "الإيطالية"],
+                ["zh", "الصينية"],
+                ["ja", "اليابانية"],
+                ["ru", "الروسية"],
+                ["pt", "البرتغالية"],
+                ["tr", "التركية"],
+                ["fa", "الفارسية"],
+                ["ur", "الأردية"],
+              ] as [string, string][]
+            ).map(([code, name]) => (
+              <SelectItem key={code} value={code} className="focus:bg-[var(--brand-gray-700)]">
+                {name} ({code.toUpperCase()})
+              </SelectItem>
             ))}
-          </select>
+          </BookSelect>
         </Field>
 
         <Field>
-          <Label htmlFor="publicationYear">سنة النشر</Label>
-          <input id="publicationYear" type="number" className={inputCls} value={form.publicationYear} onChange={(e) => set("publicationYear", e.target.value)} placeholder="2024" min="1800" max="2100" dir="ltr" />
+          <FieldLabel htmlFor="publicationYear">سنة النشر</FieldLabel>
+          <Input id="publicationYear" type="number" className={fieldCls} value={form.publicationYear} onChange={(e) => set("publicationYear", e.target.value)} placeholder="2024" min="1800" max="2100" dir="ltr" />
         </Field>
 
         <Field>
-          <Label htmlFor="country">بلد النشر</Label>
-          <input id="country" className={inputCls} value={form.country} onChange={(e) => set("country", e.target.value)} placeholder="مثال: المملكة العربية السعودية" />
+          <FieldLabel htmlFor="country">بلد النشر</FieldLabel>
+          <Input id="country" className={fieldCls} value={form.country} onChange={(e) => set("country", e.target.value)} placeholder="مثال: المملكة العربية السعودية" />
         </Field>
 
         <Field>
-          <Label htmlFor="pageCount">عدد الصفحات</Label>
-          <input id="pageCount" type="number" className={inputCls} value={form.pageCount} onChange={(e) => set("pageCount", e.target.value)} placeholder="320" min="1" dir="ltr" />
+          <FieldLabel htmlFor="pageCount">عدد الصفحات</FieldLabel>
+          <Input id="pageCount" type="number" className={fieldCls} value={form.pageCount} onChange={(e) => set("pageCount", e.target.value)} placeholder="320" min="1" dir="ltr" />
         </Field>
 
         <Field>
-          <Label htmlFor="edition">الطبعة</Label>
-          <input id="edition" className={inputCls} value={form.edition} onChange={(e) => set("edition", e.target.value)} placeholder="مثال: الطبعة الثالثة" />
+          <FieldLabel htmlFor="edition">الطبعة</FieldLabel>
+          <Input id="edition" className={fieldCls} value={form.edition} onChange={(e) => set("edition", e.target.value)} placeholder="مثال: الطبعة الثالثة" />
         </Field>
 
         <Field>
-          <Label htmlFor="dimensions">الحجم / المقاسات</Label>
-          <input id="dimensions" className={inputCls} value={form.dimensions} onChange={(e) => set("dimensions", e.target.value)} placeholder="مثال: 24 × 17 سم" />
+          <FieldLabel htmlFor="dimensions">الحجم / المقاسات</FieldLabel>
+          <Input id="dimensions" className={fieldCls} value={form.dimensions} onChange={(e) => set("dimensions", e.target.value)} placeholder="مثال: 24 × 17 سم" />
         </Field>
 
         <Field>
-          <Label htmlFor="translationStatus">حالة الترجمة</Label>
-          <select id="translationStatus" className={inputCls} value={form.translationStatus} onChange={(e) => set("translationStatus", e.target.value)}>
-            <option value="NOT_TRANSLATED">غير مترجم</option>
-            <option value="NOMINATED">مرشح للترجمة</option>
-            <option value="TRANSLATED">مترجم</option>
-          </select>
+          <FieldLabel htmlFor="translationStatus">حالة الترجمة</FieldLabel>
+          <BookSelect
+            id="translationStatus"
+            value={form.translationStatus}
+            onValueChange={(v) => set("translationStatus", v)}
+          >
+            <SelectItem value="NOT_TRANSLATED" className="focus:bg-[var(--brand-gray-700)]">غير مترجم</SelectItem>
+            <SelectItem value="NOMINATED" className="focus:bg-[var(--brand-gray-700)]">مرشح للترجمة</SelectItem>
+            <SelectItem value="TRANSLATED" className="focus:bg-[var(--brand-gray-700)]">مترجم</SelectItem>
+          </BookSelect>
         </Field>
       </SectionCard>
 
@@ -335,23 +409,41 @@ export function BookEditForm({ book, publishers, categories, authors }: BookEdit
       {/* ── 4. Publisher & Categories ────────────────────────────── */}
       <SectionCard title="دار النشر والتصنيفات">
         <Field className="sm:col-span-2">
-          <Label htmlFor="publisherId">دار النشر</Label>
-          <select id="publisherId" className={inputCls} value={form.publisherId} onChange={(e) => set("publisherId", e.target.value)}>
-            <option value="">— بدون دار نشر —</option>
+          <FieldLabel htmlFor="publisherId">دار النشر</FieldLabel>
+          <BookSelect
+            id="publisherId"
+            value={form.publisherId}
+            onValueChange={(v) => set("publisherId", v)}
+            placeholder="— بدون دار نشر —"
+          >
+            <SelectItem value="_empty" className="focus:bg-[var(--brand-gray-700)]">
+              — بدون دار نشر —
+            </SelectItem>
             {publishers.map((p) => (
-              <option key={p.id} value={p.id}>{p.title}</option>
+              <SelectItem key={p.id} value={p.id} className="focus:bg-[var(--brand-gray-700)]">
+                {p.title}
+              </SelectItem>
             ))}
-          </select>
+          </BookSelect>
         </Field>
 
         <Field className="sm:col-span-2">
-          <Label htmlFor="primaryCategoryId">التصنيف الرئيسي</Label>
-          <select id="primaryCategoryId" className={inputCls} value={form.primaryCategoryId} onChange={(e) => set("primaryCategoryId", e.target.value)}>
-            <option value="">— بدون تصنيف —</option>
+          <FieldLabel htmlFor="primaryCategoryId">التصنيف الرئيسي</FieldLabel>
+          <BookSelect
+            id="primaryCategoryId"
+            value={form.primaryCategoryId}
+            onValueChange={(v) => set("primaryCategoryId", v)}
+            placeholder="— بدون تصنيف —"
+          >
+            <SelectItem value="_empty" className="focus:bg-[var(--brand-gray-700)]">
+              — بدون تصنيف —
+            </SelectItem>
             {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.nameAr ?? c.name}</option>
+              <SelectItem key={c.id} value={c.id} className="focus:bg-[var(--brand-gray-700)]">
+                {c.nameAr ?? c.name}
+              </SelectItem>
             ))}
-          </select>
+          </BookSelect>
         </Field>
 
         <Field className="sm:col-span-2">
@@ -369,31 +461,37 @@ export function BookEditForm({ book, publishers, categories, authors }: BookEdit
       {/* ── 5. Status & Commerce ─────────────────────────────────── */}
       <SectionCard title="الحالة والتسعير">
         <Field>
-          <Label htmlFor="purchaseOption">خيار الشراء</Label>
-          <select id="purchaseOption" className={inputCls} value={form.purchaseOption} onChange={(e) => set("purchaseOption", e.target.value)}>
-            <option value="NOT_AVAILABLE">غير متاح للشراء</option>
-            <option value="DIRECT">شراء مباشر</option>
-            <option value="REFERRAL">رابط إحالة</option>
-          </select>
+          <FieldLabel htmlFor="purchaseOption">خيار الشراء</FieldLabel>
+          <BookSelect
+            id="purchaseOption"
+            value={form.purchaseOption}
+            onValueChange={(v) => set("purchaseOption", v)}
+          >
+            <SelectItem value="NOT_AVAILABLE" className="focus:bg-[var(--brand-gray-700)]">غير متاح للشراء</SelectItem>
+            <SelectItem value="DIRECT" className="focus:bg-[var(--brand-gray-700)]">شراء مباشر</SelectItem>
+            <SelectItem value="REFERRAL" className="focus:bg-[var(--brand-gray-700)]">رابط إحالة</SelectItem>
+          </BookSelect>
         </Field>
 
         <Field>
-          <Label htmlFor="currency">العملة</Label>
-          <select id="currency" className={inputCls} value={form.currency} onChange={(e) => set("currency", e.target.value)}>
+          <FieldLabel htmlFor="currency">العملة</FieldLabel>
+          <BookSelect id="currency" value={form.currency} onValueChange={(v) => set("currency", v)}>
             {["USD","EUR","GBP","SAR","AED","EGP","KWD","BHD","QAR","OMR","JOD"].map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <SelectItem key={c} value={c} className="focus:bg-[var(--brand-gray-700)]">
+                {c}
+              </SelectItem>
             ))}
-          </select>
+          </BookSelect>
         </Field>
 
         <Field>
-          <Label htmlFor="price">السعر</Label>
-          <input id="price" type="number" className={inputCls} value={form.price} onChange={(e) => set("price", e.target.value)} placeholder="0.00" step="0.01" min="0" dir="ltr" />
+          <FieldLabel htmlFor="price">السعر</FieldLabel>
+          <Input id="price" type="number" className={fieldCls} value={form.price} onChange={(e) => set("price", e.target.value)} placeholder="0.00" step="0.01" min="0" dir="ltr" />
         </Field>
 
         <Field className="sm:col-span-2">
-          <Label htmlFor="referralLink">رابط الإحالة / رابط الشراء</Label>
-          <input id="referralLink" type="url" className={inputCls} value={form.referralLink} onChange={(e) => set("referralLink", e.target.value)} placeholder="https://..." dir="ltr" />
+          <FieldLabel htmlFor="referralLink">رابط الإحالة / رابط الشراء</FieldLabel>
+          <Input id="referralLink" type="url" className={fieldCls} value={form.referralLink} onChange={(e) => set("referralLink", e.target.value)} placeholder="https://..." dir="ltr" />
         </Field>
 
         {/* Checkboxes row */}
@@ -411,28 +509,58 @@ export function BookEditForm({ book, publishers, categories, authors }: BookEdit
         </div>
         <div className="grid grid-cols-1 gap-5 p-5 lg:grid-cols-2">
           <Field>
-            <Label htmlFor="shortDescAr">وصف قصير — عربي</Label>
-            <textarea id="shortDescAr" className={textareaCls} value={form.shortDescAr} onChange={(e) => set("shortDescAr", e.target.value)} placeholder="ملخص قصير بالعربية…" />
+            <FieldLabel htmlFor="shortDescAr">مقتطف قصير — عربي</FieldLabel>
+            <Textarea
+              id="shortDescAr"
+              className={cn(fieldCls, "min-h-[100px] resize-y")}
+              value={form.shortDescAr}
+              onChange={(e) => set("shortDescAr", e.target.value)}
+              placeholder="جملة أو فقرتان تظهران فوق الملخص في صفحة الكتاب…"
+            />
           </Field>
 
           <Field>
-            <Label htmlFor="shortDesc">وصف قصير — إنجليزي</Label>
-            <textarea id="shortDesc" className={textareaCls} value={form.shortDesc} onChange={(e) => set("shortDesc", e.target.value)} placeholder="Short description in English…" dir="ltr" />
-          </Field>
-
-          <Field>
-            <Label htmlFor="descriptionAr">الوصف الكامل — عربي</Label>
-            <textarea id="descriptionAr" className={textareaCls + " min-h-[160px]"} value={form.descriptionAr} onChange={(e) => set("descriptionAr", e.target.value)} placeholder="الوصف الكامل للكتاب بالعربية…" />
-          </Field>
-
-          <Field>
-            <Label htmlFor="description">الوصف الكامل — إنجليزي</Label>
-            <textarea id="description" className={textareaCls + " min-h-[160px]"} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Full description in English…" dir="ltr" />
+            <FieldLabel htmlFor="shortDesc">مقتطف قصير — إنجليزي</FieldLabel>
+            <Textarea
+              id="shortDesc"
+              className={cn(fieldCls, "min-h-[100px] resize-y")}
+              value={form.shortDesc}
+              onChange={(e) => set("shortDesc", e.target.value)}
+              placeholder="Short lead text shown above the summary…"
+              dir="ltr"
+            />
           </Field>
 
           <Field className="lg:col-span-2">
-            <Label htmlFor="notes">ملاحظات داخلية</Label>
-            <textarea id="notes" className={textareaCls} value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="ملاحظات للفريق الداخلي فقط…" />
+            <AdminMarkdownHint />
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="descriptionAr">ملخص الكتاب (Markdown) — عربي</FieldLabel>
+            <Textarea
+              id="descriptionAr"
+              className={cn(fieldCls, "min-h-[220px] resize-y font-mono text-[13px]")}
+              value={form.descriptionAr}
+              onChange={(e) => set("descriptionAr", e.target.value)}
+              placeholder={"## فكرة الكتاب\n\n**كلمة مفتاحية** مهمة في السياق…\n\n- نقطة أولى\n- نقطة ثانية"}
+            />
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="description">ملخص الكتاب (Markdown) — إنجليزي</FieldLabel>
+            <Textarea
+              id="description"
+              className={cn(fieldCls, "min-h-[220px] resize-y font-mono text-[13px]")}
+              value={form.description}
+              onChange={(e) => set("description", e.target.value)}
+              placeholder={"## About this book\n\n**Keyword** highlighted in context…\n\n- First point\n- Second point"}
+              dir="ltr"
+            />
+          </Field>
+
+          <Field className="lg:col-span-2">
+            <FieldLabel htmlFor="notes">ملاحظات داخلية</FieldLabel>
+            <Textarea id="notes" className={cn(fieldCls, "min-h-[100px] resize-y")} value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="ملاحظات للفريق الداخلي فقط…" />
           </Field>
         </div>
       </div>
@@ -457,7 +585,7 @@ export function BookEditForm({ book, publishers, categories, authors }: BookEdit
             className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand-red)] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-red)]/90 disabled:opacity-60"
           >
             {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            حفظ التغييرات
+            {isCreate ? "إنشاء الكتاب" : "حفظ التغييرات"}
           </button>
         </div>
       </div>

@@ -224,7 +224,7 @@ export default async function HomePage() {
                 </Link>
               </Button>
             </FadeIn>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+            <div className="grid grid-cols-2 items-stretch gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
               {newlyReleased.map((book) => (
                 <BookCard
                   key={book.id}
@@ -314,7 +314,7 @@ export default async function HomePage() {
                 </Link>
               </Button>
             </FadeIn>
-            <StaggerContainer className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            <StaggerContainer className="grid grid-cols-2 items-stretch gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
               {publisherGrid.map((pub) => (
                 <StaggerItem key={pub.id}>
                   <PublisherCard
@@ -439,7 +439,7 @@ export default async function HomePage() {
                 </Button>
               </FadeIn>
               <StaggerContainer
-                className={rest.length > 0 ? "grid grid-cols-1 gap-6 md:grid-cols-3" : "max-w-2xl"}
+                className={rest.length > 0 ? "grid grid-cols-1 items-stretch gap-6 md:grid-cols-3" : "max-w-2xl"}
               >
                 <StaggerItem className={rest.length > 0 ? "md:col-span-2" : ""}>
                   <ArticleCard
@@ -511,7 +511,7 @@ export default async function HomePage() {
       {/* ── Final CTA ─────────────────────────────────────────── */}
       <AnimatedSection className="bg-white py-10 border-t border-[var(--brand-gray-200)]">
         <div className="container-platform">
-          <StaggerContainer className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <StaggerContainer className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-3">
             {[
               { href: `/${locale}/books`,            icon: Library,   label: t("finalCta.browseBooks") },
               { href: `/${locale}/articles/harvest`, icon: PenLine,   label: t("finalCta.readArticles") },

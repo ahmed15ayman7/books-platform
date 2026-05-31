@@ -3,11 +3,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Pencil, ExternalLink, Mail, Globe, MapPin } from "lucide-react";
 import { db } from "@/lib/db";
+import { notDeleted } from "@/lib/admin/audit-fields";
 import { absoluteUrl } from "@/lib/seo/site";
 import { Button } from "@/components/ui/button";
 import { AdminStatusBadge } from "@/components/admin/admin-table";
 import { BookMarketingDialog } from "./book-marketing-dialog";
 import { BookDeleteButton } from "./book-delete-button";
+import { AdminTimestamps } from "@/components/admin/admin-timestamps";
 
 interface Props {
   params: Promise<{ id: string; locale: string }>;
@@ -77,9 +79,11 @@ function DescriptionBlock({ title, text }: { title: string; text: string | null 
 export default async function AdminBookViewPage({ params }: Props) {
   const { id, locale } = await params;
 
-  const book = await db.product.findUnique({
-    where: { id },
+  const book = await db.product.findFirst({
+    where: { id, ...notDeleted },
     include: {
+      createdBy: { select: { fullName: true, email: true } },
+      updatedBy: { select: { fullName: true, email: true } },
       publisher: {
         include: {
           countries: { select: { id: true, name: true, nameAr: true, slug: true } },
@@ -120,6 +124,12 @@ export default async function AdminBookViewPage({ params }: Props) {
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">{title}</h1>
+          <AdminTimestamps
+            createdAt={book.createdAt}
+            updatedAt={book.updatedAt}
+            compact
+            className="mt-2"
+          />
           {book.nameAr && book.nameEn && book.nameAr !== book.nameEn && (
             <p className="mt-1 text-sm text-[var(--brand-gray-400)]" dir="ltr">
               {book.nameEn}
@@ -254,6 +264,22 @@ export default async function AdminBookViewPage({ params }: Props) {
                 value={
                   book.tags.length > 0
                     ? book.tags.map((t) => t.name).join("، ")
+                    : null
+                }
+              />
+              <DetailRow
+                label="أُنشئ بواسطة"
+                value={
+                  book.createdBy
+                    ? `${book.createdBy.fullName} (${book.createdBy.email})`
+                    : null
+                }
+              />
+              <DetailRow
+                label="آخر تعديل بواسطة"
+                value={
+                  book.updatedBy
+                    ? `${book.updatedBy.fullName} (${book.updatedBy.email})`
                     : null
                 }
               />

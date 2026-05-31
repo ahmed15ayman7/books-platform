@@ -2,9 +2,11 @@ import { type NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { apiPaginated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
+import { PERMISSIONS } from "@/lib/auth/permissions";
+import { buildOrderBy, parseSortParam } from "@/lib/admin/list-query";
 
 export async function GET(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.newsletter.view);
   if (isErrorResponse(auth)) return auth;
 
   try {
@@ -12,19 +14,24 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
     const limit = Math.min(100, parseInt(searchParams.get("limit") ?? "20", 10));
     const search = searchParams.get("search") ?? undefined;
+    const status = searchParams.get("status") ?? undefined;
+    const { sortBy, sortOrder } = parseSortParam(searchParams.get("sort"), "createdAt");
     const skip = (page - 1) * limit;
 
-    const where = search
-      ? { email: { contains: search, mode: "insensitive" as const } }
-      : {};
+    const where = {
+      ...(status && status !== "all" ? { status } : {}),
+      ...(search ? { email: { contains: search, mode: "insensitive" as const } } : {}),
+    };
+
+    const newsletterSortFields = ["createdAt", "email"] as const;
 
     const [rows, total] = await Promise.all([
       db.newsletterSubscriber.findMany({
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: "desc" },
-        select: { id: true, email: true, status: true, createdAt: true },
+        orderBy: buildOrderBy(sortBy, sortOrder, newsletterSortFields, "createdAt"),
+        select: { id: true, email: true, status: true, createdAt: true, updatedAt: true },
       }),
       db.newsletterSubscriber.count({ where }),
     ]);

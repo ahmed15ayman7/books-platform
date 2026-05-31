@@ -2,11 +2,14 @@ import { type NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
+import { PERMISSIONS } from "@/lib/auth/permissions";
+import { requirePasskeyVerification } from "@/lib/auth/require-passkey";
+import { withCreate, withUpdate } from "@/lib/admin/audit-fields";
 
 const SETTINGS_KEY = "platform_settings";
 
 export async function GET(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.settings.view);
   if (isErrorResponse(auth)) return auth;
 
   try {
@@ -20,8 +23,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.settings.update);
   if (isErrorResponse(auth)) return auth;
+
+  const passkeyErr = await requirePasskeyVerification(request, auth.payload.userId);
+  if (passkeyErr) return passkeyErr;
 
   try {
     const body = await request.json() as Record<string, unknown>;
@@ -29,8 +35,15 @@ export async function PATCH(request: NextRequest) {
 
     await db.setting.upsert({
       where: { key: SETTINGS_KEY },
-      create: { key: SETTINGS_KEY, value, updatedBy: auth.payload.userId },
-      update: { value, updatedBy: auth.payload.userId },
+      create: {
+        key: SETTINGS_KEY,
+        value,
+        ...withCreate(auth.payload.userId),
+      },
+      update: {
+        value,
+        ...withUpdate(auth.payload.userId),
+      },
     });
 
     await db.auditLog.create({

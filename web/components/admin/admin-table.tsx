@@ -1,5 +1,6 @@
 import { type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 import { getVisiblePageNumbers } from "@/lib/pagination";
 
 // ─── Status Badge ─────────────────────────────────────────────────
@@ -348,12 +349,12 @@ export function AdminSearch({
         <circle cx="11" cy="11" r="8" strokeWidth="2" />
         <path d="m21 21-4.35-4.35" strokeWidth="2" strokeLinecap="round" />
       </svg>
-      <input
+      <Input
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] py-2 ps-10 pe-3 text-sm text-white placeholder:text-[var(--brand-gray-600)] focus:border-[var(--brand-red)] focus:outline-none transition-colors"
+        className="border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] py-2 ps-10 pe-3 text-sm text-white placeholder:text-[var(--brand-gray-600)] focus-visible:ring-[var(--brand-red)]"
       />
     </form>
   );

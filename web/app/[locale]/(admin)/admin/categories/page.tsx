@@ -1,11 +1,24 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { AdminTable, AdminStatusBadge } from "@/components/admin/admin-table";
+import { AdminSearch, AdminStatusBadge } from "@/components/admin/admin-table";
+import { useAdminViewMode } from "@/lib/admin/use-admin-view-mode";
+import { AdminListToolbar, AdminSortSelect } from "@/components/admin/admin-list-controls";
+import {
+  AdminGridCard,
+  AdminGridCardBody,
+  AdminGridCardFooter,
+} from "@/components/admin/admin-data-grid";
+import { AdminListView } from "@/components/admin/admin-list-view";
+import { sortClientList } from "@/lib/admin/client-list-sort";
+import {
+  adminCreatedAtColumn,
+  adminUpdatedAtColumn,
+} from "@/components/admin/admin-timestamps";
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminInput, AdminCheckbox } from "@/components/admin/admin-form-field";
 
@@ -16,6 +29,8 @@ interface Category {
   slug: string;
   active: boolean;
   _count?: { products: number };
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface CatForm {
@@ -28,7 +43,10 @@ interface CatForm {
 const emptyForm: CatForm = { name: "", nameAr: "", slug: "", active: true };
 
 export default function AdminCategoriesPage() {
+  const { viewMode, setViewMode } = useAdminViewMode("categories");
   const [categories, setCategories] = useState<Category[]>([]);
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("name:asc");
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<CatForm>(emptyForm);
@@ -38,13 +56,31 @@ export default function AdminCategoriesPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/v1/admin/categories", { headers: adminAuthHeaders() });
+      const q = new URLSearchParams();
+      q.set("sort", sort);
+      const res = await fetch(`/api/v1/admin/categories?${q}`, { headers: adminAuthHeaders() });
       const data = await res.json() as { success: boolean; data?: Category[] };
       if (data.success && data.data) setCategories(data.data);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [sort]);
+
+  const displayed = useMemo(() => {
+    const filtered = search.trim()
+      ? categories.filter(
+          (c) =>
+            c.name.toLowerCase().includes(search.toLowerCase()) ||
+            (c.nameAr ?? "").includes(search) ||
+            c.slug.toLowerCase().includes(search.toLowerCase()),
+        )
+      : categories;
+    return sortClientList(filtered, sort, {
+      name: (c) => c.name,
+      updatedAt: (c) => c.updatedAt,
+      createdAt: (c) => c.createdAt,
+    }, "name");
+  }, [categories, search, sort]);
 
   useEffect(() => { void load(); }, [load]);
 
@@ -83,6 +119,35 @@ export default function AdminCategoriesPage() {
   const set = (k: keyof CatForm) => (v: string | boolean) =>
     setForm((p) => ({ ...p, [k]: v }));
 
+  const rowActions = (row: Category) => (
+    <div className="flex items-center gap-1">
+      <Button size="sm" variant="outline" className="gap-1 text-xs" onClick={() => openEdit(row)}>
+        <Pencil className="h-3 w-3" />
+      </Button>
+      <Button
+        size="sm"
+        variant="outline"
+        className="gap-1 border-[var(--error)]/40 text-[var(--error)] text-xs hover:bg-[var(--error)]/10"
+        onClick={() => void handleDelete(row.id)}
+      >
+        <Trash2 className="h-3 w-3" />
+      </Button>
+    </div>
+  );
+
+  const renderCard = (row: Category) => (
+    <AdminGridCard>
+      <AdminGridCardBody>
+        <h3 className="font-semibold text-white">{row.nameAr ?? row.name}</h3>
+        {row.nameAr && <p className="text-xs text-[var(--brand-gray-500)]">{row.name}</p>}
+        <code className="text-[10px] text-[var(--brand-gray-600)]">{row.slug}</code>
+        <p className="text-sm text-[var(--brand-gray-400)]">{row._count?.products ?? 0} كتاب</p>
+        <AdminStatusBadge status={row.active ? "active" : "inactive"} />
+      </AdminGridCardBody>
+      <AdminGridCardFooter>{rowActions(row)}</AdminGridCardFooter>
+    </AdminGridCard>
+  );
+
   const columns = [
     {
       key: "name",
@@ -117,26 +182,9 @@ export default function AdminCategoriesPage() {
         <AdminStatusBadge status={row.active ? "active" : "inactive"} />
       ),
     },
-    {
-      key: "actions",
-      label: "",
-      headerClassName: "w-20",
-      render: (row: Category) => (
-        <div className="flex items-center gap-1">
-          <Button size="sm" variant="outline" className="gap-1 text-xs" onClick={() => openEdit(row)}>
-            <Pencil className="h-3 w-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-1 border-[var(--error)]/40 text-[var(--error)] hover:bg-[var(--error)]/10 text-xs"
-            onClick={() => void handleDelete(row.id)}
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </div>
-      ),
-    },
+    adminCreatedAtColumn<Category>(),
+    adminUpdatedAtColumn<Category>(),
+    { key: "actions", label: "", headerClassName: "w-20", render: rowActions },
   ];
 
   return (
@@ -145,10 +193,17 @@ export default function AdminCategoriesPage() {
         title="التصنيفات"
         subtitle="إدارة تصنيفات الكتب السبعة"
         actions={
-          <Button size="sm" className="gap-1.5" onClick={() => { setEditingId(null); setForm(emptyForm); }}>
-            <Plus className="h-4 w-4" />
-            تصنيف جديد
-          </Button>
+          <div className="flex items-center gap-2">
+            <AdminSearch
+              value={search}
+              onChange={setSearch}
+              placeholder="بحث..."
+            />
+            <Button size="sm" className="gap-1.5" onClick={() => { setEditingId(null); setForm(emptyForm); }}>
+              <Plus className="h-4 w-4" />
+              تصنيف جديد
+            </Button>
+          </div>
         }
       />
 
@@ -200,11 +255,28 @@ export default function AdminCategoriesPage() {
 
         {/* Table */}
         <div className="lg:col-span-2">
-          <AdminTable
+          <AdminListToolbar
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            sort={
+              <AdminSortSelect
+                value={sort}
+                onChange={setSort}
+                options={[
+                  { value: "name:asc", label: "الاسم أ–ي" },
+                  { value: "updatedAt:desc", label: "آخر تحديث" },
+                  { value: "createdAt:desc", label: "الأحدث" },
+                ]}
+              />
+            }
+          />
+          <AdminListView
+            viewMode={viewMode}
             columns={columns}
-            data={categories}
+            data={displayed}
             loading={loading}
             emptyMessage="لا توجد تصنيفات بعد"
+            renderCard={renderCard}
           />
         </div>
       </div>

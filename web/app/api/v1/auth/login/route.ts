@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth/password";
 import { signAccessToken, signRefreshToken } from "@/lib/auth/jwt";
 import { ApiErrors } from "@/lib/api-client/response";
+import { permissionsFromUser } from "@/lib/auth/rbac";
 import crypto from "node:crypto";
 
 const loginSchema = z.object({
@@ -51,6 +52,17 @@ export async function POST(request: NextRequest) {
         data: { failedAttempts, lockedUntil },
       });
 
+      await db.auditLog.create({
+        data: {
+          userId: user.id,
+          action: "LOGIN_FAILED",
+          entity: "User",
+          entityId: user.id,
+          ipAddress,
+          userAgent,
+        },
+      });
+
       return NextResponse.json(
         { success: false, error: { code: "INVALID_CREDENTIALS", message: "Invalid email or password" } },
         { status: 401 }
@@ -81,12 +93,27 @@ export async function POST(request: NextRequest) {
       data: { userId: user.id, action: "LOGIN", entity: "User", entityId: user.id, ipAddress },
     });
 
+    const permissionList =
+      user.role === "ADMIN"
+        ? permissionsFromUser({
+            isSuperAdmin: user.isSuperAdmin,
+            permissions: user.permissions,
+          })
+        : [];
+
     const response = NextResponse.json({
       success: true,
       data: {
         accessToken,
         expiresIn: 900,
-        user: { id: user.id, email: user.email, fullName: user.fullName, role: user.role },
+        user: {
+          id: user.id,
+          email: user.email,
+          fullName: user.fullName,
+          role: user.role,
+          isSuperAdmin: user.isSuperAdmin,
+          permissions: permissionList,
+        },
       },
     });
 

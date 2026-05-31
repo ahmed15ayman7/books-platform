@@ -38,8 +38,8 @@ export const ApiErrors = {
     apiError("NOT_FOUND", `${resource} not found`, 404),
   unauthorized: () =>
     apiError("UNAUTHORIZED", "Authentication required", 401),
-  forbidden: () =>
-    apiError("FORBIDDEN", "Insufficient permissions", 403),
+  forbidden: (message = "Insufficient permissions") =>
+    apiError("FORBIDDEN", message, 403),
   badRequest: (message: string, details?: unknown) =>
     apiError("VALIDATION_ERROR", message, 400, details),
   internal: (message = "Internal server error") =>

@@ -5,12 +5,19 @@ import { Send, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminSearch, AdminPagination, AdminStatusBadge } from "@/components/admin/admin-table";
+import { appendListParams } from "@/lib/admin/list-query";
+import { useAdminViewMode } from "@/lib/admin/use-admin-view-mode";
 import {
-  AdminTable,
-  AdminSearch,
-  AdminPagination,
-  AdminStatusBadge,
-} from "@/components/admin/admin-table";
+  AdminFilterSelect,
+  AdminListToolbar,
+  AdminSortSelect,
+} from "@/components/admin/admin-list-controls";
+import {
+  AdminGridCard,
+  AdminGridCardBody,
+} from "@/components/admin/admin-data-grid";
+import { AdminListView } from "@/components/admin/admin-list-view";
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminInput, AdminTextarea } from "@/components/admin/admin-form-field";
 
@@ -22,6 +29,7 @@ interface Subscriber {
 }
 
 export default function AdminNewsletterPage() {
+  const { viewMode, setViewMode } = useAdminViewMode("newsletter");
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -31,12 +39,15 @@ export default function AdminNewsletterPage() {
   const [campaign, setCampaign] = useState({ subject: "", body: "" });
   const [sending, setSending] = useState(false);
   const [sendStatus, setSendStatus] = useState("");
+  const [sort, setSort] = useState("createdAt:desc");
+  const [status, setStatus] = useState("all");
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
       const q = new URLSearchParams({ page: String(page), limit: "20" });
       if (search.trim()) q.set("search", search.trim());
+      appendListParams(q, { sort, status });
       const res = await fetch(`/api/v1/admin/newsletter/subscribers?${q}`, { headers: adminAuthHeaders() });
       const data = await res.json() as { success: boolean; data?: Subscriber[]; pagination?: { totalPages: number; total: number } };
       if (data.success && data.data) {
@@ -47,7 +58,7 @@ export default function AdminNewsletterPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search]);
+  }, [page, search, sort, status]);
 
   useEffect(() => { void load(); }, [load]);
 
@@ -67,6 +78,20 @@ export default function AdminNewsletterPage() {
       setSending(false);
     }
   }
+
+  const renderCard = (row: Subscriber) => (
+    <AdminGridCard>
+      <AdminGridCardBody>
+        <p className="font-semibold text-white" dir="ltr">
+          {row.email}
+        </p>
+        <AdminStatusBadge status={row.status.toLowerCase()} />
+        <p className="text-xs text-[var(--brand-gray-500)]">
+          {new Date(row.createdAt).toLocaleDateString("ar-EG")}
+        </p>
+      </AdminGridCardBody>
+    </AdminGridCard>
+  );
 
   const columns = [
     {
@@ -147,11 +172,46 @@ export default function AdminNewsletterPage() {
               placeholder="بحث بالبريد..."
             />
           </div>
-          <AdminTable
+          <AdminListToolbar
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            filters={
+              <AdminFilterSelect
+                label="الحالة"
+                value={status}
+                onChange={(v) => {
+                  setStatus(v);
+                  setPage(1);
+                }}
+                options={[
+                  { value: "all", label: "الكل" },
+                  { value: "CONFIRMED", label: "مؤكد" },
+                  { value: "PENDING", label: "قيد التأكيد" },
+                  { value: "UNSUBSCRIBED", label: "ملغي" },
+                ]}
+              />
+            }
+            sort={
+              <AdminSortSelect
+                value={sort}
+                onChange={(v) => {
+                  setSort(v);
+                  setPage(1);
+                }}
+                options={[
+                  { value: "createdAt:desc", label: "الأحدث" },
+                  { value: "email:asc", label: "البريد أ–ي" },
+                ]}
+              />
+            }
+          />
+          <AdminListView
+            viewMode={viewMode}
             columns={columns}
             data={subscribers}
             loading={loading}
             emptyMessage="لا يوجد مشتركون بعد"
+            renderCard={renderCard}
           />
           <AdminPagination page={page} totalPages={totalPages} onPage={setPage} total={total} pageSize={20} />
         </div>

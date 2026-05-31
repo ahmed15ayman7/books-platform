@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import Image from "next/image";
 import Link from "next/link";
 import { PublisherService } from "@/server/services/publisher.service";
 import { BookService } from "@/server/services/book.service";
 import { PageHero } from "@/components/sections/page-hero";
 import { Badge } from "@/components/ui/badge";
+import {
+  CardMedia,
+  CardMediaImage,
+  CardMediaPlaceholder,
+} from "@/components/ui/card-media";
 import { BooksPagination } from "@/components/sections/books-pagination";
+import { Input } from "@/components/ui/input";
 import { Globe } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -72,13 +77,12 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
             <label htmlFor="publisher-search" className="sr-only">
               {t("searchPlaceholder")}
             </label>
-            <input
+            <Input
               id="publisher-search"
               name="search"
               type="search"
               defaultValue={sp.search}
               placeholder={t("searchPlaceholder")}
-              className="w-full rounded-md border border-[var(--brand-gray-300)] bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)]"
             />
           </form>
         </div>
@@ -119,9 +123,9 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            <div className="grid grid-cols-2 items-stretch gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {publishers.map((publisher) => (
-                <PublisherCard
+                <PublisherListingCard
                   key={publisher.id}
                   publisher={publisher}
                   locale={locale}
@@ -138,7 +142,7 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
   );
 }
 
-interface PublisherCardProps {
+interface PublisherListingCardProps {
   publisher: {
     id: string;
     title: string;
@@ -151,51 +155,51 @@ interface PublisherCardProps {
   locale: string;
 }
 
-function PublisherCard({ publisher, locale }: PublisherCardProps) {
+function PublisherListingCard({ publisher, locale }: PublisherListingCardProps) {
   const isAr = locale === "ar";
   const country = publisher.countries[0];
 
   return (
     <Link
       href={`/${locale}/publishers/${publisher.slug}`}
-      className="group relative flex flex-col items-center gap-2 rounded-lg border border-[var(--brand-gray-200)] bg-white p-4 text-center transition-all hover:border-[var(--brand-red)] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]"
+      className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-[var(--brand-gray-200)] bg-white text-center transition-all hover:border-[var(--brand-red)] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]"
     >
       {publisher.isSponsored && (
-        <Badge variant="sponsored" className="absolute top-2 end-2 text-[10px]">
+        <Badge variant="sponsored" className="absolute top-2 end-2 z-10 text-[10px]">
           {isAr ? "مميز" : "Featured"}
         </Badge>
       )}
 
-      {/* Logo/Image */}
-      <div className="flex h-16 w-full items-center justify-center">
+      <CardMedia rounded="top" className="bg-[var(--brand-gray-50)]">
         {publisher.imageUrl ? (
-          <Image
+          <CardMediaImage
             src={publisher.imageUrl}
             alt={publisher.title}
-            width={100}
-            height={48}
-            className="h-12 w-auto max-w-full object-contain"
+            objectFit="contain"
+            sizes="(max-width: 640px) 50vw, 20vw"
           />
         ) : (
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--brand-red-soft)]">
-            <Globe className="h-6 w-6 text-[var(--brand-red)]" aria-hidden="true" />
-          </div>
+          <CardMediaPlaceholder className="from-[var(--brand-gray-50)] to-[var(--brand-red-soft)]">
+            <Globe className="h-8 w-8 text-[var(--brand-red)]" aria-hidden="true" />
+          </CardMediaPlaceholder>
         )}
-      </div>
+      </CardMedia>
 
-      <h3 className="text-xs font-semibold text-[var(--brand-gray-900)] group-hover:text-[var(--brand-red)] line-clamp-2">
-        {publisher.title}
-      </h3>
+      <div className="flex flex-1 flex-col gap-1 p-4">
+        <h3 className="text-xs font-semibold text-[var(--brand-gray-900)] group-hover:text-[var(--brand-red)] line-clamp-2">
+          {publisher.title}
+        </h3>
 
-      {country && (
-        <span className="text-[10px] text-[var(--brand-gray-400)]">
-          {isAr && country.nameAr ? country.nameAr : country.name}
+        {country && (
+          <span className="text-[10px] text-[var(--brand-gray-400)]">
+            {isAr && country.nameAr ? country.nameAr : country.name}
+          </span>
+        )}
+
+        <span className="mt-auto text-[10px] text-[var(--brand-gray-500)]">
+          {publisher.booksCount} {isAr ? "كتاب" : "books"}
         </span>
-      )}
-
-      <span className="text-[10px] text-[var(--brand-gray-500)]">
-        {publisher.booksCount} {isAr ? "كتاب" : "books"}
-      </span>
+      </div>
     </Link>
   );
 }

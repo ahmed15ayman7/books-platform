@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { BookOpen } from "lucide-react";
 import { Badge, BadgeProps } from "@/components/ui/badge";
+import {
+  CardMedia,
+  CardMediaImage,
+  CardMediaPlaceholder,
+} from "@/components/ui/card-media";
 import { cn } from "@/lib/utils";
 import {
   localizedBookName,
@@ -78,39 +82,35 @@ export function BookCard({
       whileHover={{ y: -6, scale: 1.015 }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 360, damping: 20 }}
-      className={cn("will-change-transform", className)}
+      className={cn("h-full will-change-transform", className)}
     >
       <Link
         href={`/${locale}/books/${slug}`}
         className="group relative flex flex-col overflow-hidden surface-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] h-full"
       >
-        {/* Cover Image */}
-        <div className="relative w-full aspect-[3/4] overflow-hidden rounded-t-2xl bg-[var(--brand-gray-100)]">
+        <CardMedia>
           {imageUrl ? (
-            <Image
+            <CardMediaImage
               src={imageUrl}
               alt={displayName}
-              fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--brand-gray-100)] to-[var(--brand-gray-200)] text-[var(--brand-gray-400)]">
+            <CardMediaPlaceholder>
               <BookOpen
                 className="h-12 w-12"
                 strokeWidth={1.25}
                 aria-hidden="true"
               />
-            </div>
+            </CardMediaPlaceholder>
           )}
           {isNew && (
-            <Badge variant="new" className="absolute top-2 start-2">
+            <Badge variant="new" className="absolute top-2 start-2 z-10">
               {locale === "ar" ? "جديد" : "New"}
             </Badge>
           )}
-          {/* Subtle gradient overlay on hover */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-        </div>
+        </CardMedia>
 
         {/* Info */}
         <div className="flex flex-1 flex-col gap-1.5 p-3">

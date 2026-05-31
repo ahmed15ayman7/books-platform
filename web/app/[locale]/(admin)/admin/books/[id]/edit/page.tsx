@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { db } from "@/lib/db";
+import { notDeleted } from "@/lib/admin/audit-fields";
 import { BookEditForm } from "./book-edit-form";
 import { BookDeleteButton } from "../book-delete-button";
 
@@ -19,8 +20,8 @@ export default async function BookEditPage({ params }: Props) {
   const { id, locale } = await params;
 
   const [book, publishers, categories, allAuthors] = await Promise.all([
-    db.product.findUnique({
-      where: { id },
+    db.product.findFirst({
+      where: { id, ...notDeleted },
       include: {
         publisher: { select: { id: true } },
         primaryCategory: { select: { id: true } },
@@ -71,8 +72,9 @@ export default async function BookEditPage({ params }: Props) {
 
       <div className="mx-auto max-w-5xl">
         <BookEditForm
-          book={{
-            id: book.id,
+          bookId={book.id}
+          locale={locale}
+          initial={{
             nameEn: book.nameEn,
             nameAr: book.nameAr ?? "",
             slug: book.slug,

@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { notDeleted } from "@/lib/admin/audit-fields";
 import { PAGINATION } from "@/lib/utils/constants";
 
 export interface BookFilters {
@@ -30,6 +31,7 @@ export const BookService = {
     const skip = (page - 1) * limit;
 
     const where = {
+      ...notDeleted,
       published: true,
       ...(category && {
         OR: [
@@ -130,8 +132,8 @@ export const BookService = {
   },
 
   async getBySlug(slug: string) {
-    return db.product.findUnique({
-      where: { slug },
+    return db.product.findFirst({
+      where: { slug, ...notDeleted },
       include: {
         publisher: {
           select: {
@@ -158,8 +160,8 @@ export const BookService = {
   },
 
   async getSimilar(slug: string, limit = 6) {
-    const book = await db.product.findUnique({
-      where: { slug },
+    const book = await db.product.findFirst({
+      where: { slug, ...notDeleted },
       select: { primaryCategoryId: true, id: true },
     });
 
@@ -167,6 +169,7 @@ export const BookService = {
 
     return db.product.findMany({
       where: {
+        ...notDeleted,
         published: true,
         primaryCategoryId: book.primaryCategoryId,
         id: { not: book.id },

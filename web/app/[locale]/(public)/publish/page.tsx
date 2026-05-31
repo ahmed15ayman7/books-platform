@@ -97,7 +97,7 @@ export default async function PublishPage() {
                 <h3 className="mb-3 font-bold text-[var(--brand-gray-900)]">
                   {isAr ? "آخر الإصدارات" : "Recent Releases"}
                 </h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 items-stretch gap-3">
                   {recentBooks.slice(0, 4).map((book) => (
                     <BookCard key={book.id} {...book} locale={locale} compact />
                   ))}

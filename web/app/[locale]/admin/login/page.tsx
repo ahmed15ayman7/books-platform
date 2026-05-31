@@ -4,6 +4,12 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { BookOpen, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { adminFieldClass } from "@/components/admin/admin-form-field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { saveAdminSession } from "@/lib/admin/permissions-client";
+import { cn } from "@/lib/utils";
+import type { Permission } from "@/lib/auth/permissions";
 
 export default function AdminLoginPage() {
   const params = useParams<{ locale?: string }>();
@@ -29,11 +35,37 @@ export default function AdminLoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json() as { success: boolean; data?: { accessToken: string }; error?: { code: string; message: string } };
+      const data = await res.json() as {
+        success: boolean;
+        data?: {
+          accessToken: string;
+          user: {
+            id: string;
+            email: string;
+            fullName: string;
+            role: string;
+            isSuperAdmin?: boolean;
+            permissions?: Permission[];
+          };
+        };
+        error?: { code: string; message: string };
+      };
 
       if (res.ok && data.success && data.data) {
-        // Store access token in cookie for middleware
+        if (data.data.user.role !== "ADMIN") {
+          setStatus("error");
+          setErrorMsg(isAr ? "هذا الحساب غير مصرح له بدخول لوحة التحكم" : "This account cannot access the admin panel");
+          return;
+        }
         document.cookie = `access_token=${data.data.accessToken}; path=/; max-age=900; samesite=strict`;
+        saveAdminSession({
+          id: data.data.user.id,
+          email: data.data.user.email,
+          fullName: data.data.user.fullName,
+          role: data.data.user.role,
+          isSuperAdmin: Boolean(data.data.user.isSuperAdmin),
+          permissions: data.data.user.permissions ?? [],
+        });
         router.push(`/${locale}/admin/dashboard`);
       } else {
         setStatus("error");
@@ -72,34 +104,34 @@ export default function AdminLoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
-              <label htmlFor="admin-email" className="block text-sm font-medium text-[var(--brand-gray-300)] mb-1">
+              <Label htmlFor="admin-email" className="mb-1 block text-sm font-medium text-[var(--brand-gray-300)]">
                 {isAr ? "البريد الإلكتروني" : "Email"}
-              </label>
-              <input
+              </Label>
+              <Input
                 id="admin-email"
                 type="email"
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full rounded-md border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] px-3 py-2.5 text-sm text-white placeholder:text-[var(--brand-gray-600)] focus:border-[var(--brand-red)] focus:outline-none focus:ring-1 focus:ring-[var(--brand-red)]"
+                className={adminFieldClass}
                 placeholder="admin@booksplatform.net"
               />
             </div>
 
             <div>
-              <label htmlFor="admin-password" className="block text-sm font-medium text-[var(--brand-gray-300)] mb-1">
+              <Label htmlFor="admin-password" className="mb-1 block text-sm font-medium text-[var(--brand-gray-300)]">
                 {isAr ? "كلمة المرور" : "Password"}
-              </label>
+              </Label>
               <div className="relative">
-                <input
+                <Input
                   id="admin-password"
                   type={showPw ? "text" : "password"}
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full rounded-md border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] px-3 py-2.5 pe-10 text-sm text-white focus:border-[var(--brand-red)] focus:outline-none focus:ring-1 focus:ring-[var(--brand-red)]"
+                  className={cn(adminFieldClass, "pe-10")}
                 />
                 <button
                   type="button"

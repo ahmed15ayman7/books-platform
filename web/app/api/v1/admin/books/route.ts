@@ -3,6 +3,13 @@ import { db } from "@/lib/db";
 import { z } from "zod";
 import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
+import { PERMISSIONS } from "@/lib/auth/permissions";
+import { notDeleted, withCreate } from "@/lib/admin/audit-fields";
+import {
+  parseOptionalBool,
+  parseSortParam,
+  productListOrderBy,
+} from "@/lib/admin/list-query";
 
 const createBookSchema = z.object({
   nameEn: z.string().min(1).max(300),
@@ -28,7 +35,7 @@ const createBookSchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.books.view);
   if (isErrorResponse(auth)) return auth;
 
   try {
@@ -36,23 +43,36 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
     const limit = Math.min(50, parseInt(searchParams.get("limit") ?? "20", 10));
     const search = searchParams.get("search") ?? undefined;
+    const sortParam = searchParams.get("sort");
+    const { sortBy, sortOrder } = parseSortParam(sortParam, "updatedAt");
+    const published = parseOptionalBool(searchParams.get("published"));
+    const featured = parseOptionalBool(searchParams.get("featured"));
+    const translationStatus = searchParams.get("translationStatus") ?? undefined;
     const skip = (page - 1) * limit;
 
-    const where = search
-      ? {
-          OR: [
-            { nameEn: { contains: search, mode: "insensitive" as const } },
-            { nameAr: { contains: search, mode: "insensitive" as const } },
-          ],
-        }
-      : {};
+    const where = {
+      ...notDeleted,
+      ...(published !== undefined ? { published } : {}),
+      ...(featured !== undefined ? { featured } : {}),
+      ...(translationStatus && translationStatus !== "all"
+        ? { translationStatus }
+        : {}),
+      ...(search
+        ? {
+            OR: [
+              { nameEn: { contains: search, mode: "insensitive" as const } },
+              { nameAr: { contains: search, mode: "insensitive" as const } },
+            ],
+          }
+        : {}),
+    };
 
     const [books, total] = await Promise.all([
       db.product.findMany({
         where,
         skip,
         take: limit,
-        orderBy: { position: "desc" },
+        orderBy: productListOrderBy(sortBy, sortOrder),
         include: {
           publisher: { select: { title: true, slug: true } },
           primaryCategory: { select: { name: true, nameAr: true } },
@@ -69,7 +89,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.books.create);
   if (isErrorResponse(auth)) return auth;
 
   try {
@@ -81,7 +101,12 @@ export async function POST(request: NextRequest) {
     const originalId = Date.now();
 
     const book = await db.product.create({
-      data: { ...parsed.data, originalId, slug: parsed.data.slug },
+      data: {
+        ...parsed.data,
+        originalId,
+        slug: parsed.data.slug,
+        ...withCreate(auth.payload.userId),
+      },
     });
 
     await db.auditLog.create({

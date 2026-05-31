@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Loader2, Send } from "lucide-react";
 
 interface ContactFormProps {
@@ -30,39 +33,22 @@ export function ContactForm({ locale }: ContactFormProps) {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
-        <label htmlFor="contact-name" className="mb-1 block text-sm font-medium text-[var(--brand-gray-700)]">
+        <Label htmlFor="contact-name" className="mb-1 text-[var(--brand-gray-700)]">
           {isAr ? "الاسم" : "Name"}
-        </label>
-        <input
-          id="contact-name"
-          name="name"
-          required
-          className="w-full rounded-md border border-[var(--brand-gray-300)] px-3 py-2 text-sm focus:border-[var(--brand-red)] focus:outline-none focus:ring-1 focus:ring-[var(--brand-red)]"
-        />
+        </Label>
+        <Input id="contact-name" name="name" required />
       </div>
       <div>
-        <label htmlFor="contact-email" className="mb-1 block text-sm font-medium text-[var(--brand-gray-700)]">
+        <Label htmlFor="contact-email" className="mb-1 text-[var(--brand-gray-700)]">
           {isAr ? "البريد الإلكتروني" : "Email"}
-        </label>
-        <input
-          id="contact-email"
-          name="email"
-          type="email"
-          required
-          className="w-full rounded-md border border-[var(--brand-gray-300)] px-3 py-2 text-sm focus:border-[var(--brand-red)] focus:outline-none focus:ring-1 focus:ring-[var(--brand-red)]"
-        />
+        </Label>
+        <Input id="contact-email" name="email" type="email" required />
       </div>
       <div>
-        <label htmlFor="contact-message" className="mb-1 block text-sm font-medium text-[var(--brand-gray-700)]">
+        <Label htmlFor="contact-message" className="mb-1 text-[var(--brand-gray-700)]">
           {isAr ? "الرسالة" : "Message"}
-        </label>
-        <textarea
-          id="contact-message"
-          name="message"
-          required
-          rows={5}
-          className="w-full rounded-md border border-[var(--brand-gray-300)] px-3 py-2 text-sm focus:border-[var(--brand-red)] focus:outline-none focus:ring-1 focus:ring-[var(--brand-red)]"
-        />
+        </Label>
+        <Textarea id="contact-message" name="message" required rows={5} />
       </div>
       <Button type="submit" disabled={status === "loading"} className="w-full">
         {status === "loading" ? (

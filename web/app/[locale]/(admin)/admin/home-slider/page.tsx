@@ -4,7 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Plus, Pencil, Trash2, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { adminFieldClass } from "@/components/admin/admin-form-field";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
+import { formatAdminDateTime } from "@/lib/admin/format-dates";
 
 interface HeroSlide {
   id: string;
@@ -17,6 +23,8 @@ interface HeroSlide {
   linkUrl: string | null;
   position: number;
   isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const emptyForm = {
@@ -160,23 +168,27 @@ export default function AdminHomeSliderPage() {
             <Field label="رابط عند النقر" value={form.linkUrl} onChange={(v) => setForm({ ...form, linkUrl: v })} />
             <div className="flex gap-4">
               <div className="flex-1">
-                <label className="mb-1 block text-xs text-[var(--brand-gray-400)]">الترتيب</label>
-                <input
+                <Label className="mb-1 text-xs text-[var(--brand-gray-400)]">الترتيب</Label>
+                <Input
                   type="number"
                   value={form.position}
                   onChange={(e) => setForm({ ...form, position: parseInt(e.target.value, 10) || 0 })}
-                  className="w-full rounded-md border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] px-3 py-2 text-sm text-white"
+                  className={adminFieldClass}
                 />
               </div>
-              <label className="flex items-center gap-2 pt-6 text-sm text-white">
-                <input
-                  type="checkbox"
+              <div className="flex items-center gap-2 pt-6 text-sm text-white">
+                <Checkbox
+                  id="slide-active"
                   checked={form.isActive}
-                  onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-                  className="rounded"
+                  onCheckedChange={(checked) =>
+                    setForm({ ...form, isActive: checked === true })
+                  }
+                  className="border-[var(--brand-gray-600)] data-[state=checked]:bg-[var(--brand-red)]"
                 />
-                نشط
-              </label>
+                <Label htmlFor="slide-active" className="cursor-pointer font-normal">
+                  نشط
+                </Label>
+              </div>
             </div>
             {error && <p className="text-sm text-red-400">{error}</p>}
             <div className="flex gap-2 pt-2">
@@ -216,6 +228,10 @@ export default function AdminHomeSliderPage() {
                   <p className="truncate font-medium text-white">{slide.titleAr}</p>
                   <p className="text-xs text-[var(--brand-gray-500)]">
                     ترتيب {slide.position} · {slide.isActive ? "نشط" : "معطّل"}
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--brand-gray-600)]">
+                    أُنشئ: {formatAdminDateTime(slide.createdAt)} · آخر تحديث:{" "}
+                    {formatAdminDateTime(slide.updatedAt)}
                   </p>
                 </div>
                 <div className="flex flex-shrink-0 gap-1">
@@ -258,15 +274,25 @@ function Field({
   required?: boolean;
   multiline?: boolean;
 }) {
-  const cls =
-    "w-full rounded-md border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] px-3 py-2 text-sm text-white placeholder:text-[var(--brand-gray-600)]";
   return (
     <div>
-      <label className="mb-1 block text-xs text-[var(--brand-gray-400)]">{label}</label>
+      <Label className="mb-1 text-xs text-[var(--brand-gray-400)]">{label}</Label>
       {multiline ? (
-        <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={2} className={cls} required={required} />
+        <Textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          rows={2}
+          className={adminFieldClass}
+          required={required}
+        />
       ) : (
-        <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className={cls} required={required} />
+        <Input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={adminFieldClass}
+          required={required}
+        />
       )}
     </div>
   );

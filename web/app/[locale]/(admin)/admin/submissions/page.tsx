@@ -3,14 +3,28 @@
 import { useCallback, useEffect, useState } from "react";
 import { Eye, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { adminFieldClass } from "@/components/admin/admin-form-field";
+import { Textarea } from "@/components/ui/textarea";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminSearch, AdminPagination, AdminStatusBadge } from "@/components/admin/admin-table";
 import {
-  AdminTable,
-  AdminSearch,
-  AdminPagination,
-  AdminStatusBadge,
-} from "@/components/admin/admin-table";
+  adminCreatedAtColumn,
+  adminUpdatedAtColumn,
+} from "@/components/admin/admin-timestamps";
+import { appendListParams } from "@/lib/admin/list-query";
+import { useAdminViewMode } from "@/lib/admin/use-admin-view-mode";
+import {
+  AdminFilterSelect,
+  AdminListToolbar,
+  AdminSortSelect,
+} from "@/components/admin/admin-list-controls";
+import {
+  AdminGridCard,
+  AdminGridCardBody,
+  AdminGridCardFooter,
+} from "@/components/admin/admin-data-grid";
+import { AdminListView } from "@/components/admin/admin-list-view";
 
 interface Submission {
   id: string;
@@ -20,6 +34,7 @@ interface Submission {
   workType: string;
   status: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 interface DetailModal {
@@ -29,6 +44,7 @@ interface DetailModal {
 }
 
 export default function AdminSubmissionsPage() {
+  const { viewMode, setViewMode } = useAdminViewMode("submissions");
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -37,12 +53,15 @@ export default function AdminSubmissionsPage() {
   const [total, setTotal] = useState(0);
   const [modal, setModal] = useState<DetailModal>({ open: false, item: null, rejectReason: "" });
   const [actioning, setActioning] = useState(false);
+  const [sort, setSort] = useState("updatedAt:desc");
+  const [status, setStatus] = useState("all");
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
       const q = new URLSearchParams({ page: String(page), limit: "20" });
       if (search.trim()) q.set("search", search.trim());
+      appendListParams(q, { sort, status });
       const res = await fetch(`/api/v1/admin/submissions?${q}`, { headers: adminAuthHeaders() });
       const data = await res.json() as { success: boolean; data?: Submission[]; pagination?: { totalPages: number; total: number } };
       if (data.success && data.data) {
@@ -53,7 +72,7 @@ export default function AdminSubmissionsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search]);
+  }, [page, search, sort, status]);
 
   useEffect(() => { void load(); }, [load]);
 
@@ -89,6 +108,39 @@ export default function AdminSubmissionsPage() {
     OTHER: "أخرى",
   };
 
+  const openModal = (row: Submission) =>
+    setModal({ open: true, item: row, rejectReason: "" });
+
+  const rowActions = (row: Submission) => (
+    <div className="flex items-center gap-1">
+      <Button size="sm" variant="outline" className="gap-1 text-xs" onClick={() => openModal(row)}>
+        <Eye className="h-3 w-3" />
+        عرض
+      </Button>
+      {row.status === "pending" && (
+        <Button
+          size="sm"
+          className="gap-1 bg-[var(--success)] text-xs hover:bg-[var(--success)]/90"
+          onClick={() => void handleApprove(row.id)}
+        >
+          <Check className="h-3 w-3" />
+        </Button>
+      )}
+    </div>
+  );
+
+  const renderCard = (row: Submission) => (
+    <AdminGridCard>
+      <AdminGridCardBody>
+        <h3 className="line-clamp-2 font-semibold text-white">{row.workTitle}</h3>
+        <p className="text-sm text-[var(--brand-gray-400)]">{row.authorName}</p>
+        <p className="text-xs text-[var(--brand-gray-500)]">{workTypeLabel[row.workType] ?? row.workType}</p>
+        <AdminStatusBadge status={row.status.toLowerCase()} />
+      </AdminGridCardBody>
+      <AdminGridCardFooter>{rowActions(row)}</AdminGridCardFooter>
+    </AdminGridCard>
+  );
+
   const columns = [
     {
       key: "authorName",
@@ -115,44 +167,9 @@ export default function AdminSubmissionsPage() {
       label: "الحالة",
       render: (row: Submission) => <AdminStatusBadge status={row.status.toLowerCase()} />,
     },
-    {
-      key: "createdAt",
-      label: "التاريخ",
-      render: (row: Submission) => (
-        <span className="text-xs text-[var(--brand-gray-400)]">
-          {new Date(row.createdAt).toLocaleDateString("ar-EG")}
-        </span>
-      ),
-    },
-    {
-      key: "actions",
-      label: "",
-      headerClassName: "w-28",
-      render: (row: Submission) => (
-        <div className="flex items-center gap-1">
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-1 text-xs"
-            onClick={() => setModal({ open: true, item: row, rejectReason: "" })}
-          >
-            <Eye className="h-3 w-3" />
-            عرض
-          </Button>
-          {row.status === "pending" && (
-            <>
-              <Button
-                size="sm"
-                className="gap-1 text-xs bg-[var(--success)] hover:bg-[var(--success)]/90"
-                onClick={() => void handleApprove(row.id)}
-              >
-                <Check className="h-3 w-3" />
-              </Button>
-            </>
-          )}
-        </div>
-      ),
-    },
+    adminCreatedAtColumn<Submission>(),
+    adminUpdatedAtColumn<Submission>(),
+    { key: "actions", label: "", headerClassName: "w-28", render: rowActions },
   ];
 
   return (
@@ -170,11 +187,48 @@ export default function AdminSubmissionsPage() {
         }
       />
 
-      <AdminTable
+      <AdminListToolbar
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        filters={
+          <AdminFilterSelect
+            label="الحالة"
+            value={status}
+            onChange={(v) => {
+              setStatus(v);
+              setPage(1);
+            }}
+            options={[
+              { value: "all", label: "الكل" },
+              { value: "pending", label: "قيد المراجعة" },
+              { value: "approved", label: "موافق" },
+              { value: "rejected", label: "مرفوض" },
+            ]}
+          />
+        }
+        sort={
+          <AdminSortSelect
+            value={sort}
+            onChange={(v) => {
+              setSort(v);
+              setPage(1);
+            }}
+            options={[
+              { value: "updatedAt:desc", label: "آخر تحديث" },
+              { value: "createdAt:desc", label: "الأحدث" },
+              { value: "date:desc", label: "تاريخ التقديم" },
+            ]}
+          />
+        }
+      />
+
+      <AdminListView
+        viewMode={viewMode}
         columns={columns}
         data={submissions}
         loading={loading}
         emptyMessage="لا توجد طلبات بعد"
+        renderCard={renderCard}
       />
       <AdminPagination page={page} totalPages={totalPages} onPage={setPage} total={total} pageSize={20} />
 
@@ -204,12 +258,12 @@ export default function AdminSubmissionsPage() {
 
             {modal.item.status === "pending" && (
               <div className="mt-5 space-y-3">
-                <textarea
+                <Textarea
                   placeholder="سبب الرفض (مطلوب عند الرفض)"
                   value={modal.rejectReason}
                   onChange={(e) => setModal((p) => ({ ...p, rejectReason: e.target.value }))}
                   rows={3}
-                  className="w-full rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] px-3 py-2 text-sm text-white focus:outline-none"
+                  className={adminFieldClass}
                 />
                 <div className="flex gap-2">
                   <Button

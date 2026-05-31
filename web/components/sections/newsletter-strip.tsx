@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
 import { Mail, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 export function NewsletterStrip() {
   const t = useTranslations("home.newsletter");
@@ -74,7 +74,7 @@ export function NewsletterStrip() {
               <label htmlFor="newsletter-email" className="sr-only">
                 {t("placeholder")}
               </label>
-              <input
+              <Input
                 id="newsletter-email"
                 type="email"
                 value={email}
@@ -82,11 +82,7 @@ export function NewsletterStrip() {
                 placeholder={t("placeholder")}
                 required
                 maxLength={254}
-                className={cn(
-                  "flex-1 rounded-md border border-[var(--brand-gray-300)] bg-white px-4 py-2.5 text-sm",
-                  "placeholder:text-[var(--brand-gray-400)]",
-                  "focus:outline-none focus:ring-2 focus:ring-[var(--brand-red)] focus:border-transparent"
-                )}
+                className="flex-1"
               />
               <Button type="submit" loading={status === "loading"} className="shrink-0">
                 {t("subscribe")}

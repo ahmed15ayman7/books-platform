@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { z } from "zod";
 import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
+import { PERMISSIONS } from "@/lib/auth/permissions";
+import { buildOrderBy, parseOptionalBool, parseSortParam } from "@/lib/admin/list-query";
 
 const createSchema = z.object({
   name: z.string().min(1).max(300),
@@ -18,7 +20,7 @@ const createSchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.publishers.view);
   if (isErrorResponse(auth)) return auth;
 
   try {
@@ -26,18 +28,26 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
     const limit = Math.min(50, parseInt(searchParams.get("limit") ?? "20", 10));
     const search = searchParams.get("search") ?? undefined;
+    const status = searchParams.get("status") ?? undefined;
+    const sponsoredFilter = parseOptionalBool(searchParams.get("sponsored"));
+    const { sortBy, sortOrder } = parseSortParam(searchParams.get("sort"), "updatedAt");
     const skip = (page - 1) * limit;
 
-    const where = search
-      ? { title: { contains: search, mode: "insensitive" as const } }
-      : {};
+    const where = {
+      ...(status && status !== "all" ? { status } : {}),
+      ...(sponsoredFilter === true ? { sponsored: { isNot: null } } : {}),
+      ...(sponsoredFilter === false ? { sponsored: null } : {}),
+      ...(search ? { title: { contains: search, mode: "insensitive" as const } } : {}),
+    };
+
+    const publisherSortFields = ["updatedAt", "createdAt", "title"] as const;
 
     const [rows, total] = await Promise.all([
       db.publisher.findMany({
         where,
         skip,
         take: limit,
-        orderBy: { title: "asc" },
+        orderBy: buildOrderBy(sortBy, sortOrder, publisherSortFields, "updatedAt"),
         include: {
           _count: { select: { products: true } },
           sponsored: { select: { id: true } },
@@ -51,9 +61,12 @@ export async function GET(request: NextRequest) {
       id: p.id,
       slug: p.slug,
       name: p.title,
+      imageUrl: p.imageFeatured ?? p.imageUrl ?? null,
       country: p.countries[0]?.name ?? null,
       status: p.status,
       sponsored: p.sponsored !== null,
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt,
       _count: p._count,
     }));
 
@@ -72,7 +85,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.publishers.create);
   if (isErrorResponse(auth)) return auth;
 
   try {

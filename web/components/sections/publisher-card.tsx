@@ -1,6 +1,10 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Building2 } from "lucide-react";
+import {
+  CardMedia,
+  CardMediaImage,
+  CardMediaPlaceholder,
+} from "@/components/ui/card-media";
 import { cn } from "@/lib/utils";
 
 interface PublisherCardProps {
@@ -30,26 +34,27 @@ export function PublisherCard({
     <Link
       href={`/${locale}/publishers/${slug}`}
       className={cn(
-        "group flex flex-col items-center gap-3 rounded-2xl border border-[var(--brand-gray-200)] bg-white p-4 text-center",
+        "group flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--brand-gray-200)] bg-white text-center",
         "transition-all hover:border-[var(--brand-red)] hover:shadow-md",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]",
         className
       )}
     >
-      <div className="flex h-16 w-full items-center justify-center rounded-xl bg-[var(--brand-gray-50)] px-3 py-2">
+      <CardMedia rounded="top" className="bg-[var(--brand-gray-50)]">
         {imageUrl ? (
-          <Image
+          <CardMediaImage
             src={imageUrl}
             alt={title}
-            width={120}
-            height={56}
-            className="h-12 w-auto max-w-full object-contain"
+            objectFit="contain"
+            sizes="(max-width: 640px) 50vw, 20vw"
           />
         ) : (
-          <Building2 className="h-8 w-8 text-[var(--brand-gray-400)]" strokeWidth={1.5} />
+          <CardMediaPlaceholder className="from-[var(--brand-gray-50)] to-[var(--brand-gray-100)]">
+            <Building2 className="h-8 w-8 text-[var(--brand-gray-400)]" strokeWidth={1.5} />
+          </CardMediaPlaceholder>
         )}
-      </div>
-      <div className="min-w-0 w-full">
+      </CardMedia>
+      <div className="flex flex-1 flex-col gap-1 p-4 min-w-0 w-full">
         <p className="line-clamp-2 text-sm font-semibold text-[var(--brand-gray-900)] group-hover:text-[var(--brand-red)] transition-colors">
           {title}
         </p>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 export function HeaderSearch() {
   const [query, setQuery] = useState("");
@@ -35,7 +36,7 @@ export function HeaderSearch() {
             }`}
             aria-hidden="true"
           />
-          <input
+          <Input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -44,7 +45,7 @@ export function HeaderSearch() {
             placeholder={
               isAr ? "ابحث عن كتاب، مؤلف، ناشر..." : "Search books, authors, publishers..."
             }
-            className={`h-full w-full border-0 bg-transparent text-sm text-[var(--brand-gray-900)] placeholder:text-[var(--brand-gray-400)] focus:outline-none ${
+            className={`h-full w-full border-0 bg-transparent shadow-none focus-visible:ring-0 text-sm text-[var(--brand-gray-900)] placeholder:text-[var(--brand-gray-400)] ${
               isAr ? "pe-10 ps-4 text-right" : "ps-10 pe-4 text-left"
             }`}
             aria-label={isAr ? "بحث في الكتب" : "Search books"}

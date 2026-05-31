@@ -35,6 +35,7 @@ interface Publisher {
 }
 
 interface BookBiblioTableProps {
+  className?: string;
   isbn?: string | null;
   language?: string | null;
   publicationYear?: number | null;
@@ -94,11 +95,11 @@ function Row({ label, children, even }: RowProps) {
     <tr className={cn("border-b border-[var(--brand-gray-100)]", even ? "bg-[var(--brand-gray-50)]" : "bg-white")}>
       <th
         scope="row"
-        className="w-[38%] px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-[var(--brand-gray-500)] align-top"
+        className="w-[38%] px-4 py-3.5 text-start text-base font-bold text-[var(--brand-gray-600)] align-top"
       >
         {label}
       </th>
-      <td className="px-4 py-3 text-sm text-[var(--brand-gray-800)] align-top">
+      <td className="px-4 py-3.5 text-base text-[var(--brand-gray-800)] align-top leading-relaxed">
         {children}
       </td>
     </tr>
@@ -106,6 +107,7 @@ function Row({ label, children, even }: RowProps) {
 }
 
 export function BookBiblioTable({
+  className,
   isbn,
   language,
   publicationYear,
@@ -339,11 +341,10 @@ export function BookBiblioTable({
   const authorsWithBio = authors.filter((a) => (isAr ? a.bioAr ?? a.bio : a.bio));
 
   return (
-    <div className="mt-6 space-y-4">
-      {/* Bibliographic data table */}
+    <div className={cn("mt-6 space-y-4", className)}>
       <div className="overflow-hidden rounded-xl border border-[var(--brand-gray-200)] bg-white shadow-sm">
-        <div className="border-b border-[var(--brand-gray-200)] bg-[var(--brand-gray-50)] px-4 py-2.5">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-[var(--brand-gray-500)]">
+        <div className="border-b border-[var(--brand-gray-200)] bg-[var(--brand-gray-50)] px-5 py-3">
+          <h3 className="text-sm font-bold text-[var(--brand-gray-700)]">
             {isAr ? "البيانات الببليوغرافية" : "Bibliographic Data"}
           </h3>
         </div>
@@ -368,12 +369,12 @@ export function BookBiblioTable({
             key={author.id}
             className="overflow-hidden rounded-xl border border-[var(--brand-gray-200)] bg-white shadow-sm"
           >
-            <div className="border-b border-[var(--brand-gray-200)] bg-[var(--brand-gray-50)] px-4 py-2.5">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-[var(--brand-gray-500)]">
+            <div className="border-b border-[var(--brand-gray-200)] bg-[var(--brand-gray-50)] px-5 py-3">
+              <h3 className="text-sm font-bold text-[var(--brand-gray-700)]">
                 {isAr ? `نبذة عن ${authorName}` : `About ${authorName}`}
               </h3>
             </div>
-            <p className="px-4 py-3 text-sm leading-relaxed text-[var(--brand-gray-700)]">
+            <p className="px-5 py-4 text-base leading-relaxed text-[var(--brand-gray-700)]">
               {bioText}
             </p>
           </div>

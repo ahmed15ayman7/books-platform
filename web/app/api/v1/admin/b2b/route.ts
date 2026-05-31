@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { z } from "zod";
 import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
+import { PERMISSIONS } from "@/lib/auth/permissions";
+import { buildOrderBy, parseOptionalBool, parseSortParam } from "@/lib/admin/list-query";
 
 const PACKAGE_NAMES: Record<string, string> = {
   BIBLIOGRAPHIC: "الببليوغرافيا",
@@ -39,26 +41,33 @@ async function getOrCreatePlan(packageType: string) {
 }
 
 export async function GET(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.b2b.view);
   if (isErrorResponse(auth)) return auth;
 
   try {
     const { searchParams } = request.nextUrl;
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
     const limit = Math.min(50, parseInt(searchParams.get("limit") ?? "20", 10));
+    const isActive = parseOptionalBool(searchParams.get("isActive"));
+    const { sortBy, sortOrder } = parseSortParam(searchParams.get("sort"), "createdAt");
     const skip = (page - 1) * limit;
+
+    const where = isActive !== undefined ? { isActive } : {};
+
+    const b2bSortFields = ["createdAt", "updatedAt", "endsAt"] as const;
 
     const [rows, total] = await Promise.all([
       db.b2BSubscription.findMany({
+        where,
         skip,
         take: limit,
-        orderBy: { createdAt: "desc" },
+        orderBy: buildOrderBy(sortBy, sortOrder, b2bSortFields, "createdAt"),
         include: {
           client: true,
           plan: true,
         },
       }),
-      db.b2BSubscription.count(),
+      db.b2BSubscription.count({ where }),
     ]);
 
     const data = rows.map((s) => ({
@@ -70,6 +79,8 @@ export async function GET(request: NextRequest) {
       startDate: s.startsAt.toISOString(),
       endDate: s.endsAt.toISOString(),
       renewalDate: null,
+      createdAt: s.createdAt,
+      updatedAt: s.updatedAt,
     }));
 
     return apiPaginated(data, {
@@ -87,7 +98,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const auth = await requireAuth(request, "ADMIN");
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.b2b.create);
   if (isErrorResponse(auth)) return auth;
 
   try {

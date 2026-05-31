@@ -207,7 +207,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
                   title={locale === "ar" ? "مقالات ذات صلة" : "Related Articles"}
                   className="mb-6"
                 />
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+                <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-3">
                   {related.map((art) => (
                     <ArticleCard
                       key={art.id}

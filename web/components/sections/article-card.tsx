@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { BookOpen, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import {
+  CardMedia,
+  CardMediaImage,
+  CardMediaPlaceholder,
+} from "@/components/ui/card-media";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/utils/formatters";
 import type { Locale } from "@/lib/i18n";
@@ -61,33 +65,27 @@ export function ArticleCard({
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]"
         )}
       >
-        {/* Image */}
-        <div
-          className={cn(
-            "relative overflow-hidden bg-[var(--brand-gray-100)] flex-shrink-0",
-            featured ? "w-full md:w-64 aspect-video md:aspect-auto" : "aspect-video w-full"
-          )}
+        <CardMedia
+          className={cn(featured && "w-full shrink-0 md:w-64 md:max-w-[16rem]")}
+          rounded={featured ? "none" : "top"}
         >
           {imageUrl ? (
-            <Image
+            <CardMediaImage
               src={imageUrl}
               alt={title}
-              fill
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="flex h-full min-h-[160px] w-full items-center justify-center bg-gradient-to-br from-[var(--brand-gray-100)] to-[var(--brand-red-soft)]">
+            <CardMediaPlaceholder className="from-[var(--brand-gray-100)] to-[var(--brand-red-soft)]">
               <BookOpen
                 className="h-10 w-10 text-[var(--brand-gray-400)]"
                 strokeWidth={1.25}
                 aria-hidden="true"
               />
-            </div>
+            </CardMediaPlaceholder>
           )}
-          {/* Hover overlay */}
           <div className="absolute inset-0 bg-[var(--brand-red)]/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-        </div>
+        </CardMedia>
 
         {/* Content */}
         <div className="flex flex-1 flex-col gap-2 p-4">
