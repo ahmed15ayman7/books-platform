@@ -97,8 +97,8 @@ export async function POST(request: NextRequest) {
     const parsed = createBookSchema.safeParse(body);
     if (!parsed.success) return ApiErrors.badRequest("Validation failed", parsed.error.issues);
 
-    // Generate originalId from timestamp (for new books not imported from WordPress)
-    const originalId = Date.now();
+    const { nextProductOriginalId } = await import("@/lib/admin/legacy-ids");
+    const originalId = await nextProductOriginalId();
 
     const book = await db.product.create({
       data: {

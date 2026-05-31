@@ -26,6 +26,13 @@ export const PERMISSIONS = {
     delete: "categories.delete",
   },
 
+  authors: {
+    view: "authors.view",
+    create: "authors.create",
+    update: "authors.update",
+    delete: "authors.delete",
+  },
+
   articles: {
     view: "articles.view",
     create: "articles.create",
@@ -182,6 +189,17 @@ export const PERMISSION_GROUPS: {
       { key: PERMISSIONS.categories.create, labelAr: "إضافة", labelEn: "Create" },
       { key: PERMISSIONS.categories.update, labelAr: "تعديل", labelEn: "Update" },
       { key: PERMISSIONS.categories.delete, labelAr: "حذف", labelEn: "Delete" },
+    ],
+  },
+  {
+    id: "authors",
+    labelAr: "المؤلفون",
+    labelEn: "Authors",
+    permissions: [
+      { key: PERMISSIONS.authors.view, labelAr: "عرض", labelEn: "View" },
+      { key: PERMISSIONS.authors.create, labelAr: "إضافة", labelEn: "Create" },
+      { key: PERMISSIONS.authors.update, labelAr: "تعديل", labelEn: "Update" },
+      { key: PERMISSIONS.authors.delete, labelAr: "حذف", labelEn: "Delete" },
     ],
   },
   {
@@ -345,6 +363,7 @@ export const NAV_PERMISSION_BY_HREF: Record<string, Permission> = {
   "/admin/books": PERMISSIONS.books.view,
   "/admin/publishers": PERMISSIONS.publishers.view,
   "/admin/categories": PERMISSIONS.categories.view,
+  "/admin/authors": PERMISSIONS.authors.view,
   "/admin/articles": PERMISSIONS.articles.view,
   "/admin/media": PERMISSIONS.media.view,
   "/admin/submissions": PERMISSIONS.submissions.view,

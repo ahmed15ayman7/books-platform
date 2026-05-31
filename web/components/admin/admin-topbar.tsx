@@ -15,6 +15,7 @@ const routeLabels: Record<string, string> = {
   comments: "التعليقات",
   newsletter: "النشرة البريدية",
   categories: "التصنيفات",
+  authors: "المؤلفون",
   pages: "الصفحات الثابتة",
   b2b: "B2B المؤسسي",
   ambassadors: "السفراء",

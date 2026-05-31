@@ -57,9 +57,10 @@ export async function POST(request: NextRequest) {
     const existing = await db.productCategory.findFirst({ where: { slug: parsed.data.slug } });
     if (existing) return ApiErrors.badRequest("Slug already exists");
 
+    const { nextCategoryTermId } = await import("@/lib/admin/legacy-ids");
     const category = await db.productCategory.create({
       data: {
-        termId: Date.now(),
+        termId: await nextCategoryTermId(),
         name: parsed.data.name,
         nameAr: parsed.data.nameAr ?? null,
         slug: parsed.data.slug,

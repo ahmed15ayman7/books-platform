@@ -2,10 +2,15 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Loader2, CheckCircle2, AlertCircle, X } from "lucide-react";
+import { Save, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { createBook, updateBook, type BookEditData } from "./actions";
 import { adminFieldClass } from "@/components/admin/admin-form-field";
 import { AdminMarkdownHint } from "@/components/admin/admin-markdown-hint";
+import { AdminEntityCombobox } from "@/components/admin/admin-entity-combobox";
+import { CreateAuthorDialog } from "@/components/admin/create-author-dialog";
+import { CreatePublisherDialog } from "@/components/admin/create-publisher-dialog";
+import { CreateCategoryDialog } from "@/components/admin/create-category-dialog";
+import { slugify } from "@/lib/admin/slugify";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -31,15 +36,6 @@ interface BookEditFormProps {
   publishers: Publisher[];
   categories: Category[];
   authors: Author[];
-}
-
-function slugify(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_]+/g, "-")
-    .replace(/^-+|-+$/g, "");
 }
 
 const sectionCardCls =
@@ -135,89 +131,6 @@ function CheckboxField({
   );
 }
 
-/* ─── Multi-select with search ───────────────────────────────────────── */
-function MultiSelect({
-  id,
-  label,
-  options,
-  selected,
-  onChange,
-  getLabel,
-}: {
-  id: string;
-  label: string;
-  options: { id: string; name: string; nameAr?: string | null }[];
-  selected: string[];
-  onChange: (ids: string[]) => void;
-  getLabel: (o: { id: string; name: string; nameAr?: string | null }) => string;
-}) {
-  const [q, setQ] = useState("");
-  const filtered = q
-    ? options.filter((o) => getLabel(o).toLowerCase().includes(q.toLowerCase()))
-    : options;
-
-  function toggle(id: string) {
-    onChange(selected.includes(id) ? selected.filter((s) => s !== id) : [...selected, id]);
-  }
-
-  const selectedItems = options.filter((o) => selected.includes(o.id));
-
-  return (
-    <div>
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
-      {/* Selected chips */}
-      {selectedItems.length > 0 && (
-        <div className="mb-2 flex flex-wrap gap-1.5">
-          {selectedItems.map((o) => (
-            <span
-              key={o.id}
-              className="inline-flex items-center gap-1 rounded-full bg-[var(--brand-red-soft)] px-2.5 py-0.5 text-xs font-medium text-[var(--brand-red)]"
-            >
-              {getLabel(o)}
-              <button
-                type="button"
-                onClick={() => toggle(o.id)}
-                className="hover:text-[var(--brand-red)] opacity-70 hover:opacity-100"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
-      {/* Search */}
-      <Input
-        id={id}
-        type="text"
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder={`ابحث في ${label}…`}
-        className={cn(fieldCls, "mb-1")}
-      />
-      {/* List */}
-      <div className="max-h-44 overflow-y-auto rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)]">
-        {filtered.length === 0 ? (
-          <p className="px-3 py-2 text-xs text-[var(--brand-gray-500)]">لا نتائج</p>
-        ) : (
-          filtered.slice(0, 30).map((o) => (
-            <label
-              key={o.id}
-              className="flex cursor-pointer items-center gap-2.5 px-3 py-2 text-sm text-white hover:bg-[var(--brand-gray-700)] border-b border-[var(--brand-gray-700)] last:border-0"
-            >
-              <Checkbox
-                checked={selected.includes(o.id)}
-                onCheckedChange={() => toggle(o.id)}
-                className="shrink-0 border-[var(--brand-gray-600)] data-[state=checked]:bg-[var(--brand-red)] data-[state=checked]:border-[var(--brand-red)]"
-              />
-              <span className="truncate">{getLabel(o)}</span>
-            </label>
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
-
 /* ─── Main form ──────────────────────────────────────────────────────── */
 export function BookEditForm({
   bookId,
@@ -234,6 +147,35 @@ export function BookEditForm({
   const [errorMsg, setErrorMsg] = useState("");
 
   const [form, setForm] = useState<BookEditData>(initial);
+  const [authorsList, setAuthorsList] = useState(authors);
+  const [publishersList, setPublishersList] = useState(publishers);
+  const [categoriesList, setCategoriesList] = useState(categories);
+
+  const [authorDialogOpen, setAuthorDialogOpen] = useState(false);
+  const [publisherDialogOpen, setPublisherDialogOpen] = useState(false);
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [createQuery, setCreateQuery] = useState("");
+  const [categoryCreateTarget, setCategoryCreateTarget] = useState<"primary" | "extra">("primary");
+
+  const authorOptions = authorsList.map((a) => ({
+    id: a.id,
+    name: a.name,
+    nameAr: a.nameAr,
+    slug: a.slug,
+  }));
+  const publisherOptions = publishersList.map((p) => ({
+    id: p.id,
+    name: p.title,
+    slug: p.slug,
+  }));
+  const categoryOptions = categoriesList.map((c) => ({
+    id: c.id,
+    name: c.name,
+    nameAr: c.nameAr,
+    slug: c.slug,
+  }));
+
+  const entityLabel = (o: { name: string; nameAr?: string | null }) => o.nameAr ?? o.name;
 
   function set<K extends keyof BookEditData>(key: K, value: BookEditData[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -242,25 +184,50 @@ export function BookEditForm({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("idle");
+    setErrorMsg("");
+
+    const nameEn = form.nameEn.trim();
+    const nameAr = form.nameAr.trim();
+    const slug = form.slug.trim() || slugify(form.nameEn) || slugify(form.nameAr);
+
+    if (!nameEn && !nameAr) {
+      setStatus("error");
+      setErrorMsg("الاسم بالعربية أو الإنجليزية مطلوب");
+      return;
+    }
+    if (!slug) {
+      setStatus("error");
+      setErrorMsg("الرابط المختصر (Slug) مطلوب");
+      return;
+    }
 
     const payload: BookEditData = {
       ...form,
-      slug: form.slug.trim() || slugify(form.nameEn),
+      nameEn: nameEn || nameAr,
+      slug,
     };
 
     startTransition(async () => {
-      try {
-        if (bookId) {
-          await updateBook(bookId, payload);
-          setStatus("success");
-          setTimeout(() => setStatus("idle"), 3000);
-        } else {
-          const result = await createBook(payload);
-          router.push(`/${locale}/admin/books/${result.id}`);
+      if (bookId) {
+        const result = await updateBook(bookId, payload);
+        if (!result.ok) {
+          setStatus("error");
+          setErrorMsg(result.error);
+          return;
         }
-      } catch (err) {
+        setStatus("success");
+        setTimeout(() => setStatus("idle"), 3000);
+        return;
+      }
+
+      const result = await createBook(payload);
+      if (!result.ok) {
         setStatus("error");
-        setErrorMsg(err instanceof Error ? err.message : "حدث خطأ غير متوقع");
+        setErrorMsg(result.error);
+        return;
+      }
+      if (result.id) {
+        router.push(`/${locale}/admin/books/${result.id}`);
       }
     });
   }
@@ -395,13 +362,18 @@ export function BookEditForm({
           <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--brand-gray-400)]">المؤلفون</h2>
         </div>
         <div className="p-5">
-          <MultiSelect
+          <AdminEntityCombobox
             id="authors"
             label="المؤلفون"
-            options={authors}
-            selected={form.authorIds}
-            onChange={(ids) => set("authorIds", ids)}
-            getLabel={(a) => a.nameAr ?? a.name}
+            mode="multi"
+            options={authorOptions}
+            value={form.authorIds}
+            onChange={(v) => set("authorIds", v as string[])}
+            getLabel={entityLabel}
+            onCreateNew={(q) => {
+              setCreateQuery(q);
+              setAuthorDialogOpen(true);
+            }}
           />
         </div>
       </div>
@@ -409,51 +381,54 @@ export function BookEditForm({
       {/* ── 4. Publisher & Categories ────────────────────────────── */}
       <SectionCard title="دار النشر والتصنيفات">
         <Field className="sm:col-span-2">
-          <FieldLabel htmlFor="publisherId">دار النشر</FieldLabel>
-          <BookSelect
+          <AdminEntityCombobox
             id="publisherId"
+            label="دار النشر"
+            mode="single"
+            options={publisherOptions}
             value={form.publisherId}
-            onValueChange={(v) => set("publisherId", v)}
-            placeholder="— بدون دار نشر —"
-          >
-            <SelectItem value="_empty" className="focus:bg-[var(--brand-gray-700)]">
-              — بدون دار نشر —
-            </SelectItem>
-            {publishers.map((p) => (
-              <SelectItem key={p.id} value={p.id} className="focus:bg-[var(--brand-gray-700)]">
-                {p.title}
-              </SelectItem>
-            ))}
-          </BookSelect>
+            onChange={(v) => set("publisherId", v as string)}
+            getLabel={entityLabel}
+            placeholder="ابحث عن دار نشر…"
+            onCreateNew={(q) => {
+              setCreateQuery(q);
+              setPublisherDialogOpen(true);
+            }}
+          />
         </Field>
 
         <Field className="sm:col-span-2">
-          <FieldLabel htmlFor="primaryCategoryId">التصنيف الرئيسي</FieldLabel>
-          <BookSelect
+          <AdminEntityCombobox
             id="primaryCategoryId"
+            label="التصنيف الرئيسي"
+            mode="single"
+            options={categoryOptions}
             value={form.primaryCategoryId}
-            onValueChange={(v) => set("primaryCategoryId", v)}
-            placeholder="— بدون تصنيف —"
-          >
-            <SelectItem value="_empty" className="focus:bg-[var(--brand-gray-700)]">
-              — بدون تصنيف —
-            </SelectItem>
-            {categories.map((c) => (
-              <SelectItem key={c.id} value={c.id} className="focus:bg-[var(--brand-gray-700)]">
-                {c.nameAr ?? c.name}
-              </SelectItem>
-            ))}
-          </BookSelect>
+            onChange={(v) => set("primaryCategoryId", v as string)}
+            getLabel={entityLabel}
+            placeholder="ابحث عن تصنيف…"
+            onCreateNew={(q) => {
+              setCreateQuery(q);
+              setCategoryCreateTarget("primary");
+              setCategoryDialogOpen(true);
+            }}
+          />
         </Field>
 
         <Field className="sm:col-span-2">
-          <MultiSelect
+          <AdminEntityCombobox
             id="categories"
             label="تصنيفات إضافية"
-            options={categories}
-            selected={form.categoryIds}
-            onChange={(ids) => set("categoryIds", ids)}
-            getLabel={(c) => c.nameAr ?? c.name}
+            mode="multi"
+            options={categoryOptions}
+            value={form.categoryIds}
+            onChange={(v) => set("categoryIds", v as string[])}
+            getLabel={entityLabel}
+            onCreateNew={(q) => {
+              setCreateQuery(q);
+              setCategoryCreateTarget("extra");
+              setCategoryDialogOpen(true);
+            }}
           />
         </Field>
       </SectionCard>
@@ -589,6 +564,50 @@ export function BookEditForm({
           </button>
         </div>
       </div>
+
+      <CreateAuthorDialog
+        open={authorDialogOpen}
+        onOpenChange={setAuthorDialogOpen}
+        initialName={createQuery}
+        onCreated={(author) => {
+          const entry = {
+            id: author.id,
+            name: author.name,
+            nameAr: author.nameAr ?? null,
+            slug: author.slug ?? "",
+          };
+          setAuthorsList((prev) => [...prev, entry]);
+          set("authorIds", [...form.authorIds, author.id]);
+        }}
+      />
+      <CreatePublisherDialog
+        open={publisherDialogOpen}
+        onOpenChange={setPublisherDialogOpen}
+        initialName={createQuery}
+        onCreated={(publisher) => {
+          setPublishersList((prev) => [...prev, publisher]);
+          set("publisherId", publisher.id);
+        }}
+      />
+      <CreateCategoryDialog
+        open={categoryDialogOpen}
+        onOpenChange={setCategoryDialogOpen}
+        initialName={createQuery}
+        onCreated={(category) => {
+          const entry = {
+            id: category.id,
+            name: category.name,
+            nameAr: category.nameAr ?? null,
+            slug: category.slug ?? "",
+          };
+          setCategoriesList((prev) => [...prev, entry]);
+          if (categoryCreateTarget === "primary") {
+            set("primaryCategoryId", category.id);
+          } else {
+            set("categoryIds", [...form.categoryIds, category.id]);
+          }
+        }}
+      />
     </form>
   );
 }

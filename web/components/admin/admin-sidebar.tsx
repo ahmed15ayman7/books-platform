@@ -14,6 +14,7 @@ import {
   MessageSquare,
   Mail,
   Tag,
+  UserPen,
   FileEdit,
   Users,
   BadgeDollarSign,
@@ -50,6 +51,7 @@ const navGroups: NavGroup[] = [
     items: [
       { icon: BookOpen, label: "الكتب", href: "/admin/books" },
       { icon: Building2, label: "الناشرون", href: "/admin/publishers" },
+      { icon: UserPen, label: "المؤلفون", href: "/admin/authors" },
       { icon: Tag, label: "التصنيفات", href: "/admin/categories" },
       { icon: FileText, label: "المقالات", href: "/admin/articles" },
       { icon: Video, label: "الميديا", href: "/admin/media" },

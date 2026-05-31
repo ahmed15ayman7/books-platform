@@ -95,15 +95,17 @@ export async function POST(request: NextRequest) {
 
     const { name, description, websiteUrl, contactEmail, imageUrl, status } = parsed.data;
 
+    const { nextPublisherOriginalId } = await import("@/lib/admin/legacy-ids");
+    const originalId = await nextPublisherOriginalId();
     const slug = name
       .toLowerCase()
       .replace(/[^\w\s-]/g, "")
       .replace(/\s+/g, "-")
-      .slice(0, 200) + "-" + Date.now();
+      .slice(0, 200) + "-" + originalId;
 
     const publisher = await db.publisher.create({
       data: {
-        originalId: Date.now(),
+        originalId,
         title: name,
         content: description ?? null,
         websiteUrl: websiteUrl || null,

@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { nextProductOriginalId } from "@/lib/admin/legacy-ids";
 import { revalidatePath } from "next/cache";
 
 export interface BookEditData {
@@ -34,96 +35,145 @@ export interface BookEditData {
   authorIds: string[];
 }
 
-export async function updateBook(id: string, data: BookEditData) {
-  const {
-    categoryIds,
-    authorIds,
-    publisherId,
-    primaryCategoryId,
-    publicationYear,
-    pageCount,
-    price,
-    ...rest
-  } = data;
+export type BookActionResult =
+  | { ok: true; id?: string }
+  | { ok: false; error: string };
 
-  const parsedYear = publicationYear.trim() !== "" ? parseInt(publicationYear, 10) : null;
-  const parsedPages = pageCount.trim() !== "" ? parseInt(pageCount, 10) : null;
-  const parsedPrice = price.trim() !== "" ? parseFloat(price) : null;
-
-  await db.product.update({
-    where: { id },
-    data: {
-      ...rest,
-      publicationYear: parsedYear && !isNaN(parsedYear) ? parsedYear : null,
-      pageCount: parsedPages && !isNaN(parsedPages) ? parsedPages : null,
-      price: parsedPrice !== null && !isNaN(parsedPrice) ? parsedPrice : null,
-      publisherId: publisherId || null,
-      primaryCategoryId: primaryCategoryId || null,
-      categories: {
-        set: categoryIds.map((cid) => ({ id: cid })),
-      },
-      authors: {
-        set: authorIds.map((aid) => ({ id: aid })),
-      },
-    },
-  });
-
-  revalidatePath(`/`, "layout");
-
-  return { success: true };
+function resolveNameEn(nameEn: string, nameAr: string): string {
+  const en = nameEn.trim();
+  if (en) return en;
+  const ar = nameAr.trim();
+  if (ar) return ar;
+  return "";
 }
 
-export async function createBook(data: BookEditData) {
-  const {
-    categoryIds,
-    authorIds,
-    publisherId,
-    primaryCategoryId,
-    publicationYear,
-    pageCount,
-    price,
-    nameEn,
-    slug,
-    ...rest
-  } = data;
+export async function updateBook(id: string, data: BookEditData): Promise<BookActionResult> {
+  try {
+    const nameEn = resolveNameEn(data.nameEn, data.nameAr);
+    if (!nameEn) {
+      return { ok: false, error: "الاسم بالإنجليزية أو العربية مطلوب" };
+    }
 
-  if (!nameEn.trim()) {
-    throw new Error("الاسم بالإنجليزية مطلوب");
-  }
-  if (!slug.trim()) {
-    throw new Error("الرابط المختصر (Slug) مطلوب");
-  }
+    const slug = data.slug.trim() || slugify(nameEn);
+    if (!slug) {
+      return { ok: false, error: "الرابط المختصر (Slug) مطلوب" };
+    }
 
-  const existing = await db.product.findUnique({ where: { slug: slug.trim() } });
-  if (existing) {
-    throw new Error("هذا الرابط المختصر مستخدم بالفعل لكتاب آخر");
-  }
+    const {
+      categoryIds,
+      authorIds,
+      publisherId,
+      primaryCategoryId,
+      publicationYear,
+      pageCount,
+      price,
+      ...rest
+    } = data;
 
-  const parsedYear = publicationYear.trim() !== "" ? parseInt(publicationYear, 10) : null;
-  const parsedPages = pageCount.trim() !== "" ? parseInt(pageCount, 10) : null;
-  const parsedPrice = price.trim() !== "" ? parseFloat(price) : null;
+    const parsedYear = publicationYear.trim() !== "" ? parseInt(publicationYear, 10) : null;
+    const parsedPages = pageCount.trim() !== "" ? parseInt(pageCount, 10) : null;
+    const parsedPrice = price.trim() !== "" ? parseFloat(price) : null;
 
-  const book = await db.product.create({
-    data: {
-      ...rest,
-      nameEn: nameEn.trim(),
-      slug: slug.trim(),
-      originalId: Date.now(),
-      publicationYear: parsedYear && !isNaN(parsedYear) ? parsedYear : null,
-      pageCount: parsedPages && !isNaN(parsedPages) ? parsedPages : null,
-      price: parsedPrice !== null && !isNaN(parsedPrice) ? parsedPrice : null,
-      publisherId: publisherId || null,
-      primaryCategoryId: primaryCategoryId || null,
-      categories: {
-        connect: categoryIds.map((cid) => ({ id: cid })),
+    await db.product.update({
+      where: { id },
+      data: {
+        ...rest,
+        nameEn,
+        slug,
+        publicationYear: parsedYear && !isNaN(parsedYear) ? parsedYear : null,
+        pageCount: parsedPages && !isNaN(parsedPages) ? parsedPages : null,
+        price: parsedPrice !== null && !isNaN(parsedPrice) ? parsedPrice : null,
+        publisherId: publisherId || null,
+        primaryCategoryId: primaryCategoryId || null,
+        categories: {
+          set: categoryIds.map((cid) => ({ id: cid })),
+        },
+        authors: {
+          set: authorIds.map((aid) => ({ id: aid })),
+        },
       },
-      authors: {
-        connect: authorIds.map((aid) => ({ id: aid })),
+    });
+
+    revalidatePath(`/`, "layout");
+    return { ok: true, id };
+  } catch (err) {
+    console.error("[updateBook]", err);
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "حدث خطأ أثناء حفظ الكتاب",
+    };
+  }
+}
+
+export async function createBook(data: BookEditData): Promise<BookActionResult> {
+  try {
+    const nameEn = resolveNameEn(data.nameEn, data.nameAr);
+    if (!nameEn) {
+      return { ok: false, error: "الاسم بالإنجليزية أو العربية مطلوب" };
+    }
+
+    const slug = data.slug.trim() || slugify(nameEn);
+    if (!slug) {
+      return { ok: false, error: "الرابط المختصر (Slug) مطلوب" };
+    }
+
+    const existing = await db.product.findUnique({ where: { slug } });
+    if (existing) {
+      return { ok: false, error: "هذا الرابط المختصر مستخدم بالفعل لكتاب آخر" };
+    }
+
+    const {
+      categoryIds,
+      authorIds,
+      publisherId,
+      primaryCategoryId,
+      publicationYear,
+      pageCount,
+      price,
+      ...rest
+    } = data;
+
+    const parsedYear = publicationYear.trim() !== "" ? parseInt(publicationYear, 10) : null;
+    const parsedPages = pageCount.trim() !== "" ? parseInt(pageCount, 10) : null;
+    const parsedPrice = price.trim() !== "" ? parseFloat(price) : null;
+    const originalId = await nextProductOriginalId();
+
+    const book = await db.product.create({
+      data: {
+        ...rest,
+        nameEn,
+        slug,
+        originalId,
+        publicationYear: parsedYear && !isNaN(parsedYear) ? parsedYear : null,
+        pageCount: parsedPages && !isNaN(parsedPages) ? parsedPages : null,
+        price: parsedPrice !== null && !isNaN(parsedPrice) ? parsedPrice : null,
+        publisherId: publisherId || null,
+        primaryCategoryId: primaryCategoryId || null,
+        categories: {
+          connect: categoryIds.map((cid) => ({ id: cid })),
+        },
+        authors: {
+          connect: authorIds.map((aid) => ({ id: aid })),
+        },
       },
-    },
-  });
+    });
 
-  revalidatePath(`/`, "layout");
+    revalidatePath(`/`, "layout");
+    return { ok: true, id: book.id };
+  } catch (err) {
+    console.error("[createBook]", err);
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "حدث خطأ أثناء إنشاء الكتاب",
+    };
+  }
+}
 
-  return { success: true, id: book.id };
+function slugify(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
