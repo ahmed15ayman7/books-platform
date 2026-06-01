@@ -144,7 +144,7 @@ export function AuthorFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text)] sm:max-w-lg">
+      <DialogContent className="max-h-[90vh] overflow-y-auto border-[var(--admin-border)] bg-white text-[var(--admin-text)] sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{isEdit ? "تعديل المؤلف" : "مؤلف جديد"}</DialogTitle>
         </DialogHeader>
