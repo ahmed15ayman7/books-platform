@@ -76,13 +76,14 @@ export default function AdminBooksPage() {
   const [published, setPublished] = useState("all");
   const [translationStatus, setTranslationStatus] = useState("all");
   const [featured, setFeatured] = useState("all");
+  const [authorCount, setAuthorCount] = useState("all");
 
   const loadBooks = useCallback(async () => {
     setLoading(true);
     try {
       const q = new URLSearchParams({ page: String(page), limit: "20" });
       if (search.trim()) q.set("search", search.trim());
-      appendListParams(q, { sort, published, translationStatus, featured });
+      appendListParams(q, { sort, published, translationStatus, featured, authorCount });
       const res = await fetch(`/api/v1/admin/books?${q}`, {
         headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
       });
@@ -95,7 +96,7 @@ export default function AdminBooksPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, sort, published, translationStatus, featured]);
+  }, [page, search, sort, published, translationStatus, featured, authorCount]);
 
   useEffect(() => {
     void loadBooks();
@@ -281,6 +282,20 @@ export default function AdminBooksPage() {
                 { value: "all", label: "الكل" },
                 { value: "true", label: "مميز" },
                 { value: "false", label: "عادي" },
+              ]}
+            />
+            <AdminFilterSelect
+              label="المؤلفون"
+              value={authorCount}
+              onChange={(v) => {
+                setAuthorCount(v);
+                resetPage();
+              }}
+              options={[
+                { value: "all", label: "الكل" },
+                { value: "none", label: "بدون مؤلف" },
+                { value: "one", label: "مؤلف واحد" },
+                { value: "multiple", label: "أكثر من مؤلف" },
               ]}
             />
           </>

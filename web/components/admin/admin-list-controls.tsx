@@ -42,7 +42,7 @@ export function AdminFilterSelect({
         <SelectTrigger className={cn(adminFieldClass, "min-w-[140px] h-9")}>
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="border-[var(--admin-input-border)] bg-[var(--admin-surface)] text-[var(--admin-text)]">
+        <SelectContent className="border-[var(--admin-input-border)] bg-white text-[var(--admin-text)]">
           {options.map((o) => (
             <SelectItem
               key={o.value}

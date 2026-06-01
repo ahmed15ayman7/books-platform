@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 /** Unified 4:3 media strip for all site and admin cards */
 export const cardMediaOuterClass =
-  "relative w-full shrink-0 overflow-hidden aspect-[4/3]";
+  "relative w-full shrink-0 overflow-hidden aspect-[3/4]";
 
 export function CardMedia({
   children,
