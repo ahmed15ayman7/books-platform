@@ -28,6 +28,8 @@ import {
   AdminInput,
   AdminSelect,
 } from "@/components/admin/admin-form-field";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface B2BSubscription {
   id: string;
@@ -68,6 +70,7 @@ export default function AdminB2BPage() {
   const [total, setTotal] = useState(0);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const draft = useFormDraft(formDraftId.adminB2b(editingId), form, setForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [sort, setSort] = useState("createdAt:desc");
@@ -105,6 +108,7 @@ export default function AdminB2BPage() {
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
       if (!res.ok || !data.success) { setError(data.error?.message ?? "فشل الحفظ"); return; }
+      draft.clearDraft();
       setForm(emptyForm);
       setEditingId(null);
       await load();
@@ -201,6 +205,12 @@ export default function AdminB2BPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         <AdminCard title={editingId ? "تعديل الاشتراك" : "اشتراك جديد"} className="lg:col-span-1">
           <form onSubmit={handleSubmit} className="space-y-3">
+            <FormDraftNotice
+              showBanner={draft.showBanner}
+              status={draft.status}
+              onResume={draft.resume}
+              onDismiss={draft.dismiss}
+            />
             <AdminInput label="اسم العميل *" value={form.clientName} onChange={set("clientName")} required />
             <AdminInput label="البريد الإلكتروني *" type="email" value={form.clientEmail} onChange={set("clientEmail")} required />
             <AdminSelect label="نوع الحزمة" value={form.packageType} onChange={set("packageType")} options={packageOptions} />

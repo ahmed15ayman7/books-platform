@@ -13,6 +13,8 @@ import {
 import { usePasskeyGate } from "@/lib/admin/use-passkey-gate";
 import { can } from "@/lib/admin/permissions-client";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface LogRow {
   id: string;
@@ -27,6 +29,8 @@ export function NotificationsSettingsTab() {
   const [settings, setSettings] = useState<SiteNotificationSettings>(
     DEFAULT_SITE_NOTIFICATIONS
   );
+  const [loaded, setLoaded] = useState(false);
+  const draft = useFormDraft(formDraftId.adminNotificationSettings(), settings, setSettings, { ready: loaded });
   const [logs, setLogs] = useState<LogRow[]>([]);
   const [status, setStatus] = useState("");
   const { runWithPasskey, error: passkeyError } = usePasskeyGate();
@@ -47,7 +51,8 @@ export function NotificationsSettingsTab() {
             setLogs(d.data.recentLogs);
           }
         }
-      );
+      )
+      .finally(() => setLoaded(true));
   }, []);
 
   async function handleSave(e: React.FormEvent) {
@@ -60,12 +65,19 @@ export function NotificationsSettingsTab() {
         body: JSON.stringify(settings),
       });
       const data = (await res.json()) as { success: boolean };
+      if (data.success) draft.clearDraft();
       setStatus(data.success ? "تم الحفظ ✓" : "فشل الحفظ");
     });
   }
 
   return (
     <form onSubmit={(e) => void handleSave(e)} className="max-w-2xl space-y-5">
+      <FormDraftNotice
+        showBanner={draft.showBanner}
+        status={draft.status}
+        onResume={draft.resume}
+        onDismiss={draft.dismiss}
+      />
       <AdminCard title="Web Push">
         <div className="space-y-3">
           <AdminCheckbox

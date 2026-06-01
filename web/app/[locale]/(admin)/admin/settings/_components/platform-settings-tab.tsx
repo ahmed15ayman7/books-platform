@@ -9,6 +9,8 @@ import { AdminInput, AdminCheckbox } from "@/components/admin/admin-form-field";
 import { usePasskeyGate } from "@/lib/admin/use-passkey-gate";
 import { can } from "@/lib/admin/permissions-client";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface Settings {
   platformNameAr: string;
@@ -44,6 +46,8 @@ const defaultSettings: Settings = {
 
 export function PlatformSettingsTab() {
   const [settings, setSettings] = useState<Settings>(defaultSettings);
+  const [loaded, setLoaded] = useState(false);
+  const draft = useFormDraft(formDraftId.adminPlatformSettings(), settings, setSettings, { ready: loaded });
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState("");
   const { runWithPasskey, error: passkeyError } = usePasskeyGate();
@@ -55,7 +59,8 @@ export function PlatformSettingsTab() {
       .then((d: { success: boolean; data?: Partial<Settings> }) => {
         if (d.success && d.data) setSettings((p) => ({ ...p, ...d.data }));
       })
-      .catch(() => null);
+      .catch(() => null)
+      .finally(() => setLoaded(true));
   }, []);
 
   async function handleSave(e: React.FormEvent) {
@@ -71,6 +76,7 @@ export function PlatformSettingsTab() {
           body: JSON.stringify(settings),
         });
         const data = (await res.json()) as { success: boolean };
+        if (data.success) draft.clearDraft();
         setStatus(data.success ? "تم الحفظ بنجاح ✓" : "فشل الحفظ");
       } catch {
         setStatus("حدث خطأ");
@@ -94,6 +100,12 @@ export function PlatformSettingsTab() {
 
   return (
     <form onSubmit={(e) => void handleSave(e)} className="max-w-2xl space-y-5">
+      <FormDraftNotice
+        showBanner={draft.showBanner}
+        status={draft.status}
+        onResume={draft.resume}
+        onDismiss={draft.dismiss}
+      />
       <AdminCard title="معلومات المنصة">
         <div className="grid gap-4 sm:grid-cols-2">
           <AdminInput

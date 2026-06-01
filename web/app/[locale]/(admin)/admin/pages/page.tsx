@@ -7,6 +7,8 @@ import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminInput, AdminTextarea } from "@/components/admin/admin-form-field";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface StaticPage {
   id: string;
@@ -37,6 +39,21 @@ export default function AdminPagesPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
+  const pageDraftValues: StaticPage = editing ?? {
+    id: "",
+    slug: "_none",
+    titleAr: "",
+    titleEn: "",
+    bodyAr: "",
+    bodyEn: "",
+  };
+  const draft = useFormDraft(
+    formDraftId.adminPage(editing?.slug ?? "_none"),
+    pageDraftValues,
+    (v) => setEditing(v),
+    { enabled: !!editing, ready: !loading },
+  );
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -64,6 +81,7 @@ export default function AdminPagesPage() {
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
       if (!res.ok || !data.success) { setError(data.error?.message ?? "فشل الحفظ"); return; }
+      draft.clearDraft();
       setSuccess(true);
       await load();
     } catch { setError("حدث خطأ"); }
@@ -115,6 +133,12 @@ export default function AdminPagesPage() {
         <div className="lg:col-span-2">
           {editing ? (
             <form onSubmit={handleSave} className="space-y-4">
+              <FormDraftNotice
+                showBanner={draft.showBanner}
+                status={draft.status}
+                onResume={draft.resume}
+                onDismiss={draft.dismiss}
+              />
               <AdminCard>
                 <div className="mb-4 flex gap-2 border-b border-[var(--admin-border)] pb-3">
                   {(["ar", "en"] as LangTab[]).map((l) => (

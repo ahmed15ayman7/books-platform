@@ -22,6 +22,8 @@ import {
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminInput, AdminCheckbox, AdminSlugInput } from "@/components/admin/admin-form-field";
 import { autoSlugFromEnglish } from "@/lib/admin/slugify";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface Category {
   id: string;
@@ -51,6 +53,7 @@ export default function AdminCategoriesPage() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<CatForm>(emptyForm);
+  const draft = useFormDraft(formDraftId.adminCategory(editingId), form, setForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -104,6 +107,7 @@ export default function AdminCategoriesPage() {
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
       if (!res.ok || !data.success) { setError(data.error?.message ?? "فشل الحفظ"); return; }
+      draft.clearDraft();
       setForm(emptyForm);
       setEditingId(null);
       await load();
@@ -212,6 +216,12 @@ export default function AdminCategoriesPage() {
         {/* Form */}
         <AdminCard title={editingId ? "تعديل التصنيف" : "إضافة تصنيف"} className="lg:col-span-1">
           <form onSubmit={handleSubmit} className="space-y-3">
+            <FormDraftNotice
+              showBanner={draft.showBanner}
+              status={draft.status}
+              onResume={draft.resume}
+              onDismiss={draft.dismiss}
+            />
             <AdminInput
               label="الاسم (EN) *"
               value={form.name}

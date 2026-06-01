@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { formatAdminDateTime } from "@/lib/admin/format-dates";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface HeroSlide {
   id: string;
@@ -46,6 +48,7 @@ export default function AdminHomeSliderPage() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const draft = useFormDraft(formDraftId.adminHomeSlide(editingId), form, setForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -120,6 +123,7 @@ export default function AdminHomeSliderPage() {
       }
       setForm(emptyForm);
       setEditingId(null);
+      draft.clearDraft();
       await loadSlides();
     } catch {
       setError("حدث خطأ في الاتصال");
@@ -159,6 +163,12 @@ export default function AdminHomeSliderPage() {
             {editingId ? "تعديل الشريحة" : "إضافة شريحة"}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-3">
+            <FormDraftNotice
+              showBanner={draft.showBanner}
+              status={draft.status}
+              onResume={draft.resume}
+              onDismiss={draft.dismiss}
+            />
             <Field label="العنوان (عربي) *" value={form.titleAr} onChange={(v) => setForm({ ...form, titleAr: v })} required />
             <Field label="العنوان (إنجليزي)" value={form.titleEn} onChange={(v) => setForm({ ...form, titleEn: v })} />
             <Field label="الوصف (عربي)" value={form.subtitleAr} onChange={(v) => setForm({ ...form, subtitleAr: v })} multiline />

@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { slugify, autoSlugFromEnglish } from "@/lib/admin/slugify";
 import { AdminInput, AdminSlugInput } from "@/components/admin/admin-form-field";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 import type { EntityOption } from "@/components/admin/admin-entity-combobox";
 
 interface CategoryFormState {
@@ -36,6 +38,7 @@ export function CreateCategoryDialog({
   onCreated,
 }: CreateCategoryDialogProps) {
   const [form, setForm] = useState<CategoryFormState>(emptyForm);
+  const draft = useFormDraft(formDraftId.adminCategoryDialog(), form, setForm, { enabled: open });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -95,6 +98,7 @@ export function CreateCategoryDialog({
         nameAr: data.data.nameAr,
         slug: data.data.slug,
       });
+      draft.clearDraft();
       onOpenChange(false);
       setForm(emptyForm);
     } catch {
@@ -111,6 +115,12 @@ export function CreateCategoryDialog({
           <DialogTitle>تصنيف جديد</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-3">
+          <FormDraftNotice
+            showBanner={draft.showBanner}
+            status={draft.status}
+            onResume={draft.resume}
+            onDismiss={draft.dismiss}
+          />
           <AdminInput
             label="الاسم (EN) *"
             value={form.name}

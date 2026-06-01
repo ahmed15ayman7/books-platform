@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { slugify, autoSlugFromEnglish } from "@/lib/admin/slugify";
 import { AdminInput, AdminTextarea, AdminSlugInput } from "@/components/admin/admin-form-field";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 export interface AuthorFormValues {
   id?: string;
@@ -59,6 +61,7 @@ export function AuthorFormDialog({
 }: AuthorFormDialogProps) {
   const isEdit = Boolean(author?.id);
   const [form, setForm] = useState<AuthorFormValues>(emptyForm);
+  const draft = useFormDraft(formDraftId.adminAuthor(author?.id), form, setForm, { enabled: open });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -129,6 +132,7 @@ export function AuthorFormDialog({
         return;
       }
       onSaved?.(data.data);
+      draft.clearDraft();
       onOpenChange(false);
       setForm(emptyForm);
     } catch {
@@ -145,6 +149,12 @@ export function AuthorFormDialog({
           <DialogTitle>{isEdit ? "تعديل المؤلف" : "مؤلف جديد"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <FormDraftNotice
+            showBanner={draft.showBanner}
+            status={draft.status}
+            onResume={draft.resume}
+            onDismiss={draft.dismiss}
+          />
           <div className="grid gap-3 sm:grid-cols-2">
             <AdminInput
               label="الاسم (إنجليزي) *"

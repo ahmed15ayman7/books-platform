@@ -16,6 +16,8 @@ import {
   AdminSelect,
   AdminCheckbox,
 } from "@/components/admin/admin-form-field";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 export interface PublisherOption {
   id: string;
@@ -63,6 +65,7 @@ export function CreatePublisherDialog({
   onCreated,
 }: CreatePublisherDialogProps) {
   const [form, setForm] = useState<PublisherFormState>(emptyForm);
+  const draft = useFormDraft(formDraftId.adminPublisherDialog(), form, setForm, { enabled: open });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -104,6 +107,7 @@ export function CreatePublisherDialog({
         title: data.data.title ?? data.data.nameAr ?? data.data.name ?? form.nameAr.trim(),
         slug: data.data.slug ?? "",
       });
+      draft.clearDraft();
       onOpenChange(false);
       setForm(emptyForm);
     } catch {
@@ -120,6 +124,12 @@ export function CreatePublisherDialog({
           <DialogTitle>دار نشر جديدة</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-5">
+          <FormDraftNotice
+            showBanner={draft.showBanner}
+            status={draft.status}
+            onResume={draft.resume}
+            onDismiss={draft.dismiss}
+          />
           <div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--admin-text-subtle)]">
               البيانات الأساسية

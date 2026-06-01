@@ -13,6 +13,8 @@ import {
   AdminSelect,
 } from "@/components/admin/admin-form-field";
 import { AdminTimestamps } from "@/components/admin/admin-timestamps";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface ArticleForm {
   title: string;
@@ -66,6 +68,7 @@ export default function AdminArticleEditPage() {
   const [form, setForm] = useState<ArticleForm>(empty);
   const [tab, setTab] = useState<LangTab>("ar");
   const [loading, setLoading] = useState(!isNew);
+  const draft = useFormDraft(formDraftId.adminArticle(id), form, setForm, { ready: !loading });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -120,6 +123,7 @@ export default function AdminArticleEditPage() {
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
       if (!res.ok || !data.success) { setError(data.error?.message ?? "فشل الحفظ"); return; }
+      draft.clearDraft();
       setSuccess(true);
     } catch { setError("حدث خطأ في الاتصال"); }
     finally { setSaving(false); }
@@ -151,6 +155,12 @@ export default function AdminArticleEditPage() {
       )}
 
       <form onSubmit={handleSubmit} className="max-w-4xl space-y-5">
+        <FormDraftNotice
+          showBanner={draft.showBanner}
+          status={draft.status}
+          onResume={draft.resume}
+          onDismiss={draft.dismiss}
+        />
         <AdminCard title="الإعدادات">
           <div className="grid gap-4 sm:grid-cols-3">
             <AdminSelect

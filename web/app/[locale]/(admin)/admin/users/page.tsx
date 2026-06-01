@@ -33,6 +33,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface AdminUserRow {
   id: string;
@@ -81,6 +83,7 @@ export default function AdminUsersPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
+  const draft = useFormDraft(formDraftId.adminUser(editingId), form, setForm, { enabled: showForm });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -221,6 +224,7 @@ export default function AdminUsersPage() {
           return;
         }
       }
+      draft.clearDraft();
       setShowForm(false);
       void loadUsers();
     } catch {
@@ -358,6 +362,12 @@ export default function AdminUsersPage() {
             {editingId ? "تعديل مدير" : "مدير جديد"}
           </h2>
           <form onSubmit={handleSave} className="space-y-5">
+            <FormDraftNotice
+              showBanner={draft.showBanner}
+              status={draft.status}
+              onResume={draft.resume}
+              onDismiss={draft.dismiss}
+            />
             <div className="grid gap-4 sm:grid-cols-2">
               {!editingId && (
                 <div>

@@ -14,6 +14,8 @@ import {
   AdminCheckbox,
 } from "@/components/admin/admin-form-field";
 import { AdminTimestamps } from "@/components/admin/admin-timestamps";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface PublisherForm {
   name: string;
@@ -49,6 +51,7 @@ export default function AdminPublisherEditPage() {
 
   const [form, setForm] = useState<PublisherForm>(empty);
   const [loading, setLoading] = useState(!isNew);
+  const draft = useFormDraft(formDraftId.adminPublisher(id), form, setForm, { ready: !loading });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -111,6 +114,7 @@ export default function AdminPublisherEditPage() {
         return;
       }
       setSuccess(true);
+      draft.clearDraft();
     } catch {
       setError("حدث خطأ في الاتصال");
     } finally {
@@ -146,6 +150,12 @@ export default function AdminPublisherEditPage() {
       )}
 
       <form onSubmit={handleSubmit} className="max-w-3xl space-y-5">
+        <FormDraftNotice
+          showBanner={draft.showBanner}
+          status={draft.status}
+          onResume={draft.resume}
+          onDismiss={draft.dismiss}
+        />
         <AdminCard title="البيانات الأساسية">
           <div className="grid gap-4 sm:grid-cols-2">
             <AdminInput

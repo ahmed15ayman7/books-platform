@@ -20,6 +20,8 @@ import {
 import { AdminListView } from "@/components/admin/admin-list-view";
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminInput, AdminTextarea } from "@/components/admin/admin-form-field";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface Subscriber {
   id: string;
@@ -37,6 +39,7 @@ export default function AdminNewsletterPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [campaign, setCampaign] = useState({ subject: "", body: "" });
+  const draft = useFormDraft(formDraftId.adminNewsletterCampaign(), campaign, setCampaign);
   const [sending, setSending] = useState(false);
   const [sendStatus, setSendStatus] = useState("");
   const [sort, setSort] = useState("createdAt:desc");
@@ -73,6 +76,7 @@ export default function AdminNewsletterPage() {
         body: JSON.stringify(campaign),
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
+      if (data.success) draft.clearDraft();
       setSendStatus(data.success ? "تم إرسال الحملة بنجاح ✓" : (data.error?.message ?? "فشل الإرسال"));
     } finally {
       setSending(false);
@@ -137,6 +141,12 @@ export default function AdminNewsletterPage() {
         {/* Send Campaign */}
         <AdminCard title="إرسال حملة بريدية" className="lg:col-span-1">
           <form onSubmit={sendCampaign} className="space-y-3">
+            <FormDraftNotice
+              showBanner={draft.showBanner}
+              status={draft.status}
+              onResume={draft.resume}
+              onDismiss={draft.dismiss}
+            />
             <AdminInput
               label="عنوان الرسالة *"
               value={campaign.subject}

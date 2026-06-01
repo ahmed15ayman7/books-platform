@@ -12,10 +12,19 @@ import {
   type LoginHistoryRow,
 } from "@/components/admin/login-history-table";
 import { usePasskeyGate } from "@/lib/admin/use-passkey-gate";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 export function AccountSettingsTab() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [profileLoaded, setProfileLoaded] = useState(false);
+  const profileDraft = useFormDraft(
+    formDraftId.adminAccountProfile(),
+    { fullName },
+    (v) => setFullName(v.fullName),
+    { ready: profileLoaded },
+  );
   const [logs, setLogs] = useState<LoginHistoryRow[]>([]);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -38,6 +47,7 @@ export function AccountSettingsTab() {
       }
       const h = hist as { success: boolean; data?: LoginHistoryRow[] };
       if (h.success && h.data) setLogs(h.data);
+      setProfileLoaded(true);
     });
   }, []);
 
@@ -51,6 +61,7 @@ export function AccountSettingsTab() {
         body: JSON.stringify({ fullName }),
       });
       const data = (await res.json()) as { success: boolean };
+      if (data.success) profileDraft.clearDraft();
       setStatus(data.success ? "تم تحديث الملف ✓" : "فشل التحديث");
     });
   }
@@ -81,6 +92,12 @@ export function AccountSettingsTab() {
   return (
     <div className="max-w-3xl space-y-6">
       <form onSubmit={(e) => void saveProfile(e)} className="space-y-4">
+        <FormDraftNotice
+          showBanner={profileDraft.showBanner}
+          status={profileDraft.status}
+          onResume={profileDraft.resume}
+          onDismiss={profileDraft.dismiss}
+        />
         <AdminCard title="الملف الشخصي">
           <div className="grid gap-4 sm:grid-cols-2">
             <AdminInput label="الاسم الكامل" value={fullName} onChange={(e) => setFullName(e.target.value)} />

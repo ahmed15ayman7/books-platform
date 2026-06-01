@@ -24,6 +24,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 /* ─── Types ─────────────────────────────────────────────────────────── */
 interface Publisher  { id: string; title: string; name: string; nameAr?: string | null; slug: string }
@@ -148,6 +150,7 @@ export function BookEditForm({
   const [errorMsg, setErrorMsg] = useState("");
 
   const [form, setForm] = useState<BookEditData>(initial);
+  const draft = useFormDraft(formDraftId.adminBook(bookId), form, setForm);
   const [authorsList, setAuthorsList] = useState(authors);
   const [publishersList, setPublishersList] = useState(publishers);
   const [categoriesList, setCategoriesList] = useState(categories);
@@ -234,6 +237,7 @@ export function BookEditForm({
           setErrorMsg(result.error);
           return;
         }
+        draft.clearDraft();
         setStatus("success");
         setTimeout(() => setStatus("idle"), 3000);
         return;
@@ -246,6 +250,7 @@ export function BookEditForm({
         return;
       }
       if (result.id) {
+        draft.clearDraft();
         setStatus("success");
         setTimeout(() => {
           router.push(`/${locale}/admin/books/${result.id}`);
@@ -258,6 +263,12 @@ export function BookEditForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6" dir="rtl">
+      <FormDraftNotice
+        showBanner={draft.showBanner}
+        status={draft.status}
+        onResume={draft.resume}
+        onDismiss={draft.dismiss}
+      />
       {/* ── 1. Book Identity ─────────────────────────────────────── */}
       <SectionCard title="بيانات الكتاب الأساسية">
         <Field className="sm:col-span-2">

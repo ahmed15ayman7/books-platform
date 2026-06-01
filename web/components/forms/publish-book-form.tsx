@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select";
 import { CheckCircle, ChevronLeft, ChevronRight, Cloud, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { loadLocalFormValues, useFormAutosave } from "@/lib/forms/use-form-autosave";
+import { clearFormDraft, loadLocalFormValues, useFormAutosave } from "@/lib/forms/use-form-autosave";
 import {
   authHeaders,
   clearStoredDraft,
@@ -189,7 +189,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
   }
 
   function dismissLocalDraft() {
-    localStorage.removeItem(`form-autosave:${FORM_ID}`);
+    clearFormDraft(FORM_ID);
     setResumeBanner(false);
   }
 
@@ -211,7 +211,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
       });
       if (res.ok) {
         clearStoredDraft();
-        localStorage.removeItem(`form-autosave:${FORM_ID}`);
+        clearFormDraft(FORM_ID);
         setStatus("success");
         reset(defaultValues);
         setStep(0);

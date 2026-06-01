@@ -7,6 +7,8 @@ import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminInput, AdminTextarea } from "@/components/admin/admin-form-field";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface BroadcastForm {
   channel: string;
@@ -19,6 +21,7 @@ const empty: BroadcastForm = { channel: "push", title: "", body: "", url: "" };
 
 export default function AdminNotificationsPage() {
   const [form, setForm] = useState<BroadcastForm>(empty);
+  const draft = useFormDraft(formDraftId.adminNotificationBroadcast(), form, setForm);
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState("");
 
@@ -34,7 +37,10 @@ export default function AdminNotificationsPage() {
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
       setStatus(data.success ? "تم الإرسال بنجاح ✓" : (data.error?.message ?? "فشل الإرسال"));
-      if (data.success) setForm(empty);
+      if (data.success) {
+        draft.clearDraft();
+        setForm(empty);
+      }
     } catch {
       setStatus("حدث خطأ في الاتصال");
     } finally {
@@ -62,6 +68,12 @@ export default function AdminNotificationsPage() {
         {/* Broadcast form */}
         <AdminCard title="إرسال إشعار جماعي">
           <form onSubmit={handleSend} className="space-y-4">
+            <FormDraftNotice
+              showBanner={draft.showBanner}
+              status={draft.status}
+              onResume={draft.resume}
+              onDismiss={draft.dismiss}
+            />
             {/* Channel selector */}
             <div>
               <p className="mb-2 text-xs font-medium text-[var(--admin-text-muted)]">قناة الإرسال</p>
