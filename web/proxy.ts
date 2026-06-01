@@ -16,6 +16,8 @@ const ADMIN_PATTERN = /^\/[a-z]{2}\/admin(?:\/|$)/;
 const ADMIN_LOGIN_PATTERN = /^\/[a-z]{2}\/admin\/login\/?$/;
 const AMBASSADOR_PATTERN = /^\/[a-z]{2}\/ambassador(?:\/|$)/;
 const AMBASSADOR_LOGIN_PATTERN = /^\/[a-z]{2}\/ambassador\/login\/?$/;
+const AUTHOR_PATTERN = /^\/[a-z]{2}\/author(?:\/|$)/;
+const AUTH_PATTERN = /^\/[a-z]{2}\/auth(?:\/|$)/;
 
 export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -60,6 +62,29 @@ export default async function proxy(request: NextRequest) {
     if (!payload || (payload.role !== "AMBASSADOR" && payload.role !== "ADMIN")) {
       const locale = pathname.split("/")[1] ?? "ar";
       return NextResponse.redirect(new URL(`/${locale}/ambassador/login`, request.url));
+    }
+  }
+
+  // Protect author portal (auth login/register stay public)
+  if (AUTHOR_PATTERN.test(pathname) && !AUTH_PATTERN.test(pathname)) {
+    const token = request.cookies.get("access_token")?.value
+      ?? request.headers.get("authorization")?.replace("Bearer ", "");
+
+    if (!token) {
+      const locale = pathname.split("/")[1] ?? "ar";
+      const redirect = encodeURIComponent(pathname + request.nextUrl.search);
+      return NextResponse.redirect(
+        new URL(`/${locale}/auth/login?redirect=${redirect}`, request.url),
+      );
+    }
+
+    const payload = await verifyAccessToken(token);
+    if (!payload || (payload.role !== "AUTHOR" && payload.role !== "ADMIN")) {
+      const locale = pathname.split("/")[1] ?? "ar";
+      const redirect = encodeURIComponent(pathname + request.nextUrl.search);
+      return NextResponse.redirect(
+        new URL(`/${locale}/auth/login?redirect=${redirect}`, request.url),
+      );
     }
   }
 

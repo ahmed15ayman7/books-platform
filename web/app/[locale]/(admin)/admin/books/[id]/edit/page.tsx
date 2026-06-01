@@ -19,16 +19,21 @@ export async function generateMetadata({ params }: Props) {
 export default async function BookEditPage({ params }: Props) {
   const { id, locale } = await params;
 
-  const [book, publishers, categories, allAuthors] = await Promise.all([
-    db.product.findFirst({
-      where: { id, ...notDeleted },
-      include: {
-        publisher: { select: { id: true } },
-        primaryCategory: { select: { id: true } },
-        categories: { select: { id: true } },
-        authors: { select: { id: true } },
-      },
-    }),
+  const book = await db.product.findFirst({
+    where: { id, ...notDeleted },
+    include: {
+      publisher: { select: { id: true } },
+      primaryCategory: { select: { id: true } },
+      categories: { select: { id: true } },
+      authors: { select: { id: true } },
+    },
+  });
+
+  if (!book) notFound();
+
+  const linkedAuthorIds = book.authors.map((a) => a.id);
+
+  const [publishers, categories, allAuthors] = await Promise.all([
     db.publisher.findMany({
       where: { status: "publish" },
       select: { id: true, title: true, name: true, nameAr: true, slug: true },
@@ -39,13 +44,16 @@ export default async function BookEditPage({ params }: Props) {
       orderBy: { name: "asc" },
     }),
     db.author.findMany({
-      where: { spamFlag: null },
+      where: {
+        OR: [
+          { spamFlag: null },
+          ...(linkedAuthorIds.length > 0 ? [{ id: { in: linkedAuthorIds } }] : []),
+        ],
+      },
       select: { id: true, name: true, nameAr: true, slug: true },
       orderBy: { name: "asc" },
     }),
   ]);
-
-  if (!book) notFound();
 
   return (
     <div className="text-[var(--admin-text)]">

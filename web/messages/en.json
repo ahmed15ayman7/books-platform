@@ -179,12 +179,23 @@
   },
   "auth": {
     "login": "Login",
+    "register": "Create Account",
     "logout": "Logout",
     "email": "Email Address",
     "password": "Password",
     "loginButton": "Sign In",
     "invalidCredentials": "Invalid email or password",
     "accountLocked": "Account temporarily locked, please try again later"
+  },
+  "draft": {
+    "resume": "You have an unfinished draft — continue where you left off?",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "failed": "Save failed — will retry",
+    "idle": "Autosaved"
+  },
+  "author": {
+    "mySubmissions": "My Drafts & Submissions"
   },
   "footer": {
     "rights": "All rights reserved",

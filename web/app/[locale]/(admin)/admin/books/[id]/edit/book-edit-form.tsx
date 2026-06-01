@@ -6,10 +6,11 @@ import { Save, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { createBook, updateBook, type BookEditData } from "./actions";
 import { adminFieldClass } from "@/components/admin/admin-form-field";
 import { AdminMarkdownHint } from "@/components/admin/admin-markdown-hint";
-import { AdminEntityCombobox } from "@/components/admin/admin-entity-combobox";
+import { AdminEntityCombobox, type EntityOption } from "@/components/admin/admin-entity-combobox";
 import { CreateAuthorDialog } from "@/components/admin/create-author-dialog";
 import { CreatePublisherDialog } from "@/components/admin/create-publisher-dialog";
 import { CreateCategoryDialog } from "@/components/admin/create-category-dialog";
+import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { slugify, autoSlugFromEnglish, AUTO_SLUG_HINT } from "@/lib/admin/slugify";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -176,6 +177,24 @@ export function BookEditForm({
   }));
 
   const entityLabel = (o: { name: string; nameAr?: string | null }) => o.nameAr ?? o.name;
+
+  async function searchAuthorsRemote(query: string): Promise<EntityOption[]> {
+    const res = await fetch(
+      `/api/v1/admin/authors?search=${encodeURIComponent(query)}&limit=30`,
+      { headers: adminAuthHeaders() },
+    );
+    const data = await res.json() as {
+      success: boolean;
+      data?: Array<{ id: string; name: string; nameAr: string | null; slug: string }>;
+    };
+    if (!res.ok || !data.success || !data.data) return [];
+    return data.data.map((a) => ({
+      id: a.id,
+      name: a.name,
+      nameAr: a.nameAr,
+      slug: a.slug,
+    }));
+  }
 
   function set<K extends keyof BookEditData>(key: K, value: BookEditData[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -401,6 +420,7 @@ export function BookEditForm({
             value={form.authorIds}
             onChange={(v) => set("authorIds", v as string[])}
             getLabel={entityLabel}
+            onRemoteSearch={searchAuthorsRemote}
             onCreateNew={(q) => {
               setCreateQuery(q);
               setAuthorDialogOpen(true);

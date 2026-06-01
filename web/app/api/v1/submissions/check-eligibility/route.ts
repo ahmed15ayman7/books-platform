@@ -7,7 +7,9 @@ export async function GET(request: NextRequest) {
     const email = request.nextUrl.searchParams.get("email");
     if (!email) return ApiErrors.badRequest("email parameter required");
 
-    const count = await db.publishBookSubmission.count({ where: { authorEmail: email } });
+    const count = await db.publishBookSubmission.count({
+      where: { authorEmail: email, status: { not: "draft" } },
+    });
     return apiSuccess({ isEligibleForFree: count === 0, submissionsCount: count });
   } catch (error) {
     console.error("[GET /api/v1/submissions/check-eligibility]", error);

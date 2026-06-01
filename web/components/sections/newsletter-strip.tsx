@@ -1,17 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
 import { Mail, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { loadLocalFormValues, useFormAutosave } from "@/lib/forms/use-form-autosave";
+
+const FORM_ID = "newsletter-email";
 
 export function NewsletterStrip() {
   const t = useTranslations("home.newsletter");
   const locale = useLocale();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+
+  useEffect(() => {
+    const saved = loadLocalFormValues<{ email: string }>(FORM_ID);
+    if (saved?.email) setEmail(saved.email);
+  }, []);
+
+  useFormAutosave({
+    formId: FORM_ID,
+    values: { email },
+    canSyncToServer: (v) => v.email.includes("@"),
+  });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -23,7 +37,11 @@ export function NewsletterStrip() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, locale, source: "homepage" }),
       });
-      if (res.ok) { setStatus("success"); setEmail(""); }
+      if (res.ok) {
+        setStatus("success");
+        setEmail("");
+        localStorage.removeItem(`form-autosave:${FORM_ID}`);
+      }
       else setStatus("error");
     } catch { setStatus("error"); }
   }
