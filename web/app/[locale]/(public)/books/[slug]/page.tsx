@@ -3,11 +3,14 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { BookService } from "@/server/services/book.service";
+import { ArticleService } from "@/server/services/article.service";
 import { BookCarousel } from "@/components/sections/book-carousel";
+import { ArticleCarousel } from "@/components/sections/article-carousel";
 import { BookDetailHero } from "@/components/sections/book-detail-hero";
 import { BookBiblioTable } from "@/components/sections/book-biblio-table";
 import { SectionHeading } from "@/components/ui/section-heading";
 import type { Locale } from "@/lib/i18n";
+import { mapArticleForCard } from "@/lib/i18n/article-linked-book";
 import {
   localizedBookAlternateName,
   localizedBookDescription,
@@ -35,9 +38,10 @@ export default async function BookDetailPage({ params }: BookPageProps) {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("books");
 
-  const [book, similarResult] = await Promise.all([
+  const [book, similarResult, linkedArticlesRaw] = await Promise.all([
     BookService.getBySlug(slug).catch(() => null),
     BookService.getSimilar(slug, 12).catch(() => ({ books: [], isGeneralFallback: false })),
+    ArticleService.getByProductSlug(slug, 12).catch(() => []),
   ]);
 
   const similarBooks = similarResult.books;
@@ -46,6 +50,14 @@ export default async function BookDetailPage({ params }: BookPageProps) {
   if (!book) notFound();
 
   const displayName = localizedBookName(book, locale);
+  const linkedArticles = linkedArticlesRaw.map((article) => ({
+    ...mapArticleForCard(article, locale),
+    linkedBook: {
+      slug: book.slug,
+      name: displayName,
+      imageUrl: book.imageUrl ?? null,
+    },
+  }));
   const alternateName = localizedBookAlternateName(book, locale);
   const description = localizedBookDescription(book, locale);
   const leadText = localizedBookShortDesc(book, locale);
@@ -152,6 +164,17 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             authors={book.authors}
             locale={locale}
           />
+
+          {linkedArticles.length > 0 && (
+            <section aria-labelledby="linked-articles-heading">
+              <SectionHeading
+                id="linked-articles-heading"
+                title={t("linkedArticles")}
+                className="mb-6"
+              />
+              <ArticleCarousel articles={linkedArticles} locale={locale} />
+            </section>
+          )}
 
           {similarBooks.length > 0 && (
             <section aria-labelledby="similar-books-heading">

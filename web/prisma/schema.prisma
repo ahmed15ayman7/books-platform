@@ -149,6 +149,7 @@ model Article {
   articleCategoryId String?         @map("article_category_id")
   articleCategory  ArticleCategory? @relation(fields: [articleCategoryId], references: [id])
   postTags         PostTag[]        @relation("ArticlePostTags")
+  products         Product[]        @relation("ArticleProducts")
   comments         Comment[]
   createdById      String?          @map("created_by_id")
   updatedById      String?          @map("updated_by_id")
@@ -213,6 +214,7 @@ model Product {
   categories          ProductCategory[] @relation("ProductProductCategories")
   tags                ProductTag[]     @relation("ProductProductTags")
   authors             Author[]         @relation("ProductAuthors")
+  articles            Article[]        @relation("ArticleProducts")
   cartItems           CartItem[]
   wishlistItems       WishlistItem[]
   ratings             Rating[]

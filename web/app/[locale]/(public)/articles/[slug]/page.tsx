@@ -5,12 +5,14 @@ import Link from "next/link";
 import { getLocale } from "next-intl/server";
 import { ArticleService } from "@/server/services/article.service";
 import { ArticleCard } from "@/components/sections/article-card";
+import { BookCard } from "@/components/sections/book-card";
 import { Badge } from "@/components/ui/badge";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Clock, Calendar } from "lucide-react";
 import { formatDate } from "@/lib/utils/formatters";
 import readingTime from "reading-time";
 import type { Locale } from "@/lib/i18n";
+import { articleLinkedBookDisplay, mapArticleForCard } from "@/lib/i18n/article-linked-book";
 import { articleSeoMetadata } from "@/lib/seo/metadata";
 
 interface ArticlePageProps {
@@ -51,6 +53,10 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
 
   if (!article) notFound();
 
+  const linkedBook = articleLinkedBookDisplay(article.products?.[0], locale);
+  const heroImageUrl = linkedBook?.imageUrl ?? article.imageUrl;
+  const relatedArticles = related.map((art) => mapArticleForCard(art, locale));
+
   const channelInfo = article.channel ? channelNames[article.channel] : null;
   const channelLabel = channelInfo
     ? locale === "ar"
@@ -78,13 +84,13 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
       />
       <div className="min-h-screen bg-[var(--brand-gray-50)]">
         {/* Hero Image */}
-        {article.imageUrl && (
+        {heroImageUrl && (
           <div className="relative h-64 w-full overflow-hidden bg-[var(--brand-gray-200)] md:h-96">
             <Image
-              src={article.imageUrl}
-              alt={article.title}
+              src={heroImageUrl}
+              alt={linkedBook ? linkedBook.name : article.title}
               fill
-              className="object-cover"
+              className={linkedBook ? "object-contain bg-[var(--brand-gray-100)]" : "object-cover"}
               priority
             />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50" />
@@ -152,6 +158,23 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
             {/* Divider */}
             <hr className="my-6 border-[var(--brand-gray-200)]" />
 
+            {linkedBook && article.products?.[0] && (
+              <section className="mb-8" aria-labelledby="linked-book-heading">
+                <SectionHeading
+                  id="linked-book-heading"
+                  title={locale === "ar" ? "الكتاب" : "The Book"}
+                  className="mb-4"
+                />
+                <div className="max-w-xs">
+                  <BookCard
+                    {...article.products[0]}
+                    locale={locale}
+                    compact
+                  />
+                </div>
+              </section>
+            )}
+
             {/* Article content */}
             {article.content ? (
               <div
@@ -199,7 +222,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
           </div>
 
           {/* Related Articles */}
-          {related.length > 0 && (
+          {relatedArticles.length > 0 && (
             <section className="mt-16" aria-labelledby="related-heading">
               <div className="mx-auto max-w-5xl">
                 <SectionHeading
@@ -208,7 +231,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
                   className="mb-6"
                 />
                 <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-3">
-                  {related.map((art) => (
+                  {relatedArticles.map((art) => (
                     <ArticleCard
                       key={art.id}
                       {...art}
