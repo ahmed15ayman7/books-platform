@@ -8,6 +8,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/router/args/article_detail_args.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_loading_indicator.dart';
+import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/bottom_nav_widget.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/section_header_widget.dart';
@@ -521,30 +522,26 @@ class _CommentSection extends StatelessWidget {
         ),
         SizedBox(height: 10.h),
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: TextField(
+              child: AppTextField(
                 controller: controller,
-                decoration: InputDecoration(
-                  hintText: 'article_detail.comment_hint'.tr(),
-                  hintStyle: GoogleFonts.tajawal(
-                    fontSize: 13.sp,
-                    color: AppColors.textHint,
-                  ),
-                  filled: true,
-                  fillColor: AppColors.inputFill,
-                  contentPadding: EdgeInsetsDirectional.fromSTEB(
-                      14.w, 10.h, 14.w, 10.h),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
+                hint: 'article_detail.comment_hint'.tr(),
+                textInputAction: TextInputAction.send,
+                onFieldSubmitted: (_) {
+                  if (controller.text.trim().isEmpty) return;
+                  controller.clear();
+                },
               ),
             ),
             SizedBox(width: 8.w),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                if (controller.text.trim().isEmpty) return;
+                controller.clear();
+                // backend comment submission goes here
+              },
               child: Container(
                 width: 44.r,
                 height: 44.r,

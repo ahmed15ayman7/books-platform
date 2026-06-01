@@ -166,3 +166,36 @@ Extractions per file:
 - **Translation keys not added for mock article data** (comment author names like `'محمد العتيبي'`, relative times like `'منذ 3 ساعات'`) — these are placeholder data in `article_detail_screen.dart` that will be replaced with real API responses. Adding translation keys for them would be premature.
 - **`flutter analyze` → 0 issues** confirmed at end of session after all 6 fixes.
 - **All 14 screens remain functional** — no regressions introduced.
+
+---
+
+## Addendum — 2026-06-01: AppTextField & Static Form Fields
+
+### What Was Done
+
+- Created `lib/core/widgets/app_text_field.dart` — reusable `StatefulWidget` wrapping `TextFormField` with label, required-asterisk, and password-visibility toggle. Inherits all styling from global `InputDecorationTheme`.
+- Extended `lib/core/helpers/regex_helper.dart` with static validator factory methods: `requiredValidator`, `emailValidator`, `phoneValidator`, `minLengthValidator` (all return `String?`, use `.tr()`).
+- Added `"validation"` section to both `assets/translations/en.json` and `assets/translations/ar.json` (required, email, phone, min_length keys).
+- Replaced 7 fake `_formField()` containers in `publish_screen.dart` with real `AppTextField` inside per-step `Form` widgets; `_next()` now validates before advancing.
+- Converted `_NewsletterStrip` in `home_screen.dart` to `StatefulWidget` with a controller + form key; replaced static container with `AppTextField` using a `Theme` override for white-on-dark styling.
+- Replaced raw `TextField` in `article_detail_screen.dart` comment section with `AppTextField`; send button now has a non-empty guard.
+- `flutter analyze` → **0 issues**.
+
+### Files Changed
+
+| File | Change |
+|---|---|
+| `lib/core/widgets/app_text_field.dart` | **New** — reusable input widget |
+| `lib/core/helpers/regex_helper.dart` | Added 4 validator factory methods + `easy_localization` import |
+| `assets/translations/en.json` | Added `validation.*` keys |
+| `assets/translations/ar.json` | Added `validation.*` keys |
+| `lib/features/publish/presentation/pages/publish_screen.dart` | 7 fake containers → `AppTextField`; `Form` + validation per step; 7 controllers + `dispose()` |
+| `lib/features/books/presentation/pages/home_screen.dart` | `_NewsletterStrip` → `StatefulWidget`; static email container → `AppTextField` with Theme override |
+| `lib/features/articles/presentation/pages/article_detail_screen.dart` | Raw `TextField` → `AppTextField`; send button non-empty guard |
+
+### Updated Pending Tasks
+
+- [ ] **Publish form submit** — form validates locally but `_next()` at step 2 still calls `Navigator.pushReplacementNamed(home)` with no API call; wire to backend when ready.
+- [ ] **Newsletter subscription** — `_subscribe()` clears the field on valid email but makes no API call; wire when backend endpoint is available.
+- [ ] **Article comments** — comment `clear()` on send is a local-only stub; wire to backend when comments API exists.
+- *(All prior pending tasks from sessions 001–005 remain open.)*

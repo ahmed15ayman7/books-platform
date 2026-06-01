@@ -167,6 +167,13 @@
     "success_description": "We'll review your book and contact you within 5 business days.\nSubject to editorial approval."
   },
 
+  "validation": {
+    "required": "This field is required",
+    "email": "Enter a valid email address",
+    "phone": "Enter a valid Egyptian phone number (01XXXXXXXXX)",
+    "min_length": "Must be at least {min} characters"
+  },
+
   "categories": {
     "ideas_and_policies": "Ideas & Policies",
     "social_studies": "Social Studies",

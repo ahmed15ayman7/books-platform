@@ -5,11 +5,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../../core/helpers/regex_helper.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/router/args/book_detail_args.dart';
 import '../../../../core/router/args/category_books_args.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_bar_widget.dart';
+import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/bottom_nav_widget.dart';
 import '../../../../core/widgets/error_state_widget.dart';
 import '../../../../core/widgets/section_header_widget.dart';
@@ -503,13 +505,34 @@ class _PublisherPill extends StatelessWidget {
 }
 
 // ── Newsletter strip ──────────────────────────────────────────────────────
-class _NewsletterStrip extends StatelessWidget {
+class _NewsletterStrip extends StatefulWidget {
   const _NewsletterStrip({required this.locale});
   final String locale;
 
   @override
+  State<_NewsletterStrip> createState() => _NewsletterStripState();
+}
+
+class _NewsletterStripState extends State<_NewsletterStrip> {
+  final _emailCtrl = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    super.dispose();
+  }
+
+  void _subscribe() {
+    if (_formKey.currentState?.validate() ?? false) {
+      _emailCtrl.clear();
+      // backend subscription call goes here
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final ar = locale == 'ar';
+    final ar = widget.locale == 'ar';
     return Container(
       padding: EdgeInsetsDirectional.all(20.r),
       decoration: BoxDecoration(
@@ -538,51 +561,84 @@ class _NewsletterStrip extends StatelessWidget {
             ),
           ),
           SizedBox(height: 14.h),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 46.h,
-                  padding: EdgeInsetsDirectional.symmetric(horizontal: 14.w),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.18),
+          Form(
+            key: _formKey,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      inputDecorationTheme: Theme.of(context)
+                          .inputDecorationTheme
+                          .copyWith(
+                            fillColor: Colors.white.withValues(alpha: 0.1),
+                            hintStyle: GoogleFonts.tajawal(
+                              fontSize: 13.sp,
+                              color: Colors.white.withValues(alpha: 0.6),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.white.withValues(alpha: 0.18),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide:
+                                  const BorderSide(color: Colors.white, width: 1.5),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: BorderSide(
+                                color: Colors.white.withValues(alpha: 0.7),
+                              ),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                              borderSide: const BorderSide(
+                                  color: Colors.white, width: 1.5),
+                            ),
+                            errorStyle: GoogleFonts.tajawal(
+                              fontSize: 11.sp,
+                              color: Colors.white.withValues(alpha: 0.85),
+                            ),
+                          ),
                     ),
-                    borderRadius: BorderRadius.circular(14.r),
-                  ),
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text(
-                    'home.newsletter_email_hint'.tr(),
-                    style: GoogleFonts.tajawal(
-                      fontSize: 13.sp,
-                      color: Colors.white.withValues(alpha: 0.6),
+                    child: AppTextField(
+                      controller: _emailCtrl,
+                      hint: 'home.newsletter_email_hint'.tr(),
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.done,
+                      validator: RegexHelper.emailValidator,
+                      onFieldSubmitted: (_) => _subscribe(),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(width: 8.w),
-              GestureDetector(
-                child: Container(
-                  height: 46.h,
-                  padding: EdgeInsetsDirectional.symmetric(horizontal: 18.w),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(14.r),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'home.newsletter_subscribe'.tr(),
-                      style: GoogleFonts.cairo(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                SizedBox(width: 8.w),
+                GestureDetector(
+                  onTap: _subscribe,
+                  child: Container(
+                    height: 46.h,
+                    padding: EdgeInsetsDirectional.symmetric(horizontal: 18.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(14.r),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'home.newsletter_subscribe'.tr(),
+                        style: GoogleFonts.cairo(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

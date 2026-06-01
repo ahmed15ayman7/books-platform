@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/helpers/regex_helper.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_bar_widget.dart';
+import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/bottom_nav_widget.dart';
 
 class PublishScreen extends StatefulWidget {
@@ -20,8 +22,36 @@ class _PublishScreenState extends State<PublishScreen> {
 
   static const _steps = ['author', 'book', 'submit'];
 
+  final _authorFormKey = GlobalKey<FormState>();
+  final _bookFormKey = GlobalKey<FormState>();
+
+  late final _nameCtrl = TextEditingController();
+  late final _emailCtrl = TextEditingController();
+  late final _phoneCtrl = TextEditingController();
+  late final _bioCtrl = TextEditingController();
+  late final _titleCtrl = TextEditingController();
+  late final _summaryCtrl = TextEditingController();
+  late final _categoryCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _emailCtrl.dispose();
+    _phoneCtrl.dispose();
+    _bioCtrl.dispose();
+    _titleCtrl.dispose();
+    _summaryCtrl.dispose();
+    _categoryCtrl.dispose();
+    super.dispose();
+  }
+
   void _next() {
-    if (_step < _steps.length - 1) setState(() => _step++);
+    final isValid = switch (_step) {
+      0 => _authorFormKey.currentState?.validate() ?? false,
+      1 => _bookFormKey.currentState?.validate() ?? false,
+      _ => true,
+    };
+    if (isValid && _step < _steps.length - 1) setState(() => _step++);
   }
 
   void _back() {
@@ -52,15 +82,30 @@ class _PublishScreenState extends State<PublishScreen> {
                   16.w, 18.h, 16.w, 8.h),
               child: Column(
                 children: [
-                  // Step indicator
                   _StepIndicator(
                     step: _step,
                     labels: stepLabels,
                   ),
                   SizedBox(height: 24.h),
-                  // Step content
-                  if (_step == 0) _AuthorStep(locale: locale),
-                  if (_step == 1) _BookStep(locale: locale),
+                  if (_step == 0)
+                    Form(
+                      key: _authorFormKey,
+                      child: _AuthorStep(
+                        nameCtrl: _nameCtrl,
+                        emailCtrl: _emailCtrl,
+                        phoneCtrl: _phoneCtrl,
+                        bioCtrl: _bioCtrl,
+                      ),
+                    ),
+                  if (_step == 1)
+                    Form(
+                      key: _bookFormKey,
+                      child: _BookStep(
+                        titleCtrl: _titleCtrl,
+                        summaryCtrl: _summaryCtrl,
+                        categoryCtrl: _categoryCtrl,
+                      ),
+                    ),
                   if (_step == 2) _SuccessStep(locale: locale),
                   SizedBox(height: 16.h),
                   const _PromoSection(),
@@ -71,7 +116,8 @@ class _PublishScreenState extends State<PublishScreen> {
                     onBack: _back,
                     onPrimary: _step < _steps.length - 1
                         ? _next
-                        : () => Navigator.of(context).pushReplacementNamed(AppRoutes.home),
+                        : () => Navigator.of(context)
+                            .pushReplacementNamed(AppRoutes.home),
                   ),
                   SizedBox(height: 16.h),
                 ],
@@ -281,92 +327,62 @@ class _StepIndicator extends StatelessWidget {
   }
 }
 
-// ── Form helpers ──────────────────────────────────────────────────────────
-Widget _formField(String label, String placeholder,
-    {bool required = false, bool multiline = false, String locale = 'ar'}) {
-  return Padding(
-    padding: EdgeInsetsDirectional.only(bottom: 16.h),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              label,
-              style: GoogleFonts.cairo(
-                fontSize: 13.5.sp,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            if (required)
-              Text(
-                ' *',
-                style: GoogleFonts.inter(
-                  color: AppColors.primary,
-                  fontSize: 13.5.sp,
-                ),
-              ),
-          ],
-        ),
-        SizedBox(height: 7.h),
-        Container(
-          height: multiline ? null : 50.h,
-          constraints: multiline
-              ? BoxConstraints(minHeight: 92.h)
-              : null,
-          padding: EdgeInsetsDirectional.fromSTEB(15.w, 13.h, 15.w, 13.h),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            border: Border.all(color: AppColors.divider),
-            borderRadius: BorderRadius.circular(14.r),
-          ),
-          alignment:
-              multiline ? AlignmentDirectional.topStart : AlignmentDirectional.centerStart,
-          child: Text(
-            placeholder,
-            style: GoogleFonts.tajawal(
-              fontSize: 14.sp,
-              color: AppColors.textHint,
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
 // ── Step 0: Author ────────────────────────────────────────────────────────
 class _AuthorStep extends StatelessWidget {
-  const _AuthorStep({required this.locale});
-  final String locale;
+  const _AuthorStep({
+    required this.nameCtrl,
+    required this.emailCtrl,
+    required this.phoneCtrl,
+    required this.bioCtrl,
+  });
+
+  final TextEditingController nameCtrl;
+  final TextEditingController emailCtrl;
+  final TextEditingController phoneCtrl;
+  final TextEditingController bioCtrl;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _formField(
-          'publish.author_name_label'.tr(),
-          'publish.author_name_hint'.tr(),
-          required: true,
-          locale: locale,
+        AppTextField(
+          controller: nameCtrl,
+          label: 'publish.author_name_label'.tr(),
+          hint: 'publish.author_name_hint'.tr(),
+          isRequired: true,
+          validator: RegexHelper.requiredValidator,
+          textInputAction: TextInputAction.next,
         ),
-        _formField(
-          'publish.email_label'.tr(),
-          'name@example.com',
-          required: true,
-          locale: locale,
+        SizedBox(height: 16.h),
+        AppTextField(
+          controller: emailCtrl,
+          label: 'publish.email_label'.tr(),
+          hint: 'name@example.com',
+          isRequired: true,
+          keyboardType: TextInputType.emailAddress,
+          validator: RegexHelper.emailValidator,
+          textInputAction: TextInputAction.next,
         ),
-        _formField(
-          'publish.phone_label'.tr(),
-          '+20 1XX XXX XXXX',
-          locale: locale,
+        SizedBox(height: 16.h),
+        AppTextField(
+          controller: phoneCtrl,
+          label: 'publish.phone_label'.tr(),
+          hint: '+20 1XX XXX XXXX',
+          keyboardType: TextInputType.phone,
+          validator: RegexHelper.phoneValidator,
+          textInputAction: TextInputAction.next,
         ),
-        _formField(
-          'publish.bio_label'.tr(),
-          'publish.bio_hint'.tr(),
-          multiline: true,
-          locale: locale,
+        SizedBox(height: 16.h),
+        AppTextField(
+          controller: bioCtrl,
+          label: 'publish.bio_label'.tr(),
+          hint: 'publish.bio_hint'.tr(),
+          maxLines: 4,
+          minLines: 3,
+          validator: (v) => v != null && v.trim().isNotEmpty
+              ? RegexHelper.minLengthValidator(v, 20)
+              : null,
+          textInputAction: TextInputAction.done,
         ),
       ],
     );
@@ -375,32 +391,49 @@ class _AuthorStep extends StatelessWidget {
 
 // ── Step 1: Book ──────────────────────────────────────────────────────────
 class _BookStep extends StatelessWidget {
-  const _BookStep({required this.locale});
-  final String locale;
+  const _BookStep({
+    required this.titleCtrl,
+    required this.summaryCtrl,
+    required this.categoryCtrl,
+  });
+
+  final TextEditingController titleCtrl;
+  final TextEditingController summaryCtrl;
+  final TextEditingController categoryCtrl;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _formField(
-          'publish.book_title_label'.tr(),
-          'publish.book_title_hint'.tr(),
-          required: true,
-          locale: locale,
+        AppTextField(
+          controller: titleCtrl,
+          label: 'publish.book_title_label'.tr(),
+          hint: 'publish.book_title_hint'.tr(),
+          isRequired: true,
+          validator: RegexHelper.requiredValidator,
+          textInputAction: TextInputAction.next,
         ),
-        _formField(
-          'publish.summary_label'.tr(),
-          'publish.summary_hint'.tr(),
-          required: true,
-          multiline: true,
-          locale: locale,
+        SizedBox(height: 16.h),
+        AppTextField(
+          controller: summaryCtrl,
+          label: 'publish.summary_label'.tr(),
+          hint: 'publish.summary_hint'.tr(),
+          isRequired: true,
+          maxLines: 4,
+          minLines: 3,
+          validator: (v) => RegexHelper.minLengthValidator(v, 30),
+          textInputAction: TextInputAction.next,
         ),
-        _formField(
-          'publish.category_label'.tr(),
-          'publish.category_hint'.tr(),
-          required: true,
-          locale: locale,
+        SizedBox(height: 16.h),
+        AppTextField(
+          controller: categoryCtrl,
+          label: 'publish.category_label'.tr(),
+          hint: 'publish.category_hint'.tr(),
+          isRequired: true,
+          validator: RegexHelper.requiredValidator,
+          textInputAction: TextInputAction.done,
         ),
+        SizedBox(height: 16.h),
         // PDF upload zone
         Container(
           width: double.infinity,
