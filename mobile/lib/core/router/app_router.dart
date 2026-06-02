@@ -16,19 +16,31 @@ import '../../features/cart/presentation/pages/cart_screen/cart_screen.dart';
 import '../../features/onboarding/presentation/pages/language_screen.dart';
 import '../../features/onboarding/presentation/pages/onboarding_screen/onboarding_screen.dart';
 import '../../features/onboarding/presentation/pages/splash_screen.dart';
+import '../../features/publish/presentation/cubit/publish_cubit.dart';
 import '../../features/publish/presentation/pages/publish_screen/publish_screen.dart';
 import '../../features/publishers/presentation/cubit/publisher_detail_cubit/publisher_detail_cubit.dart';
 import '../../features/publishers/presentation/cubit/publishers_list_cubit/publishers_list_cubit.dart';
 import '../../features/publishers/presentation/pages/publisher_detail_screen/publisher_detail_screen.dart';
 import '../../features/publishers/presentation/pages/publishers_screen/publishers_screen.dart';
+import '../../features/books/presentation/pages/recommended_books_screen/recommended_books_screen.dart';
+import '../../features/books/presentation/pages/translated_books_screen/translated_books_screen.dart';
+import '../../features/notifications/presentation/cubit/notification_settings_cubit.dart';
+import '../../features/notifications/presentation/screens/notification_settings_screen/notification_settings_screen.dart';
+import '../../features/ratings/presentation/cubit/comments_cubit.dart';
+import '../../features/ratings/presentation/cubit/ratings_cubit.dart';
 import '../../features/search/presentation/cubit/search_cubit.dart';
 import '../../features/search/presentation/pages/search_screen/search_screen.dart';
+import '../../features/static_pages/presentation/cubit/static_page_cubit.dart';
+import '../../features/static_pages/presentation/screens/static_page_screen/static_page_screen.dart';
+import '../../features/wishlist/presentation/cubit/wishlist_cubit.dart';
+import '../../features/wishlist/presentation/screens/wishlist_screen/wishlist_screen.dart';
 import '../di/injection_container.dart';
 import 'app_routes.dart';
 import 'args/article_detail_args.dart';
 import 'args/book_detail_args.dart';
 import 'args/category_books_args.dart';
 import 'args/publisher_detail_args.dart';
+import 'args/static_page_args.dart';
 
 class AppRouter {
   AppRouter._();
@@ -76,8 +88,13 @@ class AppRouter {
         if (args == null) return _unknown(settings);
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => BlocProvider(
-            create: (_) => getIt<BookDetailCubit>(),
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (_) => getIt<BookDetailCubit>()),
+              BlocProvider(create: (_) => getIt<WishlistCubit>()),
+              BlocProvider(create: (_) => getIt<RatingsCubit>()),
+              BlocProvider(create: (_) => getIt<CommentsCubit>()),
+            ],
             child: BookDetailScreen(args: args),
           ),
         );
@@ -127,8 +144,11 @@ class AppRouter {
         if (args == null) return _unknown(settings);
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => BlocProvider(
-            create: (_) => getIt<ArticleDetailCubit>(),
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (_) => getIt<ArticleDetailCubit>()),
+              BlocProvider(create: (_) => getIt<CommentsCubit>()),
+            ],
             child: ArticleDetailScreen(args: args),
           ),
         );
@@ -151,7 +171,61 @@ class AppRouter {
       case AppRoutes.publish:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => const PublishScreen(),
+          builder: (_) => BlocProvider(
+            create: (_) => getIt<PublishCubit>(),
+            child: const PublishScreen(),
+          ),
+        );
+
+      case AppRoutes.wishlist:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider(
+            create: (_) => getIt<WishlistCubit>(),
+            child: const WishlistScreen(),
+          ),
+        );
+
+      case AppRoutes.translatedBooks:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider(
+            create: (_) => getIt<CatalogCubit>(),
+            child: const TranslatedBooksScreen(),
+          ),
+        );
+
+      case AppRoutes.recommendedBooks:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider(
+            create: (_) => getIt<CatalogCubit>(),
+            child: const RecommendedBooksScreen(),
+          ),
+        );
+
+      case AppRoutes.notificationSettings:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider(
+            create: (_) => getIt<NotificationSettingsCubit>(),
+            child: const NotificationSettingsScreen(),
+          ),
+        );
+
+      case AppRoutes.staticPage:
+      case AppRoutes.aboutUs:
+      case AppRoutes.contactUs:
+      case AppRoutes.privacyPolicy:
+      case AppRoutes.termsOfUse:
+        final args = settings.arguments as StaticPageArgs?;
+        if (args == null) return _unknown(settings);
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider(
+            create: (_) => getIt<StaticPageCubit>(),
+            child: StaticPageScreen(args: args),
+          ),
         );
 
       default:

@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 
+import '../../domain/entities/search_response.dart';
 import '../../domain/entities/search_result.dart';
+import '../../domain/entities/search_suggestion.dart';
 
 sealed class SearchState extends Equatable {
   const SearchState();
@@ -17,10 +19,22 @@ final class SearchLoading extends SearchState {
 }
 
 final class SearchSuccess extends SearchState {
-  const SearchSuccess(this.results);
-  final List<SearchResult> results;
+  const SearchSuccess({
+    required this.response,
+    required this.suggestions,
+    required this.query,
+  });
+  final SearchResponse response;
+  final List<SearchSuggestion> suggestions;
+  final String query;
+
+  List<SearchResult> get results => [
+        ...response.publishers.map(PublisherSearchResult.new),
+        ...response.books.map(BookSearchResult.new),
+      ];
+
   @override
-  List<Object?> get props => [results];
+  List<Object?> get props => [response, suggestions, query];
 }
 
 final class SearchEmpty extends SearchState {

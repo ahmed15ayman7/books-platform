@@ -41,7 +41,10 @@ class CatalogCubit extends Cubit<CatalogState> {
     );
     result.fold(
       (f) => emit(CatalogError(core.failureToMessage(f))),
-      (books) => emit(CatalogSuccess(books: books)),
+      (paginated) => emit(CatalogSuccess(
+        books: paginated.data,
+        hasMore: paginated.pagination.hasNextPage,
+      )),
     );
   }
 }

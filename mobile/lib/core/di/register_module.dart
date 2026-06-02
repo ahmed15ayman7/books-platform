@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../network/dio_factory.dart';
 
@@ -15,4 +16,7 @@ abstract class RegisterModule {
 
   @singleton
   Dio dio(DioFactory factory) => factory.create();
+
+  @singleton
+  Future<SharedPreferences> get prefs => SharedPreferences.getInstance();
 }

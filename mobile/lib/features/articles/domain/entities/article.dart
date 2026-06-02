@@ -12,6 +12,11 @@ class Article extends Equatable {
     required this.readMinutes,
     required this.coverColors,
     this.hasVideo = false,
+    this.slug = '',
+    this.authorFirstName = '',
+    this.authorLastName = '',
+    this.readingTime = 0,
+    this.imageUrl,
   });
 
   final String id;
@@ -23,7 +28,22 @@ class Article extends Equatable {
   final int readMinutes;
   final List<Color> coverColors;
   final bool hasVideo;
+  final String slug;
+  final String authorFirstName;
+  final String authorLastName;
+  final int readingTime;
+  final String? imageUrl;
+
+  String get authorFullName => '$authorFirstName $authorLastName'.trim();
+
+  // Channel key constants
+  static const String kChannelHarvest = 'harvest';
+  static const String kChannelIdeas = 'ideas';
+  static const String kChannelWorldReads = 'world-reads';
+  static const String kChannelBooksTalk = 'books-talk';
+  static const String kChannelWatchYourBook = 'watch-your-book';
+  static const String kChannelNovelStory = 'novel-story';
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [id, slug];
 }

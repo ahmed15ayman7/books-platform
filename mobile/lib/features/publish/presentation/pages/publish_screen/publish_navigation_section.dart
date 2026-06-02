@@ -10,13 +10,15 @@ class PublishNavigationSection extends StatelessWidget {
     required this.step,
     required this.totalSteps,
     required this.onBack,
-    required this.onPrimary,
+    this.onPrimary,
+    this.isLoading = false,
   });
 
   final int step;
   final int totalSteps;
   final VoidCallback onBack;
-  final VoidCallback onPrimary;
+  final VoidCallback? onPrimary;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -44,17 +46,25 @@ class PublishNavigationSection extends StatelessWidget {
         ],
         Expanded(
           child: ElevatedButton(
-            onPressed: onPrimary,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(isLast ? 'publish.submit'.tr() : 'publish.next'.tr()),
-                if (!isLast) ...[
-                  SizedBox(width: 8.w),
-                  Icon(Icons.chevron_right_rounded, size: 18.r),
-                ],
-              ],
-            ),
+            onPressed: isLoading ? null : onPrimary,
+            child: isLoading
+                ? SizedBox(
+                    width: 20.w,
+                    height: 20.w,
+                    child: const CircularProgressIndicator(
+                        strokeWidth: 2, color: Colors.white),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                          isLast ? 'publish.submit'.tr() : 'publish.next'.tr()),
+                      if (!isLast) ...[
+                        SizedBox(width: 8.w),
+                        Icon(Icons.chevron_right_rounded, size: 18.r),
+                      ],
+                    ],
+                  ),
           ),
         ),
       ],

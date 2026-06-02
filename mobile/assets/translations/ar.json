@@ -164,7 +164,15 @@
     "category_hint": "اختر التصنيف",
     "upload_label": "رفع ملف الكتاب (PDF)",
     "promo_subtitle": "الكتب التالية برسوم نشر رمزية",
-    "success_description": "سنراجع كتابك ونتواصل معك خلال 5 أيام عمل.\nيخضع النشر لموافقة فريق التحرير."
+    "success_description": "سنراجع كتابك ونتواصل معك خلال 5 أيام عمل.\nيخضع النشر لموافقة فريق التحرير.",
+    "review_title": "راجع طلبك",
+    "content_standards": "أؤكد أن هذا المحتوى يستوفي معايير المنصة وأمتلك حقوق الملكية الفكرية لهذا العمل.",
+    "eligibility_free": "الإرسال الأول مجاني!",
+    "eligibility_paid": "تُطبَّق رسوم نشر على هذا الإرسال.",
+    "success_title": "تم استلام طلبك!",
+    "submit_another": "إرسال كتاب آخر",
+    "back_to_home": "العودة إلى الرئيسية",
+    "cover_label": "رفع صورة الغلاف (اختياري)"
   },
 
   "validation": {
@@ -183,5 +191,75 @@
     "technologies_and_sciences": "تقنيات وعلوم",
     "religions_and_beliefs": "أديان وعقائد",
     "other": "أخرى"
-  }
+  },
+
+  "wishlist_title": "قائمة أمنياتي",
+  "wishlist_empty_title": "قائمة الأمنيات فارغة",
+  "wishlist_empty_subtitle": "احفظ الكتب التي تحبها لتجدها هنا لاحقاً.",
+  "wishlist_disclosure": "تُخزَّن قائمة الأمنيات على هذا الجهاز فقط ولا تُزامَن مع أي حساب.",
+  "wishlist_added": "أُضيف إلى قائمة الأمنيات",
+  "wishlist_removed": "أُزيل من قائمة الأمنيات",
+
+  "ratings_rate_this": "قيّم هذا الكتاب",
+  "ratings_submit": "إرسال التقييم",
+  "ratings_thank_you": "شكراً على تقييمك!",
+  "ratings_stars": "نجوم",
+
+  "comments_leave_comment": "اترك تعليقاً",
+  "comments_author_name": "الاسم المعروض",
+  "comments_email": "البريد الإلكتروني",
+  "comments_content": "تعليقك",
+  "comments_submit": "نشر التعليق",
+  "comments_name_error": "يجب أن يكون الاسم أكثر من حرفين",
+  "comments_name_too_long": "لا يمكن أن يتجاوز الاسم 100 حرف",
+  "comments_email_error": "الرجاء إدخال بريد إلكتروني صحيح",
+  "comments_too_short": "يجب أن يكون التعليق 10 أحرف على الأقل",
+  "comments_awaiting_review": "تعليقك قيد المراجعة.",
+
+  "newsletter_title": "ابقَ على اطلاع",
+  "newsletter_subtitle": "احصل على توصيات كتب منتقاة، وأخبار الترجمة، وعروض حصرية.",
+  "newsletter_email_hint": "بريدك الإلكتروني",
+  "newsletter_subscribe": "اشترك",
+  "newsletter_resend": "إعادة إرسال بريد التأكيد",
+
+  "notifications_title": "إعدادات الإشعارات",
+  "notifications_push_label": "تفعيل الإشعارات",
+  "notifications_push_subtitle": "تلقَّ تنبيهات حول الكتب والتوصيات الجديدة.",
+  "notifications_open_settings": "فتح إعدادات النظام",
+  "notifications_permission_denied": "الإشعارات معطَّلة. اضغط أدناه لتفعيلها.",
+  "notifications_prompt_title": "ابقَ على اطلاع",
+  "notifications_prompt_body": "احصل على إشعارات بصدور كتب جديدة وترجمات وعروض حصرية.",
+  "notifications_not_now": "ليس الآن",
+  "notifications_allow": "السماح",
+
+  "translated_books_title": "الكتب المترجمة",
+  "recommended_for_translation_title": "الكتب المرشحة للترجمة",
+  "translation_rights_notice": "هذه الكتب موصى بها للترجمة من قِبل فريقنا التحريري. قد تخضع حقوق الترجمة لترتيبات ترخيص.",
+
+  "publish_step_author": "معلومات المؤلف",
+  "publish_step_book": "تفاصيل الكتاب",
+  "publish_step_review": "المراجعة والإرسال",
+  "publish_step_eligibility_free": "الإرسال الأول مجاناً!",
+  "publish_step_eligibility_paid": "يُطبَّق رسم إرسال.",
+  "publish_step_content_standards": "أؤكد أن هذا المحتوى يستوفي معايير المنصة.",
+  "publish_step_ip_statement": "أؤكد أنني أملك حقوق الملكية الفكرية لهذا العمل.",
+  "publish_step_success_title": "تم إرسال الكتاب!",
+  "publish_step_success_subtitle": "سنراجع طلبك ونتواصل معك خلال 5 أيام عمل.",
+
+  "about_us_title": "من نحن",
+  "contact_us_title": "تواصل معنا",
+  "privacy_policy_title": "سياسة الخصوصية",
+  "terms_of_use_title": "شروط الاستخدام",
+  "team_title": "فريقنا",
+
+  "channel_harvest": "حصاد الكتب",
+  "channel_ideas": "جوهر الأفكار",
+  "channel_world_reads": "قراءات عالمية",
+  "channel_books_talk": "حديث الكتب",
+  "channel_watch_your_book": "شاهد كتابك",
+  "channel_novel_story": "رواية وقصة",
+
+  "ai_disclosure": "تم إنتاج هذا المحتوى بمساعدة الذكاء الاصطناعي.",
+
+  "see_all": "عرض الكل"
 }

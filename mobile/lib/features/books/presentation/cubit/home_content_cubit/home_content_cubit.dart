@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 
 import '../../../../../core/enums/translation_status.dart';
 import '../../../../../core/network/failure_messages.dart' as core;
+import '../../../domain/entities/book.dart';
 import '../../../domain/repositories/base_books_repository.dart';
 import 'home_content_state.dart';
 
@@ -45,7 +46,7 @@ class HomeContentCubit extends Cubit<HomeContentState> {
       return;
     }
 
-    final allBooks = allResult.getOrElse(() => []);
+    final allBooks = allResult.fold((_) => <Book>[], (p) => p.data);
     final freshBooks = allBooks
         .where((b) => b.isNew || b.status == TranslationStatus.nominated)
         .take(6)

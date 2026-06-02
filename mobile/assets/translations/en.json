@@ -164,7 +164,15 @@
     "category_hint": "Choose category",
     "upload_label": "Upload book file (PDF)",
     "promo_subtitle": "Subsequent books carry a small fee",
-    "success_description": "We'll review your book and contact you within 5 business days.\nSubject to editorial approval."
+    "success_description": "We'll review your book and contact you within 5 business days.\nSubject to editorial approval.",
+    "review_title": "Review your submission",
+    "content_standards": "I confirm that this content meets the platform's content standards and I hold the intellectual property rights for this work.",
+    "eligibility_free": "First submission is free!",
+    "eligibility_paid": "A submission fee applies.",
+    "success_title": "Submission Received!",
+    "submit_another": "Submit Another Book",
+    "back_to_home": "Back to Home",
+    "cover_label": "Upload cover image (optional)"
   },
 
   "validation": {
@@ -183,5 +191,75 @@
     "technologies_and_sciences": "Technologies & Sciences",
     "religions_and_beliefs": "Religions & Beliefs",
     "other": "Other"
-  }
+  },
+
+  "wishlist_title": "My Wishlist",
+  "wishlist_empty_title": "Your wishlist is empty",
+  "wishlist_empty_subtitle": "Save books you love to find them here later.",
+  "wishlist_disclosure": "Your wishlist is stored on this device only and is not synced to any account.",
+  "wishlist_added": "Added to wishlist",
+  "wishlist_removed": "Removed from wishlist",
+
+  "ratings_rate_this": "Rate this book",
+  "ratings_submit": "Submit Rating",
+  "ratings_thank_you": "Thank you for your rating!",
+  "ratings_stars": "stars",
+
+  "comments_leave_comment": "Leave a Comment",
+  "comments_author_name": "Display Name",
+  "comments_email": "Email Address",
+  "comments_content": "Your Comment",
+  "comments_submit": "Post Comment",
+  "comments_name_error": "Name must be at least 2 characters",
+  "comments_name_too_long": "Name cannot exceed 100 characters",
+  "comments_email_error": "Please enter a valid email address",
+  "comments_too_short": "Comment must be at least 10 characters",
+  "comments_awaiting_review": "Your comment is awaiting review.",
+
+  "newsletter_title": "Stay in the Know",
+  "newsletter_subtitle": "Get curated book recommendations, translation news, and exclusive offers.",
+  "newsletter_email_hint": "Your email address",
+  "newsletter_subscribe": "Subscribe",
+  "newsletter_resend": "Resend confirmation email",
+
+  "notifications_title": "Notification Settings",
+  "notifications_push_label": "Enable Push Notifications",
+  "notifications_push_subtitle": "Receive alerts about new books and recommendations.",
+  "notifications_open_settings": "Open System Settings",
+  "notifications_permission_denied": "Push notifications are disabled. Tap below to enable them.",
+  "notifications_prompt_title": "Stay Up to Date",
+  "notifications_prompt_body": "Get notified about new book releases, translations, and exclusive offers.",
+  "notifications_not_now": "Not Now",
+  "notifications_allow": "Allow",
+
+  "translated_books_title": "Translated Books",
+  "recommended_for_translation_title": "Recommended for Translation",
+  "translation_rights_notice": "These books are recommended for translation by our editorial team. Translation rights may be subject to licensing.",
+
+  "publish_step_author": "Author Info",
+  "publish_step_book": "Book Details",
+  "publish_step_review": "Review & Submit",
+  "publish_step_eligibility_free": "First submission is free!",
+  "publish_step_eligibility_paid": "A submission fee applies.",
+  "publish_step_content_standards": "I confirm this content meets the platform's content standards.",
+  "publish_step_ip_statement": "I confirm that I hold the intellectual property rights for this work.",
+  "publish_step_success_title": "Book Submitted!",
+  "publish_step_success_subtitle": "We'll review your submission and get back to you within 5 business days.",
+
+  "about_us_title": "About Us",
+  "contact_us_title": "Contact Us",
+  "privacy_policy_title": "Privacy Policy",
+  "terms_of_use_title": "Terms of Use",
+  "team_title": "Our Team",
+
+  "channel_harvest": "Book Harvest",
+  "channel_ideas": "Essence of Ideas",
+  "channel_world_reads": "World Reads",
+  "channel_books_talk": "Book Talk",
+  "channel_watch_your_book": "Watch Your Book",
+  "channel_novel_story": "Novel & Story",
+
+  "ai_disclosure": "This content was generated with the assistance of artificial intelligence.",
+
+  "see_all": "See All"
 }

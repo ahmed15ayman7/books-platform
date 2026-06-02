@@ -26,6 +26,17 @@ class AppRoutes {
   // Auth (placeholder — no login in this version; used by AuthInterceptor)
   static const String login = '/login';
 
+  // New screens (Phase 4)
+  static const String wishlist = '/wishlist';
+  static const String translatedBooks = '/translated-books';
+  static const String recommendedBooks = '/recommended-books';
+  static const String notificationSettings = '/notification-settings';
+  static const String staticPage = '/static-page';
+  static const String aboutUs = '/about-us';
+  static const String contactUs = '/contact-us';
+  static const String privacyPolicy = '/privacy-policy';
+  static const String termsOfUse = '/terms-of-use';
+
   // Fallback
   static const String unknown = '/unknown';
 }

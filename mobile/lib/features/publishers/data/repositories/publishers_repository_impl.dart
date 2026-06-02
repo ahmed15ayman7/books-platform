@@ -19,7 +19,7 @@ class PublishersRepositoryImpl implements PublishersRepository {
   Future<Either<Failure, List<Publisher>>> getPublishers({
     String? countryName,
   }) =>
-      _remote.getPublishers(countryName: countryName);
+      _remote.getPublishersLegacy(countryName: countryName);
 
   @override
   Future<Either<Failure, Publisher>> getPublisherBySlug(String slug) =>

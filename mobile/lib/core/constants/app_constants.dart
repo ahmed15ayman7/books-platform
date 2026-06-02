@@ -20,3 +20,8 @@ const double kRadius2xl = 28.0;
 
 // Storage keys (onboarding)
 const String kOnboardingDoneKey = 'onboarding_done';
+
+// Storage keys (features)
+const String kWishlistKey = 'wishlist_slugs';
+const String kCartKey = 'cart_items';
+const String kNotifOptInKey = 'notif_opt_in';

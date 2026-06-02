@@ -6,8 +6,9 @@ class ApiConstants {
     defaultValue: 'dev',
   );
 
-  static const String _devBaseUrl = 'https://api-dev.placeholder.com/v1';
-  static const String _prodBaseUrl = 'https://api.placeholder.com/v1';
+  static const String _devBaseUrl =
+      'https://booksplatform.ahmed15ayman7.com/api/v1';
+  static const String _prodBaseUrl = 'https://booksplatform.net/api/v1';
 
   static String get baseUrl =>
       _environment == 'prod' ? _prodBaseUrl : _devBaseUrl;

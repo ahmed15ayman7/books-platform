@@ -1,223 +1,77 @@
 import 'package:dartz/dartz.dart';
-import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../../core/network/api_envelope.dart';
+import '../../../../core/network/api_manager.dart';
 import '../../../../core/network/failure.dart';
 import '../../domain/entities/article.dart';
+import '../../domain/entities/article_channel.dart';
 import '../../domain/entities/article_detail.dart';
+import '../models/article_detail_model.dart';
+import '../models/article_model.dart';
 
 @lazySingleton
 class ArticlesRemoteDataSourceImpl {
-  // All articles keyed by channel — used for related articles lookup.
-  static final _allArticles = <String, List<Article>>{
-    'harvest': [
-      Article(
-        id: 'h1',
-        title: 'حصاد الكتب العالمية لشهر مايو',
-        excerpt: 'أبرز ما صدر من كتب حول العالم في شهر مايو.',
-        categoryLabel: 'حصاد',
-        channel: 'harvest',
-        date: '2026-05-28',
-        readMinutes: 7,
-        coverColors: [const Color(0xFF0D1B2A), const Color(0xFF1B4F72)],
-      ),
-      Article(
-        id: 'h2',
-        title: 'الاقتصاد العالمي في مرآة الكتب',
-        excerpt: 'كيف يرصد الباحثون تحولات الاقتصاد العالمي في إصداراتهم الأخيرة؟',
-        categoryLabel: 'حصاد',
-        channel: 'harvest',
-        date: '2026-05-21',
-        readMinutes: 5,
-        coverColors: [const Color(0xFF1A1A2E), const Color(0xFF16213E)],
-      ),
-      Article(
-        id: 'h3',
-        title: 'الفلسفة في عصر الذكاء الاصطناعي',
-        excerpt: 'مقاربات فلسفية جديدة لأسئلة الهوية والوعي في ظل الثورة التقنية.',
-        categoryLabel: 'حصاد',
-        channel: 'harvest',
-        date: '2026-05-14',
-        readMinutes: 6,
-        coverColors: [const Color(0xFF2C003E), const Color(0xFF6A0572)],
-      ),
-    ],
-    'translation': [
-      Article(
-        id: 't1',
-        title: 'رحلة الكتاب من الإنجليزية إلى العربية',
-        excerpt: 'كيف تنتقل المفاهيم عبر اللغات وما التحديات التي تواجه المترجمين.',
-        categoryLabel: 'ترجمة',
-        channel: 'translation',
-        date: '2026-05-25',
-        readMinutes: 8,
-        coverColors: [const Color(0xFF1B4332), const Color(0xFF2D6A4F)],
-        hasVideo: true,
-      ),
-      Article(
-        id: 't2',
-        title: 'أكثر 10 كتب مرشحة للترجمة في 2026',
-        excerpt: 'قائمة بأبرز الكتب التي تستحق أن تُترجم إلى العربية هذا العام.',
-        categoryLabel: 'ترجمة',
-        channel: 'translation',
-        date: '2026-05-18',
-        readMinutes: 4,
-        coverColors: [const Color(0xFF7B2D00), const Color(0xFFBF4500)],
-      ),
-    ],
-    'analysis': [
-      Article(
-        id: 'a1',
-        title: 'تحليل: لماذا تنتشر الروايات الديستوبية؟',
-        excerpt: 'قراءة في ظاهرة انتشار الأدب الديستوبي وعلاقتها بالمناخ السياسي.',
-        categoryLabel: 'تحليل',
-        channel: 'analysis',
-        date: '2026-05-20',
-        readMinutes: 10,
-        coverColors: [const Color(0xFF3D0000), const Color(0xFF8B0000)],
-      ),
-    ],
-  };
+  ArticlesRemoteDataSourceImpl(this._api);
 
-  static final _details = <String, ArticleDetail>{
-    'h1': ArticleDetail(
-      id: 'h1',
-      title: 'حصاد الكتب العالمية لشهر مايو',
-      authorName: 'د. نورة الحمدان',
-      date: '2026-05-28',
-      readMinutes: 7,
-      coverColors: [const Color(0xFF0D1B2A), const Color(0xFF1B4F72)],
-      channel: 'harvest',
-      categoryLabel: 'حصاد',
-      hasVideo: false,
-      relatedArticles: [],
-      pullQuote: 'الكتاب مرآة الحضارة، وحصاد المعرفة لا يكتمل إلا بقراءة ما كتبه العالم.',
-      bodyParagraphs: [
-        'شهد شهر مايو من العام الحالي إصدار عدد لافت من الكتب التي تستحق الوقوف عندها والتأمل في مضامينها. فمن الأدب إلى الفلسفة، ومن العلوم الاجتماعية إلى الاقتصاد، جاءت الإصدارات متنوعة وثرية بما يعكس حيوية المشهد الثقافي العالمي.',
-        'في مقدمة هذه الإصدارات، يبرز كتاب "حدود الذكاء" للمفكر الألماني كلاوس شميدت، الذي يطرح تساؤلات جوهرية حول مستقبل الذكاء الاصطناعي وأثره على الإبداع البشري. يتناول المؤلف بأسلوب سلس ومعمق كيف يمكن للإنسان أن يحتفظ بحضوره الحضاري في ظل التحولات التقنية المتسارعة.',
-        'على الصعيد الأدبي، تبرز رواية "ليالي السهل" للروائية البريطانية إيما واتسون، وهي ملحمة إنسانية تجري أحداثها في أرياف اسكتلندا خلال القرن التاسع عشر. تُجسّد الرواية صراع الإنسان مع الطبيعة ومع ذاته في آنٍ واحد، وقد حظيت بإشادة واسعة من النقاد الأدبيين.',
-        'أما في مجال العلوم الاجتماعية، فيستحق الإشارة كتاب "المجتمع الرقمي الجديد" للباحث الأمريكي توماس برايت، الذي يرصد التحولات الاجتماعية العميقة التي أحدثتها منصات التواصل الاجتماعي في طريقة تفكير الأجيال الجديدة وتفاعلها مع العالم.',
-        'وختامًا، يمكن القول إن مايو 2026 كان شهرًا حافلًا بالإصدارات المميزة التي تستحق القراءة والتأمل، وإن استثمار وقت ولو بسيط في الاطلاع على هذه الأعمال سيمنح القارئ ثروة فكرية حقيقية.',
-      ],
-    ),
-    'h2': ArticleDetail(
-      id: 'h2',
-      title: 'الاقتصاد العالمي في مرآة الكتب',
-      authorName: 'أ. كريم منصور',
-      date: '2026-05-21',
-      readMinutes: 5,
-      coverColors: [const Color(0xFF1A1A2E), const Color(0xFF16213E)],
-      channel: 'harvest',
-      categoryLabel: 'حصاد',
-      relatedArticles: [],
-      bodyParagraphs: [
-        'يشهد عالم اليوم تحولات اقتصادية متسارعة، وقد تصدّت الكتابة الاقتصادية لرصد هذه التحولات وتحليلها بعمق ورصانة. فمنذ مطلع العام الحالي، صدرت عشرات الكتب التي تتناول مستقبل العمل والتجارة والمال في ظل الثورة الرقمية.',
-        'يأتي في مقدمة هذه الكتب مؤلَّف "اقتصاد ما بعد الأزمة" للاقتصادي البريطاني جون مورغان، الذي يُشكّل قراءة ضرورية لكل من يتابع المشهد الاقتصادي العالمي. يعرض المؤلف بشكل منهجي كيف تغيّرت سلاسل الإمداد والتجارة الدولية في أعقاب الأزمات المتتالية.',
-        'وعلى مستوى الاقتصاد السلوكي، يُبرز كتاب "قرارات بلا عقل" للعالم الفرنسي بيير دوبوا ظاهرة اتخاذ القرارات الاقتصادية بشكل غير عقلاني، مستعينًا بأحدث أبحاث علم النفس المعرفي لتفسير سلوك المستهلكين والمستثمرين.',
-      ],
-    ),
-    'h3': ArticleDetail(
-      id: 'h3',
-      title: 'الفلسفة في عصر الذكاء الاصطناعي',
-      authorName: 'د. ليلى العمري',
-      date: '2026-05-14',
-      readMinutes: 6,
-      coverColors: [const Color(0xFF2C003E), const Color(0xFF6A0572)],
-      channel: 'harvest',
-      categoryLabel: 'حصاد',
-      relatedArticles: [],
-      pullQuote: 'لا يمكن للآلة أن تحلم، ولا أن تتألم؛ وفي هذا الفارق تكمن إنسانيتنا.',
-      bodyParagraphs: [
-        'يطرح الذكاء الاصطناعي تحديات فلسفية غير مسبوقة تمسّ جوهر الوجود الإنساني وفهمنا للوعي والهوية والأخلاق. وقد أخذت الفلسفة المعاصرة تتعامل مع هذه التحديات بجدية متزايدة، كما تشهد على ذلك الكتب الصادرة في هذا المجال.',
-        'من أبرز هذه الكتب "الوعي الرقمي" للفيلسوف الأمريكي ديفيد تشالمرز، الذي يتساءل فيه بعمق: هل يمكن للآلة أن تكون واعية؟ وهل الوعي ظاهرة بيولوجية بامتياز أم أنه قابل للمحاكاة والتكرار؟ يُجيب تشالمرز بأسلوب فلسفي رصين دون أن يسقط في التبسيط المُخلّ.',
-        'أما كتاب "أخلاقيات الآلة" للباحثة الكندية صوفي لوران، فيتناول الأبعاد الأخلاقية للقرارات التي تتخذها الأنظمة الذكية، ويطرح تساؤلات ملحّة حول المسؤولية والحساب والعدالة في عالم تتحكم فيه الخوارزميات.',
-        'إن الفلسفة لم تتراجع أمام موجة التقنية، بل ازدادت حضورًا وضرورة، لأنها تبقى الأداة الأنجع لفهم ما يعنيه أن تكون إنسانًا في عصر الآلات.',
-      ],
-    ),
-    't1': ArticleDetail(
-      id: 't1',
-      title: 'رحلة الكتاب من الإنجليزية إلى العربية',
-      authorName: 'أ. سامر الدريعي',
-      date: '2026-05-25',
-      readMinutes: 8,
-      coverColors: [const Color(0xFF1B4332), const Color(0xFF2D6A4F)],
-      channel: 'translation',
-      categoryLabel: 'ترجمة',
-      hasVideo: true,
-      relatedArticles: [],
-      pullQuote: 'الترجمة الحقيقية ليست نقل الكلمات، بل نقل الروح والمعنى عبر الثقافات.',
-      bodyParagraphs: [
-        'تُعدّ الترجمة الأدبية من الإنجليزية إلى العربية رحلة شاقة ومثيرة في آنٍ واحد. فاللغتان تنتميان إلى عائلتين لغويتين مختلفتين تمامًا، وتحملان ثقافتين متباينتين في كثير من ملامحهما وقيمهما وأساليب تعبيرهما.',
-        'يبدأ المترجم رحلته بقراءة العمل الأصلي قراءة عميقة، ليس فقط لفهم المعنى الظاهر، بل للإمساك بالإيقاع والمزاج والثقافة التي تختبئ بين السطور. ثم يبدأ العمل الحقيقي: كيف تنقل نكتة لا مكافئ لها في العربية؟ وكيف تعبّر عن دقيقة ثقافية لا تملك العربية كلمة واحدة لها؟',
-        'إن المترجم الناجح هو ذلك الذي يعرف متى يُخلص للنص الأصلي ومتى يُخلص للقارئ. فأحيانًا يكون الإخلاص الحرفي خيانة للروح، والتصرف المبدع أمانة أعمق. وفي هذا التوازن الدقيق تكمن عبقرية الترجمة الجيدة.',
-        'وتحتل الرواية مكانة خاصة بين الأجناس الأدبية المُترجَمة، إذ تحتاج إلى أن يعيشها المترجم بكل تفاصيلها، أن يُصبح شخصياتها ويتكلم بلغتها، قبل أن يُعيد بناءها بالعربية.',
-      ],
-    ),
-    't2': ArticleDetail(
-      id: 't2',
-      title: 'أكثر 10 كتب مرشحة للترجمة في 2026',
-      authorName: 'هيئة التحرير',
-      date: '2026-05-18',
-      readMinutes: 4,
-      coverColors: [const Color(0xFF7B2D00), const Color(0xFFBF4500)],
-      channel: 'translation',
-      categoryLabel: 'ترجمة',
-      relatedArticles: [],
-      bodyParagraphs: [
-        'في ظل الاهتمام المتزايد بالأدب العالمي، رصدنا أبرز عشرة كتب نرى أنها تستحق أن تُترجَم إلى العربية خلال عام 2026، سواء لأهميتها الفكرية أو لقيمتها الأدبية أو لتأثيرها في نقاشات الساعة.',
-        'يتصدر القائمة كتاب "المدينة والسرب" للروائي الياباني هاروكي موراكامي، المنشور حديثًا بالإنجليزية ولم تظهر له ترجمة عربية بعد. يُقدم موراكامي في هذا العمل استكشافًا للعلاقة بين الوجدان الجمعي والهوية الفردية في عالم ما بعد الحداثة.',
-        'وفي المرتبة الثانية، يستحق كتاب "جذور وطرق" للمؤرخة الأمريكية روث هوبكنز أن يُترجَم لما يُقدمه من قراءة جديدة لتاريخ الهجرات البشرية عبر القارات، مستندةً إلى أحدث اكتشافات الجينوم البشري.',
-        'تكشف هذه القائمة عن غنى الإنتاج الأدبي والفكري العالمي وعن الحاجة الملحّة لجسور ترجمة أقوى وأسرع بين العربية وسائر لغات العالم.',
-      ],
-    ),
-    'a1': ArticleDetail(
-      id: 'a1',
-      title: 'تحليل: لماذا تنتشر الروايات الديستوبية؟',
-      authorName: 'د. منى الخطيب',
-      date: '2026-05-20',
-      readMinutes: 10,
-      coverColors: [const Color(0xFF3D0000), const Color(0xFF8B0000)],
-      channel: 'analysis',
-      categoryLabel: 'تحليل',
-      relatedArticles: [],
-      pullQuote:
-          'الديستوبيا ليست تخيلًا للمستقبل، بل صرخة تحذير من حاضر يسير في اتجاه خاطئ.',
-      bodyParagraphs: [
-        'شهدت السنوات الأخيرة انتشارًا لافتًا للأدب الديستوبي، سواء في الروايات أو الأفلام والمسلسلات. ويتساءل كثيرون: ما السر وراء هذا الإقبال الجماهيري الواسع على الأعمال التي ترسم صورة قاتمة للمستقبل؟',
-        'يرى علماء الاجتماع أن الديستوبيا تنشط وقت الأزمات، حين يشعر الناس بأن الأنظمة الاجتماعية والسياسية والاقتصادية المحيطة بهم بدأت تتصدّع أو تفقد شرعيتها. وهو ما يُفسّر ارتفاع مبيعات روايات مثل "1984" لجورج أورويل و"قصة الخادمة" لمارغريت أتوود في أوقات التوترات السياسية.',
-        'على المستوى النفسي، تُوفّر الروايات الديستوبية للقراء مساحة آمنة لمواجهة مخاوفهم الأعمق دون خطر حقيقي. إنها نوع من التمرين الوجداني الذي يُعدّ الإنسان للتفكير في ما هو أسوأ، ليكون مُستعدًا أفضل.',
-        'غير أن ثمة خطرًا كامنًا في الانغماس المفرط في الأدب الديستوبي، وهو ما يُسميه بعض الباحثين "التشاؤم المُغذَّى"، أي التعود على تصور المستقبل بصورة سوداوية لدرجة يصبح فيها التغيير الإيجابي يبدو مستحيلًا.',
-        'وفي المحصلة، يبقى الأدب الديستوبي شكلًا من أشكال التفكير النقدي الاجتماعي، وأداةً لإعادة النظر في المسلّمات، شريطة أن يُقرأ بوعي وتوازن.',
-      ],
-    ),
-  };
+  final ApiManager _api;
 
-  Future<Either<Failure, ArticleDetail>> getArticleDetail(String id) async {
-    await Future.delayed(const Duration(milliseconds: 350));
-    final raw = _details[id];
-    if (raw == null) return left(const ServerFailure(404, 'Article not found'));
+  Future<Either<Failure, PaginatedResponse<Article>>> getArticles({
+    String? channel,
+    int page = 1,
+    int limit = 20,
+    String? sort,
+    String? locale,
+  }) =>
+      _api.get<PaginatedResponse<Article>>(
+        path: '/articles',
+        queryParameters: {
+          'channel': ?channel,
+          'page': page,
+          'limit': limit,
+          'sort': ?sort,
+          'locale': ?locale,
+        },
+        fromJson: (json) => PaginatedResponse<Article>.fromJson(
+          json,
+          fromJsonT: (item) => ArticleModel.fromJson(item).toEntity(),
+        ),
+      );
 
-    final related = (_allArticles[raw.channel] ?? [])
-        .where((a) => a.id != id)
-        .take(3)
-        .toList();
+  Future<Either<Failure, ArticleDetail>> getArticleDetail(
+    String slug, {
+    String? locale,
+  }) =>
+      _api.get(
+        path: '/articles/$slug',
+        queryParameters: {'locale': ?locale},
+        fromJson: (json) => ApiEnvelope.fromJson(
+          json,
+          fromData: ArticleDetailModel.fromJson,
+        ).data!.toEntity(),
+      );
 
-    // Return detail with related articles populated
-    final detail = ArticleDetail(
-      id: raw.id,
-      title: raw.title,
-      authorName: raw.authorName,
-      date: raw.date,
-      readMinutes: raw.readMinutes,
-      coverColors: raw.coverColors,
-      channel: raw.channel,
-      categoryLabel: raw.categoryLabel,
-      bodyParagraphs: raw.bodyParagraphs,
-      pullQuote: raw.pullQuote,
-      hasVideo: raw.hasVideo,
-      relatedArticles: related,
-    );
+  Future<Either<Failure, List<Article>>> getRelatedArticles(
+    String slug, {
+    int limit = 6,
+  }) =>
+      _api.get(
+        path: '/articles/$slug/related',
+        queryParameters: {'limit': limit},
+        fromJson: (json) {
+          final list = json as List<dynamic>;
+          return list
+              .map((e) => ArticleModel.fromJson(e as Map<String, dynamic>).toEntity())
+              .toList();
+        },
+      );
 
-    return right(detail);
-  }
+  List<ArticleChannel> getChannels() => const [
+        ArticleChannel(key: Article.kChannelHarvest, nameAr: 'حصاد الكتب', nameEn: 'Book Harvest', count: 0),
+        ArticleChannel(key: Article.kChannelIdeas, nameAr: 'جوهر الأفكار', nameEn: 'Essence of Ideas', count: 0),
+        ArticleChannel(key: Article.kChannelWorldReads, nameAr: 'قراءات عالمية', nameEn: 'World Reads', count: 0),
+        ArticleChannel(key: Article.kChannelBooksTalk, nameAr: 'حديث الكتب', nameEn: 'Book Talk', count: 0),
+        ArticleChannel(key: Article.kChannelWatchYourBook, nameAr: 'شاهد كتابك', nameEn: 'Watch Your Book', count: 0),
+        ArticleChannel(key: Article.kChannelNovelStory, nameAr: 'رواية وقصة', nameEn: 'Novel & Story', count: 0),
+      ];
 }

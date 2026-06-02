@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/enums/translation_status.dart';
+import '../enums/purchase_option.dart';
 
 class Book extends Equatable {
   const Book({
@@ -24,6 +25,13 @@ class Book extends Equatable {
     required this.year,
     required this.descriptionAr,
     this.isNew = false,
+    this.slug = '',
+    this.imageUrl,
+    this.purchaseOption = PurchaseOption.notAvailable,
+    this.referralLink,
+    this.averageRating,
+    this.ratingsCount,
+    this.descriptionEn,
   });
 
   final String id;
@@ -45,7 +53,14 @@ class Book extends Equatable {
   final int year;
   final String descriptionAr;
   final bool isNew;
+  final String slug;
+  final String? imageUrl;
+  final PurchaseOption purchaseOption;
+  final String? referralLink;
+  final double? averageRating;
+  final int? ratingsCount;
+  final String? descriptionEn;
 
   @override
-  List<Object?> get props => [id, titleAr, titleEn, status, price, categorySlug, isNew];
+  List<Object?> get props => [id, titleAr, titleEn, status, price, categorySlug, isNew, slug];
 }

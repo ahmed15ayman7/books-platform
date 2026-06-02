@@ -3,18 +3,20 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../../books/data/datasources/books_mock_data.dart';
-import '../../../publishers/data/datasources/publishers_remote_data_source_impl.dart';
-import '../../domain/entities/search_result.dart';
+import 'package:booksplatform/core/network/failure_messages.dart' as core;
+
+import '../../domain/entities/search_suggestion.dart';
+import '../../domain/repositories/search_repository.dart';
 import 'search_state.dart';
 
 @injectable
 class SearchCubit extends Cubit<SearchState> {
-  SearchCubit(this._publishersDs) : super(const SearchInitial());
+  SearchCubit(this._repository) : super(const SearchInitial());
 
-  final PublishersRemoteDataSourceImpl _publishersDs;
+  final SearchRepository _repository;
 
   Timer? _debounce;
+  String _lastQuery = '';
 
   void onQueryChanged(String query) {
     _debounce?.cancel();
@@ -30,33 +32,37 @@ class SearchCubit extends Cubit<SearchState> {
   }
 
   Future<void> _search(String query) async {
-    final q = query.toLowerCase();
-    // Search books
-    final matchBooks = BooksMockData.books
-        .map((r) => r.toEntity())
-        .where((b) =>
-            b.titleAr.toLowerCase().contains(q) ||
-            b.titleEn.toLowerCase().contains(q) ||
-            b.publisher.toLowerCase().contains(q))
-        .toList();
+    _lastQuery = query;
+    final searchFuture = _repository.search(query);
+    final suggestionsFuture = _repository.getSuggestions(query);
+    final searchResult = await searchFuture;
+    final suggestionsResult = await suggestionsFuture;
 
-    // Search publishers
-    final pubResult = await _publishersDs.getPublishers();
-    final matchPubs = pubResult.getOrElse(() => []).where((p) =>
-        p.name.toLowerCase().contains(q) ||
-        p.countryAr.toLowerCase().contains(q) ||
-        p.countryEn.toLowerCase().contains(q));
+    // Ignore if query changed while awaiting
+    if (_lastQuery != query) return;
 
-    final results = <SearchResult>[
-      ...matchPubs.map(PublisherSearchResult.new),
-      ...matchBooks.map(BookSearchResult.new),
-    ];
+    final suggestions = suggestionsResult.fold(
+      (_) => <SearchSuggestion>[],
+      (s) => s,
+    );
 
-    if (results.isEmpty) {
-      emit(SearchEmpty(query));
-    } else {
-      emit(SearchSuccess(results));
-    }
+    searchResult.fold(
+      (failure) => emit(SearchError(core.failureToMessage(failure))),
+      (response) {
+        if (response.totalResults == 0 &&
+            response.books.isEmpty &&
+            response.articles.isEmpty &&
+            response.publishers.isEmpty) {
+          emit(SearchEmpty(query));
+        } else {
+          emit(SearchSuccess(
+            response: response,
+            suggestions: suggestions,
+            query: query,
+          ));
+        }
+      },
+    );
   }
 
   @override

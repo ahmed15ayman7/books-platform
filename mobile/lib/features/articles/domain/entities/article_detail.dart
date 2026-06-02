@@ -17,6 +17,10 @@ class ArticleDetail extends Equatable {
     required this.relatedArticles,
     this.pullQuote,
     this.hasVideo = false,
+    this.slug = '',
+    this.authorFirstName = '',
+    this.authorLastName = '',
+    this.videoUrl,
   });
 
   final String id;
@@ -31,6 +35,10 @@ class ArticleDetail extends Equatable {
   final List<Article> relatedArticles;
   final String? pullQuote;
   final bool hasVideo;
+  final String slug;
+  final String authorFirstName;
+  final String authorLastName;
+  final String? videoUrl;
 
   @override
   List<Object?> get props => [id];

@@ -2,6 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:booksplatform/core/helpers/bottom_sheet_helper.dart';
+import 'package:booksplatform/features/more/presentation/widgets/more_bottom_sheet.dart';
+
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/router/args/book_detail_args.dart';
 import '../../../../../core/router/args/category_books_args.dart';
@@ -48,6 +51,15 @@ class _HomeScreenState extends State<HomeScreen> {
             onSearch: () => Navigator.of(context).pushNamed(AppRoutes.search),
             onCart: () => Navigator.of(context).pushNamed(AppRoutes.cart),
             onLocaleChanged: (l) => context.setLocale(Locale(l)),
+            trailing: IconButton(
+              icon: const Icon(Icons.menu_rounded),
+              color: AppColors.textPrimary,
+              onPressed: () => BottomSheetHelper.showAppBottomSheet(
+                context: context,
+                child: const MoreBottomSheet(),
+                isScrollable: true,
+              ),
+            ),
           ),
           Expanded(
             child: BlocBuilder<HomeContentCubit, HomeContentState>(

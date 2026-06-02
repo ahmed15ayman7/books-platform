@@ -132,8 +132,11 @@ class ApiManager {
 
   String _extractMessage(Response<dynamic>? response) {
     final data = response?.data;
-    if (data is Map && data['message'] != null) {
-      return data['message'].toString();
+    if (data is Map) {
+      final msg = data['message'] as String?;
+      if (msg != null) return msg;
+      final errorMsg = (data['error'] as Map?)?.cast<String, dynamic>()['message'] as String?;
+      if (errorMsg != null) return errorMsg;
     }
     return 'Server error';
   }
