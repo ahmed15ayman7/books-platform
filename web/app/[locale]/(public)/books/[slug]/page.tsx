@@ -20,6 +20,9 @@ import {
 } from "@/lib/i18n/book-locale";
 import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
 import { bookSeoMetadata } from "@/lib/seo/metadata";
+import { loadAdminSession } from "@/lib/admin/permissions-client";
+import { MotionButton } from "@/components/motion";
+import { Edit } from "lucide-react";
 
 interface BookPageProps {
   params: Promise<{ slug: string; locale: string }>;
@@ -37,6 +40,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
   const { slug } = await params;
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("books");
+  const session = loadAdminSession();
 
   const [book, similarResult, linkedArticlesRaw] = await Promise.all([
     BookService.getBySlug(slug).catch(() => null),
@@ -123,7 +127,13 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             </span>
           </div>
         </nav>
-
+        { session && <div className=" absolute top-44 rtl:left-10 right-10 w-40 z-50">
+        <Link href={`/admin/books/${book.id}`} className="">
+        <MotionButton className=" text-[var(--brand-red)] flex gap-2 cursor-pointer">
+        <Edit/>
+        </MotionButton>
+        </Link>
+      </div>}
         <div className="container-platform py-8 space-y-10">
           <BookDetailHero
             locale={locale}
