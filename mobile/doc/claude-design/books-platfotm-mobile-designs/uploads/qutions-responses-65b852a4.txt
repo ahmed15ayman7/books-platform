@@ -1,0 +1,37 @@
+1. Project Name & Tagline: is "Books Platfrom" -  "Our goal is to make the Arab reader aware of every new book published in the world." 
+
+2. The Core Problem: What you said is accurate ✅, no any add or sharpen.
+
+3. User Roles (Visitor / Public Reader, Author (Unpublished),Publisher, Translator): in past system those roles are exit as business needs and on website  but not configured in DB in  past system ( those are exist but not in direct way ) what we need in this scop implantation - implement same to last (past) system, note the "Admin / Editorial Team — manages all content, book entries, publisher profiles, media" is exist in BD and in dircte way in last system and will also implemned in this scop. In short, what will be implemented is the same as the previous system at this point (user Roles).
+
+4. Core Modules From the site I can see: the Cart/purchasing will be in this version and ( activated ) also with E-commerce system with activated, e will apply payment getway but not specified yet.
+
+5. Business Model
+From the site it appears to be a mix, but none are confirmed:
+
+- B2B institutional subscriptions (libraries, publishers, TV channels, newspapers). - Confirmed ✅
+- Book sales with commission or referral (via Cart — future). - both Confirmed ✅
+- Author publishing service (paid or free?). - Confirmed ✅ : only first book is free, then paid.
+- Sponsored publisher profiles?. - Confirmed ✅
+
+6. Key Business Rules
+
+Can anyone submit a book to "Publish Your Book" or is there approval? - required acceptance from admin.
+Who can create a Publisher profile — the publisher themselves or only Admin? - at this version the admin.
+Can books be bought directly or only referred to the original publisher? - both mixed. 
+Are translated books listed with a purchase link or just informational? -  just informational.
+
+7. What is explicitly NOT in this version?
+
+The Cart exists but seems inactive — is e-commerce in or out? - yes e-commerce in, Cart/purchasing will be activated in this version.
+User accounts / reader profiles — do readers have logins? - no at this version.
+Comments, ratings, or reading lists — in or out? - yes in.
+Mobile app — in or out? - yes in but we will make a new seprated scop sprint for mobile.
+Newsletter / email subscription system — in or out? - yes in.
+
+8. Integrations & External Dependencies
+
+YouTube (embedded videos) - Confirmed ✅
+Social media links (Facebook, X, Telegram, LinkedIn, YouTube) - Confirmed ✅
+The Cart implies a payment gateway will be needed - yes you are right but we not yet choose specifief payment getway - consider this in scop, we need payment getway for enable Cart/purchasing e-commerce.
+

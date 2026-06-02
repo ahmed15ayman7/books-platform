@@ -1,4 +1,4 @@
-import 'package:easy_localization/easy_localization.dart';
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -57,7 +57,6 @@ class LanguageScreen extends StatelessWidget {
               SizedBox(height: 48.h),
               _LanguageCard(
                 locale: const Locale('ar'),
-                flagEmoji: '🇸🇦',
                 label: 'العربية',
                 subtitle: 'Arabic — RTL',
                 isRtl: true,
@@ -66,7 +65,6 @@ class LanguageScreen extends StatelessWidget {
               SizedBox(height: 16.h),
               _LanguageCard(
                 locale: const Locale('en'),
-                flagEmoji: '🇬🇧',
                 label: 'English',
                 subtitle: 'اللغة الإنجليزية',
                 isRtl: false,
@@ -89,7 +87,6 @@ class LanguageScreen extends StatelessWidget {
 class _LanguageCard extends StatelessWidget {
   const _LanguageCard({
     required this.locale,
-    required this.flagEmoji,
     required this.label,
     required this.subtitle,
     required this.isRtl,
@@ -97,7 +94,6 @@ class _LanguageCard extends StatelessWidget {
   });
 
   final Locale locale;
-  final String flagEmoji;
   final String label;
   final String subtitle;
   final bool isRtl;
@@ -123,8 +119,6 @@ class _LanguageCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Text(flagEmoji, style: TextStyle(fontSize: 32.sp)),
-            SizedBox(width: 16.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,10 +141,13 @@ class _LanguageCard extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
-              isRtl ? Icons.chevron_left_rounded : Icons.chevron_right_rounded,
-              color: AppColors.primary,
-              size: 24.r,
+            Directionality(
+              textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+              child: Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.primary,
+                size: 24.r,
+              ),
             ),
           ],
         ),

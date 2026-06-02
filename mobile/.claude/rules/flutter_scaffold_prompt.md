@@ -336,7 +336,7 @@ These three widgets live in `lib/core/widgets/` and are used by every feature's
   Throws `FormatException` (caught by `ApiManager` as `UnexpectedFailure`) when the
   top-level response is not a JSON object or `data` is null.
   For void endpoints (logout, delete) bypass entirely: `fromJson: (_) => unit`.
-  See feature guide §10 for usage patterns.
+  See feature guide §11 for usage patterns.
 
 **Routing:**
 
@@ -376,6 +376,9 @@ These three widgets live in `lib/core/widgets/` and are used by every feature's
   A private static `_unknown(RouteSettings settings)` helper is extracted from
   the switch — every null-guard on a missing/invalid args cast delegates to it,
   keeping all route cases consistent.
+  When a screen lives in a folder (`pages/<screen_name>/<screen_name>_screen.dart`),
+  the import path in `AppRouter` reflects that — the `BlocProvider` creation pattern
+  is identical regardless of flat or folder layout.
 
 **Localization:**
 
@@ -490,6 +493,7 @@ These three widgets live in `lib/core/widgets/` and are used by every feature's
 2. **ScreenUtil safe usage:** `.sp`, `.w`, `.h` forbidden at class-level static
    init. AppTextStyles and AppSpacing must use lazy getters (static getters,
    not static const). Plan must name this rule explicitly.
+   Note: ScreenUtil only handles proportional scaling — content overflow and device safe areas (notch, home indicator) are screen-level responsibilities covered in `flutter_feature_prompt.md §6`.
 
 3. **Auth interceptor circular dependency:** Construction order must be:
    FlutterSecureStorage → SecureStorageHelper → GlobalKey<NavigatorState> →
@@ -507,7 +511,7 @@ These three widgets live in `lib/core/widgets/` and are used by every feature's
    `AppRouter.generateRoute` casts `settings.arguments` to the typed class with a
    null guard (null → `_unknown(settings)`), never to `Map`.
    Args live in core so both feature and non-feature callers can import without
-   cross-feature dependency violations. See feature guide §9 for full pattern.
+   cross-feature dependency violations. See feature guide §10 for full pattern.
 
 6. **Null token on public routes:** AuthInterceptor skips the Authorization
    header silently when token is null. It does not throw, redirect, or log.

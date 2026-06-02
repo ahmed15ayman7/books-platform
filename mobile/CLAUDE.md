@@ -80,6 +80,11 @@ features/<feature>/
 └── presentation/
     ├── cubit/         # @injectable (factory); one cubit per concern (action vs. list)
     ├── pages/
+    │   ├── simple_screen.dart     # flat — under ~250 lines, no embedded StatefulWidget
+    │   └── complex_screen/        # folder — exceeds threshold (see rule 6)
+    │       ├── complex_screen.dart  # only the screen widget
+    │       ├── complex_body.dart
+    │       └── complex_shimmer.dart
     └── widgets/       # only when shared across 2+ screens within the feature
 ```
 
@@ -103,6 +108,9 @@ Add a use case only when: (a) two or more cubits call the same operation, or (b)
 
 ### 5. Action/query cubit split
 Features with both mutations and reads must use separate cubits to prevent state collisions. The action cubit uses `BlocConsumer` (listener triggers list refresh); the list cubit uses `BlocBuilder`.
+
+### 6. Screen complexity threshold
+If a screen's total widget code is under ~250 lines and contains no embedded `StatefulWidget`, keep private classes in the single page file. Once either threshold is crossed, create a screen folder: `pages/<screen_name>_screen/` containing `<screen_name>_screen.dart` (only the screen widget) plus one file per extracted component. Screen-specific components go in this folder — not in `widgets/`. `widgets/` remains strictly for components shared across two or more screens. No `states/` subfolder — name files by concern (`home_shimmer.dart`, `home_newsletter_strip.dart`) and keep flat.
 
 ---
 
@@ -153,6 +161,7 @@ Create a feature-level override (`presentation/cubit/failure_messages.dart`) onl
 - `.sp`, `.w`, `.h`, `.r` are forbidden at class-level static initialization — use them only inside `build()` methods or lazy getters
 - `AppTextStyles` and `AppSpacing` use `static get` (not `static const`) for this reason
 - All UI chrome in helpers (`DialogHelper`, `SnackBarHelper`, `BottomSheetHelper`) must use ScreenUtil — no raw pixel literals
+- ScreenUtil only scales sizes proportionally. It does **not** prevent content overflow or protect from device safe areas — those require `SingleChildScrollView`/`Expanded` and `SafeArea` respectively.
 
 ---
 
@@ -240,6 +249,15 @@ Verify new registrations appear in `lib/core/di/injection_container.config.dart`
 - Use Cubit for feature state and business logic coordination by default. Bloc is acceptable only when a feature has complex event-driven flows that Cubit cannot express cleanly.
 - UI must only observe state and trigger Cubit methods — no business logic inside widgets.
 - Do not bypass architecture layers: presentation talks to cubits, cubits talk to repositories (or use cases when warranted), never the reverse.
+
+### Layout & responsiveness
+- Never stack fixed `.h` sections whose total approaches screen height — wrap the screen body in `SingleChildScrollView` instead.
+- Use `Expanded` for lists and sections that should fill remaining space; never use a fixed `.h` container for them.
+- Use `Flexible` + `maxLines` + `TextOverflow.ellipsis` for text beside other `Row` children.
+- Use `AspectRatio` for book covers — never a fixed `.h` on an image.
+- Apply `SafeArea` at Scaffold body level on every screen.
+- Use `Scaffold.bottomNavigationBar` for pinned bottom buttons — not `Positioned(bottom: 0)`. Flutter automatically pads the scroll body so content is never hidden under it.
+- Bottom nav bar must use `SafeArea(top: false)` to clear the home indicator on iOS.
 
 ---
 

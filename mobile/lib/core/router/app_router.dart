@@ -3,26 +3,26 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../features/articles/presentation/cubit/article_detail_cubit/article_detail_cubit.dart';
 import '../../features/articles/presentation/cubit/articles_list_cubit/articles_list_cubit.dart';
-import '../../features/articles/presentation/pages/article_detail_screen.dart';
-import '../../features/articles/presentation/pages/articles_screen.dart';
+import '../../features/articles/presentation/pages/article_detail_screen/article_detail_screen.dart';
+import '../../features/articles/presentation/pages/articles_screen/articles_screen.dart';
 import '../../features/books/presentation/cubit/book_detail_cubit/book_detail_cubit.dart';
 import '../../features/books/presentation/cubit/catalog_cubit/catalog_cubit.dart';
 import '../../features/books/presentation/cubit/home_content_cubit/home_content_cubit.dart';
-import '../../features/books/presentation/pages/book_detail_screen.dart';
-import '../../features/books/presentation/pages/catalog_screen.dart';
+import '../../features/books/presentation/pages/book_detail_screen/book_detail_screen.dart';
+import '../../features/books/presentation/pages/catalog_screen/catalog_screen.dart';
 import '../../features/books/presentation/pages/category_books_screen.dart';
-import '../../features/books/presentation/pages/home_screen.dart';
-import '../../features/cart/presentation/pages/cart_screen.dart';
+import '../../features/books/presentation/pages/home_screen/home_screen.dart';
+import '../../features/cart/presentation/pages/cart_screen/cart_screen.dart';
 import '../../features/onboarding/presentation/pages/language_screen.dart';
-import '../../features/onboarding/presentation/pages/onboarding_screen.dart';
+import '../../features/onboarding/presentation/pages/onboarding_screen/onboarding_screen.dart';
 import '../../features/onboarding/presentation/pages/splash_screen.dart';
-import '../../features/publish/presentation/pages/publish_screen.dart';
+import '../../features/publish/presentation/pages/publish_screen/publish_screen.dart';
 import '../../features/publishers/presentation/cubit/publisher_detail_cubit/publisher_detail_cubit.dart';
 import '../../features/publishers/presentation/cubit/publishers_list_cubit/publishers_list_cubit.dart';
-import '../../features/publishers/presentation/pages/publisher_detail_screen.dart';
-import '../../features/publishers/presentation/pages/publishers_screen.dart';
+import '../../features/publishers/presentation/pages/publisher_detail_screen/publisher_detail_screen.dart';
+import '../../features/publishers/presentation/pages/publishers_screen/publishers_screen.dart';
 import '../../features/search/presentation/cubit/search_cubit.dart';
-import '../../features/search/presentation/pages/search_screen.dart';
+import '../../features/search/presentation/pages/search_screen/search_screen.dart';
 import '../di/injection_container.dart';
 import 'app_routes.dart';
 import 'args/article_detail_args.dart';
@@ -160,9 +160,9 @@ class AppRouter {
   }
 
   static Route<dynamic> _unknown(RouteSettings settings) => MaterialPageRoute(
-        settings: settings,
-        builder: (_) => const _UnknownScreen(),
-      );
+    settings: settings,
+    builder: (_) => const _UnknownScreen(),
+  );
 }
 
 class _UnknownScreen extends StatelessWidget {

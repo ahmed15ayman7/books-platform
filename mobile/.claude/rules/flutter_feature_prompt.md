@@ -37,13 +37,53 @@ lib/features/<feature>/
     │       ├── <query>_cubit.dart                  # @injectable (factory)
     │       └── <query>_state.dart                  # sealed class
     ├── pages/
-    │   └── <screen>_screen.dart
+    │   ├── <screen>_screen.dart       # flat — under ~250 lines, no embedded StatefulWidget
+    │   └── <screen>_screen/            # folder — exceeds threshold (see §1.1)
+    │       ├── <screen>_screen.dart   # only the screen widget
+    │       ├── <screen>_body.dart
+    │       └── <screen>_shimmer.dart
     └── widgets/
-        └── <component>.dart
+        └── <component>.dart           # shared across 2+ screens only
 ```
 
 **Rule:** Never add folders that are empty. Only create `use_cases/` when §4 applies.
 Only create a `widgets/` folder if widgets are shared across two or more screens in the feature.
+
+### §1.1 — Screen file vs screen folder
+
+Use a flat file by default. Create a screen folder when either threshold is crossed:
+
+| Threshold | Trigger |
+|---|---|
+| File size | Total widget code reaches ~250 lines |
+| Lifecycle | Any embedded component is a `StatefulWidget` with its own controller or form |
+
+**Flat (default):**
+```
+pages/
+└── catalog_screen.dart    # simple, stays flat
+```
+
+**Folder (threshold crossed):**
+```
+pages/
+└── home_screen/
+    ├── home_screen.dart              # only HomeScreen — routing target
+    ├── home_body.dart                # main scroll content
+    ├── home_categories_section.dart
+    ├── home_books_carousel_section.dart
+    ├── home_newsletter_strip.dart    # StatefulWidget — always extract
+    └── home_shimmer.dart             # all shimmer skeletons in one file
+```
+
+**Rules inside a screen folder:**
+- `<screen>_screen.dart` contains only the screen widget — no private sub-widgets.
+- One file per extracted component. Group closely related skeletons (e.g. all shimmer
+  classes for the same screen) into a single `<screen>_shimmer.dart`.
+- No `states/` subfolder — "states" already means cubit sealed classes in this codebase.
+  Name files by visual concern and keep flat.
+- Components here are **not** reusable widgets. If a component is needed in a second
+  screen, move it to `widgets/` and import from there.
 
 ### Data source: single file vs contract + implementations
 
@@ -141,7 +181,7 @@ try {
 ```
 
 **Corollary:** All user-facing error strings come from `failureToMessage(Failure)` in
-`lib/core/network/failure_messages.dart` (created during scaffold phase — see §7).
+`lib/core/network/failure_messages.dart` (created during scaffold phase — see §9).
 No screen or cubit hardcodes error strings.
 
 ---
@@ -408,7 +448,94 @@ screens and widgets, let ambient `Directionality` do the work.
 
 ---
 
-## 6. Response Model Rules
+## 6. Layout & Responsiveness
+
+ScreenUtil scales sizes proportionally across devices. It does **not** handle content overflow or device safe areas — those are your responsibility on every screen. They are two separate concerns.
+
+### Never stack fixed `.h` sections
+
+A column of fixed-height widgets will overflow on short phones or when the keyboard opens.
+
+```dart
+// ❌ Wrong — total height can exceed viewport on short devices
+Column(children: [HeroSection(), CategorySection(), BooksSection(), StatsStrip()])
+
+// ✅ Correct — scrolls when content is taller than the screen
+SingleChildScrollView(
+  child: Column(children: [HeroSection(), CategorySection(), BooksSection(), StatsStrip()]),
+)
+```
+
+Use `Expanded` for a section that should fill remaining space (e.g. a list inside a `Scaffold` body):
+
+```dart
+// ❌ Wrong — fixed height overflows on short phones
+Container(height: 400.h, child: BookList())
+
+// ✅ Correct — takes whatever space is left
+Expanded(child: BookList())
+```
+
+Use `Flexible` + `TextOverflow.ellipsis` for text beside other content in a `Row`:
+
+```dart
+Row(
+  children: [
+    Flexible(
+      child: Text(book.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+    ),
+    Text(book.price),
+  ],
+)
+```
+
+Use `AspectRatio` for book covers — never a fixed `.h` on an image:
+
+```dart
+AspectRatio(
+  aspectRatio: 2 / 3,
+  child: BookCoverImage(book: book),
+)
+```
+
+### SafeArea — protect from notch and home indicator
+
+Flutter renders behind system UI by default. Apply `SafeArea` on every screen:
+
+```dart
+// Scaffold body — covers notch + status bar
+Scaffold(
+  body: SafeArea(child: YourScreenContent()),
+)
+
+// Bottom nav bar — only protect the bottom (home indicator)
+SafeArea(
+  top: false,
+  child: BottomNavBar(),
+)
+```
+
+For screens with a pinned bottom button (BookDetail, Cart, Checkout), use `Scaffold.bottomNavigationBar` — not `Positioned`:
+
+```dart
+// ❌ Wrong — home indicator hides the button; Scaffold body scroll doesn't account for it
+Scaffold(
+  body: Stack(children: [BookContent(), Positioned(bottom: 0, child: AddToCartButton())]),
+)
+
+// ✅ Correct — Flutter pads the scroll body automatically; SafeArea clears the home indicator
+Scaffold(
+  body: SingleChildScrollView(child: BookContent()),
+  bottomNavigationBar: SafeArea(
+    top: false,
+    child: AddToCartButton(),
+  ),
+)
+```
+
+---
+
+## 7. Response Model Rules
 
 Response models live in `data/models/` and have two responsibilities only:
 1. `fromJson(Map<String, dynamic>)` — deserialize from API JSON
@@ -450,7 +577,7 @@ They are data transfer objects — instantiated once, mapped to entity, then dis
 
 ---
 
-## 7. Request Model Rules
+## 8. Request Model Rules
 
 Request models live in `data/models/` and expose only `toJson()`.
 
@@ -480,7 +607,7 @@ backend explicitly requires null for "clear this field" semantics.
 
 ---
 
-## 8. Error Messages — One Place
+## 9. Error Messages — One Place
 
 > **This file is created during scaffold phase.** `lib/core/network/failure_messages.dart`
 > already exists when you start a feature. Do not recreate it. Import it directly.
@@ -548,7 +675,7 @@ Do not create a feature-level `failure_messages.dart` unless a unique status cod
 
 ---
 
-## 9. Route Args
+## 10. Route Args
 
 Only screens that require navigation parameters have an args class.
 Args classes live in `lib/core/router/args/` — one file per screen:
@@ -608,7 +735,7 @@ Do not add args classes to `app_router.dart` or inside any feature folder.
 
 ---
 
-## 10. ApiEnvelope Unwrapper
+## 11. ApiEnvelope Unwrapper
 
 **Only applies if the backend wraps every response in a general envelope:**
 ```json
@@ -642,7 +769,7 @@ Never pass a void endpoint through `unwrapServiceResult` — it will throw.
 
 ---
 
-## 11. Pre-Ship Checklist
+## 12. Pre-Ship Checklist
 
 Before marking a feature complete, verify every item:
 
@@ -667,6 +794,15 @@ Before marking a feature complete, verify every item:
 - [ ] Diagonal gradients use `AlignmentDirectional.topStart / bottomEnd` — no `Alignment.topLeft / bottomRight`
 - [ ] Directional icons use standard Material icons (`Icons.chevron_right_rounded`, `Icons.arrow_back_rounded`) with no `isRtl` ternary (see §5)
 
+**Layout**
+- [ ] Screens with tall/variable content are wrapped in `SingleChildScrollView` or `CustomScrollView`
+- [ ] Dynamic lists use `Expanded`, not `Container(height: X.h)`
+- [ ] Text beside sibling widgets in `Row` uses `Flexible` + `TextOverflow.ellipsis`
+- [ ] Book covers use `AspectRatio(2/3)`, not a fixed `.h`
+- [ ] `SafeArea` applied at Scaffold body level on every screen
+- [ ] Pinned bottom buttons use `Scaffold.bottomNavigationBar` + `SafeArea(top: false)`, not `Positioned`
+- [ ] Bottom nav uses `SafeArea(top: false)` to clear the home indicator
+
 **DI**
 - [ ] After adding `@injectable` / `@lazySingleton` classes, run:
   `dart run build_runner build --delete-conflicting-outputs`
@@ -677,7 +813,7 @@ Before marking a feature complete, verify every item:
 
 ---
 
-## 12. Anti-Patterns (Do Not Repeat)
+## 13. Anti-Patterns (Do Not Repeat)
 
 The following patterns were found in other projects and features and must not appear
 in this codebase:
@@ -694,3 +830,9 @@ in this codebase:
 | `isRtl ? Icons.chevron_left : Icons.chevron_right` ternary | Fragile; pollutes every caller; `isRtl` variable noise throughout the file | Use `Icons.chevron_right_rounded` — `matchTextDirection` is baked into the `IconData`; the `Icon` widget mirrors automatically |
 | `Alignment.topLeft / bottomRight` in gradients | Hard-coded LTR diagonal; gradient does not flip in RTL | `AlignmentDirectional.topStart / bottomEnd` |
 | `EdgeInsets.only(left: …)` for insets | Does not mirror in RTL; content shifts wrong | `EdgeInsetsDirectional.only(start: …)` |
+| Stacking fixed `.h` sections without scroll wrapper | Overflows on short phones or when keyboard opens | Wrap in `SingleChildScrollView` |
+| `Container(height: X.h)` for a dynamic list | Fixed height overflows as list grows | `Expanded(child: list)` inside Scaffold body |
+| `Positioned(bottom: 0)` for pinned buttons | Home indicator hides button; Scaffold body scroll unaware of it | `Scaffold.bottomNavigationBar` + `SafeArea(top: false)` |
+| No `SafeArea` on a screen | Content renders behind notch or home indicator on real devices | `SafeArea` at Scaffold body level |
+| Putting screen-specific components in `widgets/` | `widgets/` means shared across 2+ screens; non-shared components there mislead readers into thinking they are reusable | Put them in `pages/<screen_name>_screen/` next to the screen (see §1.1) |
+| Creating a `states/` subfolder inside a screen folder | "states" already means cubit sealed classes in this codebase — naming collision causes confusion | Keep flat inside the screen folder; name by visual concern (`home_shimmer.dart`, `home_body.dart`) |

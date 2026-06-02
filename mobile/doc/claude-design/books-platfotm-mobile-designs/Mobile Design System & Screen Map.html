@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Books Platform — Mobile Design System & Screen Map</title>
+<link rel="stylesheet" href="assets/ds.css">
+</head>
+<body>
+<div class="shell">
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar">
+  <img src="assets/logo.webp" alt="Books Platform">
+  <div class="kicker">Mobile Design System · v0.1</div>
+  <nav>
+    <div class="nav-group">Context</div>
+    <a href="#brief">Brief &amp; assumptions</a>
+    <a href="#scope">Scope &amp; business rules</a>
+    <div class="nav-group">Phase 1 · Foundations</div>
+    <a href="#color">Color tokens</a>
+    <a href="#type">Typography</a>
+    <a href="#spacing">Spacing &amp; grid</a>
+    <a href="#radius">Border radius</a>
+    <a href="#elevation">Elevation</a>
+    <a href="#motion">Motion</a>
+    <a href="#icons">Iconography</a>
+    <div class="nav-group">Phase 1 · Components</div>
+    <a href="#components">Component inventory</a>
+    <div class="nav-group">Phase 2 · Plan</div>
+    <a href="#screenmap">Screen map</a>
+    <a href="#priority">5 priority screens</a>
+    <a href="#flags">Open questions</a>
+  </nav>
+</aside>
+
+<!-- ============ MAIN ============ -->
+<main class="main">
+
+  <!-- COVER -->
+  <div class="cover">
+    <span class="tag">Phase 1 + 2 · For approval</span>
+    <h1>Mobile Design System<br>&amp; Screen Map</h1>
+    <div class="ar pill-ar">منصة الكتب العالمية · تطبيق الجوال</div>
+    <p class="lede">A native-feeling Flutter foundation for the Books Platform mobile app — a bilingual
+      Arabic-first books discovery &amp; commerce experience. Every token below is lifted <b>verbatim from the
+      live web codebase</b> (<code>globals.css</code> + <code>tailwind.config.ts</code>), so mobile and web share
+      one source of truth.</p>
+    <div class="meta">
+      <span>Flutter 3.x · Material 3</span>
+      <span>RTL-first · AR / EN</span>
+      <span>iOS + Android · portrait</span>
+      <span>4,654 books · 665 publishers · 63 countries</span>
+    </div>
+  </div>
+
+  <!-- ============ BRIEF / ASSUMPTIONS ============ -->
+  <section id="brief">
+    <div class="eyebrow">Reading the room</div>
+    <h2>What I found &amp; what I'm assuming</h2>
+    <p class="sub">Before tokens, here's the reasoning — flagging where the codebase contradicts the older
+      written brief so you can correct me early.</p>
+
+    <div class="note red">
+      <div class="hd">⚑ The palette is red + black, not navy</div>
+      The earlier written style guide described a <b>navy/indigo (#46467F)</b> brand. The shipped code tells a
+      different, authoritative story: the live product is a <b>"Soft UI" system in cultural red
+      <code>#B11E2E</code>, near-black <code>#0B0B0B</code> and white</b> over warm grays — explicitly commented
+      <code>أحمر + أسود + أبيض</code> in <code>globals.css</code>. The prompt asks me to confirm hex from the code,
+      so <b>I'm treating the codebase as the truth and discarding the navy direction.</b> Say the word if the
+      brand has since moved back to navy.
+    </div>
+
+    <div class="note amber">
+      <div class="hd">⚑ "Soft UI" — rounder &amp; springier than the web guide implied</div>
+      The code is deliberately soft: large radii (cards <code>1.75rem</code>, buttons <code>1.5rem</code>),
+      gentle navy-free shadows, and a <b>spring easing</b> <code>cubic-bezier(.34,1.45,.64,1)</code> on hovers/taps.
+      I've carried that personality into the mobile foundation rather than the "scholarly, 6–8px corners" the old
+      guide described.
+    </div>
+
+    <div class="note gray">
+      <div class="hd">⚑ Mobile is a separate sprint — this is the spec for it</div>
+      Your answers note the mobile app is <b>"a new separated scope sprint."</b> This document is exactly that
+      hand-off spec: it defines the foundation + screen map the mobile sprint builds against. <b>No screens are
+      designed yet</b> — per the brief, this is for approval first.
+    </div>
+  </section>
+
+  <!-- ============ SCOPE ============ -->
+  <section id="scope">
+    <div class="eyebrow">Decisions locked from your answers</div>
+    <h2>Scope &amp; business rules</h2>
+    <p class="sub">Folding the clarification answers + the Prisma schema into a single source of decisions.</p>
+
+    <div class="two-col">
+      <div class="note green">
+        <div class="hd">✓ In this version</div>
+        <ul style="margin:0; padding-inline-start:18px; line-height:1.9;">
+          <li><b>E-commerce / Cart</b> — activated. Checkout + a payment gateway (provider TBD).</li>
+          <li><b>Mixed buying</b> — some books bought directly, some referred to the publisher.</li>
+          <li><b>Comments &amp; ratings</b> — on books &amp; articles (admin-moderated).</li>
+          <li><b>Wishlist</b> — save-for-later (email-keyed, no login).</li>
+          <li><b>Newsletter</b> + push/Telegram notifications.</li>
+          <li><b>Publish your book</b> — first book free, then paid; <b>admin approval required</b>.</li>
+          <li><b>B2B subscriptions</b>, <b>ambassador referrals</b>, <b>sponsored publishers</b>.</li>
+        </ul>
+      </div>
+      <div class="note gray">
+        <div class="hd">✕ Out / deferred this version</div>
+        <ul style="margin:0; padding-inline-start:18px; line-height:1.9;">
+          <li><b>Reader accounts / logins</b> — not in this version. Cart &amp; wishlist run on
+            session + email, not auth.</li>
+          <li><b>Translated-book purchase links</b> — informational only.</li>
+          <li><b>Self-serve publisher profiles</b> — admin-created only for now.</li>
+          <li><b>Chosen payment provider</b> — not selected; design must stay provider-agnostic.</li>
+        </ul>
+        <p style="margin:12px 0 0; font-size:13px; color:var(--muted);">Roles present in the DB (Admin/Editorial,
+          Author, Publisher, Translator, Ambassador) match the previous system — surfaced through admin, not a
+          public reader login.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COLOR ============ -->
+  <section id="color">
+    <div class="eyebrow">Phase 1 · Foundation</div>
+    <h2>Color tokens</h2>
+    <p class="sub">Verbatim from <code>globals.css</code>. Two brand colors do all the emotional work; grays and
+      semantics stay quiet. Light + dark are both defined in the code.</p>
+
+    <h3 class="block">Brand</h3>
+    <div class="swatch-grid">
+      <div class="swatch"><div class="chip" style="background:#b11e2e"></div><div class="meta"><div class="name">brand-red</div><div class="val">#B11E2E</div><div class="role">primary · CTAs · links</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#8b1623"></div><div class="meta"><div class="name">brand-red-hover</div><div class="val">#8B1623</div><div class="role">pressed / hover</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#f8e5e8"></div><div class="meta"><div class="name">brand-red-soft</div><div class="val">#F8E5E8</div><div class="role">tints · icon wells</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#0b0b0b"></div><div class="meta"><div class="name">brand-black</div><div class="val">#0B0B0B</div><div class="role">dark surfaces · header</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#ffffff;box-shadow:inset 0 0 0 1px #e5e5e5"></div><div class="meta"><div class="name">brand-white</div><div class="val">#FFFFFF</div><div class="role">cards · canvas</div></div></div>
+    </div>
+
+    <h3 class="block">Neutral scale</h3>
+    <div class="swatch-grid">
+      <div class="swatch"><div class="chip" style="background:#fafafa;box-shadow:inset 0 0 0 1px #eee"></div><div class="meta"><div class="name">gray-50</div><div class="val">#FAFAFA</div><div class="role">app background</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#f5f5f5"></div><div class="meta"><div class="name">gray-100</div><div class="val">#F5F5F5</div><div class="role">muted fill</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#e5e5e5"></div><div class="meta"><div class="name">gray-200</div><div class="val">#E5E5E5</div><div class="role">borders · dividers</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#a3a3a3"></div><div class="meta"><div class="name">gray-400</div><div class="val">#A3A3A3</div><div class="role">hint · disabled</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#6b6b6b"></div><div class="meta"><div class="name">gray-500</div><div class="val">#6B6B6B</div><div class="role">secondary text</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#1a1a1a"></div><div class="meta"><div class="name">gray-900</div><div class="val">#1A1A1A</div><div class="role">primary text</div></div></div>
+    </div>
+
+    <h3 class="block">Semantic — forms &amp; status only, never marketing</h3>
+    <div class="swatch-grid">
+      <div class="swatch"><div class="chip" style="background:#15803d"></div><div class="meta"><div class="name">success</div><div class="val">#15803D</div><div class="role">"مترجم" Translated</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#ca8a04"></div><div class="meta"><div class="name">warning</div><div class="val">#CA8A04</div><div class="role">"مرشح" Nominated</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#1d4ed8"></div><div class="meta"><div class="name">info</div><div class="val">#1D4ED8</div><div class="role">info banners</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#dc2626"></div><div class="meta"><div class="name">error</div><div class="val">#DC2626</div><div class="role">validation</div></div></div>
+    </div>
+
+    <h3 class="block">Flutter <code>ColorScheme</code> mapping</h3>
+    <table class="tbl">
+      <thead><tr><th>ColorScheme role</th><th>Light</th><th>Dark</th><th>Source token</th></tr></thead>
+      <tbody>
+        <tr><td><code>primary</code></td><td><span class="dot" style="background:#b11e2e"></span>#B11E2E</td><td><span class="dot" style="background:#b11e2e"></span>#B11E2E</td><td>brand-red</td></tr>
+        <tr><td><code>onPrimary</code></td><td><span class="dot" style="background:#fff"></span>#FFFFFF</td><td><span class="dot" style="background:#fff"></span>#FFFFFF</td><td>brand-white</td></tr>
+        <tr><td><code>surface</code></td><td><span class="dot" style="background:#fff"></span>#FFFFFF</td><td><span class="dot" style="background:#1a1a1a"></span>#1A1A1A</td><td>card</td></tr>
+        <tr><td><code>background</code></td><td><span class="dot" style="background:#fafafa"></span>#FAFAFA</td><td><span class="dot" style="background:#0b0b0b"></span>#0B0B0B</td><td>gray-50 / black</td></tr>
+        <tr><td><code>onSurface</code></td><td><span class="dot" style="background:#1a1a1a"></span>#1A1A1A</td><td><span class="dot" style="background:#fff"></span>#FFFFFF</td><td>gray-900 / white</td></tr>
+        <tr><td><code>onSurfaceVariant</code> (secondary text)</td><td><span class="dot" style="background:#6b6b6b"></span>#6B6B6B</td><td><span class="dot" style="background:#a3a3a3"></span>#A3A3A3</td><td>muted-foreground</td></tr>
+        <tr><td><code>outline</code> (border)</td><td><span class="dot" style="background:#e5e5e5"></span>#E5E5E5</td><td><span class="dot" style="background:#262626"></span>#262626</td><td>border</td></tr>
+        <tr><td><code>error</code></td><td><span class="dot" style="background:#dc2626"></span>#DC2626</td><td><span class="dot" style="background:#dc2626"></span>#DC2626</td><td>error</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ TYPE ============ -->
+  <section id="type">
+    <div class="eyebrow">Phase 1 · Foundation</div>
+    <h2>Typography</h2>
+    <p class="sub"><b>Tajawal</b> for body &amp; UI (Arabic-first, strong Latin coverage), <b>Cairo</b> for display
+      headings, <b>Inter</b> for Latin micro-labels. Arabic runs at <b>1.7 line-height</b> — denser script needs
+      the air. Below maps directly to Flutter's <code>TextTheme</code>.</p>
+
+    <div class="spec"><div class="sample" style="font-family:'Cairo';font-weight:800;font-size:34px;line-height:1.15;letter-spacing:-.5px;">منصة الكتب العالمية</div><div class="label">displayLarge<br>Cairo 800 · 34 / 1.15 · -0.5</div></div>
+    <div class="spec"><div class="sample" style="font-family:'Cairo';font-weight:700;font-size:28px;line-height:1.2;">صدر حديثًا · Just Released</div><div class="label">displayMedium<br>Cairo 700 · 28 / 1.2</div></div>
+    <div class="spec"><div class="sample" style="font-family:'Tajawal';font-weight:700;font-size:22px;line-height:1.3;">تصانيف الكتب الثمانية</div><div class="label">titleLarge<br>Tajawal 700 · 22 / 1.3</div></div>
+    <div class="spec"><div class="sample" style="font-family:'Tajawal';font-weight:700;font-size:18px;line-height:1.4;">دار النشر · Seven Stories Press</div><div class="label">titleMedium<br>Tajawal 700 · 18 / 1.4</div></div>
+    <div class="spec"><div class="sample" style="font-family:'Tajawal';font-weight:400;font-size:16px;line-height:1.7;">هدفنا أن يعرف القارئ العربي بكل كتاب جديد يصدر في العالم، فنفتح نافذة معرفية على أفكار وعلوم وثقافات.</div><div class="label">bodyLarge<br>Tajawal 400 · 16 / 1.7</div></div>
+    <div class="spec"><div class="sample" style="font-family:'Tajawal';font-weight:400;font-size:14px;line-height:1.7;color:var(--g500)">وصف موجز للكتاب يظهر أسفل العنوان في البطاقة وصفحة التفاصيل.</div><div class="label">bodyMedium<br>Tajawal 400 · 14 / 1.7</div></div>
+    <div class="spec"><div class="sample"><span class="bp-btn primary" style="pointer-events:none">أضف إلى السلة</span></div><div class="label">labelLarge (buttons)<br>Tajawal 500 · 14</div></div>
+    <div class="spec"><div class="sample" style="font-family:'Inter';font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--brand-red)">Recommended for translation</div><div class="label">labelSmall (eyebrow)<br>Inter 600 · 11 · +0.14em · CAPS</div></div>
+
+    <div class="note amber" style="margin-top:18px">
+      <div class="hd">Arabic readability rule</div>
+      Set <code>height: 1.7</code> on every Arabic text style and never go below <b>14px</b> for body. The brief's
+      1.6–1.8× recommendation is honoured here. Latin (Inter) can sit a touch tighter at 1.5.
+    </div>
+  </section>
+
+  <!-- ============ SPACING ============ -->
+  <section id="spacing">
+    <div class="eyebrow">Phase 1 · Foundation</div>
+    <h2>Spacing &amp; grid</h2>
+    <p class="sub">An <b>8-pt base</b> (4 for fine adjustments). Use direction-agnostic insets
+      (<code>EdgeInsetsDirectional</code>) everywhere so RTL mirrors for free.</p>
+    <div class="demo"><div class="demo-title">Scale</div>
+      <div class="bars">
+        <div class="bar"><b style="width:4px;height:4px"></b><span>4</span></div>
+        <div class="bar"><b style="width:8px;height:8px"></b><span>8</span></div>
+        <div class="bar"><b style="width:12px;height:12px"></b><span>12</span></div>
+        <div class="bar"><b style="width:16px;height:16px"></b><span>16</span></div>
+        <div class="bar"><b style="width:24px;height:24px"></b><span>24</span></div>
+        <div class="bar"><b style="width:32px;height:32px"></b><span>32</span></div>
+        <div class="bar"><b style="width:40px;height:40px"></b><span>40</span></div>
+        <div class="bar"><b style="width:48px;height:48px"></b><span>48</span></div>
+      </div>
+    </div>
+    <table class="tbl">
+      <thead><tr><th>Usage</th><th>Value</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Screen edge padding</td><td><code>16</code></td><td>standard gutter on phones</td></tr>
+        <tr><td>Card inner padding</td><td><code>12–16</code></td><td>12 on book cards, 16 on detail panels</td></tr>
+        <tr><td>List item height</td><td><code>72–88</code></td><td>min tap target ≥ 48</td></tr>
+        <tr><td>Section gap (vertical rhythm)</td><td><code>32</code></td><td>between homepage sections</td></tr>
+        <tr><td>Component gap (chips, buttons)</td><td><code>12</code></td><td>use <code>gap:</code> / <code>Wrap</code> spacing</td></tr>
+        <tr><td>Book grid</td><td><code>2-up · 12 gap</code></td><td>cover aspect <code>3/4</code>; 1.4-up scroll-snap in carousels</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ RADIUS ============ -->
+  <section id="radius">
+    <div class="eyebrow">Phase 1 · Foundation</div>
+    <h2>Border radius</h2>
+    <p class="sub">Verbatim from <code>globals.css</code>. Generous "Soft UI" rounding — the brand signature.</p>
+    <div class="demo">
+      <div class="radii">
+        <div class="r"><div class="box" style="border-radius:8px"></div><span>sm · 8</span></div>
+        <div class="r"><div class="box" style="border-radius:14px"></div><span>md · 14</span></div>
+        <div class="r"><div class="box" style="border-radius:18px"></div><span>lg · 18</span></div>
+        <div class="r"><div class="box" style="border-radius:24px"></div><span>xl · 24</span></div>
+        <div class="r"><div class="box" style="border-radius:28px"></div><span>2xl · 28</span></div>
+        <div class="r"><div class="box" style="border-radius:999px"></div><span>full</span></div>
+      </div>
+    </div>
+    <table class="tbl">
+      <thead><tr><th>Element</th><th>Radius</th><th>Token</th></tr></thead>
+      <tbody>
+        <tr><td>Book cover thumbnail</td><td><code>12</code> (top of card 28)</td><td>radius-sm / image</td></tr>
+        <tr><td>Cards (book, publisher, article)</td><td><code>28</code></td><td>radius-2xl</td></tr>
+        <tr><td>Buttons</td><td><code>24</code> (sm 14)</td><td>radius-xl</td></tr>
+        <tr><td>Input fields</td><td><code>14</code></td><td>radius-md</td></tr>
+        <tr><td>Chips / tags / badges</td><td><code>999</code></td><td>radius-full</td></tr>
+        <tr><td>Bottom sheets / modals</td><td><code>28</code> top corners</td><td>radius-2xl</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ ELEVATION ============ -->
+  <section id="elevation">
+    <div class="eyebrow">Phase 1 · Foundation</div>
+    <h2>Elevation &amp; shadows</h2>
+    <p class="sub">Soft, neutral shadows — no harsh drop shadows. The brand shadow is red-tinted for primary CTAs.</p>
+    <div class="demo"><div class="elev">
+      <div class="e" style="box-shadow:var(--shadow-soft)"><b>soft</b><span>0 4px 24px /.06</span><div style="margin-top:8px;color:var(--g500);font-size:11px">cards · app bar on scroll</div></div>
+      <div class="e" style="box-shadow:var(--shadow-soft-lg)"><b>soft-lg</b><span>0 12px 40px /.08</span><div style="margin-top:8px;color:var(--g500);font-size:11px">bottom nav · sheets · hover</div></div>
+      <div class="e" style="box-shadow:var(--shadow-brand)"><b>brand</b><span>0 8px 28px red/.22</span><div style="margin-top:8px;color:var(--g500);font-size:11px">primary buttons</div></div>
+      <div class="e" style="background:#0b0b0b;color:#fff;box-shadow:var(--shadow-header)"><b style="color:#fff">header</b><span style="color:#bbb">0 12px 40px /.45</span><div style="margin-top:8px;color:#bbb;font-size:11px">dark app bar / hero</div></div>
+    </div></div>
+    <p class="legend">Map to Flutter as custom <code>BoxShadow</code> lists, not Material <code>elevation:</code>
+      — Material's tonal elevation would tint surfaces and break the flat-white card look.</p>
+  </section>
+
+  <!-- ============ MOTION ============ -->
+  <section id="motion">
+    <div class="eyebrow">Phase 1 · Foundation</div>
+    <h2>Motion</h2>
+    <p class="sub">Three durations, three curves. The <b>spring</b> curve is the brand's tactile signature — used on
+      card lift &amp; tap. Respect <code>prefers-reduced-motion</code>.</p>
+    <table class="tbl">
+      <thead><tr><th>Token</th><th>Value</th><th>Use</th></tr></thead>
+      <tbody>
+        <tr><td><code>motion-fast</code></td><td>180ms</td><td>color / hover fades</td></tr>
+        <tr><td><code>motion-base</code></td><td>320ms</td><td>cards, sheets, transitions</td></tr>
+        <tr><td><code>motion-slow</code></td><td>520ms</td><td>page-in stagger</td></tr>
+        <tr><td><code>spring</code></td><td>cubic-bezier(.34, 1.45, .64, 1)</td><td>card lift <code>y:-6 scale:1.015</code>, tap <code>0.98</code></td></tr>
+        <tr><td><code>easing</code></td><td>cubic-bezier(.4, 0, .2, 1)</td><td>standard ease-in-out</td></tr>
+        <tr><td><code>smooth</code></td><td>cubic-bezier(.25, .8, .25, 1)</td><td>button scale, entrances</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ ICONS ============ -->
+  <section id="icons">
+    <div class="eyebrow">Phase 1 · Foundation</div>
+    <h2>Iconography</h2>
+    <p class="sub">The web uses <b>Lucide</b> (stroke 1.5, rounded). <b>Recommendation: keep Lucide on mobile</b>
+      (<code>lucide_icons</code> for Flutter) so web ↔ app icons match exactly — including the category mapping
+      already coded in <code>category-grid.tsx</code>. Mirror directional icons in RTL via
+      <code>Transform.scale(scaleX: -1)</code>.</p>
+
+    <h3 class="block">Category icons (8 main — from the live mapping)</h3>
+    <div class="icons" id="cat-icons"></div>
+
+    <h3 class="block">Core UI icons</h3>
+    <div class="icons" id="ui-icons"></div>
+    <p class="legend">Cart badge &amp; "live"/destructive affordances use <code>brand-red</code>; everything else
+      inherits text color.</p>
+  </section>
+
+  <!-- ============ COMPONENTS ============ -->
+  <section id="components">
+    <div class="eyebrow">Phase 1 · Components</div>
+    <h2>Component inventory</h2>
+    <p class="sub">Every reusable widget the app needs, grouped. Live recreations below are pixel-faithful to the
+      web components (<code>book-card.tsx</code>, <code>badge.tsx</code>, <code>button.tsx</code>,
+      <code>category-grid.tsx</code>).</p>
+
+    <h3 class="block">Buttons — <code>variant</code> × <code>size</code></h3>
+    <div class="demo"><div class="demo-title">Variants</div>
+      <div class="row">
+        <span class="bp-btn primary">Primary</span>
+        <span class="bp-btn outline">Outline</span>
+        <span class="bp-btn secondary">Secondary</span>
+        <span class="bp-btn dark">Dark</span>
+        <span class="bp-btn ghost">Ghost</span>
+      </div>
+      <div class="row" style="margin-top:16px">
+        <span class="bp-btn primary sm">Small</span>
+        <span class="bp-btn primary">Default</span>
+        <span class="bp-btn primary lg">Large</span>
+      </div>
+    </div>
+
+    <h3 class="block">Badges — translation status &amp; flags</h3>
+    <div class="demo"><div class="demo-title">Badge variants</div>
+      <div class="row">
+        <span class="bp-badge translated pill-ar">مترجم · Translated</span>
+        <span class="bp-badge nominated pill-ar">مرشح للترجمة · Nominated</span>
+        <span class="bp-badge not pill-ar">غير مترجم · Not translated</span>
+        <span class="bp-badge new pill-ar">جديد · New</span>
+        <span class="bp-badge sponsored pill-ar">مُموَّل · Sponsored</span>
+        <span class="bp-badge category pill-ar">تصنيف</span>
+        <span class="bp-badge outline pill-ar">Outline</span>
+      </div>
+    </div>
+
+    <h3 class="block">BookCard · CategoryChip · SearchBar</h3>
+    <div class="demo"><div class="demo-title">Books · Discovery</div>
+      <div class="row" style="align-items:flex-start" dir="rtl">
+        <div class="bp-card">
+          <div class="cover" style="background:linear-gradient(135deg,#2b2540,#46467f)">كيف يسرق النظام العالمي أموالك<span class="bp-badge new nb">جديد</span></div>
+          <div class="info">
+            <div class="cat pill-ar">اقتصاد وتنمية</div>
+            <h4 class="pill-ar">كيف يسرق النظام العالمي أموالك وأنت تبتسم؟</h4>
+            <p class="pill-ar">قراءة نقدية في آليات الاقتصاد العالمي وأثرها على الفرد.</p>
+            <span class="bp-badge nominated pill-ar">مرشح للترجمة</span>
+          </div>
+        </div>
+        <div class="bp-card">
+          <div class="cover" style="background:linear-gradient(135deg,#8b1623,#b11e2e)">العالم يقرأ</div>
+          <div class="info">
+            <div class="cat pill-ar">فلسفات وثقافات</div>
+            <h4 class="pill-ar">حين يصبح الكتاب نافذة على العالم</h4>
+            <p class="pill-ar">مختارات من أبرز ما يُترجَم هذا الموسم.</p>
+            <span class="bp-badge translated pill-ar">مترجم</span>
+          </div>
+        </div>
+        <div class="bp-cat">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 0-2.5-2.5H2v-13a1 1 0 0 1 1-1z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 1 2.5-2.5H22v-13a1 1 0 0 0-1-1z"/></svg></div>
+          <div class="nm pill-ar">أفكار وسياسات</div>
+          <div class="ct">612 كتاب</div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:20px" dir="rtl">
+        <div class="bp-search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span class="pill-ar">ابحث عن كتاب أو دار نشر…</span></div>
+      </div>
+    </div>
+
+    <h3 class="block">Bottom navigation (4 tabs)</h3>
+    <div class="demo"><div class="demo-title">BottomNavBar — RTL order</div>
+      <div class="bp-bottomnav" dir="rtl">
+        <div class="it on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span class="pill-ar">الرئيسية</span></div>
+        <div class="it"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span class="pill-ar">الكتب</span></div>
+        <div class="it"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg><span class="pill-ar">المقالات</span></div>
+        <div class="it"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/><path d="M9 9v.01M9 12v.01M9 15v.01"/></svg><span class="pill-ar">الناشرون</span></div>
+      </div>
+    </div>
+
+    <h3 class="block">Full inventory checklist</h3>
+    <table class="tbl">
+      <thead><tr><th>Group</th><th>Components</th></tr></thead>
+      <tbody>
+        <tr><td><b>Navigation</b></td><td>BottomNavBar (Home · Books · Articles · Publishers) · AppBar (collapsing, with search + cart) · LanguageToggle (AR/EN) · SectionHeader (title + "view all")</td></tr>
+        <tr><td><b>Books</b></td><td>BookCard (grid + list + compact) · BookCoverImage (3:4, fallback) · TranslationStatusBadge · CategoryChip · FeaturedBookHero · BookCarousel · BiblioTable (ISBN, year, pages…) · RatingStars · PriceTag</td></tr>
+        <tr><td><b>Commerce</b></td><td>AddToCartButton · QuantityStepper · CartLineItem · CartSummary · CouponField · CheckoutStepper · ReferralLinkBanner · WishlistButton (heart)</td></tr>
+        <tr><td><b>Publishers</b></td><td>PublisherCard (logo + country + book count) · CountryFilterChip · SponsoredBadge · PublishersMarquee</td></tr>
+        <tr><td><b>Articles</b></td><td>ArticleCard (thumb + channel + title) · ArticleChannelChip (6 channels) · YouTubeEmbed · CommentThread · CommentComposer</td></tr>
+        <tr><td><b>Inputs / forms</b></td><td>SearchBar · FilterSheet (sort · status · category · country) · PublishBookForm (multi-step, file upload) · ContactForm · NewsletterField · TextField · Select · FileDropField</td></tr>
+        <tr><td><b>Feedback</b></td><td>EmptyState · LoadingSkeleton (card/list/detail) · ErrorState · SnackBar (toast) · RatingDialog</td></tr>
+        <tr><td><b>Misc</b></td><td>StatCounter (4,654 · 665 · 63) · Avatar · Divider · BottomSheet · Chip group · Tag</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ SCREEN MAP ============ -->
+  <section id="screenmap">
+    <div class="eyebrow">Phase 2 · Plan</div>
+    <h2>Screen map</h2>
+    <p class="sub">Every screen as a Flutter route, grouped by section, with the data it shows, key interactions,
+      and where it navigates. Routes are locale-prefixed (<code>/ar/…</code> · <code>/en/…</code>).</p>
+
+    <h3 class="block">Onboarding</h3>
+    <table class="tbl">
+      <thead><tr><th>Route</th><th>Shows</th><th>Interactions → navigates</th></tr></thead>
+      <tbody>
+        <tr><td><code>/splash</code></td><td>Logo on black, brand load</td><td>auto → Home (or Language Select on first run)</td></tr>
+        <tr><td><code>/language</code></td><td>AR / EN choice, dir preview</td><td>select → sets locale, dir → Home</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="block">Main tabs</h3>
+    <table class="tbl">
+      <thead><tr><th>Route</th><th>Shows</th><th>Interactions → navigates</th></tr></thead>
+      <tbody>
+        <tr><td><code>/home</code></td><td>Hero carousel, "صدر حديثًا", category grid, featured publishers, stats, newsletter strip</td><td>tap book → BookDetail · category → CategoryBooks · search → Search</td></tr>
+        <tr><td><code>/books</code></td><td>2-up book grid, filter/sort bar, pagination/infinite scroll</td><td>filter → FilterSheet · book → BookDetail</td></tr>
+        <tr><td><code>/articles</code></td><td>Channel tabs (6), article cards</td><td>channel switch · article → ArticleDetail</td></tr>
+        <tr><td><code>/publishers</code></td><td>Publisher grid, country filter, sponsored first</td><td>country chip · publisher → PublisherDetail</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="block">Detail screens</h3>
+    <table class="tbl">
+      <thead><tr><th>Route</th><th>Shows</th><th>Interactions → navigates</th></tr></thead>
+      <tbody>
+        <tr><td><code>/books/:slug</code></td><td>Cover, title/subtitle, status badge, biblio table, description, ratings, price, related</td><td>Add to cart / Buy / Referral · wishlist · rate · comment · publisher → PublisherDetail</td></tr>
+        <tr><td><code>/books/category/:slug</code></td><td>Category-filtered grid + header</td><td>filter · book → BookDetail</td></tr>
+        <tr><td><code>/publishers/:slug</code></td><td>Logo, country, about, that publisher's books</td><td>website link · book → BookDetail</td></tr>
+        <tr><td><code>/articles/:slug</code></td><td>Article body, YouTube embed, comments</td><td>comment · share</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="block">Actions &amp; commerce</h3>
+    <table class="tbl">
+      <thead><tr><th>Route</th><th>Shows</th><th>Interactions → navigates</th></tr></thead>
+      <tbody>
+        <tr><td><code>/search</code></td><td>Query field, results (books + publishers), recent</td><td>result → detail · filter</td></tr>
+        <tr><td><code>/cart</code></td><td>Line items, quantity, coupon, subtotal</td><td>edit qty · coupon → Checkout</td></tr>
+        <tr><td><code>/checkout</code></td><td>Contact, address, payment (provider-agnostic), review</td><td>pay → OrderConfirmation</td></tr>
+        <tr><td><code>/wishlist</code></td><td>Saved books (email-keyed)</td><td>move to cart · remove</td></tr>
+        <tr><td><code>/publish</code></td><td>Multi-step: book info, author, file upload, free/paid notice</td><td>submit → pending review state</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="block">Static &amp; settings</h3>
+    <table class="tbl">
+      <thead><tr><th>Route</th><th>Shows</th></tr></thead>
+      <tbody>
+        <tr><td><code>/about</code> · <code>/services</code> · <code>/contact</code></td><td>Editorial pages, team grid, contact form</td></tr>
+        <tr><td><code>/b2b</code></td><td>Institutional subscription plans (libraries · publishers · media)</td></tr>
+        <tr><td><code>/settings</code></td><td>Language toggle, theme, notifications opt-in, newsletter</td></tr>
+        <tr><td><code>/privacy</code> · <code>/terms</code></td><td>Legal prose</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ PRIORITY ============ -->
+  <section id="priority">
+    <div class="eyebrow">Phase 2 · Plan</div>
+    <h2>5 highest-priority screens to design first</h2>
+    <p class="sub">The discovery spine — everything else hangs off these. Suggested build order:</p>
+    <div class="phones">
+      <div class="phone"><div class="scr"><span class="pri-rank">1</span>Home</div><div class="lbl"><b>Home</b><span>hero · new · categories · stats</span></div></div>
+      <div class="phone"><div class="scr"><span class="pri-rank">2</span>Books</div><div class="lbl"><b>Books Catalog</b><span>grid · filter · sort</span></div></div>
+      <div class="phone"><div class="scr"><span class="pri-rank">3</span>Detail</div><div class="lbl"><b>Book Detail</b><span>biblio · status · cart</span></div></div>
+      <div class="phone"><div class="scr"><span class="pri-rank">4</span>Publish</div><div class="lbl"><b>Publishers</b><span>grid · country filter</span></div></div>
+      <div class="phone"><div class="scr"><span class="pri-rank">5</span>Search</div><div class="lbl"><b>Search</b><span>query · results</span></div></div>
+    </div>
+    <p class="legend" style="margin-top:14px">Cart / Checkout / PublishBook follow once the catalog spine is
+      approved — they depend on the payment-provider decision (see open questions).</p>
+  </section>
+
+  <!-- ============ FLAGS ============ -->
+  <section id="flags">
+    <div class="eyebrow">Phase 2 · Plan</div>
+    <h2>Open questions before screen design</h2>
+    <p class="sub">Most ambiguities are resolved by your answers (folded into Scope above). These remain genuinely
+      open and block specific screens:</p>
+
+    <div class="note red">
+      <div class="hd">1 · Payment gateway not chosen</div>
+      Checkout is in-scope but the provider is undecided. I'll design checkout <b>provider-agnostic</b> (generic
+      card + redirect-to-gateway pattern). Confirm target — local (e.g. region card processor) vs international
+      (Stripe/PayPal) — as it changes which fields and trust marks appear.
+    </div>
+    <div class="note amber">
+      <div class="hd">2 · Direct-buy vs referral per book</div>
+      Buying is "mixed." Confirm the rule that decides which a book shows — is it driven by
+      <code>purchaseOption</code> / <code>referralLink</code> in the DB (my assumption), or an editorial toggle?
+    </div>
+    <div class="note amber">
+      <div class="hd">3 · Comments &amp; ratings — gating without logins</div>
+      Readers have no accounts this version, but comments/ratings are in. Assumption: <b>email + name</b> per
+      comment (matches the schema), admin-moderated. Confirm this is acceptable vs. requiring a light verification.
+    </div>
+    <div class="note gray">
+      <div class="hd">4 · Dark mode at launch?</div>
+      The code defines a full dark theme. Is dark mode a launch requirement for mobile, or phase 2? It affects how
+      many specs each screen needs.
+    </div>
+    <div class="note gray">
+      <div class="hd">5 · Navy vs red — final brand confirmation</div>
+      I went with the codebase red. One-line confirm and I lock it; if navy is the real current brand I'll re-issue
+      the color section only.
+    </div>
+
+    <div class="note green" style="margin-top:22px">
+      <div class="hd">Next step</div>
+      On approval of these tokens + screen map (and answers to the 5 above), I'll design the <b>5 priority screens</b>
+      first — RTL-first, light mode — as a clickable Flutter-faithful prototype.
+    </div>
+  </section>
+
+</main>
+</div>
+
+<script>
+// ---- icon rendering (Lucide-style inline) ----
+const cat = [
+  ['أفكار وسياسات','<path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 0-2.5-2.5H2v-13a1 1 0 0 1 1-1z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 1 2.5-2.5H22v-13a1 1 0 0 0-1-1z"/>'],
+  ['دراسات اجتماعية','<path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>'],
+  ['فلسفات وثقافات','<path d="M9.5 2a7.5 7.5 0 1 0 5 13.1"/><path d="M12 8v4l2 2"/><circle cx="12" cy="12" r="9"/>'],
+  ['اقتصاد وتنمية','<path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/>'],
+  ['لغات وآداب','<path d="m5 8 6 6M4 14l6-6 2-3"/><path d="M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/>'],
+  ['تقنيات وعلوم','<path d="M10 2v8.5L4 18a2 2 0 0 0 1.7 3h12.6A2 2 0 0 0 20 18l-6-7.5V2"/><path d="M8.5 2h7"/>'],
+  ['أديان وعقائد','<path d="M3 6h18M3 6l9-4 9 4M5 6v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6"/><path d="M9 21V11h6v10"/>'],
+  ['أخرى','<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>'],
+];
+const ui = [
+  ['search','<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'],
+  ['cart','<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 2-1.58l1.65-7.42H5.12"/>'],
+  ['heart','<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"/>'],
+  ['menu','<path d="M4 6h16M4 12h16M4 18h16"/>'],
+  ['close','<path d="M18 6 6 18M6 6l12 12"/>'],
+  ['chevron','<path d="m9 18 6-6-6-6"/>'],
+  ['book-open','<path d="M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>'],
+  ['play','<circle cx="12" cy="12" r="10"/><path d="m10 8 6 4-6 4z"/>'],
+  ['globe','<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/>'],
+  ['filter','<path d="M3 4h18l-7 8v6l-4 2v-8z"/>'],
+  ['star','<path d="m12 2 3 7 7 .5-5.5 4.5 2 7L12 17l-6.5 4 2-7L2 9.5 9 9z"/>'],
+  ['share','<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5 8.6 10.5"/>'],
+];
+function svg(p){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';}
+document.getElementById('cat-icons').innerHTML = cat.map(([n,p])=>'<div class="i">'+svg(p)+'<span class="pill-ar">'+n+'</span></div>').join('');
+document.getElementById('ui-icons').innerHTML = ui.map(([n,p])=>'<div class="i">'+svg(p)+'<span>'+n+'</span></div>').join('');
+
+// ---- scroll spy ----
+const links=[...document.querySelectorAll('.sidebar nav a')];
+const map=new Map(links.map(a=>[a.getAttribute('href').slice(1),a]));
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(l=>l.classList.remove('active'));map.get(e.target.id)?.classList.add('active');}});},{rootMargin:'-10% 0px -80% 0px'});
+document.querySelectorAll('section[id]').forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>

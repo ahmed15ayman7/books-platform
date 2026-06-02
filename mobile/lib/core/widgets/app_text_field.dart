@@ -26,6 +26,7 @@ class AppTextField extends StatefulWidget {
     this.maxLength,
     this.autofocus = false,
     this.isRequired = false,
+    this.textStyle,
   });
 
   final TextEditingController? controller;
@@ -47,6 +48,7 @@ class AppTextField extends StatefulWidget {
   final int? maxLength;
   final bool autofocus;
   final bool isRequired;
+  final TextStyle? textStyle;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -68,8 +70,9 @@ class _AppTextFieldState extends State<AppTextField> {
               if (widget.isRequired)
                 Text(
                   ' *',
-                  style: AppTextStyles.labelLarge
-                      .copyWith(color: AppColors.primary),
+                  style: AppTextStyles.labelLarge.copyWith(
+                    color: AppColors.primary,
+                  ),
                 ),
             ],
           ),
@@ -90,14 +93,13 @@ class _AppTextFieldState extends State<AppTextField> {
           focusNode: widget.focusNode,
           maxLength: widget.maxLength,
           autofocus: widget.autofocus,
-          style: AppTextStyles.bodyMedium,
+          style: widget.textStyle ?? AppTextStyles.bodyMedium,
           decoration: InputDecoration(
             hintText: widget.hint,
             prefixIcon: widget.prefixIcon,
             suffixIcon: widget.isPassword
                 ? GestureDetector(
-                    onTap: () =>
-                        setState(() => _isObscured = !_isObscured),
+                    onTap: () => setState(() => _isObscured = !_isObscured),
                     child: Icon(
                       _isObscured
                           ? Icons.visibility_off_outlined
