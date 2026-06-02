@@ -111,14 +111,14 @@ export default function AdminPublishersPage() {
       key: "country",
       label: "الدولة",
       render: (row: Publisher) => (
-        <span className="text-[var(--brand-gray-300)]">{row.country ?? "—"}</span>
+        <span className="text-[var(--admin-text-muted)]">{row.country ?? "—"}</span>
       ),
     },
     {
       key: "products",
       label: "الكتب",
       render: (row: Publisher) => (
-        <span className="text-[var(--brand-gray-300)]">{row._count?.products ?? 0}</span>
+        <span className="text-[var(--admin-text-muted)]">{row._count?.products ?? 0}</span>
       ),
     },
     {
@@ -135,7 +135,7 @@ export default function AdminPublishersPage() {
         row.sponsored ? (
           <AdminStatusBadge status="sponsored" />
         ) : (
-          <span className="text-xs text-[var(--brand-gray-600)]">—</span>
+          <span className="text-xs text-[var(--admin-text-subtle)]">—</span>
         ),
     },
     adminCreatedAtColumn<Publisher>(),
@@ -152,11 +152,11 @@ export default function AdminPublishersPage() {
       />
       <AdminGridCardBody>
         <div className="flex items-start gap-1">
-          <h3 className="line-clamp-2 flex-1 font-semibold text-white">{row.name}</h3>
+          <h3 className="line-clamp-2 flex-1 font-semibold text-[var(--admin-text)]">{row.name}</h3>
           {row.sponsored && <Star className="h-4 w-4 shrink-0 text-[var(--warning)]" />}
         </div>
-        <p className="text-xs text-[var(--brand-gray-500)]">{row.country ?? "—"}</p>
-        <p className="text-xs text-[var(--brand-gray-400)]">
+        <p className="text-xs text-[var(--admin-text-subtle)]">{row.country ?? "—"}</p>
+        <p className="text-xs text-[var(--admin-text-muted)]">
           {row._count?.products ?? 0} كتاب
         </p>
         <AdminStatusBadge status={row.status === "publish" ? "published" : "draft"} />
@@ -166,7 +166,7 @@ export default function AdminPublishersPage() {
   );
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader
         title="الناشرون"
         subtitle="إدارة دور النشر وحالة التمويل"

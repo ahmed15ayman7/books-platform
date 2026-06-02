@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { BookService } from "@/server/services/book.service";
 import { PageHero } from "@/components/sections/page-hero";
@@ -74,7 +75,9 @@ export default async function PublishPage() {
           {/* Form */}
           <div>
             <div className="rounded-xl bg-white p-6 shadow-sm border border-[var(--brand-gray-200)] md:p-8">
-              <PublishBookForm locale={locale} />
+              <Suspense fallback={<div className="py-8 text-center text-sm text-[var(--brand-gray-500)]">{isAr ? "جاري التحميل…" : "Loading…"}</div>}>
+                <PublishBookForm locale={locale} />
+              </Suspense>
             </div>
           </div>
 

@@ -83,7 +83,7 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--brand-black)] px-4">
+    <div className="admin-shell flex min-h-screen items-center justify-center bg-[var(--admin-bg)] px-4 text-[var(--admin-text)]">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center gap-3">
@@ -91,20 +91,20 @@ export default function AdminLoginPage() {
             <BookOpen className="h-8 w-8 text-white" aria-hidden="true" />
           </div>
           <div className="text-center">
-            <h1 className="font-display text-xl font-bold text-white">Books Platform</h1>
-            <p className="text-sm text-[var(--brand-gray-500)]">Admin Panel</p>
+            <h1 className="font-display text-xl font-bold text-[var(--admin-text)]">Books Platform</h1>
+            <p className="text-sm text-[var(--admin-text-subtle)]">Admin Panel</p>
           </div>
         </div>
 
         {/* Form */}
-        <div className="rounded-xl bg-[var(--brand-gray-900)] p-6 shadow-2xl border border-[var(--brand-gray-800)]">
-          <h2 className="mb-5 font-bold text-white">
+        <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-6 shadow-[var(--shadow-soft-lg)]">
+          <h2 className="mb-5 font-bold text-[var(--admin-text)]">
             {isAr ? "تسجيل الدخول" : "Sign In"}
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
-              <Label htmlFor="admin-email" className="mb-1 block text-sm font-medium text-[var(--brand-gray-300)]">
+              <Label htmlFor="admin-email" className="mb-1 block text-sm font-medium text-[var(--admin-text-muted)]">
                 {isAr ? "البريد الإلكتروني" : "Email"}
               </Label>
               <Input
@@ -120,7 +120,7 @@ export default function AdminLoginPage() {
             </div>
 
             <div>
-              <Label htmlFor="admin-password" className="mb-1 block text-sm font-medium text-[var(--brand-gray-300)]">
+              <Label htmlFor="admin-password" className="mb-1 block text-sm font-medium text-[var(--admin-text-muted)]">
                 {isAr ? "كلمة المرور" : "Password"}
               </Label>
               <div className="relative">
@@ -136,7 +136,7 @@ export default function AdminLoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPw(!showPw)}
-                  className="absolute inset-y-0 end-0 flex items-center px-3 text-[var(--brand-gray-500)] hover:text-white"
+                  className="absolute inset-y-0 end-0 flex items-center px-3 text-[var(--admin-text-subtle)] hover:text-[var(--admin-accent)]"
                   aria-label={showPw ? "Hide password" : "Show password"}
                 >
                   {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -145,7 +145,7 @@ export default function AdminLoginPage() {
             </div>
 
             {status === "error" && (
-              <div className="rounded-md bg-[var(--error)]/10 border border-[var(--error)]/30 px-3 py-2 text-sm text-[var(--error)]">
+              <div className="rounded-md border border-[var(--error)]/30 bg-[var(--error)]/10 px-3 py-2 text-sm text-[var(--error)]">
                 {errorMsg}
               </div>
             )}

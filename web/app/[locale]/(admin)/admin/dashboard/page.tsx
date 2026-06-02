@@ -165,11 +165,11 @@ export default async function AdminDashboardPage() {
   ];
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       {/* Header */}
       <div className="mb-6">
         <h1 className="font-display text-2xl font-bold">لوحة التحكم</h1>
-        <p className="text-sm text-[var(--brand-gray-500)]">
+        <p className="text-sm text-[var(--admin-text-subtle)]">
           نظرة عامة على المنصة
         </p>
       </div>
@@ -188,7 +188,7 @@ export default async function AdminDashboardPage() {
 
       {/* Quick Actions */}
       <div className="mt-8">
-        <h2 className="mb-3 text-sm font-semibold text-[var(--brand-gray-300)]">
+        <h2 className="mb-3 text-sm font-semibold text-[var(--admin-text-muted)]">
           إجراءات سريعة
         </h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -196,7 +196,7 @@ export default async function AdminDashboardPage() {
             <Link
               key={action.href}
               href={action.href}
-              className="flex items-center justify-center gap-2 rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)] px-4 py-3 text-sm font-medium text-[var(--brand-gray-300)] transition-colors hover:border-[var(--brand-red)] hover:bg-[var(--brand-red)] hover:text-white"
+              className="flex items-center justify-center gap-2 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 py-3 text-sm font-medium text-[var(--admin-text-muted)] transition-colors hover:border-[var(--brand-red)] hover:bg-[var(--brand-red)] hover:text-white"
             >
               <action.icon className="h-4 w-4" aria-hidden="true" />
               {action.label}
@@ -208,8 +208,8 @@ export default async function AdminDashboardPage() {
       {/* Recent data */}
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Recent Books */}
-        <div className="rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)]">
-          <div className="flex items-center justify-between border-b border-[var(--brand-gray-800)] px-5 py-3">
+        <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
+          <div className="flex items-center justify-between border-b border-[var(--admin-border)] px-5 py-3">
             <h2 className="text-sm font-semibold">آخر الكتب المضافة</h2>
             <Link
               href="books"
@@ -218,9 +218,9 @@ export default async function AdminDashboardPage() {
               عرض الكل
             </Link>
           </div>
-          <div className="divide-y divide-[var(--brand-gray-800)]">
+          <div className="divide-y divide-[var(--admin-border)]">
             {data.recentBooks.length === 0 ? (
-              <p className="px-5 py-6 text-sm text-[var(--brand-gray-500)]">
+              <p className="px-5 py-6 text-sm text-[var(--admin-text-subtle)]">
                 لا توجد كتب بعد
               </p>
             ) : (
@@ -233,7 +233,7 @@ export default async function AdminDashboardPage() {
                     <p className="truncate text-sm font-medium">
                       {(book.nameAr as string | null) ?? (book.nameEn as string)}
                     </p>
-                    <p className="truncate text-xs text-[var(--brand-gray-500)]">
+                    <p className="truncate text-xs text-[var(--admin-text-subtle)]">
                       {(book.publisher as { title: string } | null)?.title ?? "—"}
                       {(book.primaryCategory as { nameAr: string | null; name: string } | null) && (
                         <> · {(book.primaryCategory as { nameAr: string | null; name: string }).nameAr ?? (book.primaryCategory as { nameAr: string | null; name: string }).name}</>
@@ -250,8 +250,8 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Recent Orders */}
-        <div className="rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)]">
-          <div className="flex items-center justify-between border-b border-[var(--brand-gray-800)] px-5 py-3">
+        <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
+          <div className="flex items-center justify-between border-b border-[var(--admin-border)] px-5 py-3">
             <h2 className="text-sm font-semibold">آخر الطلبات</h2>
             <Link
               href="orders"
@@ -260,9 +260,9 @@ export default async function AdminDashboardPage() {
               عرض الكل
             </Link>
           </div>
-          <div className="divide-y divide-[var(--brand-gray-800)]">
+          <div className="divide-y divide-[var(--admin-border)]">
             {data.recentOrders.length === 0 ? (
-              <p className="px-5 py-6 text-sm text-[var(--brand-gray-500)]">
+              <p className="px-5 py-6 text-sm text-[var(--admin-text-subtle)]">
                 لا توجد طلبات بعد
               </p>
             ) : (
@@ -275,7 +275,7 @@ export default async function AdminDashboardPage() {
                     <p className="truncate text-sm font-medium">
                       {order.customerEmail as string}
                     </p>
-                    <p className="text-xs text-[var(--brand-gray-500)]">
+                    <p className="text-xs text-[var(--admin-text-subtle)]">
                       {order.total
                         ? `${Number(order.total).toFixed(2)} ج.م`
                         : "—"}

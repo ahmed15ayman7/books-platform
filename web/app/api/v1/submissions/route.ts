@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
     // Check first-free eligibility
     const previousCount = await db.publishBookSubmission.count({
-      where: { authorEmail: data.authorEmail },
+      where: { authorEmail: data.authorEmail, status: { not: "draft" } },
     });
     const isFirstFree = previousCount === 0;
 

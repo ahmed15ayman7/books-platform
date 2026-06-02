@@ -19,19 +19,24 @@ export async function generateMetadata({ params }: Props) {
 export default async function BookEditPage({ params }: Props) {
   const { id, locale } = await params;
 
-  const [book, publishers, categories, allAuthors] = await Promise.all([
-    db.product.findFirst({
-      where: { id, ...notDeleted },
-      include: {
-        publisher: { select: { id: true } },
-        primaryCategory: { select: { id: true } },
-        categories: { select: { id: true } },
-        authors: { select: { id: true } },
-      },
-    }),
+  const book = await db.product.findFirst({
+    where: { id, ...notDeleted },
+    include: {
+      publisher: { select: { id: true } },
+      primaryCategory: { select: { id: true } },
+      categories: { select: { id: true } },
+      authors: { select: { id: true } },
+    },
+  });
+
+  if (!book) notFound();
+
+  const linkedAuthorIds = book.authors.map((a) => a.id);
+
+  const [publishers, categories, allAuthors] = await Promise.all([
     db.publisher.findMany({
       where: { status: "publish" },
-      select: { id: true, title: true, slug: true },
+      select: { id: true, title: true, name: true, nameAr: true, slug: true },
       orderBy: { title: "asc" },
     }),
     db.productCategory.findMany({
@@ -39,26 +44,29 @@ export default async function BookEditPage({ params }: Props) {
       orderBy: { name: "asc" },
     }),
     db.author.findMany({
-      where: { spamFlag: null },
+      where: {
+        OR: [
+          { spamFlag: null },
+          ...(linkedAuthorIds.length > 0 ? [{ id: { in: linkedAuthorIds } }] : []),
+        ],
+      },
       select: { id: true, name: true, nameAr: true, slug: true },
       orderBy: { name: "asc" },
     }),
   ]);
 
-  if (!book) notFound();
-
   return (
-    <div className="text-white">
-      <div className="mb-6 flex flex-col gap-4 border-b border-[var(--brand-gray-800)] pb-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="text-[var(--admin-text)]">
+      <div className="mb-6 flex flex-col gap-4 border-b border-[var(--admin-border)] pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-4">
           <Link
             href={`/${locale}/admin/books/${id}`}
-            className="flex shrink-0 items-center gap-1.5 text-sm text-[var(--brand-gray-400)] transition-colors hover:text-white"
+            className="flex shrink-0 items-center gap-1.5 text-sm text-[var(--admin-text-muted)] transition-colors hover:text-[var(--admin-accent)]"
           >
             <ChevronLeft className="h-4 w-4" />
             العودة للكتاب
           </Link>
-          <span className="text-[var(--brand-gray-600)]">/</span>
+          <span className="text-[var(--admin-text-subtle)]">/</span>
           <h1 className="truncate text-base font-semibold">
             تعديل: {book.nameAr ?? book.nameEn}
           </h1>
@@ -85,6 +93,7 @@ export default async function BookEditPage({ params }: Props) {
             country: book.country ?? "",
             pageCount: book.pageCount?.toString() ?? "",
             edition: book.edition ?? "",
+            editionAr: book.editionAr ?? "",
             dimensions: book.dimensions ?? "",
             translationStatus: book.translationStatus,
             purchaseOption: book.purchaseOption,

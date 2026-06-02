@@ -10,7 +10,7 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
-    <div className="flex min-h-screen bg-[var(--brand-gray-900)]">
+    <div className="admin-shell flex min-h-screen bg-[var(--admin-bg)] text-[var(--admin-text)]">
       <AdminSidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <AdminTopbar />

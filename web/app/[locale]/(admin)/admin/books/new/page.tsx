@@ -21,6 +21,7 @@ const emptyBook: BookEditData = {
   country: "",
   pageCount: "",
   edition: "",
+  editionAr: "",
   dimensions: "",
   translationStatus: "NOT_TRANSLATED",
   purchaseOption: "NOT_AVAILABLE",
@@ -47,7 +48,7 @@ export default async function AdminBookNewPage({ params }: Props) {
   const [publishers, categories, allAuthors] = await Promise.all([
     db.publisher.findMany({
       where: { status: "publish" },
-      select: { id: true, title: true, slug: true },
+      select: { id: true, title: true, name: true, nameAr: true, slug: true },
       orderBy: { title: "asc" },
     }),
     db.productCategory.findMany({
@@ -62,17 +63,17 @@ export default async function AdminBookNewPage({ params }: Props) {
   ]);
 
   return (
-    <div className="text-white">
-      <div className="mb-6 flex flex-col gap-4 border-b border-[var(--brand-gray-800)] pb-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="text-[var(--admin-text)]">
+      <div className="mb-6 flex flex-col gap-4 border-b border-[var(--admin-border)] pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-4">
           <Link
             href={`/${locale}/admin/books`}
-            className="flex shrink-0 items-center gap-1.5 text-sm text-[var(--brand-gray-400)] transition-colors hover:text-white"
+            className="flex shrink-0 items-center gap-1.5 text-sm text-[var(--admin-text-muted)] transition-colors hover:text-[var(--admin-accent)]"
           >
             <ChevronLeft className="h-4 w-4" />
             العودة للقائمة
           </Link>
-          <span className="text-[var(--brand-gray-600)]">/</span>
+          <span className="text-[var(--admin-text-subtle)]">/</span>
           <h1 className="truncate text-base font-semibold">إضافة كتاب جديد</h1>
         </div>
       </div>

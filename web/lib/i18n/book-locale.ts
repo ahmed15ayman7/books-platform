@@ -7,6 +7,8 @@ export interface BookLocalizedFields {
   shortDescAr?: string | null;
   description?: string | null;
   descriptionAr?: string | null;
+  edition?: string | null;
+  editionAr?: string | null;
 }
 
 /** Primary display title for the active UI locale */
@@ -46,6 +48,51 @@ export function localizedBookDescription(
   const isAr = locale === "ar";
   const ar = book.descriptionAr?.trim();
   const en = book.description?.trim();
+  if (isAr) return ar ?? en ?? null;
+  return en ?? ar ?? null;
+}
+
+export function localizedBookEdition(
+  book: BookLocalizedFields,
+  locale: Locale | string
+): string | null {
+  const isAr = locale === "ar";
+  const ar = book.editionAr?.trim();
+  const en = book.edition?.trim();
+  if (isAr) return ar ?? en ?? null;
+  return en ?? ar ?? null;
+}
+
+export interface AuthorLocalizedFields {
+  name: string;
+  nameAr?: string | null;
+  bio?: string | null;
+  bioAr?: string | null;
+}
+
+export function localizedAuthorName(author: AuthorLocalizedFields, locale: Locale | string): string {
+  const isAr = locale === "ar";
+  if (isAr && author.nameAr?.trim()) return author.nameAr.trim();
+  return author.name;
+}
+
+export function localizedAuthorAlternateName(
+  author: AuthorLocalizedFields,
+  locale: Locale | string,
+): string | null {
+  const isAr = locale === "ar";
+  if (isAr && author.name?.trim()) return author.name.trim();
+  if (!isAr && author.nameAr?.trim()) return author.nameAr.trim();
+  return null;
+}
+
+export function localizedAuthorBio(
+  author: AuthorLocalizedFields,
+  locale: Locale | string,
+): string | null {
+  const isAr = locale === "ar";
+  const ar = author.bioAr?.trim();
+  const en = author.bio?.trim();
   if (isAr) return ar ?? en ?? null;
   return en ?? ar ?? null;
 }

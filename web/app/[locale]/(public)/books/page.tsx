@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { BookService } from "@/server/services/book.service";
 import { PageHero } from "@/components/sections/page-hero";
@@ -31,6 +32,7 @@ interface BooksPageProps {
     category?: string;
     language?: string;
     publisher?: string;
+    author?: string;
     status?: string;
     sort?: string;
     q?: string;
@@ -40,6 +42,11 @@ interface BooksPageProps {
 export default async function BooksPage({ searchParams }: BooksPageProps) {
   const params = await searchParams;
   const locale = (await getLocale()) as Locale;
+
+  if (params.author?.trim()) {
+    redirect(`/${locale}/authors/${params.author.trim()}`);
+  }
+
   const t = await getTranslations("books");
 
   const page = Math.max(1, parseInt(params.page ?? "1", 10));

@@ -49,14 +49,14 @@ export default function AdminUserDetailPage() {
   }, [load]);
 
   if (!can(PERMISSIONS.users.view)) {
-    return <p className="text-[var(--brand-gray-500)]">لا صلاحية للعرض</p>;
+    return <p className="text-[var(--admin-text-subtle)]">لا صلاحية للعرض</p>;
   }
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <Link
         href={`/${locale}/admin/users`}
-        className="mb-6 inline-flex items-center gap-2 text-sm text-[var(--brand-gray-400)] hover:text-white"
+        className="mb-6 inline-flex items-center gap-2 text-sm text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)]"
       >
         <ArrowLeft className="h-4 w-4" />
         العودة للمديرين

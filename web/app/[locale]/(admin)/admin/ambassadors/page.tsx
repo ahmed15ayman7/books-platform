@@ -25,6 +25,8 @@ import {
 } from "@/components/admin/admin-timestamps";
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminInput, AdminSelect } from "@/components/admin/admin-form-field";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface Ambassador {
   id: string;
@@ -56,6 +58,7 @@ export default function AdminAmbassadorsPage() {
   const [total, setTotal] = useState(0);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const draft = useFormDraft(formDraftId.adminAmbassador(editingId), form, setForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [sort, setSort] = useState("createdAt:desc");
@@ -94,6 +97,7 @@ export default function AdminAmbassadorsPage() {
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
       if (!res.ok || !data.success) { setError(data.error?.message ?? "فشل الحفظ"); return; }
+      draft.clearDraft();
       setForm(emptyForm);
       setEditingId(null);
       await load();
@@ -137,8 +141,8 @@ export default function AdminAmbassadorsPage() {
   const renderCard = (row: Ambassador) => (
     <AdminGridCard>
       <AdminGridCardBody>
-        <h3 className="font-semibold text-white">{row.name}</h3>
-        <p className="text-xs text-[var(--brand-gray-500)]" dir="ltr">
+        <h3 className="font-semibold text-[var(--admin-text)]">{row.name}</h3>
+        <p className="text-xs text-[var(--admin-text-subtle)]" dir="ltr">
           {row.email}
         </p>
         <p className="text-lg font-bold text-[var(--warning)]">{row.commissionRate}%</p>
@@ -155,7 +159,7 @@ export default function AdminAmbassadorsPage() {
       render: (row: Ambassador) => (
         <div>
           <p className="font-medium">{row.name}</p>
-          <p className="text-xs text-[var(--brand-gray-400)]">{row.email}</p>
+          <p className="text-xs text-[var(--admin-text-muted)]">{row.email}</p>
         </div>
       ),
     },
@@ -170,7 +174,7 @@ export default function AdminAmbassadorsPage() {
       key: "totalClicks",
       label: "النقرات",
       render: (row: Ambassador) => (
-        <span className="text-[var(--brand-gray-300)]">{row.totalClicks ?? 0}</span>
+        <span className="text-[var(--admin-text-muted)]">{row.totalClicks ?? 0}</span>
       ),
     },
     {
@@ -193,7 +197,7 @@ export default function AdminAmbassadorsPage() {
   ];
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader
         title="السفراء"
         subtitle="إدارة برنامج الإحالة والعمولات"
@@ -207,6 +211,12 @@ export default function AdminAmbassadorsPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         <AdminCard title={editingId ? "تعديل السفير" : "سفير جديد"} className="lg:col-span-1">
           <form onSubmit={handleSubmit} className="space-y-3">
+            <FormDraftNotice
+              showBanner={draft.showBanner}
+              status={draft.status}
+              onResume={draft.resume}
+              onDismiss={draft.dismiss}
+            />
             <AdminInput label="الاسم *" value={form.name} onChange={set("name")} required />
             <AdminInput label="البريد الإلكتروني *" type="email" value={form.email} onChange={set("email")} required />
             <AdminInput label="نسبة العمولة %" type="number" value={form.commissionRate} onChange={set("commissionRate")} min="0" max="100" />

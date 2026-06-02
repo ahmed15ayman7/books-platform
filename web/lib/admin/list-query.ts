@@ -73,6 +73,7 @@ export function appendListParams(
     channel?: string;
     sponsored?: string;
     isActive?: string;
+    authorCount?: string;
   },
 ) {
   if (opts.sort) q.set("sort", opts.sort);
@@ -85,4 +86,5 @@ export function appendListParams(
   if (opts.channel && opts.channel !== "all") q.set("channel", opts.channel);
   if (opts.sponsored && opts.sponsored !== "all") q.set("sponsored", opts.sponsored);
   if (opts.isActive && opts.isActive !== "all") q.set("isActive", opts.isActive);
+  if (opts.authorCount && opts.authorCount !== "all") q.set("authorCount", opts.authorCount);
 }

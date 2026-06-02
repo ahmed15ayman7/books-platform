@@ -3,6 +3,10 @@ import { ArticleCard } from "./article-card";
 import { BooksPagination } from "./books-pagination";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { Locale } from "@/lib/i18n";
+import {
+  mapArticleForCard,
+  type ArticleLinkedProduct,
+} from "@/lib/i18n/article-linked-book";
 
 interface Article {
   id: string;
@@ -14,6 +18,7 @@ interface Article {
   channel?: string | null;
   readingTimeMinutes?: number | null;
   isFeatured?: boolean;
+  products?: ArticleLinkedProduct[];
 }
 
 interface ArticleChannelPageProps {
@@ -40,8 +45,9 @@ export function ArticleChannelPage({
   breadcrumbLabel,
   heroBgClass = "bg-[var(--brand-black)]",
 }: ArticleChannelPageProps) {
-  const featured = articles.find((a) => a.isFeatured) ?? articles[0];
-  const rest = articles.filter((a) => a.id !== featured?.id);
+  const mappedArticles = articles.map((article) => mapArticleForCard(article, locale));
+  const featured = mappedArticles.find((a) => a.isFeatured) ?? mappedArticles[0];
+  const rest = mappedArticles.filter((a) => a.id !== featured?.id);
 
   return (
     <div className="min-h-screen bg-[var(--brand-gray-50)]">

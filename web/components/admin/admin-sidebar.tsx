@@ -14,6 +14,7 @@ import {
   MessageSquare,
   Mail,
   Tag,
+  UserPen,
   FileEdit,
   Users,
   BadgeDollarSign,
@@ -50,6 +51,7 @@ const navGroups: NavGroup[] = [
     items: [
       { icon: BookOpen, label: "الكتب", href: "/admin/books" },
       { icon: Building2, label: "الناشرون", href: "/admin/publishers" },
+      { icon: UserPen, label: "المؤلفون", href: "/admin/authors" },
       { icon: Tag, label: "التصنيفات", href: "/admin/categories" },
       { icon: FileText, label: "المقالات", href: "/admin/articles" },
       { icon: Video, label: "الميديا", href: "/admin/media" },
@@ -95,9 +97,9 @@ export function AdminSidebar() {
   }
 
   return (
-    <aside className="w-60 flex-shrink-0 bg-[var(--brand-black)] flex flex-col h-screen sticky top-0">
+    <aside className="w-60 flex-shrink-0 bg-[var(--admin-surface)] flex flex-col h-screen sticky top-0 border-e border-[var(--admin-border)]">
       {/* Logo */}
-      <div className="border-b border-[var(--brand-gray-800)] p-4">
+      <div className="border-b border-[var(--admin-border)] p-4">
         <Link
           href={`/${locale}/admin/dashboard`}
           className="flex items-center gap-2.5"
@@ -106,10 +108,10 @@ export function AdminSidebar() {
             <BookOpen className="h-4 w-4 text-white" aria-hidden="true" />
           </div>
           <div>
-            <p className="text-sm font-bold text-white leading-tight">
+            <p className="text-sm font-bold text-[var(--admin-text)] leading-tight">
               Books Platform
             </p>
-            <p className="text-[10px] text-[var(--brand-gray-500)]">Admin</p>
+            <p className="text-[10px] text-[var(--admin-text-subtle)]">Admin</p>
           </div>
         </Link>
       </div>
@@ -124,7 +126,7 @@ export function AdminSidebar() {
           if (visibleItems.length === 0) return null;
           return (
           <div key={group.label}>
-            <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-widest text-[var(--brand-gray-600)]">
+            <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-widest text-[var(--admin-text-subtle)]">
               {group.label}
             </p>
             <div className="space-y-0.5">
@@ -141,7 +143,7 @@ export function AdminSidebar() {
                       "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
                       isActive
                         ? "bg-[var(--brand-red)] text-white"
-                        : "text-[var(--brand-gray-400)] hover:bg-[var(--brand-gray-800)] hover:text-white"
+                        : "text-[var(--admin-text-muted)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-text)]"
                     )}
                   >
                     <item.icon
@@ -159,18 +161,18 @@ export function AdminSidebar() {
       </nav>
 
       {/* Bottom */}
-      <div className="border-t border-[var(--brand-gray-800)] p-2">
+      <div className="border-t border-[var(--admin-border)] p-2">
         <Link
           href={`/${locale}`}
           target="_blank"
-          className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[var(--brand-gray-400)] hover:bg-[var(--brand-gray-800)] hover:text-white transition-colors"
+          className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[var(--admin-text-muted)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-text)] transition-colors"
         >
           <Globe className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
           <span>عرض الموقع</span>
         </Link>
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[var(--brand-gray-400)] hover:bg-[var(--brand-gray-800)] hover:text-white transition-colors"
+          className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[var(--admin-text-muted)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-text)] transition-colors"
         >
           <LogOut className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
           <span>تسجيل الخروج</span>

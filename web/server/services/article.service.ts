@@ -1,6 +1,19 @@
 import { db } from "@/lib/db";
+import { notDeleted } from "@/lib/admin/audit-fields";
 import { PAGINATION } from "@/lib/utils/constants";
 import readingTime from "reading-time";
+
+const linkedProductSelect = {
+  where: { ...notDeleted, published: true },
+  take: 1,
+  orderBy: { position: "desc" as const },
+  select: {
+    slug: true,
+    nameEn: true,
+    nameAr: true,
+    imageUrl: true,
+  },
+};
 
 export interface ArticleFilters {
   channel?: string;
@@ -49,6 +62,7 @@ export const ArticleService = {
           articleCategory: {
             select: { name: true, nameAr: true, slug: true },
           },
+          products: linkedProductSelect,
         },
       }),
       db.article.count({ where }),
@@ -82,6 +96,7 @@ export const ArticleService = {
       include: {
         articleCategory: true,
         postTags: true,
+        products: linkedProductSelect,
         comments: {
           where: { status: "approved" },
           orderBy: { commentDate: "asc" },
@@ -121,8 +136,42 @@ export const ArticleService = {
         imageUrl: true,
         date: true,
         channel: true,
+        products: linkedProductSelect,
       },
     });
+  },
+
+  async getByProductSlug(productSlug: string, limit = 12) {
+    const product = await db.product.findFirst({
+      where: { slug: productSlug, ...notDeleted, published: true },
+      select: { id: true },
+    });
+    if (!product) return [];
+
+    const articles = await db.article.findMany({
+      where: {
+        status: "publish",
+        products: { some: { id: product.id } },
+      },
+      take: limit,
+      orderBy: { date: "desc" },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        excerpt: true,
+        imageUrl: true,
+        date: true,
+        channel: true,
+        content: true,
+        products: linkedProductSelect,
+      },
+    });
+
+    return articles.map(({ content, ...rest }) => ({
+      ...rest,
+      readingTimeMinutes: content ? Math.ceil(readingTime(content).minutes) : null,
+    }));
   },
 
   async getCategories() {
@@ -156,6 +205,7 @@ export const ArticleService = {
           channel: true,
           isFeatured: true,
           content: true,
+          products: linkedProductSelect,
         },
       }),
       db.article.count({ where: { status: "publish", articleCategoryId: category.id } }),
@@ -191,6 +241,12 @@ export const ArticleService = {
       imageUrl: string | null;
       date: Date | null;
       channel: string | null;
+      products: Array<{
+        slug: string;
+        nameEn: string;
+        nameAr: string | null;
+        imageUrl: string | null;
+      }>;
     };
 
     const results = await Promise.all(
@@ -207,6 +263,7 @@ export const ArticleService = {
             imageUrl: true,
             date: true,
             channel: true,
+            products: linkedProductSelect,
           },
         })
       )

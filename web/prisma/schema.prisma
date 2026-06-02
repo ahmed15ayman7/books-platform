@@ -149,6 +149,7 @@ model Article {
   articleCategoryId String?         @map("article_category_id")
   articleCategory  ArticleCategory? @relation(fields: [articleCategoryId], references: [id])
   postTags         PostTag[]        @relation("ArticlePostTags")
+  products         Product[]        @relation("ArticleProducts")
   comments         Comment[]
   createdById      String?          @map("created_by_id")
   updatedById      String?          @map("updated_by_id")
@@ -184,6 +185,7 @@ model Product {
   country             String?
   pageCount           Int?             @map("page_count")
   edition             String?
+  editionAr           String?          @map("edition_ar")
   dimensions          String?
   published           Boolean          @default(true)
   featured            Boolean          @default(false)
@@ -212,6 +214,7 @@ model Product {
   categories          ProductCategory[] @relation("ProductProductCategories")
   tags                ProductTag[]     @relation("ProductProductTags")
   authors             Author[]         @relation("ProductAuthors")
+  articles            Article[]        @relation("ArticleProducts")
   cartItems           CartItem[]
   wishlistItems       WishlistItem[]
   ratings             Rating[]
@@ -247,7 +250,10 @@ model Publisher {
   id               String     @id @default(cuid())
   originalId       Int        @unique @map("original_id")
   title            String
+  name             String     @default("")
+  nameAr           String?    @map("name_ar")
   content          String?    @db.Text
+  contentAr        String?    @map("content_ar") @db.Text
   excerpt          String?    @db.Text
   date             DateTime?
   postType         String?    @map("post_type")
@@ -379,11 +385,17 @@ model PublishBookSubmission {
   postModifiedDate DateTime? @map("post_modified_date")
   spamFlag         String?   @map("spam_flag")
   notes            String?   @db.Text
+  userId           String?   @map("user_id")
+  draftToken       String?   @unique @map("draft_token")
+  currentStep      Int       @default(0) @map("current_step")
+  formData         Json?     @map("form_data")
+  user             User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   @@index([authorEmail])
   @@index([status])
+  @@index([userId])
   @@map("publish_book_submissions")
 }
 
@@ -396,7 +408,7 @@ model User {
   email           String         @unique
   passwordHash    String         @map("password_hash")
   fullName        String         @map("full_name")
-  role            String         @default("ADMIN") // ADMIN | AMBASSADOR
+  role            String         @default("ADMIN") // ADMIN | AMBASSADOR | AUTHOR
   isSuperAdmin    Boolean        @default(false) @map("is_super_admin")
   permissions     Json           @default("[]")
   isActive        Boolean        @default(true) @map("is_active")
@@ -414,6 +426,7 @@ model User {
   auditLogs       AuditLog[]
   passkeys        UserPasskey[]
   ambassador      Ambassador?
+  submissions     PublishBookSubmission[]
   createdBy       User?          @relation("UserCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   updatedBy       User?          @relation("UserUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
   deletedBy       User?          @relation("UserDeletedBy", fields: [deletedById], references: [id], onDelete: SetNull)

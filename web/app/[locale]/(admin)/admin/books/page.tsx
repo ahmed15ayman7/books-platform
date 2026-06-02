@@ -76,13 +76,14 @@ export default function AdminBooksPage() {
   const [published, setPublished] = useState("all");
   const [translationStatus, setTranslationStatus] = useState("all");
   const [featured, setFeatured] = useState("all");
+  const [authorCount, setAuthorCount] = useState("all");
 
   const loadBooks = useCallback(async () => {
     setLoading(true);
     try {
       const q = new URLSearchParams({ page: String(page), limit: "20" });
       if (search.trim()) q.set("search", search.trim());
-      appendListParams(q, { sort, published, translationStatus, featured });
+      appendListParams(q, { sort, published, translationStatus, featured, authorCount });
       const res = await fetch(`/api/v1/admin/books?${q}`, {
         headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
       });
@@ -95,7 +96,7 @@ export default function AdminBooksPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, sort, published, translationStatus, featured]);
+  }, [page, search, sort, published, translationStatus, featured, authorCount]);
 
   useEffect(() => {
     void loadBooks();
@@ -109,7 +110,7 @@ export default function AdminBooksPage() {
         <Button
           size="icon"
           variant="ghost"
-          className="h-8 w-8 text-[var(--brand-gray-400)] hover:text-white"
+          className="h-8 w-8 text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)]"
         >
           <Eye className="h-4 w-4" />
         </Button>
@@ -118,7 +119,7 @@ export default function AdminBooksPage() {
         <Button
           size="icon"
           variant="ghost"
-          className="h-8 w-8 text-[var(--brand-gray-400)] hover:text-white"
+          className="h-8 w-8 text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)]"
         >
           <Pencil className="h-4 w-4" />
         </Button>
@@ -148,7 +149,7 @@ export default function AdminBooksPage() {
       label: "العنوان (AR)",
       className: "max-w-[200px]",
       render: (row: AdminBook) => (
-        <span className="block max-w-[200px] truncate text-[var(--brand-gray-300)]">
+        <span className="block max-w-[200px] truncate text-[var(--admin-text-muted)]">
           {row.nameAr ?? "—"}
         </span>
       ),
@@ -184,11 +185,11 @@ export default function AdminBooksPage() {
     <AdminGridCard>
       <AdminGridCardMedia src={row.imageUrl} alt={row.nameAr ?? row.nameEn} />
       <AdminGridCardBody>
-        <h3 className="line-clamp-2 font-semibold text-white">
+        <h3 className="line-clamp-2 font-semibold text-[var(--admin-text)]">
           {row.nameAr ?? row.nameEn}
         </h3>
         {row.nameAr && row.nameEn && (
-          <p className="line-clamp-1 text-xs text-[var(--brand-gray-500)]" dir="ltr">
+          <p className="line-clamp-1 text-xs text-[var(--admin-text-subtle)]" dir="ltr">
             {row.nameEn}
           </p>
         )}
@@ -200,10 +201,10 @@ export default function AdminBooksPage() {
           <AdminStatusBadge status={row.published ? "published" : "draft"} />
           {row.featured && <AdminStatusBadge status="nominated" customLabel="مميز" />}
         </div>
-        <p className="mt-auto truncate text-[10px] text-[var(--brand-gray-600)]" dir="ltr">
+        <p className="mt-auto truncate text-[10px] text-[var(--admin-text-subtle)]" dir="ltr">
           /{row.slug}
         </p>
-        <p className="text-[10px] text-[var(--brand-gray-600)]">
+        <p className="text-[10px] text-[var(--admin-text-subtle)]">
           {formatAdminDateTime(row.updatedAt)}
         </p>
       </AdminGridCardBody>
@@ -212,7 +213,7 @@ export default function AdminBooksPage() {
   );
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader
         title="الكتب"
         subtitle="إدارة كتالوج الكتب بجميع التفاصيل"
@@ -281,6 +282,20 @@ export default function AdminBooksPage() {
                 { value: "all", label: "الكل" },
                 { value: "true", label: "مميز" },
                 { value: "false", label: "عادي" },
+              ]}
+            />
+            <AdminFilterSelect
+              label="المؤلفون"
+              value={authorCount}
+              onChange={(v) => {
+                setAuthorCount(v);
+                resetPage();
+              }}
+              options={[
+                { value: "all", label: "الكل" },
+                { value: "none", label: "بدون مؤلف" },
+                { value: "one", label: "مؤلف واحد" },
+                { value: "multiple", label: "أكثر من مؤلف" },
               ]}
             />
           </>

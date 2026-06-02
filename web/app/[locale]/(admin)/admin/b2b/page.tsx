@@ -28,6 +28,8 @@ import {
   AdminInput,
   AdminSelect,
 } from "@/components/admin/admin-form-field";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface B2BSubscription {
   id: string;
@@ -68,6 +70,7 @@ export default function AdminB2BPage() {
   const [total, setTotal] = useState(0);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const draft = useFormDraft(formDraftId.adminB2b(editingId), form, setForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [sort, setSort] = useState("createdAt:desc");
@@ -105,6 +108,7 @@ export default function AdminB2BPage() {
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
       if (!res.ok || !data.success) { setError(data.error?.message ?? "فشل الحفظ"); return; }
+      draft.clearDraft();
       setForm(emptyForm);
       setEditingId(null);
       await load();
@@ -139,15 +143,15 @@ export default function AdminB2BPage() {
   const renderCard = (row: B2BSubscription) => (
     <AdminGridCard>
       <AdminGridCardBody>
-        <h3 className="font-semibold text-white">{row.clientName}</h3>
-        <p className="text-xs text-[var(--brand-gray-500)]" dir="ltr">
+        <h3 className="font-semibold text-[var(--admin-text)]">{row.clientName}</h3>
+        <p className="text-xs text-[var(--admin-text-subtle)]" dir="ltr">
           {row.clientEmail}
         </p>
-        <p className="text-xs text-[var(--brand-gray-400)]">
+        <p className="text-xs text-[var(--admin-text-muted)]">
           {packageOptions.find((p) => p.value === row.packageType)?.label ?? row.packageType}
         </p>
         <AdminStatusBadge status={row.status.toLowerCase()} />
-        <p className="text-[10px] text-[var(--brand-gray-600)]">
+        <p className="text-[10px] text-[var(--admin-text-subtle)]">
           ينتهي {new Date(row.endDate).toLocaleDateString("ar-EG")}
         </p>
       </AdminGridCardBody>
@@ -162,7 +166,7 @@ export default function AdminB2BPage() {
       render: (row: B2BSubscription) => (
         <div>
           <p className="font-medium">{row.clientName}</p>
-          <p className="text-xs text-[var(--brand-gray-400)]">{row.clientEmail}</p>
+          <p className="text-xs text-[var(--admin-text-muted)]">{row.clientEmail}</p>
         </div>
       ),
     },
@@ -170,7 +174,7 @@ export default function AdminB2BPage() {
       key: "packageType",
       label: "الحزمة",
       render: (row: B2BSubscription) => (
-        <span className="text-[var(--brand-gray-300)] text-xs">
+        <span className="text-[var(--admin-text-muted)] text-xs">
           {packageOptions.find((p) => p.value === row.packageType)?.label ?? row.packageType}
         </span>
       ),
@@ -184,7 +188,7 @@ export default function AdminB2BPage() {
       key: "endDate",
       label: "تاريخ الانتهاء",
       render: (row: B2BSubscription) => (
-        <span className="text-xs text-[var(--brand-gray-400)]">
+        <span className="text-xs text-[var(--admin-text-muted)]">
           {new Date(row.endDate).toLocaleDateString("ar-EG")}
         </span>
       ),
@@ -195,12 +199,18 @@ export default function AdminB2BPage() {
   ];
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader title="B2B المؤسسي" subtitle="إدارة اشتراكات المؤسسات والمكتبات" />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <AdminCard title={editingId ? "تعديل الاشتراك" : "اشتراك جديد"} className="lg:col-span-1">
           <form onSubmit={handleSubmit} className="space-y-3">
+            <FormDraftNotice
+              showBanner={draft.showBanner}
+              status={draft.status}
+              onResume={draft.resume}
+              onDismiss={draft.dismiss}
+            />
             <AdminInput label="اسم العميل *" value={form.clientName} onChange={set("clientName")} required />
             <AdminInput label="البريد الإلكتروني *" type="email" value={form.clientEmail} onChange={set("clientEmail")} required />
             <AdminSelect label="نوع الحزمة" value={form.packageType} onChange={set("packageType")} options={packageOptions} />

@@ -20,7 +20,7 @@ export function AdminDataGrid<T extends { id: string }>({
 }: AdminDataGridProps<T>) {
   if (loading) {
     return (
-      <div className="flex min-h-[200px] items-center justify-center rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)]">
+      <div className="flex min-h-[200px] items-center justify-center rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
         <span className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-[var(--brand-gray-700)] border-t-[var(--brand-red)]" />
       </div>
     );
@@ -28,7 +28,7 @@ export function AdminDataGrid<T extends { id: string }>({
 
   if (data.length === 0) {
     return (
-      <div className="rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)] px-4 py-14 text-center text-sm text-[var(--brand-gray-500)]">
+      <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 py-14 text-center text-sm text-[var(--admin-text-subtle)]">
         {emptyMessage}
       </div>
     );
@@ -60,7 +60,7 @@ export function AdminGridCard({
   return (
     <article
       className={cn(
-        "flex h-full min-h-[260px] w-full flex-col overflow-hidden rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)] transition-colors hover:border-[var(--brand-gray-700)]",
+        "flex h-full min-h-[260px] w-full flex-col overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] transition-colors hover:border-[var(--brand-gray-700)]",
         className,
       )}
     >
@@ -79,12 +79,12 @@ export function AdminGridCardMedia({
   fallback?: ReactNode;
 }) {
   return (
-    <CardMedia className="bg-[var(--brand-gray-800)]" rounded="none">
+    <CardMedia className="bg-[var(--admin-surface-muted)]" rounded="none">
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt={alt} className="h-full w-full object-cover" />
       ) : (
-        <div className="flex h-full w-full items-center justify-center text-[var(--brand-gray-600)]">
+        <div className="flex h-full w-full items-center justify-center text-[var(--admin-text-subtle)]">
           {fallback ?? <BookOpen className="h-10 w-10 opacity-40" />}
         </div>
       )}
@@ -98,7 +98,7 @@ export function AdminGridCardBody({ children }: { children: ReactNode }) {
 
 export function AdminGridCardFooter({ children }: { children: ReactNode }) {
   return (
-    <div className="mt-auto flex items-center justify-between gap-2 border-t border-[var(--brand-gray-800)] px-4 py-3">
+    <div className="mt-auto flex items-center justify-between gap-2 border-t border-[var(--admin-border)] px-4 py-3">
       {children}
     </div>
   );

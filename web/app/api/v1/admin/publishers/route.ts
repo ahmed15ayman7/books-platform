@@ -5,15 +5,17 @@ import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { buildOrderBy, parseOptionalBool, parseSortParam } from "@/lib/admin/list-query";
+import { publisherBilingualDbData } from "@/lib/admin/publisher-fields";
+import { slugify } from "@/lib/admin/slugify";
 
 const createSchema = z.object({
-  name: z.string().min(1).max(300),
-  nameEn: z.string().max(300).optional(),
+  name: z.string().max(300).optional(),
+  nameAr: z.string().min(1).max(300),
   country: z.string().max(100).optional(),
   websiteUrl: z.string().url().optional().or(z.literal("")),
   contactEmail: z.string().email().optional().or(z.literal("")),
-  description: z.string().optional(),
-  descriptionEn: z.string().optional(),
+  content: z.string().optional(),
+  contentAr: z.string().optional(),
   imageUrl: z.string().url().optional().or(z.literal("")),
   status: z.enum(["publish", "draft"]).default("publish"),
   sponsored: z.boolean().default(false),
@@ -37,10 +39,18 @@ export async function GET(request: NextRequest) {
       ...(status && status !== "all" ? { status } : {}),
       ...(sponsoredFilter === true ? { sponsored: { isNot: null } } : {}),
       ...(sponsoredFilter === false ? { sponsored: null } : {}),
-      ...(search ? { title: { contains: search, mode: "insensitive" as const } } : {}),
+      ...(search
+        ? {
+            OR: [
+              { title: { contains: search, mode: "insensitive" as const } },
+              { name: { contains: search, mode: "insensitive" as const } },
+              { nameAr: { contains: search, mode: "insensitive" as const } },
+            ],
+          }
+        : {}),
     };
 
-    const publisherSortFields = ["updatedAt", "createdAt", "title"] as const;
+    const publisherSortFields = ["updatedAt", "createdAt", "title", "name", "nameAr"] as const;
 
     const [rows, total] = await Promise.all([
       db.publisher.findMany({
@@ -60,7 +70,9 @@ export async function GET(request: NextRequest) {
     const data = rows.map((p) => ({
       id: p.id,
       slug: p.slug,
-      name: p.title,
+      name: p.nameAr ?? p.name ?? p.title,
+      nameAr: p.nameAr,
+      nameEn: p.name,
       imageUrl: p.imageFeatured ?? p.imageUrl ?? null,
       country: p.countries[0]?.name ?? null,
       status: p.status,
@@ -93,19 +105,34 @@ export async function POST(request: NextRequest) {
     const parsed = createSchema.safeParse(body);
     if (!parsed.success) return ApiErrors.badRequest("Validation failed", parsed.error.issues);
 
-    const { name, description, websiteUrl, contactEmail, imageUrl, status } = parsed.data;
+    const {
+      name = "",
+      nameAr,
+      content,
+      contentAr,
+      websiteUrl,
+      contactEmail,
+      imageUrl,
+      status,
+      sponsored,
+    } = parsed.data;
 
-    const slug = name
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .slice(0, 200) + "-" + Date.now();
+    const bilingual = publisherBilingualDbData({
+      name,
+      nameAr,
+      content,
+      contentAr,
+    });
+
+    const { nextPublisherOriginalId } = await import("@/lib/admin/legacy-ids");
+    const originalId = await nextPublisherOriginalId();
+    const slugBase = slugify(name) || slugify(nameAr) || `publisher-${originalId}`;
+    const slug = `${slugBase}-${originalId}`;
 
     const publisher = await db.publisher.create({
       data: {
-        originalId: Date.now(),
-        title: name,
-        content: description ?? null,
+        originalId,
+        ...bilingual,
         websiteUrl: websiteUrl || null,
         contactEmail: contactEmail || null,
         imageFeatured: imageUrl || null,
@@ -114,11 +141,27 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    if (sponsored) {
+      await db.sponsoredPublisher.create({
+        data: {
+          publisherId: publisher.id,
+          priority: 0,
+          startsAt: new Date(),
+          endsAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+          amountPaid: 0,
+        },
+      });
+    }
+
     await db.auditLog.create({
       data: { userId: auth.payload.userId, action: "CREATE_PUBLISHER", entity: "Publisher", entityId: publisher.id },
     });
 
-    return apiCreated({ ...publisher, name: publisher.title, sponsored: false });
+    return apiCreated({
+      ...publisher,
+      title: publisher.title,
+      sponsored: sponsored ?? false,
+    });
   } catch (error) {
     console.error("[POST /api/v1/admin/publishers]", error);
     return ApiErrors.internal();

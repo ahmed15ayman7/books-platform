@@ -23,7 +23,7 @@ export function HeaderSearch() {
   return (
     <form
       onSubmit={handleSubmit}
-      className={`relative w-full max-w-xl transition-all duration-[var(--motion-base)] ${
+      className={`relative w-full max-w-xl transition-all rounded-2xl duration-[var(--motion-base)] ${
         focused ? "shadow-[0_0_0_3px_rgba(177,30,46,0.35)]" : "shadow-[var(--shadow-soft)]"
       }`}
       role="search"

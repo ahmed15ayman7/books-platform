@@ -7,6 +7,8 @@ import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminInput, AdminTextarea } from "@/components/admin/admin-form-field";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface StaticPage {
   id: string;
@@ -37,6 +39,21 @@ export default function AdminPagesPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
+  const pageDraftValues: StaticPage = editing ?? {
+    id: "",
+    slug: "_none",
+    titleAr: "",
+    titleEn: "",
+    bodyAr: "",
+    bodyEn: "",
+  };
+  const draft = useFormDraft(
+    formDraftId.adminPage(editing?.slug ?? "_none"),
+    pageDraftValues,
+    (v) => setEditing(v),
+    { enabled: !!editing, ready: !loading },
+  );
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -64,16 +81,17 @@ export default function AdminPagesPage() {
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
       if (!res.ok || !data.success) { setError(data.error?.message ?? "فشل الحفظ"); return; }
+      draft.clearDraft();
       setSuccess(true);
       await load();
     } catch { setError("حدث خطأ"); }
     finally { setSaving(false); }
   }
 
-  if (loading) return <div className="text-[var(--brand-gray-400)]">جاري التحميل...</div>;
+  if (loading) return <div className="text-[var(--admin-text-muted)]">جاري التحميل...</div>;
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader title="الصفحات الثابتة" subtitle="تحرير محتوى صفحات المنصة الثابتة" />
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -100,8 +118,8 @@ export default function AdminPagesPage() {
                 }}
                 className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm transition-colors ${
                   editing?.slug === slug
-                    ? "border-[var(--brand-red)] bg-[var(--brand-red)]/10 text-white"
-                    : "border-[var(--brand-gray-800)] text-[var(--brand-gray-300)] hover:border-[var(--brand-gray-700)] hover:text-white"
+                    ? "border-[var(--brand-red)] bg-[var(--brand-red)]/10 font-medium text-[var(--admin-accent)]"
+                    : "border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:border-[var(--admin-border-strong)] hover:text-[var(--admin-accent)]"
                 }`}
               >
                 <span>{label}</span>
@@ -115,8 +133,14 @@ export default function AdminPagesPage() {
         <div className="lg:col-span-2">
           {editing ? (
             <form onSubmit={handleSave} className="space-y-4">
+              <FormDraftNotice
+                showBanner={draft.showBanner}
+                status={draft.status}
+                onResume={draft.resume}
+                onDismiss={draft.dismiss}
+              />
               <AdminCard>
-                <div className="mb-4 flex gap-2 border-b border-[var(--brand-gray-800)] pb-3">
+                <div className="mb-4 flex gap-2 border-b border-[var(--admin-border)] pb-3">
                   {(["ar", "en"] as LangTab[]).map((l) => (
                     <button
                       key={l}
@@ -125,7 +149,7 @@ export default function AdminPagesPage() {
                       className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors ${
                         tab === l
                           ? "bg-[var(--brand-red)] text-white"
-                          : "text-[var(--brand-gray-400)] hover:text-white"
+                          : "text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)]"
                       }`}
                     >
                       {l === "ar" ? "العربية" : "English"}
@@ -174,7 +198,7 @@ export default function AdminPagesPage() {
               </Button>
             </form>
           ) : (
-            <div className="flex h-48 items-center justify-center rounded-xl border border-dashed border-[var(--brand-gray-700)] text-[var(--brand-gray-500)]">
+            <div className="flex h-48 items-center justify-center rounded-xl border border-dashed border-[var(--admin-border-strong)] text-[var(--admin-text-subtle)]">
               اختر صفحة من القائمة لتحريرها
             </div>
           )}

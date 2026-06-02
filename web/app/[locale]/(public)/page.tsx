@@ -19,6 +19,8 @@ import { PublisherCard } from "@/components/sections/publisher-card";
 import { Button } from "@/components/ui/button";
 import { PenTool, Library, PenLine, Building2 } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
+import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
+import { articleLinkedBookDisplay } from "@/lib/i18n/article-linked-book";
 import {
   AnimatedSection,
   FadeIn,
@@ -103,7 +105,17 @@ export default async function HomePage() {
         ];
 
   const { newlyReleased, translated, nominated, publishers, publisherGrid = [], categorySections } = homeBooks as typeof homeBooks & {
-    publisherGrid?: Array<{ id: string; title: string; slug: string; imageUrl: string | null; websiteUrl: string | null; country: string | null; bookCount: number }>;
+    publisherGrid?: Array<{
+      id: string;
+      title: string;
+      name: string;
+      nameAr?: string | null;
+      slug: string;
+      imageUrl: string | null;
+      websiteUrl: string | null;
+      country: string | null;
+      bookCount: number;
+    }>;
   };
 
   type ArticleSnippet = {
@@ -114,6 +126,12 @@ export default async function HomePage() {
     imageUrl: string | null;
     date: Date | null;
     channel: string | null;
+    products: Array<{
+      slug: string;
+      nameEn: string;
+      nameAr: string | null;
+      imageUrl: string | null;
+    }>;
   };
   const articles = articlesMap as Record<string, ArticleSnippet[]>;
 
@@ -319,7 +337,7 @@ export default async function HomePage() {
                 <StaggerItem key={pub.id}>
                   <PublisherCard
                     id={pub.id}
-                    title={pub.title}
+                    title={localizedPublisherName(pub, locale)}
                     slug={pub.slug}
                     imageUrl={pub.imageUrl}
                     websiteUrl={pub.websiteUrl}
@@ -418,8 +436,19 @@ export default async function HomePage() {
         const channelArticles = articles[ch.key] ?? [];
         if (!channelArticles.length) return null;
         const bg = postBg();
-        const [featured, ...rest] = channelArticles;
-        if (!featured?.slug) return null;
+        const [featuredRaw, ...restRaw] = channelArticles;
+        if (!featuredRaw?.slug) return null;
+        const featuredLinked = articleLinkedBookDisplay(featuredRaw.products?.[0], locale);
+        const featured = {
+          ...featuredRaw,
+          linkedBook: featuredLinked,
+        };
+        const rest = restRaw
+          .filter((a) => !!a.slug)
+          .map((a) => ({
+            ...a,
+            linkedBook: articleLinkedBookDisplay(a.products?.[0], locale),
+          }));
         return (
           <AnimatedSection
             key={ch.key}
@@ -447,19 +476,21 @@ export default async function HomePage() {
                     title={featured.title ?? ""}
                     excerpt={featured.excerpt}
                     imageUrl={featured.imageUrl}
+                    linkedBook={featured.linkedBook}
                     date={featured.date ?? undefined}
                     channel={featured.channel ?? undefined}
                     locale={locale}
                     featured={rest.length > 0}
                   />
                 </StaggerItem>
-                {rest.filter((a) => !!a.slug).map((a) => (
+                {rest.map((a) => (
                   <StaggerItem key={a.id}>
                     <ArticleCard
                       slug={a.slug!}
                       title={a.title ?? ""}
                       excerpt={a.excerpt}
                       imageUrl={a.imageUrl}
+                      linkedBook={a.linkedBook}
                       date={a.date ?? undefined}
                       channel={a.channel ?? undefined}
                       locale={locale}

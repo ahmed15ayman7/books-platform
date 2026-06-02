@@ -1,10 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { localizedPublisherName, type PublisherLocalizedFields } from "@/lib/i18n/publisher-locale";
 
-interface Publisher {
+interface Publisher extends PublisherLocalizedFields {
   id: string;
-  title: string;
+  title?: string;
   slug: string;
   imageUrl?: string | null;
 }
@@ -17,7 +18,6 @@ interface PublishersMarqueeProps {
 export function PublishersMarquee({ publishers, locale }: PublishersMarqueeProps) {
   if (!publishers.length) return null;
 
-  // Duplicate for infinite scroll
   const items = [...publishers, ...publishers];
 
   return (
@@ -31,7 +31,9 @@ export function PublishersMarquee({ publishers, locale }: PublishersMarqueeProps
           locale === "ar" ? "animate-marquee-rtl" : "animate-marquee"
         )}
       >
-        {items.map((publisher, i) => (
+        {items.map((publisher, i) => {
+          const displayName = localizedPublisherName(publisher, locale);
+          return (
           <Link
             key={`${publisher.id}-${i}`}
             href={`/${locale}/publishers/${publisher.slug}`}
@@ -41,23 +43,24 @@ export function PublishersMarquee({ publishers, locale }: PublishersMarqueeProps
               "transition-all hover:border-[var(--brand-red)] hover:shadow-md",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]"
             )}
-            aria-label={publisher.title}
+            aria-label={displayName}
           >
             {publisher.imageUrl ? (
               <Image
                 src={publisher.imageUrl}
-                alt={publisher.title}
+                alt={displayName}
                 width={120}
                 height={48}
                 className="h-10 w-auto object-contain"
               />
             ) : (
               <span className="text-xs font-medium text-[var(--brand-gray-600)] text-center line-clamp-2">
-                {publisher.title}
+                {displayName}
               </span>
             )}
           </Link>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

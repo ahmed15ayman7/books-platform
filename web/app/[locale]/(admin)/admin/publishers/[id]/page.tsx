@@ -14,15 +14,17 @@ import {
   AdminCheckbox,
 } from "@/components/admin/admin-form-field";
 import { AdminTimestamps } from "@/components/admin/admin-timestamps";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface PublisherForm {
   name: string;
-  nameEn: string;
+  nameAr: string;
   country: string;
   websiteUrl: string;
   contactEmail: string;
-  description: string;
-  descriptionEn: string;
+  content: string;
+  contentAr: string;
   imageUrl: string;
   status: string;
   sponsored: boolean;
@@ -30,12 +32,12 @@ interface PublisherForm {
 
 const empty: PublisherForm = {
   name: "",
-  nameEn: "",
+  nameAr: "",
   country: "",
   websiteUrl: "",
   contactEmail: "",
-  description: "",
-  descriptionEn: "",
+  content: "",
+  contentAr: "",
   imageUrl: "",
   status: "publish",
   sponsored: false,
@@ -49,6 +51,7 @@ export default function AdminPublisherEditPage() {
 
   const [form, setForm] = useState<PublisherForm>(empty);
   const [loading, setLoading] = useState(!isNew);
+  const draft = useFormDraft(formDraftId.adminPublisher(id), form, setForm, { ready: !loading });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -67,12 +70,12 @@ export default function AdminPublisherEditPage() {
         const d = data.data;
         setForm({
           name: String(d.name ?? ""),
-          nameEn: String(d.nameEn ?? ""),
+          nameAr: String(d.nameAr ?? ""),
           country: String(d.country ?? ""),
           websiteUrl: String(d.websiteUrl ?? ""),
           contactEmail: String(d.contactEmail ?? ""),
-          description: String(d.description ?? ""),
-          descriptionEn: String(d.descriptionEn ?? ""),
+          content: String(d.content ?? ""),
+          contentAr: String(d.contentAr ?? ""),
           imageUrl: String(d.imageUrl ?? ""),
           status: String(d.status ?? "publish"),
           sponsored: Boolean(d.sponsored),
@@ -91,6 +94,10 @@ export default function AdminPublisherEditPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!form.nameAr.trim() && !form.name.trim()) {
+      setError("أدخل اسم الناشر بالعربية أو الإنجليزية");
+      return;
+    }
     setSaving(true);
     setError("");
     setSuccess(false);
@@ -107,6 +114,7 @@ export default function AdminPublisherEditPage() {
         return;
       }
       setSuccess(true);
+      draft.clearDraft();
     } catch {
       setError("حدث خطأ في الاتصال");
     } finally {
@@ -117,13 +125,13 @@ export default function AdminPublisherEditPage() {
   const set = (key: keyof PublisherForm) => (v: string | boolean) =>
     setForm((prev) => ({ ...prev, [key]: v }));
 
-  if (loading) return <div className="text-[var(--brand-gray-400)]">جاري التحميل...</div>;
+  if (loading) return <div className="text-[var(--admin-text-muted)]">جاري التحميل...</div>;
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <Link
         href={`/${locale}/admin/publishers`}
-        className="mb-5 inline-flex items-center gap-2 text-sm text-[var(--brand-gray-400)] hover:text-white transition-colors"
+        className="mb-5 inline-flex items-center gap-2 text-sm text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] transition-colors"
       >
         <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
         العودة للناشرين
@@ -142,18 +150,25 @@ export default function AdminPublisherEditPage() {
       )}
 
       <form onSubmit={handleSubmit} className="max-w-3xl space-y-5">
+        <FormDraftNotice
+          showBanner={draft.showBanner}
+          status={draft.status}
+          onResume={draft.resume}
+          onDismiss={draft.dismiss}
+        />
         <AdminCard title="البيانات الأساسية">
           <div className="grid gap-4 sm:grid-cols-2">
             <AdminInput
               label="الاسم (عربي)"
-              value={form.name}
-              onChange={(e) => set("name")(e.target.value)}
+              value={form.nameAr}
+              onChange={(e) => set("nameAr")(e.target.value)}
               required
             />
             <AdminInput
               label="الاسم (إنجليزي)"
-              value={form.nameEn}
-              onChange={(e) => set("nameEn")(e.target.value)}
+              value={form.name}
+              onChange={(e) => set("name")(e.target.value)}
+              dir="ltr"
             />
             <AdminInput
               label="الدولة"
@@ -165,17 +180,20 @@ export default function AdminPublisherEditPage() {
               type="url"
               value={form.websiteUrl}
               onChange={(e) => set("websiteUrl")(e.target.value)}
+              dir="ltr"
             />
             <AdminInput
               label="البريد الإلكتروني للتواصل"
               type="email"
               value={form.contactEmail}
               onChange={(e) => set("contactEmail")(e.target.value)}
+              dir="ltr"
             />
             <AdminInput
               label="رابط صورة الغلاف"
               value={form.imageUrl}
               onChange={(e) => set("imageUrl")(e.target.value)}
+              dir="ltr"
             />
           </div>
         </AdminCard>
@@ -185,14 +203,15 @@ export default function AdminPublisherEditPage() {
             <AdminTextarea
               label="الوصف (عربي)"
               rows={4}
-              value={form.description}
-              onChange={(e) => set("description")(e.target.value)}
+              value={form.contentAr}
+              onChange={(e) => set("contentAr")(e.target.value)}
             />
             <AdminTextarea
               label="الوصف (إنجليزي)"
               rows={4}
-              value={form.descriptionEn}
-              onChange={(e) => set("descriptionEn")(e.target.value)}
+              value={form.content}
+              onChange={(e) => set("content")(e.target.value)}
+              dir="ltr"
             />
           </div>
         </AdminCard>

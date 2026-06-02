@@ -13,6 +13,8 @@ import {
   AdminSelect,
 } from "@/components/admin/admin-form-field";
 import { AdminTimestamps } from "@/components/admin/admin-timestamps";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface ArticleForm {
   title: string;
@@ -66,6 +68,7 @@ export default function AdminArticleEditPage() {
   const [form, setForm] = useState<ArticleForm>(empty);
   const [tab, setTab] = useState<LangTab>("ar");
   const [loading, setLoading] = useState(!isNew);
+  const draft = useFormDraft(formDraftId.adminArticle(id), form, setForm, { ready: !loading });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -120,6 +123,7 @@ export default function AdminArticleEditPage() {
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
       if (!res.ok || !data.success) { setError(data.error?.message ?? "فشل الحفظ"); return; }
+      draft.clearDraft();
       setSuccess(true);
     } catch { setError("حدث خطأ في الاتصال"); }
     finally { setSaving(false); }
@@ -128,13 +132,13 @@ export default function AdminArticleEditPage() {
   const set = (k: keyof ArticleForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm((p) => ({ ...p, [k]: e.target.value }));
 
-  if (loading) return <div className="text-[var(--brand-gray-400)]">جاري التحميل...</div>;
+  if (loading) return <div className="text-[var(--admin-text-muted)]">جاري التحميل...</div>;
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <Link
         href={`/${locale}/admin/articles`}
-        className="mb-5 inline-flex items-center gap-2 text-sm text-[var(--brand-gray-400)] hover:text-white transition-colors"
+        className="mb-5 inline-flex items-center gap-2 text-sm text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] transition-colors"
       >
         <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
         العودة للمقالات
@@ -151,6 +155,12 @@ export default function AdminArticleEditPage() {
       )}
 
       <form onSubmit={handleSubmit} className="max-w-4xl space-y-5">
+        <FormDraftNotice
+          showBanner={draft.showBanner}
+          status={draft.status}
+          onResume={draft.resume}
+          onDismiss={draft.dismiss}
+        />
         <AdminCard title="الإعدادات">
           <div className="grid gap-4 sm:grid-cols-3">
             <AdminSelect
@@ -185,7 +195,7 @@ export default function AdminArticleEditPage() {
 
         {/* Language tabs */}
         <AdminCard>
-          <div className="mb-4 flex gap-2 border-b border-[var(--brand-gray-800)] pb-3">
+          <div className="mb-4 flex gap-2 border-b border-[var(--admin-border)] pb-3">
             {(["ar", "en"] as LangTab[]).map((l) => (
               <button
                 key={l}
@@ -194,7 +204,7 @@ export default function AdminArticleEditPage() {
                 className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors ${
                   tab === l
                     ? "bg-[var(--brand-red)] text-white"
-                    : "text-[var(--brand-gray-400)] hover:text-white"
+                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)]"
                 }`}
               >
                 {l === "ar" ? "العربية" : "English"}

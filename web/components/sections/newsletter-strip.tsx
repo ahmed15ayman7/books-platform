@@ -6,11 +6,14 @@ import { useTranslations, useLocale } from "next-intl";
 import { Mail, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 export function NewsletterStrip() {
   const t = useTranslations("home.newsletter");
   const locale = useLocale();
   const [email, setEmail] = useState("");
+  const draft = useFormDraft(formDraftId.newsletter(), { email }, (v) => setEmail(v.email));
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   async function handleSubmit(e: React.FormEvent) {
@@ -23,7 +26,11 @@ export function NewsletterStrip() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, locale, source: "homepage" }),
       });
-      if (res.ok) { setStatus("success"); setEmail(""); }
+      if (res.ok) {
+        setStatus("success");
+        setEmail("");
+        draft.clearDraft();
+      }
       else setStatus("error");
     } catch { setStatus("error"); }
   }
@@ -66,9 +73,18 @@ export function NewsletterStrip() {
               <span className="font-medium">{t("success")}</span>
             </motion.div>
           ) : (
+            <>
+              <FormDraftNotice
+                variant="public"
+                showBanner={draft.showBanner}
+                status={draft.status}
+                onResume={draft.resume}
+                onDismiss={draft.dismiss}
+                className="mt-4 text-start"
+              />
             <form
               onSubmit={handleSubmit}
-              className="mt-6 flex flex-col gap-3 sm:flex-row"
+              className="mt-2 flex flex-col gap-3 sm:flex-row"
               aria-label={t("title")}
             >
               <label htmlFor="newsletter-email" className="sr-only">
@@ -88,6 +104,7 @@ export function NewsletterStrip() {
                 {t("subscribe")}
               </Button>
             </form>
+            </>
           )}
 
           {status === "error" && (

@@ -2,10 +2,16 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Loader2, CheckCircle2, AlertCircle, X } from "lucide-react";
+import { Save, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { createBook, updateBook, type BookEditData } from "./actions";
 import { adminFieldClass } from "@/components/admin/admin-form-field";
 import { AdminMarkdownHint } from "@/components/admin/admin-markdown-hint";
+import { AdminEntityCombobox, type EntityOption } from "@/components/admin/admin-entity-combobox";
+import { CreateAuthorDialog } from "@/components/admin/create-author-dialog";
+import { CreatePublisherDialog } from "@/components/admin/create-publisher-dialog";
+import { CreateCategoryDialog } from "@/components/admin/create-category-dialog";
+import { adminAuthHeaders } from "@/lib/admin/auth-client";
+import { slugify, autoSlugFromEnglish, AUTO_SLUG_HINT } from "@/lib/admin/slugify";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -18,9 +24,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 /* ─── Types ─────────────────────────────────────────────────────────── */
-interface Publisher  { id: string; title: string; slug: string }
+interface Publisher  { id: string; title: string; name: string; nameAr?: string | null; slug: string }
 interface Category   { id: string; name: string; nameAr: string | null; slug: string }
 interface Author     { id: string; name: string; nameAr: string | null; slug: string }
 
@@ -33,19 +41,10 @@ interface BookEditFormProps {
   authors: Author[];
 }
 
-function slugify(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
 const sectionCardCls =
-  "overflow-hidden rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)]";
+  "overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]";
 const sectionHeaderCls =
-  "border-b border-[var(--brand-gray-800)] bg-[var(--brand-gray-800)] px-5 py-3";
+  "border-b border-[var(--admin-border)] bg-[var(--admin-surface-muted)] px-5 py-3";
 
 const fieldCls = adminFieldClass;
 
@@ -61,7 +60,7 @@ function FieldLabel({
   return (
     <Label
       htmlFor={htmlFor}
-      className="mb-1.5 block text-sm font-medium text-[var(--brand-gray-300)]"
+      className="mb-1.5 block text-sm font-medium text-[var(--admin-text-muted)]"
     >
       {children}
       {required && <span className="ms-0.5 text-[var(--brand-red)]">*</span>}
@@ -87,7 +86,7 @@ function BookSelect({
       <SelectTrigger id={id} className={fieldCls}>
         <SelectValue placeholder={placeholder ?? "اختر..."} />
       </SelectTrigger>
-      <SelectContent className="border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] text-white">
+      <SelectContent className="border-[var(--admin-border-strong)] bg-[var(--admin-surface)] text-[var(--admin-text)]">
         {children}
       </SelectContent>
     </Select>
@@ -102,7 +101,7 @@ function SectionCard({ title, children }: { title: string; children: React.React
   return (
     <div className={sectionCardCls}>
       <div className={sectionHeaderCls}>
-        <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--brand-gray-400)]">{title}</h2>
+        <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--admin-text-muted)]">{title}</h2>
       </div>
       <div className="grid grid-cols-1 gap-5 p-5 sm:grid-cols-2">{children}</div>
     </div>
@@ -121,99 +120,16 @@ function CheckboxField({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-[var(--brand-gray-700)] px-4 py-3 transition-colors hover:bg-[var(--brand-gray-800)]">
+    <div className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-[var(--admin-border-strong)] px-4 py-3 transition-colors hover:bg-[var(--admin-hover)]">
       <Checkbox
         id={id}
         checked={checked}
         onCheckedChange={(state) => onChange(state === true)}
-        className="border-[var(--brand-gray-600)] data-[state=checked]:bg-[var(--brand-red)] data-[state=checked]:border-[var(--brand-red)]"
+        className="border-[var(--admin-input-border)] data-[state=checked]:bg-[var(--brand-red)] data-[state=checked]:border-[var(--brand-red)]"
       />
-      <Label htmlFor={id} className="cursor-pointer text-sm font-medium text-[var(--brand-gray-300)]">
+      <Label htmlFor={id} className="cursor-pointer text-sm font-medium text-[var(--admin-text-muted)]">
         {label}
       </Label>
-    </div>
-  );
-}
-
-/* ─── Multi-select with search ───────────────────────────────────────── */
-function MultiSelect({
-  id,
-  label,
-  options,
-  selected,
-  onChange,
-  getLabel,
-}: {
-  id: string;
-  label: string;
-  options: { id: string; name: string; nameAr?: string | null }[];
-  selected: string[];
-  onChange: (ids: string[]) => void;
-  getLabel: (o: { id: string; name: string; nameAr?: string | null }) => string;
-}) {
-  const [q, setQ] = useState("");
-  const filtered = q
-    ? options.filter((o) => getLabel(o).toLowerCase().includes(q.toLowerCase()))
-    : options;
-
-  function toggle(id: string) {
-    onChange(selected.includes(id) ? selected.filter((s) => s !== id) : [...selected, id]);
-  }
-
-  const selectedItems = options.filter((o) => selected.includes(o.id));
-
-  return (
-    <div>
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
-      {/* Selected chips */}
-      {selectedItems.length > 0 && (
-        <div className="mb-2 flex flex-wrap gap-1.5">
-          {selectedItems.map((o) => (
-            <span
-              key={o.id}
-              className="inline-flex items-center gap-1 rounded-full bg-[var(--brand-red-soft)] px-2.5 py-0.5 text-xs font-medium text-[var(--brand-red)]"
-            >
-              {getLabel(o)}
-              <button
-                type="button"
-                onClick={() => toggle(o.id)}
-                className="hover:text-[var(--brand-red)] opacity-70 hover:opacity-100"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
-      {/* Search */}
-      <Input
-        id={id}
-        type="text"
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder={`ابحث في ${label}…`}
-        className={cn(fieldCls, "mb-1")}
-      />
-      {/* List */}
-      <div className="max-h-44 overflow-y-auto rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)]">
-        {filtered.length === 0 ? (
-          <p className="px-3 py-2 text-xs text-[var(--brand-gray-500)]">لا نتائج</p>
-        ) : (
-          filtered.slice(0, 30).map((o) => (
-            <label
-              key={o.id}
-              className="flex cursor-pointer items-center gap-2.5 px-3 py-2 text-sm text-white hover:bg-[var(--brand-gray-700)] border-b border-[var(--brand-gray-700)] last:border-0"
-            >
-              <Checkbox
-                checked={selected.includes(o.id)}
-                onCheckedChange={() => toggle(o.id)}
-                className="shrink-0 border-[var(--brand-gray-600)] data-[state=checked]:bg-[var(--brand-red)] data-[state=checked]:border-[var(--brand-red)]"
-              />
-              <span className="truncate">{getLabel(o)}</span>
-            </label>
-          ))
-        )}
-      </div>
     </div>
   );
 }
@@ -234,6 +150,54 @@ export function BookEditForm({
   const [errorMsg, setErrorMsg] = useState("");
 
   const [form, setForm] = useState<BookEditData>(initial);
+  const draft = useFormDraft(formDraftId.adminBook(bookId), form, setForm);
+  const [authorsList, setAuthorsList] = useState(authors);
+  const [publishersList, setPublishersList] = useState(publishers);
+  const [categoriesList, setCategoriesList] = useState(categories);
+
+  const [authorDialogOpen, setAuthorDialogOpen] = useState(false);
+  const [publisherDialogOpen, setPublisherDialogOpen] = useState(false);
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [createQuery, setCreateQuery] = useState("");
+  const [categoryCreateTarget, setCategoryCreateTarget] = useState<"primary" | "extra">("primary");
+
+  const authorOptions = authorsList.map((a) => ({
+    id: a.id,
+    name: a.name,
+    nameAr: a.nameAr,
+    slug: a.slug,
+  }));
+  const publisherOptions = publishersList.map((p) => ({
+    id: p.id,
+    name: p.nameAr ?? p.name ?? p.title,
+    slug: p.slug,
+  }));
+  const categoryOptions = categoriesList.map((c) => ({
+    id: c.id,
+    name: c.name,
+    nameAr: c.nameAr,
+    slug: c.slug,
+  }));
+
+  const entityLabel = (o: { name: string; nameAr?: string | null }) => o.nameAr ?? o.name;
+
+  async function searchAuthorsRemote(query: string): Promise<EntityOption[]> {
+    const res = await fetch(
+      `/api/v1/admin/authors?search=${encodeURIComponent(query)}&limit=30`,
+      { headers: adminAuthHeaders() },
+    );
+    const data = await res.json() as {
+      success: boolean;
+      data?: Array<{ id: string; name: string; nameAr: string | null; slug: string }>;
+    };
+    if (!res.ok || !data.success || !data.data) return [];
+    return data.data.map((a) => ({
+      id: a.id,
+      name: a.name,
+      nameAr: a.nameAr,
+      slug: a.slug,
+    }));
+  }
 
   function set<K extends keyof BookEditData>(key: K, value: BookEditData[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -242,45 +206,69 @@ export function BookEditForm({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("idle");
+    setErrorMsg("");
+
+    const nameEn = form.nameEn.trim();
+    const nameAr = form.nameAr.trim();
+    const slug = form.slug.trim() || slugify(form.nameEn) || slugify(form.nameAr);
+
+    if (!nameEn && !nameAr) {
+      setStatus("error");
+      setErrorMsg("الاسم بالعربية أو الإنجليزية مطلوب");
+      return;
+    }
+    if (!slug) {
+      setStatus("error");
+      setErrorMsg("الرابط المختصر (Slug) مطلوب");
+      return;
+    }
 
     const payload: BookEditData = {
       ...form,
-      slug: form.slug.trim() || slugify(form.nameEn),
+      nameEn: nameEn || nameAr,
+      slug,
     };
 
     startTransition(async () => {
-      try {
-        if (bookId) {
-          await updateBook(bookId, payload);
-          setStatus("success");
-          setTimeout(() => setStatus("idle"), 3000);
-        } else {
-          const result = await createBook(payload);
-          router.push(`/${locale}/admin/books/${result.id}`);
+      if (bookId) {
+        const result = await updateBook(bookId, payload);
+        if (!result.ok) {
+          setStatus("error");
+          setErrorMsg(result.error);
+          return;
         }
-      } catch (err) {
+        draft.clearDraft();
+        setStatus("success");
+        setTimeout(() => setStatus("idle"), 3000);
+        return;
+      }
+
+      const result = await createBook(payload);
+      if (!result.ok) {
         setStatus("error");
-        setErrorMsg(err instanceof Error ? err.message : "حدث خطأ غير متوقع");
+        setErrorMsg(result.error);
+        return;
+      }
+      if (result.id) {
+        draft.clearDraft();
+        setStatus("success");
+        setTimeout(() => {
+          router.push(`/${locale}/admin/books/${result.id}`);
+        }, 1500);
       }
     });
   }
 
+  const successMessage = isCreate ? "تم إنشاء الكتاب بنجاح" : "تم حفظ التغييرات بنجاح";
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6" dir="rtl">
-      {/* ── Status banner ───────────────────────────────────────── */}
-      {status === "success" && !isCreate && (
-        <div className="flex items-center gap-2 rounded-xl border border-green-800/50 bg-green-950/40 px-4 py-3 text-sm text-green-400">
-          <CheckCircle2 className="h-4 w-4 shrink-0" />
-          تم حفظ التغييرات بنجاح
-        </div>
-      )}
-      {status === "error" && (
-        <div className="flex items-center gap-2 rounded-xl border border-red-800/50 bg-red-950/40 px-4 py-3 text-sm text-red-400">
-          <AlertCircle className="h-4 w-4 shrink-0" />
-          {errorMsg}
-        </div>
-      )}
-
+      <FormDraftNotice
+        showBanner={draft.showBanner}
+        status={draft.status}
+        onResume={draft.resume}
+        onDismiss={draft.dismiss}
+      />
       {/* ── 1. Book Identity ─────────────────────────────────────── */}
       <SectionCard title="بيانات الكتاب الأساسية">
         <Field className="sm:col-span-2">
@@ -290,12 +278,34 @@ export function BookEditForm({
 
         <Field className="sm:col-span-2">
           <FieldLabel htmlFor="nameEn" required>الاسم بالإنجليزية</FieldLabel>
-          <Input id="nameEn" className={fieldCls} value={form.nameEn} onChange={(e) => set("nameEn", e.target.value)} placeholder="Book name in English" dir="ltr" />
+          <Input
+            id="nameEn"
+            className={fieldCls}
+            value={form.nameEn}
+            onChange={(e) => {
+              const nameEn = e.target.value;
+              setForm((prev) => ({
+                ...prev,
+                nameEn,
+                slug: autoSlugFromEnglish(nameEn, prev.slug, prev.nameEn),
+              }));
+            }}
+            placeholder="Book name in English"
+            dir="ltr"
+          />
         </Field>
 
         <Field className="sm:col-span-2">
           <FieldLabel htmlFor="slug" required>الرابط المختصر (Slug)</FieldLabel>
-          <Input id="slug" className={fieldCls} value={form.slug} onChange={(e) => set("slug", e.target.value)} placeholder="book-slug-url" dir="ltr" />
+          <Input
+            id="slug"
+            className={fieldCls}
+            value={form.slug}
+            onChange={(e) => set("slug", e.target.value)}
+            placeholder="book-slug-url"
+            dir="ltr"
+          />
+          <p className="mt-1 text-[11px] text-[var(--admin-text-subtle)]">{AUTO_SLUG_HINT}</p>
         </Field>
 
         <Field className="sm:col-span-2">
@@ -303,7 +313,7 @@ export function BookEditForm({
           <Input id="imageUrl" type="url" className={fieldCls} value={form.imageUrl} onChange={(e) => set("imageUrl", e.target.value)} placeholder="https://..." dir="ltr" />
           {form.imageUrl && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={form.imageUrl} alt="cover preview" className="mt-2 h-32 w-auto rounded-lg border border-[var(--brand-gray-700)] object-contain" />
+            <img src={form.imageUrl} alt="cover preview" className="mt-2 h-32 w-auto rounded-lg border border-[var(--admin-border-strong)] object-contain" />
           )}
         </Field>
       </SectionCard>
@@ -323,7 +333,7 @@ export function BookEditForm({
             onValueChange={(v) => set("language", v)}
             placeholder="— اختر اللغة —"
           >
-            <SelectItem value="_empty" className="focus:bg-[var(--brand-gray-700)]">
+            <SelectItem value="_empty" className="focus:bg-[var(--admin-hover)]">
               — اختر اللغة —
             </SelectItem>
             {(
@@ -343,7 +353,7 @@ export function BookEditForm({
                 ["ur", "الأردية"],
               ] as [string, string][]
             ).map(([code, name]) => (
-              <SelectItem key={code} value={code} className="focus:bg-[var(--brand-gray-700)]">
+              <SelectItem key={code} value={code} className="focus:bg-[var(--admin-hover)]">
                 {name} ({code.toUpperCase()})
               </SelectItem>
             ))}
@@ -366,8 +376,26 @@ export function BookEditForm({
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="edition">الطبعة</FieldLabel>
-          <Input id="edition" className={fieldCls} value={form.edition} onChange={(e) => set("edition", e.target.value)} placeholder="مثال: الطبعة الثالثة" />
+          <FieldLabel htmlFor="edition">الطبعة (إنجليزي)</FieldLabel>
+          <Input
+            id="edition"
+            className={fieldCls}
+            value={form.edition}
+            onChange={(e) => set("edition", e.target.value)}
+            placeholder="e.g. 3rd edition"
+            dir="ltr"
+          />
+        </Field>
+
+        <Field>
+          <FieldLabel htmlFor="editionAr">الطبعة (عربي)</FieldLabel>
+          <Input
+            id="editionAr"
+            className={fieldCls}
+            value={form.editionAr}
+            onChange={(e) => set("editionAr", e.target.value)}
+            placeholder="مثال: الطبعة الثالثة"
+          />
         </Field>
 
         <Field>
@@ -382,9 +410,9 @@ export function BookEditForm({
             value={form.translationStatus}
             onValueChange={(v) => set("translationStatus", v)}
           >
-            <SelectItem value="NOT_TRANSLATED" className="focus:bg-[var(--brand-gray-700)]">غير مترجم</SelectItem>
-            <SelectItem value="NOMINATED" className="focus:bg-[var(--brand-gray-700)]">مرشح للترجمة</SelectItem>
-            <SelectItem value="TRANSLATED" className="focus:bg-[var(--brand-gray-700)]">مترجم</SelectItem>
+            <SelectItem value="NOT_TRANSLATED" className="focus:bg-[var(--admin-hover)]">غير مترجم</SelectItem>
+            <SelectItem value="NOMINATED" className="focus:bg-[var(--admin-hover)]">مرشح للترجمة</SelectItem>
+            <SelectItem value="TRANSLATED" className="focus:bg-[var(--admin-hover)]">مترجم</SelectItem>
           </BookSelect>
         </Field>
       </SectionCard>
@@ -392,16 +420,22 @@ export function BookEditForm({
       {/* ── 3. Authors ───────────────────────────────────────────── */}
       <div className={sectionCardCls}>
         <div className={sectionHeaderCls}>
-          <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--brand-gray-400)]">المؤلفون</h2>
+          <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--admin-text-muted)]">المؤلفون</h2>
         </div>
         <div className="p-5">
-          <MultiSelect
+          <AdminEntityCombobox
             id="authors"
             label="المؤلفون"
-            options={authors}
-            selected={form.authorIds}
-            onChange={(ids) => set("authorIds", ids)}
-            getLabel={(a) => a.nameAr ?? a.name}
+            mode="multi"
+            options={authorOptions}
+            value={form.authorIds}
+            onChange={(v) => set("authorIds", v as string[])}
+            getLabel={entityLabel}
+            onRemoteSearch={searchAuthorsRemote}
+            onCreateNew={(q) => {
+              setCreateQuery(q);
+              setAuthorDialogOpen(true);
+            }}
           />
         </div>
       </div>
@@ -409,51 +443,54 @@ export function BookEditForm({
       {/* ── 4. Publisher & Categories ────────────────────────────── */}
       <SectionCard title="دار النشر والتصنيفات">
         <Field className="sm:col-span-2">
-          <FieldLabel htmlFor="publisherId">دار النشر</FieldLabel>
-          <BookSelect
+          <AdminEntityCombobox
             id="publisherId"
+            label="دار النشر"
+            mode="single"
+            options={publisherOptions}
             value={form.publisherId}
-            onValueChange={(v) => set("publisherId", v)}
-            placeholder="— بدون دار نشر —"
-          >
-            <SelectItem value="_empty" className="focus:bg-[var(--brand-gray-700)]">
-              — بدون دار نشر —
-            </SelectItem>
-            {publishers.map((p) => (
-              <SelectItem key={p.id} value={p.id} className="focus:bg-[var(--brand-gray-700)]">
-                {p.title}
-              </SelectItem>
-            ))}
-          </BookSelect>
+            onChange={(v) => set("publisherId", v as string)}
+            getLabel={entityLabel}
+            placeholder="ابحث عن دار نشر…"
+            onCreateNew={(q) => {
+              setCreateQuery(q);
+              setPublisherDialogOpen(true);
+            }}
+          />
         </Field>
 
         <Field className="sm:col-span-2">
-          <FieldLabel htmlFor="primaryCategoryId">التصنيف الرئيسي</FieldLabel>
-          <BookSelect
+          <AdminEntityCombobox
             id="primaryCategoryId"
+            label="التصنيف الرئيسي"
+            mode="single"
+            options={categoryOptions}
             value={form.primaryCategoryId}
-            onValueChange={(v) => set("primaryCategoryId", v)}
-            placeholder="— بدون تصنيف —"
-          >
-            <SelectItem value="_empty" className="focus:bg-[var(--brand-gray-700)]">
-              — بدون تصنيف —
-            </SelectItem>
-            {categories.map((c) => (
-              <SelectItem key={c.id} value={c.id} className="focus:bg-[var(--brand-gray-700)]">
-                {c.nameAr ?? c.name}
-              </SelectItem>
-            ))}
-          </BookSelect>
+            onChange={(v) => set("primaryCategoryId", v as string)}
+            getLabel={entityLabel}
+            placeholder="ابحث عن تصنيف…"
+            onCreateNew={(q) => {
+              setCreateQuery(q);
+              setCategoryCreateTarget("primary");
+              setCategoryDialogOpen(true);
+            }}
+          />
         </Field>
 
         <Field className="sm:col-span-2">
-          <MultiSelect
+          <AdminEntityCombobox
             id="categories"
             label="تصنيفات إضافية"
-            options={categories}
-            selected={form.categoryIds}
-            onChange={(ids) => set("categoryIds", ids)}
-            getLabel={(c) => c.nameAr ?? c.name}
+            mode="multi"
+            options={categoryOptions}
+            value={form.categoryIds}
+            onChange={(v) => set("categoryIds", v as string[])}
+            getLabel={entityLabel}
+            onCreateNew={(q) => {
+              setCreateQuery(q);
+              setCategoryCreateTarget("extra");
+              setCategoryDialogOpen(true);
+            }}
           />
         </Field>
       </SectionCard>
@@ -467,9 +504,9 @@ export function BookEditForm({
             value={form.purchaseOption}
             onValueChange={(v) => set("purchaseOption", v)}
           >
-            <SelectItem value="NOT_AVAILABLE" className="focus:bg-[var(--brand-gray-700)]">غير متاح للشراء</SelectItem>
-            <SelectItem value="DIRECT" className="focus:bg-[var(--brand-gray-700)]">شراء مباشر</SelectItem>
-            <SelectItem value="REFERRAL" className="focus:bg-[var(--brand-gray-700)]">رابط إحالة</SelectItem>
+            <SelectItem value="NOT_AVAILABLE" className="focus:bg-[var(--admin-hover)]">غير متاح للشراء</SelectItem>
+            <SelectItem value="DIRECT" className="focus:bg-[var(--admin-hover)]">شراء مباشر</SelectItem>
+            <SelectItem value="REFERRAL" className="focus:bg-[var(--admin-hover)]">رابط إحالة</SelectItem>
           </BookSelect>
         </Field>
 
@@ -477,7 +514,7 @@ export function BookEditForm({
           <FieldLabel htmlFor="currency">العملة</FieldLabel>
           <BookSelect id="currency" value={form.currency} onValueChange={(v) => set("currency", v)}>
             {["USD","EUR","GBP","SAR","AED","EGP","KWD","BHD","QAR","OMR","JOD"].map((c) => (
-              <SelectItem key={c} value={c} className="focus:bg-[var(--brand-gray-700)]">
+              <SelectItem key={c} value={c} className="focus:bg-[var(--admin-hover)]">
                 {c}
               </SelectItem>
             ))}
@@ -505,7 +542,7 @@ export function BookEditForm({
       {/* ── 6. Descriptions ──────────────────────────────────────── */}
       <div className={sectionCardCls}>
         <div className={sectionHeaderCls}>
-          <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--brand-gray-400)]">الأوصاف والمحتوى</h2>
+          <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--admin-text-muted)]">الأوصاف والمحتوى</h2>
         </div>
         <div className="grid grid-cols-1 gap-5 p-5 lg:grid-cols-2">
           <Field>
@@ -565,9 +602,29 @@ export function BookEditForm({
         </div>
       </div>
 
+      {/* ── Status (أسفل النموذج) ─────────────────────────────────── */}
+      {status === "success" && (
+        <div
+          role="status"
+          className="flex items-center gap-2 rounded-xl border border-green-800/50 bg-green-950/40 px-4 py-3 text-sm text-green-400"
+        >
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          {successMessage}
+        </div>
+      )}
+      {status === "error" && (
+        <div
+          role="alert"
+          className="flex items-center gap-2 rounded-xl border border-red-800/50 bg-red-950/40 px-4 py-3 text-sm text-red-400"
+        >
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          {errorMsg}
+        </div>
+      )}
+
       {/* ── Save bar ─────────────────────────────────────────────── */}
-      <div className="sticky bottom-0 flex items-center justify-between gap-3 rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)] px-5 py-3 shadow-lg">
-        <p className="text-xs text-[var(--brand-gray-500)]">
+      <div className="sticky bottom-0 flex items-center justify-between gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-5 py-3 shadow-lg">
+        <p className="text-xs text-[var(--admin-text-subtle)]">
           {isPending ? "جارٍ الحفظ…" : "تأكد من مراجعة البيانات قبل الحفظ"}
         </p>
         <div className="flex items-center gap-2">
@@ -575,20 +632,73 @@ export function BookEditForm({
             type="button"
             onClick={() => router.back()}
             disabled={isPending}
-            className="rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] px-4 py-2 text-sm font-medium text-[var(--brand-gray-300)] transition-colors hover:bg-[var(--brand-gray-700)] disabled:opacity-50"
+            className="rounded-lg border border-[var(--admin-border-strong)] bg-[var(--admin-surface-muted)] px-4 py-2 text-sm font-medium text-[var(--admin-text-muted)] transition-colors hover:bg-[var(--admin-hover)] disabled:opacity-50"
           >
             إلغاء
           </button>
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand-red)] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-red)]/90 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand-red)] px-5 py-2 text-sm font-semibold text-[var(--admin-text)] transition-colors hover:bg-[var(--brand-red)]/90 disabled:opacity-60"
           >
             {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             {isCreate ? "إنشاء الكتاب" : "حفظ التغييرات"}
           </button>
         </div>
       </div>
+
+      <CreateAuthorDialog
+        open={authorDialogOpen}
+        onOpenChange={setAuthorDialogOpen}
+        initialName={createQuery}
+        onCreated={(author) => {
+          const entry = {
+            id: author.id,
+            name: author.name,
+            nameAr: author.nameAr ?? null,
+            slug: author.slug ?? "",
+          };
+          setAuthorsList((prev) => [...prev, entry]);
+          set("authorIds", [...form.authorIds, author.id]);
+        }}
+      />
+      <CreatePublisherDialog
+        open={publisherDialogOpen}
+        onOpenChange={setPublisherDialogOpen}
+        initialName={createQuery}
+        onCreated={(publisher) => {
+          setPublishersList((prev) => [
+            ...prev,
+            {
+              id: publisher.id,
+              title: publisher.title,
+              name: publisher.title,
+              nameAr: publisher.title,
+              slug: publisher.slug,
+            },
+          ]);
+          set("publisherId", publisher.id);
+        }}
+      />
+      <CreateCategoryDialog
+        open={categoryDialogOpen}
+        onOpenChange={setCategoryDialogOpen}
+        initialName={createQuery}
+        onCreated={(category) => {
+          const entry = {
+            id: category.id,
+            name: category.name,
+            nameAr: category.nameAr ?? null,
+            slug: category.slug ?? "",
+          };
+          setCategoriesList((prev) => [...prev, entry]);
+          if (categoryCreateTarget === "primary") {
+            set("primaryCategoryId", category.id);
+          } else {
+            set("categoryIds", [...form.categoryIds, category.id]);
+          }
+        }}
+      />
     </form>
   );
 }

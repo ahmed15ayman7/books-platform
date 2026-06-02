@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Locale } from "@/lib/i18n";
+import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
 
 interface Category {
   id: string;
@@ -27,7 +28,9 @@ interface Author {
 }
 
 interface Publisher {
-  title: string;
+  title?: string;
+  name?: string;
+  nameAr?: string | null;
   slug: string;
   websiteUrl?: string | null;
   address?: string | null;
@@ -138,7 +141,7 @@ export function BookBiblioTable({
           {authors.map((author) => (
             <Link
               key={author.id}
-              href={`/${locale}/books?author=${author.slug}`}
+              href={`/${locale}/authors/${author.slug}`}
               className="font-medium text-[var(--brand-red)] hover:underline"
             >
               {isAr && author.nameAr ? author.nameAr : author.name}
@@ -159,7 +162,7 @@ export function BookBiblioTable({
             href={`/${locale}/publishers/${publisher.slug}`}
             className="font-medium text-[var(--brand-red)] hover:underline"
           >
-            {publisher.title}
+            {localizedPublisherName(publisher, locale)}
           </Link>
           {publisher.websiteUrl && (
             <a
@@ -377,6 +380,14 @@ export function BookBiblioTable({
             <p className="px-5 py-4 text-base leading-relaxed text-[var(--brand-gray-700)]">
               {bioText}
             </p>
+            <div className="border-t border-[var(--brand-gray-200)] px-5 py-3">
+              <Link
+                href={`/${locale}/authors/${author.slug}`}
+                className="text-sm font-medium text-[var(--brand-red)] hover:underline"
+              >
+                {isAr ? "عرض كل كتب المؤلف" : "View all books by this author"}
+              </Link>
+            </div>
           </div>
         );
       })}

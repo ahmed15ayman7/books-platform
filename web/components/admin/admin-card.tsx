@@ -25,14 +25,14 @@ export function AdminCard({
   return (
     <div
       className={cn(
-        "rounded-xl border border-[var(--brand-gray-800)] bg-[var(--brand-gray-900)]",
+        "rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]",
         className
       )}
     >
       {(title ?? actions) && (
-        <div className="flex items-center justify-between border-b border-[var(--brand-gray-800)] px-5 py-3">
+        <div className="flex items-center justify-between border-b border-[var(--admin-border)] px-5 py-3">
           {title && (
-            <h2 className="text-sm font-semibold text-white">{title}</h2>
+            <h2 className="text-sm font-semibold text-[var(--admin-text)]">{title}</h2>
           )}
           {actions && <div className="flex items-center gap-2">{actions}</div>}
         </div>
@@ -64,10 +64,10 @@ export function AdminStatCard({
   return (
     <div
       className={cn(
-        "relative rounded-xl border bg-[var(--brand-gray-900)] p-5 transition-colors",
+        "relative rounded-xl border bg-[var(--admin-surface)] p-5 transition-colors",
         alert
           ? "border-[var(--brand-red)]/40"
-          : "border-[var(--brand-gray-800)] hover:border-[var(--brand-gray-700)]"
+          : "border-[var(--admin-border)] hover:border-[var(--admin-border-strong)]"
       )}
     >
       {alert && (
@@ -76,10 +76,10 @@ export function AdminStatCard({
       <div className={cn("mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg", bg)}>
         <Icon className={cn("h-5 w-5", color)} aria-hidden="true" />
       </div>
-      <p className="text-2xl font-black text-white">
+      <p className="text-2xl font-black text-[var(--admin-text)]">
         {typeof value === "number" ? value.toLocaleString("ar-EG") : value}
       </p>
-      <p className="mt-0.5 text-xs text-[var(--brand-gray-400)]">{label}</p>
+      <p className="mt-0.5 text-xs text-[var(--admin-text-muted)]">{label}</p>
       {trend && (
         <p
           className={cn(

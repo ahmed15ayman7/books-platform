@@ -24,20 +24,20 @@ type StatusVariant =
 
 const statusConfig: Record<StatusVariant, { label: string; cls: string }> = {
   published:    { label: "منشور",       cls: "bg-[var(--success-soft)] text-[var(--success)]" },
-  draft:        { label: "مسودة",       cls: "bg-[var(--brand-gray-800)] text-[var(--brand-gray-400)]" },
+  draft:        { label: "مسودة",       cls: "bg-[var(--admin-surface-muted)] text-[var(--admin-text-muted)]" },
   pending:      { label: "قيد المراجعة",cls: "bg-[var(--warning-soft)] text-[var(--warning)]" },
   approved:     { label: "موافق عليه",  cls: "bg-[var(--success-soft)] text-[var(--success)]" },
   rejected:     { label: "مرفوض",       cls: "bg-[var(--error-soft)] text-[var(--error)]" },
   active:       { label: "نشط",         cls: "bg-[var(--success-soft)] text-[var(--success)]" },
-  inactive:     { label: "غير نشط",     cls: "bg-[var(--brand-gray-800)] text-[var(--brand-gray-400)]" },
+  inactive:     { label: "غير نشط",     cls: "bg-[var(--admin-surface-muted)] text-[var(--admin-text-muted)]" },
   translated:   { label: "مترجم",       cls: "bg-[var(--info-soft)] text-[var(--info)]" },
   nominated:    { label: "مرشح",        cls: "bg-[var(--warning-soft)] text-[var(--warning)]" },
   completed:    { label: "مكتمل",       cls: "bg-[var(--success-soft)] text-[var(--success)]" },
-  refunded:     { label: "مسترجع",      cls: "bg-[var(--brand-gray-800)] text-[var(--brand-gray-400)]" },
+  refunded:     { label: "مسترجع",      cls: "bg-[var(--admin-surface-muted)] text-[var(--admin-text-muted)]" },
   cancelled:    { label: "ملغي",        cls: "bg-[var(--error-soft)] text-[var(--error)]" },
   sponsored:    { label: "مموّل",       cls: "bg-[var(--warning-soft)] text-[var(--warning)]" },
   confirmed:    { label: "مؤكد",        cls: "bg-[var(--success-soft)] text-[var(--success)]" },
-  unsubscribed: { label: "غير مشترك",   cls: "bg-[var(--brand-gray-800)] text-[var(--brand-gray-400)]" },
+  unsubscribed: { label: "غير مشترك",   cls: "bg-[var(--admin-surface-muted)] text-[var(--admin-text-muted)]" },
 };
 
 interface AdminStatusBadgeProps {
@@ -49,7 +49,7 @@ export function AdminStatusBadge({ status, customLabel }: AdminStatusBadgeProps)
   const cfg = statusConfig[status.toLowerCase() as StatusVariant];
   if (!cfg) {
     return (
-      <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-[var(--brand-gray-800)] text-[var(--brand-gray-400)]">
+      <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-[var(--admin-surface-muted)] text-[var(--admin-text-muted)]">
         {customLabel ?? status}
       </span>
     );
@@ -92,15 +92,15 @@ export function AdminTable<T extends { id: string }>({
   onRowClick,
 }: AdminTableProps<T>) {
   return (
-    <div className="overflow-hidden rounded-xl border border-[var(--brand-gray-800)]">
+    <div className="overflow-hidden rounded-xl border border-[var(--admin-border)]">
       <table className="w-full text-sm">
-        <thead className="bg-[var(--brand-gray-800)]">
+        <thead className="bg-[var(--admin-surface-muted)]">
           <tr>
             {columns.map((col) => (
               <th
                 key={col.key}
                 className={cn(
-                  "px-4 py-3 text-start text-xs font-medium text-[var(--brand-gray-400)]",
+                  "px-4 py-3 text-start text-xs font-medium text-[var(--admin-text-muted)]",
                   col.headerClassName
                 )}
               >
@@ -109,12 +109,12 @@ export function AdminTable<T extends { id: string }>({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-[var(--brand-gray-800)] bg-[var(--brand-gray-900)]">
+        <tbody className="divide-y divide-[var(--admin-border)] bg-[var(--admin-surface)]">
           {loading ? (
             <tr>
               <td
                 colSpan={columns.length}
-                className="px-4 py-10 text-center text-[var(--brand-gray-400)]"
+                className="px-4 py-10 text-center text-[var(--admin-text-muted)]"
               >
                 <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-[var(--brand-gray-700)] border-t-[var(--brand-red)]" />
               </td>
@@ -123,7 +123,7 @@ export function AdminTable<T extends { id: string }>({
             <tr>
               <td
                 colSpan={columns.length}
-                className="px-4 py-10 text-center text-[var(--brand-gray-500)]"
+                className="px-4 py-10 text-center text-[var(--admin-text-subtle)]"
               >
                 {emptyMessage}
               </td>
@@ -134,10 +134,10 @@ export function AdminTable<T extends { id: string }>({
                 key={row.id}
                 onClick={() => onRowClick?.(row)}
                 className={cn(
-                  "text-white transition-colors",
+                  "text-[var(--admin-text)] transition-colors",
                   onRowClick
-                    ? "cursor-pointer hover:bg-[var(--brand-gray-800)]/60"
-                    : "hover:bg-[var(--brand-gray-800)]/40"
+                    ? "cursor-pointer hover:bg-[var(--admin-hover)]"
+                    : "hover:bg-[var(--admin-hover)]/60"
                 )}
               >
                 {columns.map((col) => (
@@ -184,7 +184,7 @@ export function AdminPagination({
 
   const btnBase =
     "min-w-[32px] h-8 rounded-lg border border-[var(--brand-gray-700)] px-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40";
-  const btnIdle = `${btnBase} text-[var(--brand-gray-300)] hover:bg-[var(--brand-gray-800)]`;
+  const btnIdle = `${btnBase} text-[var(--admin-text-muted)] hover:bg-[var(--admin-hover)]`;
   const btnActive = `${btnBase} bg-[var(--brand-red)] border-[var(--brand-red)] text-white font-medium`;
 
   return (
@@ -265,7 +265,7 @@ export function AdminPaginationServer({
 
   const linkBase =
     "min-w-[32px] h-8 rounded-lg border border-[var(--brand-gray-700)] px-2 text-sm transition-colors inline-flex items-center justify-center";
-  const linkIdle = `${linkBase} text-[var(--brand-gray-300)] hover:bg-[var(--brand-gray-800)]`;
+  const linkIdle = `${linkBase} text-[var(--admin-text-muted)] hover:bg-[var(--admin-hover)]`;
   const linkActive = `${linkBase} bg-[var(--brand-red)] border-[var(--brand-red)] text-white font-medium`;
   const linkDisabled = `${linkBase} text-[var(--brand-gray-600)] pointer-events-none opacity-40`;
 
@@ -354,7 +354,7 @@ export function AdminSearch({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="border-[var(--brand-gray-700)] bg-[var(--brand-gray-800)] py-2 ps-10 pe-3 text-sm text-white placeholder:text-[var(--brand-gray-600)] focus-visible:ring-[var(--brand-red)]"
+        className="border-[var(--admin-input-border)] bg-[var(--admin-input-bg)] py-2 ps-10 pe-3 text-sm text-[var(--admin-text)] placeholder:text-[var(--admin-text-subtle)] focus-visible:ring-[var(--admin-accent)]"
       />
     </form>
   );

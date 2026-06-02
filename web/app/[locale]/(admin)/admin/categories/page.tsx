@@ -20,7 +20,10 @@ import {
   adminUpdatedAtColumn,
 } from "@/components/admin/admin-timestamps";
 import { AdminCard } from "@/components/admin/admin-card";
-import { AdminInput, AdminCheckbox } from "@/components/admin/admin-form-field";
+import { AdminInput, AdminCheckbox, AdminSlugInput } from "@/components/admin/admin-form-field";
+import { autoSlugFromEnglish } from "@/lib/admin/slugify";
+import { FormDraftNotice } from "@/components/forms/form-draft-notice";
+import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
 interface Category {
   id: string;
@@ -50,6 +53,7 @@ export default function AdminCategoriesPage() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<CatForm>(emptyForm);
+  const draft = useFormDraft(formDraftId.adminCategory(editingId), form, setForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -103,6 +107,7 @@ export default function AdminCategoriesPage() {
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
       if (!res.ok || !data.success) { setError(data.error?.message ?? "فشل الحفظ"); return; }
+      draft.clearDraft();
       setForm(emptyForm);
       setEditingId(null);
       await load();
@@ -138,10 +143,10 @@ export default function AdminCategoriesPage() {
   const renderCard = (row: Category) => (
     <AdminGridCard>
       <AdminGridCardBody>
-        <h3 className="font-semibold text-white">{row.nameAr ?? row.name}</h3>
-        {row.nameAr && <p className="text-xs text-[var(--brand-gray-500)]">{row.name}</p>}
-        <code className="text-[10px] text-[var(--brand-gray-600)]">{row.slug}</code>
-        <p className="text-sm text-[var(--brand-gray-400)]">{row._count?.products ?? 0} كتاب</p>
+        <h3 className="font-semibold text-[var(--admin-text)]">{row.nameAr ?? row.name}</h3>
+        {row.nameAr && <p className="text-xs text-[var(--admin-text-subtle)]">{row.name}</p>}
+        <code className="text-[10px] text-[var(--admin-text-subtle)]">{row.slug}</code>
+        <p className="text-sm text-[var(--admin-text-muted)]">{row._count?.products ?? 0} كتاب</p>
         <AdminStatusBadge status={row.active ? "active" : "inactive"} />
       </AdminGridCardBody>
       <AdminGridCardFooter>{rowActions(row)}</AdminGridCardFooter>
@@ -158,21 +163,21 @@ export default function AdminCategoriesPage() {
       key: "nameAr",
       label: "الاسم (AR)",
       render: (row: Category) => (
-        <span className="text-[var(--brand-gray-300)]">{row.nameAr ?? "—"}</span>
+        <span className="text-[var(--admin-text-muted)]">{row.nameAr ?? "—"}</span>
       ),
     },
     {
       key: "slug",
       label: "Slug",
       render: (row: Category) => (
-        <code className="text-xs text-[var(--brand-gray-400)]">{row.slug}</code>
+        <code className="text-xs text-[var(--admin-text-muted)]">{row.slug}</code>
       ),
     },
     {
       key: "products",
       label: "الكتب",
       render: (row: Category) => (
-        <span className="text-[var(--brand-gray-300)]">{row._count?.products ?? 0}</span>
+        <span className="text-[var(--admin-text-muted)]">{row._count?.products ?? 0}</span>
       ),
     },
     {
@@ -188,7 +193,7 @@ export default function AdminCategoriesPage() {
   ];
 
   return (
-    <div className="text-white">
+    <div className="text-[var(--admin-text)]">
       <AdminPageHeader
         title="التصنيفات"
         subtitle="إدارة تصنيفات الكتب السبعة"
@@ -211,10 +216,24 @@ export default function AdminCategoriesPage() {
         {/* Form */}
         <AdminCard title={editingId ? "تعديل التصنيف" : "إضافة تصنيف"} className="lg:col-span-1">
           <form onSubmit={handleSubmit} className="space-y-3">
+            <FormDraftNotice
+              showBanner={draft.showBanner}
+              status={draft.status}
+              onResume={draft.resume}
+              onDismiss={draft.dismiss}
+            />
             <AdminInput
               label="الاسم (EN) *"
               value={form.name}
-              onChange={(e) => set("name")(e.target.value)}
+              onChange={(e) => {
+                const name = e.target.value;
+                setForm((p) => ({
+                  ...p,
+                  name,
+                  slug: autoSlugFromEnglish(name, p.slug, p.name),
+                }));
+              }}
+              dir="ltr"
               required
             />
             <AdminInput
@@ -222,12 +241,11 @@ export default function AdminCategoriesPage() {
               value={form.nameAr}
               onChange={(e) => set("nameAr")(e.target.value)}
             />
-            <AdminInput
+            <AdminSlugInput
               label="Slug *"
               value={form.slug}
               onChange={(e) => set("slug")(e.target.value)}
               required
-              dir="ltr"
             />
             <AdminCheckbox
               label="نشط"

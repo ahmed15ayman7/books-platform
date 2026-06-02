@@ -97,6 +97,8 @@
     "notAvailable": "غير متاح للشراء",
     "addToWishlist": "أضف لقائمة الرغبات",
     "similarBooks": "كتب مشابهة",
+    "similarBooksGeneral": "اقتراحات من كتب أخرى على المنصة",
+    "linkedArticles": "مقالات عن هذا الكتاب",
     "translationStatus": {
       "NOT_TRANSLATED": "غير مترجم",
       "NOMINATED": "مرشح للترجمة",
@@ -177,12 +179,23 @@
   },
   "auth": {
     "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
     "logout": "تسجيل الخروج",
     "email": "البريد الإلكتروني",
     "password": "كلمة المرور",
     "loginButton": "دخول",
     "invalidCredentials": "البريد أو كلمة المرور غير صحيحة",
     "accountLocked": "الحساب مقفول مؤقتاً، حاول بعد قليل"
+  },
+  "draft": {
+    "resume": "لديك مسودة غير مكتملة — هل تريد متابعة العمل عليها؟",
+    "saving": "جاري الحفظ…",
+    "saved": "تم الحفظ",
+    "failed": "تعذّر الحفظ — سيتم إعادة المحاولة",
+    "idle": "يُحفظ تلقائياً"
+  },
+  "author": {
+    "mySubmissions": "مسوداتي وطلباتي"
   },
   "footer": {
     "rights": "جميع الحقوق محفوظة",

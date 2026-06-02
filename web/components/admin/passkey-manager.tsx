@@ -77,9 +77,9 @@ export function PasskeyManager() {
 
         {error && <p className="text-sm text-[var(--error)]">{error}</p>}
 
-        <ul className="divide-y divide-[var(--brand-gray-800)] rounded-lg border border-[var(--brand-gray-800)]">
+        <ul className="divide-y divide-[var(--admin-border)] rounded-lg border border-[var(--admin-border)]">
           {passkeys.length === 0 ? (
-            <li className="px-4 py-6 text-center text-sm text-[var(--brand-gray-500)]">
+            <li className="px-4 py-6 text-center text-sm text-[var(--admin-text-subtle)]">
               لا توجد مفاتيح — سجّل واحداً لتأمين الحذف والإعدادات
             </li>
           ) : (
@@ -89,10 +89,10 @@ export function PasskeyManager() {
                 className="flex items-center justify-between gap-3 px-4 py-3"
               >
                 <div>
-                  <p className="font-medium text-white">
+                  <p className="font-medium text-[var(--admin-text)]">
                     {p.deviceName ?? "Passkey"}
                   </p>
-                  <p className="text-xs text-[var(--brand-gray-500)]">
+                  <p className="text-xs text-[var(--admin-text-subtle)]">
                     أُضيف {new Date(p.createdAt).toLocaleString("ar-EG")}
                     {p.lastUsedAt
                       ? ` · آخر استخدام ${new Date(p.lastUsedAt).toLocaleString("ar-EG")}`

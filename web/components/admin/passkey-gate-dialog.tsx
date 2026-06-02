@@ -30,16 +30,16 @@ export function PasskeyGateDialog({
       role="dialog"
       aria-modal="true"
     >
-      <div className="w-full max-w-md rounded-xl border border-[var(--brand-gray-700)] bg-[var(--brand-gray-900)] shadow-2xl">
-        <div className="flex items-start justify-between border-b border-[var(--brand-gray-800)] px-5 py-4">
+      <div className="w-full max-w-md rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] shadow-2xl">
+        <div className="flex items-start justify-between border-b border-[var(--admin-border)] px-5 py-4">
           <div className="flex items-center gap-2">
             <Fingerprint className="h-5 w-5 text-[var(--brand-red)]" />
-            <h2 className="text-lg font-bold text-white">{title}</h2>
+            <h2 className="text-lg font-bold text-[var(--admin-text)]">{title}</h2>
           </div>
           <button
             type="button"
             onClick={() => !busy && onOpenChange(false)}
-            className="rounded-lg p-1 text-[var(--brand-gray-400)] hover:bg-[var(--brand-gray-800)]"
+            className="rounded-lg p-1 text-[var(--brand-gray-400)] hover:bg-[var(--admin-hover)]"
             aria-label="إغلاق"
           >
             <X className="h-5 w-5" />

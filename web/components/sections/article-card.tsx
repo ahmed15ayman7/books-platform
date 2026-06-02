@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card-media";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/utils/formatters";
+import type { ArticleLinkedBookDisplay } from "@/lib/i18n/article-linked-book";
 import type { Locale } from "@/lib/i18n";
 
 interface ArticleCardProps {
@@ -21,6 +22,7 @@ interface ArticleCardProps {
   date?: Date | string | null;
   channel?: string | null;
   readingTimeMinutes?: number | null;
+  linkedBook?: ArticleLinkedBookDisplay;
   locale: Locale;
   className?: string;
   featured?: boolean;
@@ -43,6 +45,7 @@ export function ArticleCard({
   date,
   channel,
   readingTimeMinutes,
+  linkedBook,
   locale,
   className,
   featured = false,
@@ -51,57 +54,78 @@ export function ArticleCard({
     ? (channelLabels[channel]?.[locale] ?? channel)
     : null;
 
+  const coverUrl = linkedBook?.imageUrl ?? imageUrl;
+  const coverAlt = linkedBook ? linkedBook.name : title;
+  const bookCover = Boolean(linkedBook?.imageUrl);
+
   return (
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 360, damping: 22 }}
       className={cn("will-change-transform h-full", className)}
     >
-      <Link
-        href={`/${locale}/articles/${slug}`}
+      <div
         className={cn(
           "group flex h-full overflow-hidden surface-card",
           featured ? "flex-col md:flex-row" : "flex-col",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]"
         )}
       >
-        <CardMedia
-          className={cn(featured && "w-full shrink-0 md:w-64 md:max-w-[16rem]")}
-          rounded={featured ? "none" : "top"}
-        >
-          {imageUrl ? (
-            <CardMediaImage
-              src={imageUrl}
-              alt={title}
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
-          ) : (
-            <CardMediaPlaceholder className="from-[var(--brand-gray-100)] to-[var(--brand-red-soft)]">
-              <BookOpen
-                className="h-10 w-10 text-[var(--brand-gray-400)]"
-                strokeWidth={1.25}
-                aria-hidden="true"
-              />
-            </CardMediaPlaceholder>
+        <Link
+          href={`/${locale}/articles/${slug}`}
+          className={cn(
+            "block shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]",
+            featured && "w-full md:w-64 md:max-w-[16rem]",
           )}
-          <div className="absolute inset-0 bg-[var(--brand-red)]/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-        </CardMedia>
+        >
+          <CardMedia rounded={featured ? "none" : "top"}>
+            {coverUrl ? (
+              <CardMediaImage
+                src={coverUrl}
+                alt={coverAlt}
+                objectFit={bookCover ? "contain" : "cover"}
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            ) : (
+              <CardMediaPlaceholder className="from-[var(--brand-gray-100)] to-[var(--brand-red-soft)]">
+                <BookOpen
+                  className="h-10 w-10 text-[var(--brand-gray-400)]"
+                  strokeWidth={1.25}
+                  aria-hidden="true"
+                />
+              </CardMediaPlaceholder>
+            )}
+            <div className="absolute inset-0 bg-[var(--brand-red)]/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+          </CardMedia>
+        </Link>
 
-        {/* Content */}
         <div className="flex flex-1 flex-col gap-2 p-4">
           {channelLabel && (
             <Badge variant="outline" className="self-start text-xs">
               {channelLabel}
             </Badge>
           )}
-          <h3
-            className={cn(
-              "font-bold text-[var(--brand-gray-900)] group-hover:text-[var(--brand-red)] transition-colors text-balance line-clamp-2",
-              featured ? "text-lg" : "text-base"
-            )}
+          <Link
+            href={`/${locale}/articles/${slug}`}
+            className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] rounded-sm"
           >
-            {title}
-          </h3>
+            <h3
+              className={cn(
+                "font-bold text-[var(--brand-gray-900)] group-hover:text-[var(--brand-red)] transition-colors text-balance line-clamp-2",
+                featured ? "text-lg" : "text-base",
+              )}
+            >
+              {title}
+            </h3>
+          </Link>
+          {linkedBook && (
+            <Link
+              href={`/${locale}/books/${linkedBook.slug}`}
+              className="flex items-center gap-1.5 text-xs text-[var(--brand-gray-500)] hover:text-[var(--brand-red)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] rounded-sm"
+            >
+              <BookOpen className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <span className="line-clamp-1">{linkedBook.name}</span>
+            </Link>
+          )}
           {excerpt && (
             <p className="text-sm text-[var(--brand-gray-500)] line-clamp-2">
               {excerpt}
@@ -117,7 +141,7 @@ export function ArticleCard({
             )}
           </div>
         </div>
-      </Link>
+      </div>
     </motion.div>
   );
 }

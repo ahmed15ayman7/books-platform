@@ -11,6 +11,10 @@ import { BooksPagination } from "@/components/sections/books-pagination";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Mail, Globe } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
+import {
+  localizedPublisherDescription,
+  localizedPublisherName,
+} from "@/lib/i18n/publisher-locale";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 interface PublisherPageProps {
@@ -22,13 +26,15 @@ export async function generateMetadata({ params }: PublisherPageProps): Promise<
   const { slug, locale } = await params;
   const publisher = await PublisherService.getBySlug(slug).catch(() => null);
   if (!publisher) return { title: "Publisher Not Found" };
+  const displayName = localizedPublisherName(publisher, locale as Locale);
+  const displayDesc = localizedPublisherDescription(publisher, locale as Locale);
   return buildPageMetadata({
     locale: locale as Locale,
     path: `/${locale}/publishers/${slug}`,
-    title: publisher.title,
-    description: publisher.excerpt ?? (locale === "ar" ? `ناشر ${publisher.title}` : `Publisher ${publisher.title}`),
+    title: displayName,
+    description: displayDesc ?? (locale === "ar" ? `ناشر ${displayName}` : `Publisher ${displayName}`),
     imageUrl: publisher.imageUrl,
-    keywords: [publisher.title, locale === "ar" ? "ناشرون" : "publishers"],
+    keywords: [displayName, locale === "ar" ? "ناشرون" : "publishers"],
   });
 }
 
@@ -52,6 +58,8 @@ export default async function PublisherDetailPage({
   if (!publisher) notFound();
 
   const isAr = locale === "ar";
+  const displayName = localizedPublisherName(publisher, locale);
+  const displayDescription = localizedPublisherDescription(publisher, locale);
   const isSponsored = publisher.sponsored?.isActive && publisher.sponsored.endsAt > new Date();
 
   return (
@@ -68,7 +76,7 @@ export default async function PublisherDetailPage({
               {isAr ? "الناشرون" : "Publishers"}
             </Link>
             <span>/</span>
-            <span className="text-white">{publisher.title}</span>
+            <span className="text-white">{displayName}</span>
           </nav>
 
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
@@ -77,7 +85,7 @@ export default async function PublisherDetailPage({
               {publisher.imageUrl ? (
                 <Image
                   src={publisher.imageUrl}
-                  alt={publisher.title}
+                  alt={displayName}
                   width={80}
                   height={80}
                   className="h-full w-full object-contain"
@@ -91,7 +99,7 @@ export default async function PublisherDetailPage({
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="font-display text-display-sm font-black text-white">
-                  {publisher.title}
+                  {displayName}
                 </h1>
                 {isSponsored && (
                   <Badge variant="sponsored">
@@ -111,9 +119,9 @@ export default async function PublisherDetailPage({
                 </div>
               )}
 
-              {publisher.excerpt && (
-                <p className="mt-3 text-sm text-[var(--brand-gray-300)] max-w-2xl">
-                  {publisher.excerpt}
+              {displayDescription && (
+                <p className="mt-3 text-sm text-[var(--brand-gray-300)] max-w-2xl whitespace-pre-wrap">
+                  {displayDescription}
                 </p>
               )}
 
@@ -144,14 +152,20 @@ export default async function PublisherDetailPage({
       {/* Books */}
       <div className="container-platform py-8">
         <SectionHeading
-          title={isAr ? `كتب ${publisher.title}` : `Books by ${publisher.title}`}
+          title={isAr ? `كتب ${displayName}` : `Books by ${displayName}`}
           subtitle={`${pagination.total} ${isAr ? "كتاب" : "books"}`}
           className="mb-6"
         />
 
         {books.length === 0 ? (
           <div className="py-20 text-center text-[var(--brand-gray-500)]">
-            {isAr ? "لا توجد كتب متاحة" : "No books available"}
+            <p>{isAr ? "لا توجد كتب منشورة لهذا الناشر" : "No published books for this publisher"}</p>
+            <Link
+              href={`/${locale}/publishers`}
+              className="mt-4 inline-block text-sm text-[var(--brand-red)] hover:underline"
+            >
+              {isAr ? "تصفح كل الناشرين" : "Browse all publishers"}
+            </Link>
           </div>
         ) : (
           <>

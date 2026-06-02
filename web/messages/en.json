@@ -97,6 +97,8 @@
     "notAvailable": "Not Available for Purchase",
     "addToWishlist": "Add to Wishlist",
     "similarBooks": "Similar Books",
+    "similarBooksGeneral": "Suggestions from other books on the platform",
+    "linkedArticles": "Articles About This Book",
     "translationStatus": {
       "NOT_TRANSLATED": "Not Translated",
       "NOMINATED": "Recommended for Translation",
@@ -177,12 +179,23 @@
   },
   "auth": {
     "login": "Login",
+    "register": "Create Account",
     "logout": "Logout",
     "email": "Email Address",
     "password": "Password",
     "loginButton": "Sign In",
     "invalidCredentials": "Invalid email or password",
     "accountLocked": "Account temporarily locked, please try again later"
+  },
+  "draft": {
+    "resume": "You have an unfinished draft — continue where you left off?",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "failed": "Save failed — will retry",
+    "idle": "Autosaved"
+  },
+  "author": {
+    "mySubmissions": "My Drafts & Submissions"
   },
   "footer": {
     "rights": "All rights reserved",
