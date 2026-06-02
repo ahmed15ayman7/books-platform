@@ -58,7 +58,7 @@ class LanguageScreen extends StatelessWidget {
               _LanguageCard(
                 locale: const Locale('ar'),
                 label: 'العربية',
-                subtitle: 'Arabic — RTL',
+                subtitle: 'Arabic',
                 isRtl: true,
                 onTap: (l) => _select(context, l),
               ),
