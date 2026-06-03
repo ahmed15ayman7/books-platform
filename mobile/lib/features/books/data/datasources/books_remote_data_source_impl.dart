@@ -23,7 +23,7 @@ class BooksRemoteDataSourceImpl {
   Future<Either<Failure, List<Book>>> getFeaturedBooks() => _api.get(
         path: '/books',
         queryParameters: {
-          'status': 'TRANSLATED',
+          'translationStatus': 'TRANSLATED',
           'sort': 'newest',
           'limit': 10,
         },
@@ -44,7 +44,7 @@ class BooksRemoteDataSourceImpl {
         path: '/books',
         queryParameters: {
           'category': ?categorySlug,
-          if (status != null) 'status': _statusToString(status),
+          if (status != null) 'translationStatus': _statusToString(status),
           'sort': sort == SortOrder.newest ? 'newest' : 'oldest',
           'page': page,
           'limit': limit,
@@ -118,7 +118,7 @@ class BooksRemoteDataSourceImpl {
   }) =>
       _api.get<PaginatedResponse<Book>>(
         path: '/books',
-        queryParameters: {'status': 'TRANSLATED', 'page': page, 'limit': limit},
+        queryParameters: {'translationStatus': 'TRANSLATED', 'page': page, 'limit': limit},
         fromJson: (json) => PaginatedResponse<Book>.fromJson(
           json,
           fromJsonT: (item) => BookModel.fromJson(item).toEntity(),
@@ -131,7 +131,7 @@ class BooksRemoteDataSourceImpl {
   }) =>
       _api.get<PaginatedResponse<Book>>(
         path: '/books',
-        queryParameters: {'status': 'NOMINATED', 'page': page, 'limit': limit},
+        queryParameters: {'translationStatus': 'NOMINATED', 'page': page, 'limit': limit},
         fromJson: (json) => PaginatedResponse<Book>.fromJson(
           json,
           fromJsonT: (item) => BookModel.fromJson(item).toEntity(),

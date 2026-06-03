@@ -47,7 +47,8 @@ class ArticleDetailModel {
       authorFirstName: author?['firstName'] as String? ?? json['authorFirstName'] as String? ?? '',
       authorLastName: author?['lastName'] as String? ?? json['authorLastName'] as String? ?? '',
       date: json['createdAt'] as String? ?? json['date'] as String? ?? '',
-      readingTime: (json['readingTime'] as num?)?.toInt() ?? 5,
+      readingTime: (json['readingTimeMinutes'] as num?)?.toInt() ??
+          (json['readingTime'] as num?)?.toInt() ?? 5,
       channel: json['channel'] as String? ?? '',
       categoryLabel: json['categoryLabel'] as String? ?? json['channel'] as String? ?? '',
       bodyParagraphs: bodyRaw.map((e) => e.toString()).toList(),
