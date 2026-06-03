@@ -5,6 +5,14 @@ import { hashPassword, validatePasswordStrength } from "@/lib/auth/password";
 import { signAccessToken, signRefreshToken } from "@/lib/auth/jwt";
 import { ApiErrors } from "@/lib/api-client/response";
 import { claimDraftSchema } from "@/lib/validation/submission.schema";
+import {
+  accessTokenCookieOptions,
+  refreshTokenCookieOptions,
+} from "@/lib/auth/access-token-cookie";
+import {
+  ACCESS_TOKEN_MAX_AGE_SECONDS,
+  REFRESH_TOKEN_MAX_AGE_SECONDS,
+} from "@/lib/auth/session-config";
 import crypto from "node:crypto";
 
 const registerSchema = z.object({
@@ -58,7 +66,7 @@ export async function POST(request: NextRequest) {
       data: {
         userId: user.id,
         tokenHash,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        expiresAt: new Date(Date.now() + REFRESH_TOKEN_MAX_AGE_SECONDS * 1000),
         userAgent: request.headers.get("user-agent") ?? undefined,
         ipAddress: request.headers.get("x-forwarded-for") ?? undefined,
       },
@@ -68,7 +76,7 @@ export async function POST(request: NextRequest) {
       success: true,
       data: {
         accessToken,
-        expiresIn: 900,
+        expiresIn: ACCESS_TOKEN_MAX_AGE_SECONDS,
         user: {
           id: user.id,
           email: user.email,
@@ -78,13 +86,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    response.cookies.set("refresh_token", refreshToken, {
-      httpOnly: true,
-      secure: process.env["NODE_ENV"] === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60,
-      path: "/api/v1/auth",
-    });
+    response.cookies.set(refreshTokenCookieOptions(refreshToken));
+    response.cookies.set(accessTokenCookieOptions(accessToken));
 
     return response;
   } catch (error) {

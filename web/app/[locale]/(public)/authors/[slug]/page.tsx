@@ -96,9 +96,6 @@ export default async function AuthorDetailPage({
               <h1 className="font-display text-display-sm font-black text-white">
                 {displayName}
               </h1>
-              <p className="mt-2 text-sm text-[var(--brand-gray-400)]">
-                {bio}
-              </p>
               {alternateName && (
                 <p
                   className="mt-2 text-base font-medium text-[var(--brand-gray-400)]"

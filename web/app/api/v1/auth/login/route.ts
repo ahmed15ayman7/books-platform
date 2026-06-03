@@ -5,6 +5,14 @@ import { verifyPassword } from "@/lib/auth/password";
 import { signAccessToken, signRefreshToken } from "@/lib/auth/jwt";
 import { ApiErrors } from "@/lib/api-client/response";
 import { permissionsFromUser } from "@/lib/auth/rbac";
+import {
+  accessTokenCookieOptions,
+  refreshTokenCookieOptions,
+} from "@/lib/auth/access-token-cookie";
+import {
+  ACCESS_TOKEN_MAX_AGE_SECONDS,
+  REFRESH_TOKEN_MAX_AGE_SECONDS,
+} from "@/lib/auth/session-config";
 import crypto from "node:crypto";
 
 const loginSchema = z.object({
@@ -83,7 +91,7 @@ export async function POST(request: NextRequest) {
 
     // Store refresh token hash in DB
     const tokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + REFRESH_TOKEN_MAX_AGE_SECONDS * 1000);
     await db.refreshToken.create({
       data: { userId: user.id, tokenHash, expiresAt, userAgent, ipAddress },
     });
@@ -105,7 +113,7 @@ export async function POST(request: NextRequest) {
       success: true,
       data: {
         accessToken,
-        expiresIn: 900,
+        expiresIn: ACCESS_TOKEN_MAX_AGE_SECONDS,
         user: {
           id: user.id,
           email: user.email,
@@ -117,13 +125,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    response.cookies.set("refresh_token", refreshToken, {
-      httpOnly: true,
-      secure: process.env["NODE_ENV"] === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60,
-      path: "/api/v1/auth",
-    });
+    response.cookies.set(refreshTokenCookieOptions(refreshToken));
+    response.cookies.set(accessTokenCookieOptions(accessToken));
 
     return response;
   } catch (error) {

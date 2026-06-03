@@ -1,4 +1,8 @@
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
+import {
+  ACCESS_TOKEN_JWT_EXPIRY,
+  REFRESH_TOKEN_JWT_EXPIRY,
+} from "@/lib/auth/session-config";
 
 function getAccessSecret() {
   return new TextEncoder().encode(
@@ -22,8 +26,7 @@ export async function signAccessToken(payload: AuthPayload): Promise<string> {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("5h")
-    // .setExpirationTime(process.env["JWT_ACCESS_EXPIRES_IN"] ?? "5h")
+    .setExpirationTime(process.env["JWT_ACCESS_EXPIRES_IN"] ?? ACCESS_TOKEN_JWT_EXPIRY)
     .sign(getAccessSecret());
 }
 
@@ -31,7 +34,7 @@ export async function signRefreshToken(payload: Pick<AuthPayload, "userId" | "em
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(process.env["JWT_REFRESH_EXPIRES_IN"] ?? "7d")
+    .setExpirationTime(process.env["JWT_REFRESH_EXPIRES_IN"] ?? REFRESH_TOKEN_JWT_EXPIRY)
     .sign(getRefreshSecret());
 }
 
