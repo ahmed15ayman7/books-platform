@@ -37,6 +37,7 @@ export const ArticleService = {
 
     const where = {
       status: "publish",
+      ...notDeleted,
       ...(channel && { channel }),
       ...(featured !== undefined && { isFeatured: featured }),
     };

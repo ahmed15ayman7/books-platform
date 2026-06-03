@@ -5,6 +5,7 @@ import { usePathname, useParams } from "next/navigation";
 import Link from "next/link";
 import { Bell, ChevronRight, Home } from "lucide-react";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
+import { AdminHubLinks } from "@/components/admin/admin-hub-links";
 
 const routeLabels: Record<string, string> = {
   admin: "لوحة التحكم",
@@ -29,6 +30,8 @@ const routeLabels: Record<string, string> = {
   new: "إضافة جديد",
   edit: "تعديل",
   users: "المستخدمون",
+  trash: "سلة المحذوفات",
+  drafts: "المسودات",
 };
 
 /** Prisma cuid-style ids in admin book routes */
@@ -124,6 +127,7 @@ export function AdminTopbar() {
       </nav>
 
       <div className="flex items-center gap-2">
+        <AdminHubLinks />
         <button
           type="button"
           aria-label="الإشعارات"

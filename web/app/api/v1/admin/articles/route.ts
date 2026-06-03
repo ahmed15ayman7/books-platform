@@ -5,6 +5,7 @@ import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { buildOrderBy, parseSortParam } from "@/lib/admin/list-query";
+import { notDeleted } from "@/lib/admin/audit-fields";
 
 const createSchema = z.object({
   title: z.string().min(1).max(500),
@@ -34,6 +35,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     const where = {
+      ...notDeleted,
       ...(status && status !== "all" ? { status } : {}),
       ...(channel && channel !== "all" ? { channel } : {}),
       ...(search

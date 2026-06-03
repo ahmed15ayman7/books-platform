@@ -377,6 +377,8 @@ export const NAV_PERMISSION_BY_HREF: Record<string, Permission> = {
   "/admin/settings": PERMISSIONS.settings.view,
   "/admin/audit-log": PERMISSIONS.audit.view,
   "/admin/users": PERMISSIONS.users.view,
+  "/admin/trash": PERMISSIONS.books.delete,
+  "/admin/drafts": PERMISSIONS.books.view,
 };
 
 export function parsePermissionsJson(value: unknown): Permission[] {

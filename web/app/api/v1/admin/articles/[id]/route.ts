@@ -4,6 +4,8 @@ import { z } from "zod";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { notDeleted, withSoftDelete } from "@/lib/admin/audit-fields";
+import { requirePasskeyVerification } from "@/lib/auth/require-passkey";
 
 const updateSchema = z.object({
   title: z.string().min(1).max(500).optional(),
@@ -27,7 +29,7 @@ export async function GET(
 
   const { id } = await params;
   try {
-    const article = await db.article.findUnique({ where: { id } });
+    const article = await db.article.findFirst({ where: { id, ...notDeleted } });
     if (!article) return ApiErrors.notFound("Article");
 
     return apiSuccess({
@@ -56,6 +58,9 @@ export async function PATCH(
     const parsed = updateSchema.safeParse(body);
     if (!parsed.success) return ApiErrors.badRequest("Validation failed", parsed.error.issues);
 
+    const existing = await db.article.findFirst({ where: { id, ...notDeleted } });
+    if (!existing) return ApiErrors.notFound("Article");
+
     const { body: content, title, excerpt, channel, status, imageUrl, date } = parsed.data;
 
     const article = await db.article.update({
@@ -79,6 +84,37 @@ export async function PATCH(
     return apiSuccess(article);
   } catch (error) {
     console.error("[PATCH /api/v1/admin/articles/:id]", error);
+    return ApiErrors.internal();
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.articles.delete);
+  if (isErrorResponse(auth)) return auth;
+
+  const passkeyErr = await requirePasskeyVerification(request, auth.payload.userId);
+  if (passkeyErr) return passkeyErr;
+
+  const { id } = await params;
+  try {
+    const existing = await db.article.findFirst({ where: { id, ...notDeleted } });
+    if (!existing) return ApiErrors.notFound("Article");
+
+    await db.article.update({
+      where: { id },
+      data: withSoftDelete(auth.payload.userId),
+    });
+
+    await db.auditLog.create({
+      data: { userId: auth.payload.userId, action: "DELETE_ARTICLE", entity: "Article", entityId: id },
+    });
+
+    return apiSuccess({ deleted: true });
+  } catch (error) {
+    console.error("[DELETE /api/v1/admin/articles/:id]", error);
     return ApiErrors.internal();
   }
 }
