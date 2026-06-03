@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { RotateCcw, Loader2, Pencil } from "lucide-react";
+import { RotateCcw, Loader2, Pencil, Trash2, AlertTriangle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
@@ -16,6 +16,7 @@ import {
 } from "@/lib/admin/content-hub-permissions";
 import { loadAdminSession } from "@/lib/admin/permissions-client";
 import { getAccessibleTrashTypes } from "@/lib/admin/content-hub-permissions";
+import { TRASH_RETENTION_DAYS } from "@/lib/admin/trash-config";
 import { formatAdminDateTime } from "@/lib/admin/format-dates";
 
 interface TrashItem {
@@ -26,6 +27,8 @@ interface TrashItem {
   slug?: string;
   deletedAt?: string;
   updatedAt: string;
+  autoPurgeAt?: string | null;
+  daysRemaining?: number | null;
 }
 
 interface PaginatedResponse {
@@ -70,7 +73,8 @@ export default function AdminTrashPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [error, setError] = useState("");
-  const [restoreTarget, setRestoreTarget] = useState<TrashItem | null>(null);
+  const [actionTarget, setActionTarget] = useState<TrashItem | null>(null);
+  const [purgeOpen, setPurgeOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const tabs = accessibleTypes.map((id) => ({
@@ -120,7 +124,7 @@ export default function AdminTrashPage() {
   }, [accessibleTypes, activeType]);
 
   function handleRestore(item: TrashItem) {
-    setRestoreTarget(item);
+    setActionTarget(item);
     startTransition(async () => {
       setError("");
       try {
@@ -134,7 +138,39 @@ export default function AdminTrashPage() {
           setError(data.error?.message ?? "فشل الاستعادة");
           return;
         }
-        setRestoreTarget(null);
+        setActionTarget(null);
+        await load();
+      } catch {
+        setError("حدث خطأ في الاتصال");
+      }
+    });
+  }
+
+  function openPurgeConfirm(item: TrashItem) {
+    setActionTarget(item);
+    setPurgeOpen(true);
+  }
+
+  function executePurge() {
+    if (!actionTarget) return;
+    setError("");
+    startTransition(async () => {
+      try {
+        const res = await fetch("/api/v1/admin/trash/purge", {
+          method: "POST",
+          headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
+          body: JSON.stringify({ type: actionTarget.type, id: actionTarget.id }),
+        });
+        const data = (await res.json()) as {
+          success?: boolean;
+          error?: { message?: string };
+        };
+        if (!res.ok || !data.success) {
+          setError(data.error?.message ?? "فشل الحذف النهائي");
+          return;
+        }
+        setPurgeOpen(false);
+        setActionTarget(null);
         await load();
       } catch {
         setError("حدث خطأ في الاتصال");
@@ -154,7 +190,7 @@ export default function AdminTrashPage() {
     <div>
       <AdminPageHeader
         title="سلة المحذوفات"
-        subtitle={`${total} عنصر محذوف — يمكن استعادته في أي وقت`}
+        subtitle={`${total} عنصر — تُحذف تلقائياً بعد ${TRASH_RETENTION_DAYS} يوماً من تاريخ الحذف`}
         actions={<AdminHubLinks />}
       />
 
@@ -183,25 +219,31 @@ export default function AdminTrashPage() {
               <th className="hidden px-4 py-3 text-start font-medium text-[var(--admin-text-muted)] md:table-cell">
                 تاريخ الحذف
               </th>
+              <th className="hidden px-4 py-3 text-start font-medium text-[var(--admin-text-muted)] lg:table-cell">
+                الحذف التلقائي
+              </th>
               <th className="px-4 py-3 text-end font-medium text-[var(--admin-text-muted)]">إجراءات</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={3} className="px-4 py-12 text-center text-[var(--admin-text-muted)]">
+                <td colSpan={4} className="px-4 py-12 text-center text-[var(--admin-text-muted)]">
                   <Loader2 className="mx-auto h-6 w-6 animate-spin" />
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
-                <td colSpan={3} className="px-4 py-12 text-center text-[var(--admin-text-muted)]">
+                <td colSpan={4} className="px-4 py-12 text-center text-[var(--admin-text-muted)]">
                   سلة المحذوفات فارغة في هذا القسم
                 </td>
               </tr>
             ) : (
               items.map((item) => {
                 const href = editHref(locale, item.type, item.id);
+                const isBusy = isPending && actionTarget?.id === item.id;
+                const daysLeft = item.daysRemaining ?? null;
+
                 return (
                   <tr
                     key={item.id}
@@ -215,6 +257,30 @@ export default function AdminTrashPage() {
                     </td>
                     <td className="hidden px-4 py-3 text-[var(--admin-text-muted)] md:table-cell">
                       {item.deletedAt ? formatAdminDateTime(item.deletedAt) : "—"}
+                    </td>
+                    <td className="hidden px-4 py-3 lg:table-cell">
+                      {daysLeft !== null ? (
+                        <span
+                          className={
+                            daysLeft === 0
+                              ? "text-xs font-medium text-red-400"
+                              : daysLeft <= 7
+                                ? "text-xs text-amber-400"
+                                : "text-xs text-[var(--admin-text-muted)]"
+                          }
+                        >
+                          {daysLeft === 0
+                            ? "يُحذف قريباً"
+                            : `بعد ${daysLeft} ${daysLeft === 1 ? "يوم" : "أيام"}`}
+                          {item.autoPurgeAt && (
+                            <span className="mt-0.5 block text-[10px] text-[var(--admin-text-subtle)]">
+                              {formatAdminDateTime(item.autoPurgeAt)}
+                            </span>
+                          )}
+                        </span>
+                      ) : (
+                        "—"
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
@@ -233,15 +299,25 @@ export default function AdminTrashPage() {
                           size="sm"
                           variant="outline"
                           className="gap-1.5 border-[var(--admin-border-strong)] text-emerald-400 hover:border-emerald-800/60 hover:bg-emerald-950/30"
-                          disabled={isPending}
+                          disabled={isBusy}
                           onClick={() => handleRestore(item)}
                         >
-                          {isPending && restoreTarget?.id === item.id ? (
+                          {isBusy && !purgeOpen ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
                             <RotateCcw className="h-4 w-4" />
                           )}
                           استعادة
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="gap-1.5 border-[var(--admin-border-strong)] text-red-400 hover:border-red-800/60 hover:bg-red-950/30"
+                          disabled={isBusy}
+                          onClick={() => openPurgeConfirm(item)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          حذف نهائي
                         </Button>
                       </div>
                     </td>
@@ -254,6 +330,75 @@ export default function AdminTrashPage() {
       </div>
 
       <AdminPagination page={page} totalPages={totalPages} onPage={setPage} />
+
+      {purgeOpen && actionTarget && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="purge-trash-title"
+        >
+          <div className="w-full max-w-md rounded-xl border border-[var(--admin-border-strong)] bg-[var(--admin-surface)] shadow-2xl">
+            <div className="flex items-start justify-between gap-3 border-b border-[var(--admin-border)] px-5 py-4">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-950/50 text-red-400">
+                  <AlertTriangle className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 id="purge-trash-title" className="text-lg font-bold text-[var(--admin-text)]">
+                    حذف نهائي
+                  </h2>
+                  <p className="mt-1 text-sm text-[var(--admin-text-muted)]">
+                    لا يمكن التراجع عن هذا الإجراء.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => !isPending && setPurgeOpen(false)}
+                disabled={isPending}
+                className="rounded-lg p-1 text-[var(--admin-text-muted)] hover:bg-[var(--admin-hover)] disabled:opacity-50"
+                aria-label="إغلاق"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4 p-5">
+              <p className="text-sm text-[var(--admin-text-muted)]">
+                سيتم مسح العنصر نهائياً من قاعدة البيانات:
+              </p>
+              <p className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-muted)] px-3 py-2 text-sm font-medium text-[var(--admin-text)]">
+                {actionTarget.title}
+              </p>
+
+              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isPending}
+                  onClick={() => setPurgeOpen(false)}
+                >
+                  إلغاء
+                </Button>
+                <Button
+                  type="button"
+                  className="gap-2 bg-red-700 text-white hover:bg-red-600"
+                  disabled={isPending}
+                  onClick={executePurge}
+                >
+                  {isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                  نعم، احذف نهائياً
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

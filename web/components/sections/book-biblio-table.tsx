@@ -79,6 +79,41 @@ const TRANSLATION_STATUS: Record<string, { ar: string; en: string; variant: "tra
   NOT_TRANSLATED: { ar: "غير مترجم",       en: "Not Translated", variant: "not-translated" },
 };
 
+function normalizeComparableUrl(value: string): string {
+  return value.trim().replace(/\/+$/, "").toLowerCase();
+}
+
+/** يزيل التكرار ويستبعد العنوان إذا كان مجرد رابط الموقع (معروض في صف دار النشر) */
+function resolvedPublisherAddress(
+  address: string | null | undefined,
+  websiteUrl: string | null | undefined,
+): string | null {
+  const raw = address?.trim();
+  if (!raw) return null;
+
+  const websiteNorm = websiteUrl?.trim() ? normalizeComparableUrl(websiteUrl) : null;
+
+  const uniqueTokens: string[] = [];
+  const seen = new Set<string>();
+  for (const token of raw.split(/\s+/).filter(Boolean)) {
+    const key = normalizeComparableUrl(token);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    uniqueTokens.push(token);
+  }
+
+  if (uniqueTokens.length === 0) return null;
+
+  if (
+    websiteNorm &&
+    uniqueTokens.every((token) => normalizeComparableUrl(token) === websiteNorm)
+  ) {
+    return null;
+  }
+
+  return uniqueTokens.join(" ");
+}
+
 function resolveLanguage(code: string | null | undefined, locale: Locale): string | null {
   if (!code) return null;
   const key = code.toLowerCase().split("-")[0] ?? code.toLowerCase();
@@ -181,11 +216,14 @@ export function BookBiblioTable({
     });
   }
 
-  // ── Publisher address ─────────────────────────────────────────────────
-  if (publisher?.address) {
+  // ── Publisher address (physical — not the website link) ─────────────
+  const publisherAddress = publisher
+    ? resolvedPublisherAddress(publisher.address, publisher.websiteUrl)
+    : null;
+  if (publisherAddress) {
     rows.push({
       label: isAr ? "عنوان الناشر" : "Publisher Address",
-      content: <span className="text-sm leading-relaxed">{publisher.address}</span>,
+      content: <span className="text-sm leading-relaxed">{publisherAddress}</span>,
     });
   }
 

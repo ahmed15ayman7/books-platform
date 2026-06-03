@@ -8,6 +8,11 @@ import {
   getAccessibleTrashTypes,
   listTrashItems,
 } from "@/lib/admin/content-hub";
+import { purgeExpiredTrash } from "@/lib/admin/trash-purge";
+import {
+  trashAutoPurgeAt,
+  trashDaysRemaining,
+} from "@/lib/admin/trash-config";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAdminAuth(request);
@@ -29,6 +34,10 @@ export async function GET(request: NextRequest) {
   if (!canAccessTrashType(auth, type)) return ApiErrors.forbidden();
 
   try {
+    void purgeExpiredTrash().catch((err) => {
+      console.error("[GET /api/v1/admin/trash] auto-purge", err);
+    });
+
     const { items, total } = await listTrashItems(type, page, limit);
     const totalPages = Math.max(1, Math.ceil(total / limit));
     return apiPaginated(
@@ -37,6 +46,8 @@ export async function GET(request: NextRequest) {
         type,
         deletedAt: item.deletedAt?.toISOString(),
         updatedAt: item.updatedAt.toISOString(),
+        autoPurgeAt: item.deletedAt ? trashAutoPurgeAt(item.deletedAt).toISOString() : null,
+        daysRemaining: item.deletedAt ? trashDaysRemaining(item.deletedAt) : null,
       })),
       {
         page,
