@@ -33,7 +33,7 @@ Future<void> main() async {
   await configureDependencies();
   // Eagerly resolve CartCubit so getIt<CartCubit>() is safe to call synchronously
   // from _CartButton.build() before the first frame renders.
-  await getIt.getAsync<CartCubit>();
+  getIt<CartCubit>();
 
   // Uncomment after T093 is resolved:
   // getIt<FcmService>().initialize();

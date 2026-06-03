@@ -17,6 +17,7 @@ abstract class RegisterModule {
   @singleton
   Dio dio(DioFactory factory) => factory.create();
 
+  @preResolve
   @singleton
   Future<SharedPreferences> get prefs => SharedPreferences.getInstance();
 }

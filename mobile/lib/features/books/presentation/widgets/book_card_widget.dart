@@ -49,6 +49,7 @@ class BookCardWidget extends StatelessWidget {
                     titleAr: book.titleAr,
                     titleEn: book.titleEn,
                     publisher: book.publisher,
+                    imageUrl: book.imageUrl,
                   ),
                   if (book.isNew)
                     PositionedDirectional(

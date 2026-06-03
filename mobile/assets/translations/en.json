@@ -91,7 +91,9 @@
     "top_publishers": "Top Publishers",
     "newsletter_title": "Subscribe to our newsletter",
     "newsletter_email_hint": "Your email",
-    "newsletter_subscribe": "Subscribe"
+    "newsletter_subscribe": "Subscribe",
+    "no_translated_books": "No translated books yet",
+    "no_translated_books_subtitle": "We're working on adding more translated books soon"
   },
 
   "book_detail": {

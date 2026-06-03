@@ -91,7 +91,9 @@
     "top_publishers": "أبرز الناشرين",
     "newsletter_title": "اشترك في نشرتنا البريدية",
     "newsletter_email_hint": "بريدك الإلكتروني",
-    "newsletter_subscribe": "اشترك"
+    "newsletter_subscribe": "اشترك",
+    "no_translated_books": "لا توجد كتب مترجمة حالياً",
+    "no_translated_books_subtitle": "نعمل على إضافة المزيد من الكتب المترجمة قريباً"
   },
 
   "book_detail": {

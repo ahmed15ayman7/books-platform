@@ -1,10 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../theme/app_colors.dart';
 
-/// Gradient book-cover placeholder.
+/// Book cover widget. Shows the actual cover photo when [imageUrl] is provided,
+/// falling back to a gradient placeholder with embedded title/publisher text.
 /// Caller wraps in [AspectRatio(aspectRatio: 3 / 4)] and provides a fixed width.
 class BookCoverWidget extends StatelessWidget {
   const BookCoverWidget({
@@ -13,6 +15,7 @@ class BookCoverWidget extends StatelessWidget {
     required this.titleAr,
     required this.titleEn,
     required this.publisher,
+    this.imageUrl,
     this.borderRadius = 0,
   });
 
@@ -20,6 +23,7 @@ class BookCoverWidget extends StatelessWidget {
   final String titleAr;
   final String titleEn;
   final String publisher;
+  final String? imageUrl;
   final double borderRadius;
 
   @override
@@ -112,6 +116,17 @@ class BookCoverWidget extends StatelessWidget {
                 ],
               ),
             ),
+
+            // Actual cover photo — overlays gradient when loaded; gradient acts as placeholder/fallback
+            if (imageUrl != null)
+              Positioned.fill(
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl!,
+                  fit: BoxFit.cover,
+                  placeholder: (_, _) => const SizedBox.shrink(),
+                  errorWidget: (_, _, _) => const SizedBox.shrink(),
+                ),
+              ),
           ],
         ),
       ),

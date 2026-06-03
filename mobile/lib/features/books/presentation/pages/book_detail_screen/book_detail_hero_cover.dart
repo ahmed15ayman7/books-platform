@@ -44,6 +44,7 @@ class BookDetailHeroCover extends StatelessWidget {
                 titleAr: book.titleAr,
                 titleEn: book.titleEn,
                 publisher: book.publisher,
+                imageUrl: book.imageUrl,
               ),
             ),
           ),

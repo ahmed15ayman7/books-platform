@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../../core/widgets/empty_state_widget.dart';
 import '../../../../../core/widgets/section_header_widget.dart';
 import '../../../domain/entities/book.dart';
 import '../../widgets/book_card_widget.dart';
@@ -13,6 +14,8 @@ class HomeBooksCarouselSection extends StatelessWidget {
     required this.locale,
     required this.onSeeAll,
     required this.onBookTap,
+    this.emptyTitle,
+    this.emptySubtitle,
   });
 
   final String title;
@@ -20,6 +23,8 @@ class HomeBooksCarouselSection extends StatelessWidget {
   final String locale;
   final VoidCallback onSeeAll;
   final void Function(String id, String titleAr) onBookTap;
+  final String? emptyTitle;
+  final String? emptySubtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -30,26 +35,36 @@ class HomeBooksCarouselSection extends StatelessWidget {
             padding: EdgeInsetsDirectional.only(top: 26.h, bottom: 12.h),
             child: SectionHeaderWidget(title: title, onSeeAll: onSeeAll),
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsetsDirectional.fromSTEB(16.w, 0, 16.w, 4.h),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: books
-                  .map(
-                    (b) => Padding(
-                      padding: EdgeInsetsDirectional.only(end: 12.w),
-                      child: BookCardWidget(
-                        book: b,
-                        locale: locale,
-                        width: 150.w,
-                        onTap: () => onBookTap(b.id, b.titleAr),
+          if (books.isEmpty && emptyTitle != null)
+            SizedBox(
+              height: 160.h,
+              child: EmptyStateWidget(
+                icon: Icons.menu_book_rounded,
+                title: emptyTitle!,
+                subtitle: emptySubtitle,
+              ),
+            )
+          else
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsetsDirectional.fromSTEB(16.w, 0, 16.w, 4.h),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: books
+                    .map(
+                      (b) => Padding(
+                        padding: EdgeInsetsDirectional.only(end: 12.w),
+                        child: BookCardWidget(
+                          book: b,
+                          locale: locale,
+                          width: 150.w,
+                          onTap: () => onBookTap(b.id, b.titleAr),
+                        ),
                       ),
-                    ),
-                  )
-                  .toList(),
+                    )
+                    .toList(),
+              ),
             ),
-          ),
         ],
       ),
     );

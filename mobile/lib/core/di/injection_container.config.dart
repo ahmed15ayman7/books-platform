@@ -117,17 +117,20 @@ import 'package:shared_preferences/shared_preferences.dart' as _i460;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
-  _i174.GetIt init({
+  Future<_i174.GetIt> init({
     String? environment,
     _i526.EnvironmentFilter? environmentFilter,
-  }) {
+  }) async {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerModule = _$RegisterModule();
     gh.factory<_i101.StaticPageCubit>(() => _i101.StaticPageCubit());
     gh.singleton<_i409.GlobalKey<_i409.NavigatorState>>(
       () => registerModule.navigatorKey,
     );
-    gh.singletonAsync<_i460.SharedPreferences>(() => registerModule.prefs);
+    await gh.singletonAsync<_i460.SharedPreferences>(
+      () => registerModule.prefs,
+      preResolve: true,
+    );
     gh.lazySingleton<_i558.FlutterSecureStorage>(
       () => registerModule.secureStorage,
     );
@@ -154,16 +157,15 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i409.GlobalKey<_i409.NavigatorState>>(),
       ),
     );
-    gh.lazySingletonAsync<_i498.CartStorage>(
-      () async => _i498.CartStorage(await getAsync<_i460.SharedPreferences>()),
+    gh.lazySingleton<_i498.CartStorage>(
+      () => _i498.CartStorage(gh<_i460.SharedPreferences>()),
     );
-    gh.lazySingletonAsync<_i421.WishlistStorage>(
-      () async =>
-          _i421.WishlistStorage(await getAsync<_i460.SharedPreferences>()),
+    gh.lazySingleton<_i421.WishlistStorage>(
+      () => _i421.WishlistStorage(gh<_i460.SharedPreferences>()),
     );
-    gh.factoryAsync<_i377.NotificationSettingsCubit>(
-      () async => _i377.NotificationSettingsCubit(
-        await getAsync<_i460.SharedPreferences>(),
+    gh.factory<_i377.NotificationSettingsCubit>(
+      () => _i377.NotificationSettingsCubit(
+        gh<_i460.SharedPreferences>(),
         gh<_i438.FcmService>(),
         gh<_i693.NotificationsRepository>(),
       ),
@@ -174,9 +176,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i517.SnackBarHelper>(
       () => _i517.SnackBarHelper(gh<_i409.GlobalKey<_i409.NavigatorState>>()),
     );
-    gh.lazySingletonAsync<_i1061.WishlistDataSource>(
-      () async =>
-          _i1061.WishlistDataSource(await getAsync<_i421.WishlistStorage>()),
+    gh.lazySingleton<_i1061.WishlistDataSource>(
+      () => _i1061.WishlistDataSource(gh<_i421.WishlistStorage>()),
     );
     gh.lazySingleton<_i339.DioFactory>(
       () => _i339.DioFactory(
@@ -184,17 +185,14 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i409.GlobalKey<_i409.NavigatorState>>(),
       ),
     );
-    gh.lazySingletonAsync<_i230.WishlistRepository>(
-      () async => _i140.WishlistRepositoryImpl(
-        await getAsync<_i1061.WishlistDataSource>(),
-      ),
+    gh.lazySingleton<_i230.WishlistRepository>(
+      () => _i140.WishlistRepositoryImpl(gh<_i1061.WishlistDataSource>()),
     );
-    gh.factoryAsync<_i232.WishlistCubit>(
-      () async =>
-          _i232.WishlistCubit(await getAsync<_i230.WishlistRepository>()),
+    gh.factory<_i232.WishlistCubit>(
+      () => _i232.WishlistCubit(gh<_i230.WishlistRepository>()),
     );
-    gh.lazySingletonAsync<_i309.CartCubit>(
-      () async => _i309.CartCubit(await getAsync<_i498.CartStorage>()),
+    gh.lazySingleton<_i309.CartCubit>(
+      () => _i309.CartCubit(gh<_i498.CartStorage>()),
     );
     gh.singleton<_i361.Dio>(() => registerModule.dio(gh<_i339.DioFactory>()));
     gh.lazySingleton<_i473.ApiManager>(() => _i473.ApiManager(gh<_i361.Dio>()));
@@ -273,11 +271,11 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i407.BooksRepository>(),
       ),
     );
-    gh.factoryAsync<_i557.PublishCubit>(
-      () async => _i557.PublishCubit(
+    gh.factory<_i557.PublishCubit>(
+      () => _i557.PublishCubit(
         gh<_i95.PublishRepository>(),
         gh<_i171.FileUploadService>(),
-        await getAsync<_i460.SharedPreferences>(),
+        gh<_i460.SharedPreferences>(),
       ),
     );
     gh.factory<_i47.NewsletterCubit>(
