@@ -58,6 +58,30 @@ void main() {
       });
     });
 
+    group('publisher field — Bug 3', () {
+      test('extracts publisher title from nested object', () {
+        final json = _baseJson({
+          'publisher': {'id': 'pub-1', 'title': 'Avid Reader Press', 'slug': 'avid-reader-press'},
+        });
+        final model = BookModel.fromJson(json);
+        expect(model.publisher, 'Avid Reader Press');
+        expect(model.publisherId, 'avid-reader-press');
+      });
+
+      test('returns empty string when publisher is null', () {
+        final model = BookModel.fromJson(_baseJson({'publisher': null}));
+        expect(model.publisher, '');
+        expect(model.publisherId, '');
+      });
+
+      test('returns empty string when publisher object has no title field', () {
+        final json = _baseJson({
+          'publisher': {'id': 'pub-2', 'slug': 'some-publisher'},
+        });
+        expect(BookModel.fromJson(json).publisher, '');
+      });
+    });
+
     group('toEntity()', () {
       test('maps pages and country correctly to Book entity', () {
         final json = _baseJson({'pageCount': 200, 'publishingCountry': 'ألمانيا'});

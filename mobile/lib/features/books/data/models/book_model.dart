@@ -72,8 +72,7 @@ class BookModel {
       slug: json['slug'] as String? ?? '',
       titleAr: json['nameAr'] as String? ?? json['titleAr'] as String? ?? '',
       titleEn: json['nameEn'] as String? ?? json['titleEn'] as String? ?? '',
-      publisher: (json['publisher'] as Map<String, dynamic>?)?['name'] as String? ??
-          json['publisher'] as String? ?? '',
+      publisher: (json['publisher'] as Map<String, dynamic>?)?['title'] as String? ?? '',
       publisherId: (json['publisher'] as Map<String, dynamic>?)?['slug'] as String? ??
           json['publisherId'] as String? ?? '',
       countryAr: json['publishingCountry'] as String? ?? json['countryAr'] as String? ?? '',
