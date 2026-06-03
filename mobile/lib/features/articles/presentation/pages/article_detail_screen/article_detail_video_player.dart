@@ -62,7 +62,7 @@ class _ArticleDetailVideoPlayerState extends State<ArticleDetailVideoPlayer> {
         ),
         if (widget.showAiDisclosure) ...[
           SizedBox(height: 8.h),
-          _AiDisclosureBanner(),
+          const _AiDisclosureBanner(),
         ],
       ],
     );
@@ -70,6 +70,8 @@ class _ArticleDetailVideoPlayerState extends State<ArticleDetailVideoPlayer> {
 }
 
 class _AiDisclosureBanner extends StatelessWidget {
+  const _AiDisclosureBanner();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -122,8 +124,7 @@ class ArticleDetailVideoPlaceholder extends StatelessWidget {
         ),
         if (showAiDisclosure) ...[
           SizedBox(height: 8.h),
-          // ignore: prefer_const_constructors
-          _AiDisclosureBanner(),
+          const _AiDisclosureBanner(),
         ],
       ],
     );

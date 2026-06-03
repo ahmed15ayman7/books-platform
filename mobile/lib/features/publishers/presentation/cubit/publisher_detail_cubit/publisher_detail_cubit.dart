@@ -27,7 +27,7 @@ class PublisherDetailCubit extends Cubit<PublisherDetailState> {
     }
 
     final publisher = publisherResult.getOrElse(() => throw StateError(''));
-    final booksResult = await _booksRepo.getBooksByPublisherId(publisher.id);
+    final booksResult = await _booksRepo.getBooksByPublisherSlug(publisher.id);
 
     booksResult.fold(
       (f) => emit(PublisherDetailError(core.failureToMessage(f))),

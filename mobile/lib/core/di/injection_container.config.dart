@@ -100,6 +100,8 @@ import 'package:booksplatform/features/search/presentation/cubit/search_cubit.da
     as _i1073;
 import 'package:booksplatform/features/static_pages/presentation/cubit/static_page_cubit.dart'
     as _i101;
+import 'package:booksplatform/features/wishlist/data/datasources/wishlist_data_source.dart'
+    as _i1061;
 import 'package:booksplatform/features/wishlist/data/repositories/wishlist_repository_impl.dart'
     as _i140;
 import 'package:booksplatform/features/wishlist/domain/repositories/wishlist_repository.dart'
@@ -108,7 +110,6 @@ import 'package:booksplatform/features/wishlist/presentation/cubit/wishlist_cubi
     as _i232;
 import 'package:dio/dio.dart' as _i361;
 import 'package:flutter/material.dart' as _i409;
-import 'package:flutter/widgets.dart' as _i718;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' as _i558;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
@@ -160,11 +161,22 @@ extension GetItInjectableX on _i174.GetIt {
       () async =>
           _i421.WishlistStorage(await getAsync<_i460.SharedPreferences>()),
     );
+    gh.factoryAsync<_i377.NotificationSettingsCubit>(
+      () async => _i377.NotificationSettingsCubit(
+        await getAsync<_i460.SharedPreferences>(),
+        gh<_i438.FcmService>(),
+        gh<_i693.NotificationsRepository>(),
+      ),
+    );
     gh.lazySingleton<_i502.DialogHelper>(
       () => _i502.DialogHelper(gh<_i409.GlobalKey<_i409.NavigatorState>>()),
     );
     gh.lazySingleton<_i517.SnackBarHelper>(
       () => _i517.SnackBarHelper(gh<_i409.GlobalKey<_i409.NavigatorState>>()),
+    );
+    gh.lazySingletonAsync<_i1061.WishlistDataSource>(
+      () async =>
+          _i1061.WishlistDataSource(await getAsync<_i421.WishlistStorage>()),
     );
     gh.lazySingleton<_i339.DioFactory>(
       () => _i339.DioFactory(
@@ -173,20 +185,13 @@ extension GetItInjectableX on _i174.GetIt {
       ),
     );
     gh.lazySingletonAsync<_i230.WishlistRepository>(
-      () async =>
-          _i140.WishlistRepositoryImpl(await getAsync<_i421.WishlistStorage>()),
+      () async => _i140.WishlistRepositoryImpl(
+        await getAsync<_i1061.WishlistDataSource>(),
+      ),
     );
     gh.factoryAsync<_i232.WishlistCubit>(
       () async =>
           _i232.WishlistCubit(await getAsync<_i230.WishlistRepository>()),
-    );
-    gh.factoryAsync<_i377.NotificationSettingsCubit>(
-      () async => _i377.NotificationSettingsCubit(
-        await getAsync<_i460.SharedPreferences>(),
-        gh<_i438.FcmService>(),
-        gh<_i693.NotificationsRepository>(),
-        gh<_i718.GlobalKey<_i718.NavigatorState>>(),
-      ),
     );
     gh.lazySingletonAsync<_i309.CartCubit>(
       () async => _i309.CartCubit(await getAsync<_i498.CartStorage>()),

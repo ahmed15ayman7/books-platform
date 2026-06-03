@@ -48,12 +48,4 @@ void main() {
     });
   });
 
-  group('CommentForm honeypot', () {
-    test('submitComment data always includes website empty string', () {
-      // Verify the data map used in submitComment includes the honeypot field
-      const honeyPot = {'website': ''};
-      // The ratings_remote_data_source.dart hardcodes 'website': '' in the body
-      expect(honeyPot['website'], '');
-    });
-  });
 }

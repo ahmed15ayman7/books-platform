@@ -46,20 +46,6 @@ class PublishersRemoteDataSourceImpl {
         ).data!.toEntity(),
       );
 
-  Future<Either<Failure, PaginatedResponse<Publisher>>> getPublisherBooks(
-    String slug, {
-    int page = 1,
-    int limit = 20,
-  }) =>
-      _api.get<PaginatedResponse<Publisher>>(
-        path: '/publishers/$slug/books',
-        queryParameters: {'page': page, 'limit': limit},
-        fromJson: (json) => PaginatedResponse<Publisher>.fromJson(
-          json,
-          fromJsonT: (item) => PublisherModel.fromJson(item).toEntity(),
-        ),
-      );
-
   Future<Either<Failure, List<String>>> getCountries() async {
     if (_cachedCountries != null) return right(_cachedCountries!);
     final result = await getPublishers(limit: 100);

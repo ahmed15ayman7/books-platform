@@ -72,6 +72,7 @@ class _NewsletterSheetContentState extends State<_NewsletterSheetContent> {
     return BlocListener<NewsletterCubit, NewsletterState>(
       listener: (ctx, state) {
         if (state is NewsletterSuccess) {
+          _resendTimer?.cancel();
           getIt<SnackBarHelper>().showSuccess(state.message);
           Navigator.of(ctx).pop();
         } else if (state is NewsletterError) {

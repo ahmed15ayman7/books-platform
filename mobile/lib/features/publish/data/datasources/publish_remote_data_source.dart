@@ -24,7 +24,7 @@ class PublishRemoteDataSource {
             fromData: (d) => d,
           ).data!;
           return EligibilityResult(
-            isEligibleForFree: data['isFirstFree'] as bool? ?? true,
+            isEligibleForFree: data['isEligibleForFree'] as bool? ?? true,
             submissionsCount: (data['submissionsCount'] as num?)?.toInt() ?? 0,
           );
         },

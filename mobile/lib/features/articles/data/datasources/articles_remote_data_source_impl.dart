@@ -59,7 +59,7 @@ class ArticlesRemoteDataSourceImpl {
         path: '/articles/$slug/related',
         queryParameters: {'limit': limit},
         fromJson: (json) {
-          final list = json as List<dynamic>;
+          final list = (json as Map<String, dynamic>)['data'] as List<dynamic>;
           return list
               .map((e) => ArticleModel.fromJson(e as Map<String, dynamic>).toEntity())
               .toList();

@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter logs*)",
+      "Bash(flutter test integration_test/*)",
+      "Bash(xcrun simctl io booted screenshot*)",
+      "Bash(xcrun simctl syslog booted*)",
+      "Bash(xcrun simctl list*)",
+      "Bash(xcrun simctl io booted tap*)",
+      "Bash(idb ui tap*)",
+      "Bash(idb ui text*)",
+      "Bash(idb ui swipe*)",
+      "Bash(idb ui button*)",
+      "Bash(idb log*)",
+      "Bash(idb list-targets*)",
+      "Bash(idb_companion --list*)"
+    ]
+  }
+}

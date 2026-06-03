@@ -2,8 +2,6 @@
 // Requires google-services.json at android/app/ and GoogleService-Info.plist
 // at ios/Runner/. App will not compile until these are added.
 
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,20 +19,18 @@ class NotificationSettingsCubit extends Cubit<NotificationSettingsState> {
     this._prefs,
     this._fcmService,
     this._repository,
-    this._navigatorKey,
   ) : super(const NotificationSettingsInitial());
 
   final SharedPreferences _prefs;
   final FcmService _fcmService;
   final NotificationsRepository _repository;
-  final GlobalKey<NavigatorState> _navigatorKey;
 
   Future<void> load() async {
     final enabled = _prefs.getBool(kNotifOptInKey) ?? false;
     emit(NotificationSettingsLoaded(pushEnabled: enabled));
   }
 
-  Future<void> togglePush(bool enabled) async {
+  Future<void> togglePush(bool enabled, {String locale = 'ar'}) async {
     emit(const NotificationSettingsUpdating());
     if (enabled) {
       final granted = await _fcmService.requestPermission();
@@ -45,8 +41,6 @@ class NotificationSettingsCubit extends Cubit<NotificationSettingsState> {
       }
       final token = await _fcmService.getToken();
       if (token != null) {
-        final locale =
-            _navigatorKey.currentContext?.locale.languageCode ?? 'ar';
         final result = await _repository.registerFcmToken(token, locale);
         result.fold(
           (failure) => emit(

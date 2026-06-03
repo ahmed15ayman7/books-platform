@@ -43,7 +43,7 @@ class BooksRemoteDataSourceImpl {
       _api.get<PaginatedResponse<Book>>(
         path: '/books',
         queryParameters: {
-          'categorySlug': ?categorySlug,
+          'category': ?categorySlug,
           if (status != null) 'status': _statusToString(status),
           'sort': sort == SortOrder.newest ? 'newest' : 'oldest',
           'page': page,
@@ -68,7 +68,7 @@ class BooksRemoteDataSourceImpl {
   Future<Either<Failure, List<Category>>> getCategories() => _api.get(
         path: '/books/categories',
         fromJson: (json) {
-          final list = json as List<dynamic>;
+          final list = (json as Map<String, dynamic>)['data'] as List<dynamic>;
           return list
               .map((e) => CategoryModel.fromJson(e as Map<String, dynamic>).toEntity())
               .toList();
@@ -86,18 +86,18 @@ class BooksRemoteDataSourceImpl {
         path: '/books/$bookSlug/similar',
         queryParameters: {'limit': 6},
         fromJson: (json) {
-          final list = json as List<dynamic>;
+          final list = (json as Map<String, dynamic>)['data'] as List<dynamic>;
           return list
               .map((e) => BookModel.fromJson(e as Map<String, dynamic>).toEntity())
               .toList();
         },
       );
 
-  Future<Either<Failure, List<Book>>> getBooksByPublisherId(String publisherId) =>
+  Future<Either<Failure, List<Book>>> getBooksByPublisherSlug(String publisherSlug) =>
       _api.get(
-        path: '/publishers/$publisherId/books',
+        path: '/publishers/$publisherSlug/books',
         fromJson: (json) {
-          final list = json as List<dynamic>;
+          final list = (json as Map<String, dynamic>)['data'] as List<dynamic>;
           return list
               .map((e) => BookModel.fromJson(e as Map<String, dynamic>).toEntity())
               .toList();

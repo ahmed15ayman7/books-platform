@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:booksplatform/core/network/failure.dart';
 import 'package:booksplatform/core/network/failure_messages.dart' as core;
 
 import '../../domain/entities/submission_request.dart';
@@ -57,7 +58,9 @@ class PublishCubit extends Cubit<PublishState> {
     if (result == null || result.files.isEmpty) return;
     final file = result.files.first;
     if ((file.size) > 50 * 1024 * 1024) {
-      emit(const PublishError('File size exceeds 50MB limit'));
+      emit(PublishError(core.failureToMessage(
+        const ValidationFailure('File size exceeds 50MB limit'),
+      )));
       emit(PublishStep(step: _currentStep, formData: Map.from(_formData)));
       return;
     }

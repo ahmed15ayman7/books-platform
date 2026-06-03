@@ -44,7 +44,7 @@ class SearchRemoteDataSource {
         path: '/search/suggestions',
         queryParameters: {'q': query, 'limit': limit},
         fromJson: (json) {
-          final list = json as List<dynamic>;
+          final list = (json as Map<String, dynamic>)['data'] as List<dynamic>;
           return list
               .map((e) => SearchSuggestionModel.fromJson(e as Map<String, dynamic>).toEntity())
               .toList();

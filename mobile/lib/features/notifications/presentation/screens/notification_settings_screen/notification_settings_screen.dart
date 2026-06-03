@@ -49,46 +49,44 @@ class _NotificationSettingsScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          AppBarWidget(
-            variant: AppBarVariant.title,
-            title: 'notifications_title'.tr(),
-            showBack: true,
-          ),
-          Expanded(
-            child: BlocBuilder<NotificationSettingsCubit,
-                NotificationSettingsState>(
-              builder: (context, state) {
-                if (state is NotificationSettingsLoaded) {
-                  return SafeArea(
-                    top: false,
-                    child: Column(
+      body: SafeArea(
+        child: Column(
+          children: [
+            AppBarWidget(
+              variant: AppBarVariant.title,
+              title: 'notifications_title'.tr(),
+              showBack: true,
+            ),
+            Expanded(
+              child: BlocBuilder<NotificationSettingsCubit,
+                  NotificationSettingsState>(
+                builder: (context, state) {
+                  if (state is NotificationSettingsLoaded) {
+                    return Column(
                       children: [
                         SwitchListTile(
                           title: Text('notifications_push_label'.tr()),
                           value: state.pushEnabled,
                           onChanged: (v) => context
                               .read<NotificationSettingsCubit>()
-                              .togglePush(v),
+                              .togglePush(v, locale: context.locale.languageCode),
                           activeTrackColor: AppColors.primary,
                         ),
                         if (_permissionDenied)
                           TextButton(
                             onPressed: () =>
                                 launchUrl(Uri.parse('app-settings:')),
-                            child: Text(
-                                'notifications_open_settings'.tr()),
+                            child: Text('notifications_open_settings'.tr()),
                           ),
                       ],
-                    ),
-                  );
-                }
-                return const Center(child: AppLoadingIndicator());
-              },
+                    );
+                  }
+                  return const Center(child: AppLoadingIndicator());
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

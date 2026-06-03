@@ -148,7 +148,7 @@ class _PublishScreenState extends State<PublishScreen> {
               isLoading: isLoading,
             ),
           ),
-          body: Column(
+          body: SafeArea(bottom: false, child: Column(
             children: [
               AppBarWidget(
                 variant: AppBarVariant.title,
@@ -213,6 +213,7 @@ class _PublishScreenState extends State<PublishScreen> {
                 currentLocale: locale,
               ),
             ],
+          ),
           ),
         );
       },

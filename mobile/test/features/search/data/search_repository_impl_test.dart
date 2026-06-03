@@ -10,15 +10,6 @@ import 'package:booksplatform/features/search/domain/entities/search_suggestion.
 class MockSearchRemoteDataSource extends Mock implements SearchRemoteDataSource {}
 
 void main() {
-  // Architecture violation check: SearchCubit must not import publishers data source
-  test('search_cubit.dart does not import publishers data source', () {
-    const filePath =
-        'lib/features/search/presentation/cubit/search_cubit.dart';
-    // This test validates at the dart level via compile-time — no mock needed.
-    // The cubit compiles without PublishersRemoteDataSourceImpl, confirming the fix.
-    expect(filePath.contains('search_cubit'), true);
-  });
-
   group('SearchRepositoryImpl', () {
     late MockSearchRemoteDataSource mockDataSource;
     late SearchRepositoryImpl repository;
