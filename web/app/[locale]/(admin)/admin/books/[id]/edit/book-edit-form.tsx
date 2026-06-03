@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { Save, Loader2, CheckCircle2, AlertCircle, ExternalLink } from "lucide-react";
 import { createBook, updateBook, type BookEditData } from "./actions";
 import { adminFieldClass } from "@/components/admin/admin-form-field";
 import { AdminMarkdownHint } from "@/components/admin/admin-markdown-hint";
@@ -151,6 +151,7 @@ export function BookEditForm({
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [savedPublicSlug, setSavedPublicSlug] = useState<string | null>(null);
 
   const [form, setForm] = useState<BookEditData>(initial);
   const draft = useFormDraft(formDraftId.adminBook(bookId), form, setForm);
@@ -210,6 +211,7 @@ export function BookEditForm({
     e.preventDefault();
     setStatus("idle");
     setErrorMsg("");
+    setSavedPublicSlug(null);
 
     const nameEn = form.nameEn.trim();
     const nameAr = form.nameAr.trim();
@@ -241,8 +243,9 @@ export function BookEditForm({
           return;
         }
         draft.clearDraft();
+        setSavedPublicSlug(slug);
         setStatus("success");
-        setTimeout(() => setStatus("idle"), 3000);
+        setTimeout(() => setStatus("idle"), 8000);
         return;
       }
 
@@ -254,15 +257,17 @@ export function BookEditForm({
       }
       if (result.id) {
         draft.clearDraft();
+        setSavedPublicSlug(result.slug ?? slug);
         setStatus("success");
         setTimeout(() => {
           router.push(`/${locale}/admin/books/${result.id}`);
-        }, 1500);
+        }, 4000);
       }
     });
   }
 
   const successMessage = isCreate ? "تم إنشاء الكتاب بنجاح" : "تم حفظ التغييرات بنجاح";
+  const publicSlug = savedPublicSlug ?? bookSlug ?? (form.slug.trim() || null);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6" dir="rtl">
@@ -592,10 +597,24 @@ export function BookEditForm({
       {status === "success" && (
         <div
           role="status"
-          className="flex items-center gap-2 rounded-xl border border-green-800/50 bg-green-950/40 px-4 py-3 text-sm text-green-400"
+          className="rounded-xl border border-green-800/50 bg-green-950/40 px-4 py-3 text-sm text-green-400"
         >
-          <CheckCircle2 className="h-4 w-4 shrink-0" />
-          {successMessage}
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 shrink-0" />
+            {successMessage}
+          </div>
+          {publicSlug && (
+            <a
+              href={`/${locale}/books/${publicSlug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex items-center gap-1.5 text-[var(--brand-red)] hover:underline"
+              dir="ltr"
+            >
+              <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+              /{locale}/books/{publicSlug}
+            </a>
+          )}
         </div>
       )}
       {status === "error" && (
