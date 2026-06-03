@@ -7,6 +7,7 @@ import { ArticleService } from "@/server/services/article.service";
 import { BookCarousel } from "@/components/sections/book-carousel";
 import { ArticleCarousel } from "@/components/sections/article-carousel";
 import { BookDetailHero } from "@/components/sections/book-detail-hero";
+import { BookAdminEditLink } from "@/components/admin/book-admin-edit-link";
 import { BookBiblioTable } from "@/components/sections/book-biblio-table";
 import { SectionHeading } from "@/components/ui/section-heading";
 import type { Locale } from "@/lib/i18n";
@@ -125,6 +126,9 @@ export default async function BookDetailPage({ params }: BookPageProps) {
         </nav>
 
         <div className="container-platform py-8 space-y-10">
+          <div className="flex justify-end">
+            <BookAdminEditLink locale={locale} bookId={book.id} />
+          </div>
           <BookDetailHero
             locale={locale}
             displayName={displayName}

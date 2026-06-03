@@ -26,6 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
+import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 
 /* ─── Types ─────────────────────────────────────────────────────────── */
 interface Publisher  { id: string; title: string; name: string; nameAr?: string | null; slug: string }
@@ -35,6 +36,7 @@ interface Author     { id: string; name: string; nameAr: string | null; slug: st
 interface BookEditFormProps {
   bookId?: string;
   locale: string;
+  bookSlug?: string;
   initial: BookEditData;
   publishers: Publisher[];
   categories: Category[];
@@ -138,6 +140,7 @@ function CheckboxField({
 export function BookEditForm({
   bookId,
   locale,
+  bookSlug,
   initial,
   publishers,
   categories,
@@ -269,31 +272,42 @@ export function BookEditForm({
         onResume={draft.resume}
         onDismiss={draft.dismiss}
       />
+      {bookSlug && (
+        <div className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-muted)] px-4 py-3">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-[var(--admin-text-subtle)]">
+            الصفحة العامة
+          </p>
+          <a
+            href={`/${locale}/books/${bookSlug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 break-all text-sm text-[var(--brand-red)] hover:underline"
+            dir="ltr"
+          >
+            /{locale}/books/{bookSlug}
+          </a>
+        </div>
+      )}
       {/* ── 1. Book Identity ─────────────────────────────────────── */}
       <SectionCard title="بيانات الكتاب الأساسية">
-        <Field className="sm:col-span-2">
-          <FieldLabel htmlFor="nameAr" required>الاسم بالعربية</FieldLabel>
-          <Input id="nameAr" className={fieldCls} value={form.nameAr} onChange={(e) => set("nameAr", e.target.value)} placeholder="اسم الكتاب بالعربية" />
-        </Field>
-
-        <Field className="sm:col-span-2">
-          <FieldLabel htmlFor="nameEn" required>الاسم بالإنجليزية</FieldLabel>
-          <Input
-            id="nameEn"
-            className={fieldCls}
-            value={form.nameEn}
-            onChange={(e) => {
-              const nameEn = e.target.value;
-              setForm((prev) => ({
-                ...prev,
-                nameEn,
-                slug: autoSlugFromEnglish(nameEn, prev.slug, prev.nameEn),
-              }));
-            }}
-            placeholder="Book name in English"
-            dir="ltr"
-          />
-        </Field>
+        <AdminBilingualField
+          arValue={form.nameAr}
+          enValue={form.nameEn}
+          onArChange={(v) => set("nameAr", v)}
+          onEnChange={(v) => {
+            setForm((prev) => ({
+              ...prev,
+              nameEn: v,
+              slug: autoSlugFromEnglish(v, prev.slug, prev.nameEn),
+            }));
+          }}
+          labels={{ ar: "الاسم بالعربية", en: "الاسم بالإنجليزية" }}
+          inputClassName={fieldCls}
+          arPlaceholder="اسم الكتاب بالعربية"
+          enPlaceholder="Book name in English"
+          arRequired
+          enRequired
+        />
 
         <Field className="sm:col-span-2">
           <FieldLabel htmlFor="slug" required>الرابط المختصر (Slug)</FieldLabel>
@@ -375,28 +389,17 @@ export function BookEditForm({
           <Input id="pageCount" type="number" className={fieldCls} value={form.pageCount} onChange={(e) => set("pageCount", e.target.value)} placeholder="320" min="1" dir="ltr" />
         </Field>
 
-        <Field>
-          <FieldLabel htmlFor="edition">الطبعة (إنجليزي)</FieldLabel>
-          <Input
-            id="edition"
-            className={fieldCls}
-            value={form.edition}
-            onChange={(e) => set("edition", e.target.value)}
-            placeholder="e.g. 3rd edition"
-            dir="ltr"
-          />
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="editionAr">الطبعة (عربي)</FieldLabel>
-          <Input
-            id="editionAr"
-            className={fieldCls}
-            value={form.editionAr}
-            onChange={(e) => set("editionAr", e.target.value)}
-            placeholder="مثال: الطبعة الثالثة"
-          />
-        </Field>
+        <AdminBilingualField
+          arValue={form.editionAr}
+          enValue={form.edition}
+          onArChange={(v) => set("editionAr", v)}
+          onEnChange={(v) => set("edition", v)}
+          labels={{ ar: "الطبعة (عربي)", en: "الطبعة (إنجليزي)" }}
+          inputClassName={fieldCls}
+          arPlaceholder="مثال: الطبعة الثالثة"
+          enPlaceholder="e.g. 3rd edition"
+          layout="half"
+        />
 
         <Field>
           <FieldLabel htmlFor="dimensions">الحجم / المقاسات</FieldLabel>
@@ -545,55 +548,38 @@ export function BookEditForm({
           <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--admin-text-muted)]">الأوصاف والمحتوى</h2>
         </div>
         <div className="grid grid-cols-1 gap-5 p-5 lg:grid-cols-2">
-          <Field>
-            <FieldLabel htmlFor="shortDescAr">مقتطف قصير — عربي</FieldLabel>
-            <Textarea
-              id="shortDescAr"
-              className={cn(fieldCls, "min-h-[100px] resize-y")}
-              value={form.shortDescAr}
-              onChange={(e) => set("shortDescAr", e.target.value)}
-              placeholder="جملة أو فقرتان تظهران فوق الملخص في صفحة الكتاب…"
-            />
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="shortDesc">مقتطف قصير — إنجليزي</FieldLabel>
-            <Textarea
-              id="shortDesc"
-              className={cn(fieldCls, "min-h-[100px] resize-y")}
-              value={form.shortDesc}
-              onChange={(e) => set("shortDesc", e.target.value)}
-              placeholder="Short lead text shown above the summary…"
-              dir="ltr"
-            />
-          </Field>
+          <AdminBilingualField
+            arValue={form.shortDescAr}
+            enValue={form.shortDesc}
+            onArChange={(v) => set("shortDescAr", v)}
+            onEnChange={(v) => set("shortDesc", v)}
+            labels={{ ar: "مقتطف قصير — عربي", en: "مقتطف قصير — إنجليزي" }}
+            inputClassName={fieldCls}
+            arPlaceholder="جملة أو فقرتان تظهران فوق الملخص في صفحة الكتاب…"
+            enPlaceholder="Short lead text shown above the summary…"
+            multiline
+            rows={4}
+            layout="half"
+          />
 
           <Field className="lg:col-span-2">
             <AdminMarkdownHint />
           </Field>
 
-          <Field>
-            <FieldLabel htmlFor="descriptionAr">ملخص الكتاب (Markdown) — عربي</FieldLabel>
-            <Textarea
-              id="descriptionAr"
-              className={cn(fieldCls, "min-h-[220px] resize-y font-mono text-[13px]")}
-              value={form.descriptionAr}
-              onChange={(e) => set("descriptionAr", e.target.value)}
-              placeholder={"## فكرة الكتاب\n\n**كلمة مفتاحية** مهمة في السياق…\n\n- نقطة أولى\n- نقطة ثانية"}
-            />
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="description">ملخص الكتاب (Markdown) — إنجليزي</FieldLabel>
-            <Textarea
-              id="description"
-              className={cn(fieldCls, "min-h-[220px] resize-y font-mono text-[13px]")}
-              value={form.description}
-              onChange={(e) => set("description", e.target.value)}
-              placeholder={"## About this book\n\n**Keyword** highlighted in context…\n\n- First point\n- Second point"}
-              dir="ltr"
-            />
-          </Field>
+          <AdminBilingualField
+            arValue={form.descriptionAr}
+            enValue={form.description}
+            onArChange={(v) => set("descriptionAr", v)}
+            onEnChange={(v) => set("description", v)}
+            labels={{ ar: "ملخص الكتاب (Markdown) — عربي", en: "ملخص الكتاب (Markdown) — إنجليزي" }}
+            inputClassName={fieldCls}
+            arPlaceholder={"## فكرة الكتاب\n\n**كلمة مفتاحية** مهمة في السياق…"}
+            enPlaceholder={"## About this book\n\n**Keyword** highlighted in context…"}
+            multiline
+            rows={12}
+            enMonospace
+            layout="half"
+          />
 
           <Field className="lg:col-span-2">
             <FieldLabel htmlFor="notes">ملاحظات داخلية</FieldLabel>
