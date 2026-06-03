@@ -17,8 +17,6 @@ import {
 import { loadAdminSession } from "@/lib/admin/permissions-client";
 import { getAccessibleTrashTypes } from "@/lib/admin/content-hub-permissions";
 import { formatAdminDateTime } from "@/lib/admin/format-dates";
-import { usePasskeyGate } from "@/lib/admin/use-passkey-gate";
-import { PasskeyGateDialog } from "@/components/admin/passkey-gate-dialog";
 
 interface TrashItem {
   id: string;
@@ -73,9 +71,7 @@ export default function AdminTrashPage() {
   const [total, setTotal] = useState(0);
   const [error, setError] = useState("");
   const [restoreTarget, setRestoreTarget] = useState<TrashItem | null>(null);
-  const [passkeyOpen, setPasskeyOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const { busy: passkeyBusy, error: passkeyError, runWithPasskey } = usePasskeyGate();
 
   const tabs = accessibleTypes.map((id) => ({
     id,
@@ -125,32 +121,24 @@ export default function AdminTrashPage() {
 
   function handleRestore(item: TrashItem) {
     setRestoreTarget(item);
-    setPasskeyOpen(true);
-  }
-
-  async function confirmRestore() {
-    if (!restoreTarget) return;
-    await runWithPasskey(async () => {
-      setPasskeyOpen(false);
-      startTransition(async () => {
-        setError("");
-        try {
-          const res = await fetch("/api/v1/admin/trash/restore", {
-            method: "POST",
-            headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
-            body: JSON.stringify({ type: restoreTarget.type, id: restoreTarget.id }),
-          });
-          const data = (await res.json()) as { success?: boolean; error?: { message?: string } };
-          if (!res.ok || !data.success) {
-            setError(data.error?.message ?? "فشل الاستعادة");
-            return;
-          }
-          setRestoreTarget(null);
-          await load();
-        } catch {
-          setError("حدث خطأ في الاتصال");
+    startTransition(async () => {
+      setError("");
+      try {
+        const res = await fetch("/api/v1/admin/trash/restore", {
+          method: "POST",
+          headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
+          body: JSON.stringify({ type: item.type, id: item.id }),
+        });
+        const data = (await res.json()) as { success?: boolean; error?: { message?: string } };
+        if (!res.ok || !data.success) {
+          setError(data.error?.message ?? "فشل الاستعادة");
+          return;
         }
-      });
+        setRestoreTarget(null);
+        await load();
+      } catch {
+        setError("حدث خطأ في الاتصال");
+      }
     });
   }
 
@@ -266,15 +254,6 @@ export default function AdminTrashPage() {
       </div>
 
       <AdminPagination page={page} totalPages={totalPages} onPage={setPage} />
-
-      <PasskeyGateDialog
-        open={passkeyOpen}
-        onOpenChange={setPasskeyOpen}
-        busy={passkeyBusy || isPending}
-        error={passkeyError}
-        onConfirm={() => void confirmRestore()}
-        title="تأكيد الاستعادة بـ Passkey"
-      />
     </div>
   );
 }
