@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -93,8 +93,10 @@ class ArticlesArticleRow extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 5.h),
+                  // $mobile-debug-skill | Problem: Arabic "د" at end of string triggered BiDi RTL rendering, scrambling the date. Fix: force LTR so factual date metadata always reads left-to-right.
                   Text(
                     '${article.date} · ${article.readMinutes} ${'articles.min'.tr()}',
+                    textDirection: TextDirection.ltr,
                     style: GoogleFonts.inter(
                       fontSize: 11.sp,
                       color: AppColors.textHint,

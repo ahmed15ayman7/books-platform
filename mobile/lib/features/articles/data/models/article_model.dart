@@ -46,9 +46,19 @@ class ArticleModel {
           (json['readingTime'] as num?)?.toInt() ?? 5,
       authorFirstName: author?['firstName'] as String? ?? json['authorFirstName'] as String? ?? '',
       authorLastName: author?['lastName'] as String? ?? json['authorLastName'] as String? ?? '',
-      imageUrl: json['imageUrl'] as String? ?? json['coverImageUrl'] as String?,
+      // $mobile-debug-skill | Problem: imageUrl paths contain Arabic characters (e.g. /uploads/اللغة.jpg) which are invalid in HTTP requests without percent-encoding. Fix: Uri.encodeFull preserves scheme/host but encodes non-ASCII path characters.
+      imageUrl: _encodeUrl(json['imageUrl'] as String? ?? json['coverImageUrl'] as String?),
       hasVideo: json['hasVideo'] as bool? ?? false,
     );
+  }
+
+  static String? _encodeUrl(String? url) {
+    if (url == null) return null;
+    try {
+      return Uri.encodeFull(url);
+    } catch (_) {
+      return url;
+    }
   }
 
   Article toEntity() => Article(

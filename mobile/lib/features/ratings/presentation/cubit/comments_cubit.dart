@@ -14,11 +14,15 @@ class CommentsCubit extends Cubit<CommentsState> {
   String? _productId;
   String? _articleId;
 
-  Future<void> load(String productId, {String? articleId}) async {
+  Future<void> load({String? productId, String? articleId}) async {
     _productId = productId;
     _articleId = articleId;
     emit(const CommentsLoading());
-    final result = await _repository.getComments(productId, page: 1);
+    final result = await _repository.getComments(
+      productId: _productId,
+      articleId: _articleId,
+      page: 1,
+    );
     result.fold(
       (failure) => emit(CommentsError(core.failureToMessage(failure))),
       (paginated) => emit(CommentsLoaded(
@@ -34,7 +38,11 @@ class CommentsCubit extends Cubit<CommentsState> {
     if (current is! CommentsLoaded || !current.hasNextPage) return;
     emit(CommentsLoadingMore(current));
     final nextPage = current.page + 1;
-    final result = await _repository.getComments(_productId ?? '', page: nextPage);
+    final result = await _repository.getComments(
+      productId: _productId,
+      articleId: _articleId,
+      page: nextPage,
+    );
     result.fold(
       (failure) => emit(CommentsError(core.failureToMessage(failure))),
       (paginated) => emit(CommentsLoaded(
@@ -64,7 +72,7 @@ class CommentsCubit extends Cubit<CommentsState> {
       (failure) => emit(CommentsError(core.failureToMessage(failure))),
       (_) {
         emit(const CommentsSubmitted());
-        load(_productId ?? '', articleId: _articleId);
+        load(productId: _productId, articleId: _articleId);
       },
     );
   }

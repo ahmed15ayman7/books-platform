@@ -27,12 +27,13 @@ class RatingsRepositoryImpl implements RatingsRepository {
       _remote.submitRating(productId, email, stars);
 
   @override
-  Future<Either<Failure, PaginatedResponse<Comment>>> getComments(
-    String productId, {
+  Future<Either<Failure, PaginatedResponse<Comment>>> getComments({
+    String? productId,
+    String? articleId,
     int page = 1,
     int limit = 20,
   }) =>
-      _remote.getComments(productId, page: page, limit: limit);
+      _remote.getComments(productId: productId, articleId: articleId, page: page, limit: limit);
 
   @override
   Future<Either<Failure, Unit>> submitComment({

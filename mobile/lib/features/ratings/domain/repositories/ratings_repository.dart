@@ -14,8 +14,9 @@ abstract class RatingsRepository {
     int stars,
   );
 
-  Future<Either<Failure, PaginatedResponse<Comment>>> getComments(
-    String productId, {
+  Future<Either<Failure, PaginatedResponse<Comment>>> getComments({
+    String? productId,
+    String? articleId,
     int page = 1,
     int limit = 20,
   });

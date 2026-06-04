@@ -21,14 +21,13 @@ class ArticleDetailBody extends StatelessWidget {
     super.key,
     required this.article,
     required this.locale,
-    required this.commentController,
+
     required this.onBack,
     required this.onRelatedTap,
   });
 
   final ArticleDetail article;
   final String locale;
-  final TextEditingController commentController;
   final VoidCallback onBack;
   final ValueChanged<Article> onRelatedTap;
 
@@ -102,10 +101,7 @@ class ArticleDetailBody extends StatelessWidget {
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(16.w, 28.h, 16.w, 0),
-            child: ArticleDetailCommentSection(
-              locale: locale,
-              controller: commentController,
-            ),
+            child: ArticleDetailCommentSection(articleId: article.id),
           ),
         ),
         if (article.relatedArticles.isNotEmpty) ...[
