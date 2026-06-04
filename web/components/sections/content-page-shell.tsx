@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { PageHero, type BreadcrumbItem } from "@/components/sections/page-hero";
+import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
 import { cn } from "@/lib/utils";
 import type { Locale } from "@/lib/i18n";
 
@@ -11,10 +12,13 @@ interface ContentPageShellProps {
     breadcrumbs?: BreadcrumbItem[];
     variant?: "dark" | "light";
     size?: "md" | "lg";
+    backgroundImage?: string;
+    backgroundImageAlt?: string;
   };
   background?: "gray-50" | "white";
   children: ReactNode;
   className?: string;
+  animateSections?: boolean;
 }
 
 export function ContentPageShell({
@@ -23,6 +27,7 @@ export function ContentPageShell({
   background = "gray-50",
   children,
   className,
+  animateSections = true,
 }: ContentPageShellProps) {
   return (
     <div
@@ -33,7 +38,13 @@ export function ContentPageShell({
       )}
     >
       <PageHero locale={locale} {...hero} />
-      <div className="container-platform space-y-20 py-14 md:py-16">{children}</div>
+      <div className="container-platform py-14 md:py-16">
+        {animateSections ? (
+          <AnimatedContentSections>{children}</AnimatedContentSections>
+        ) : (
+          <div className="space-y-20">{children}</div>
+        )}
+      </div>
     </div>
   );
 }

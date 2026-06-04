@@ -52,7 +52,8 @@ export function ArticleCard({
   locale,
   className,
   featured = false,
-}: ArticleCardProps) {
+  entrance = true,
+}: ArticleCardProps & { entrance?: boolean }) {
   const channelLabel = channel
     ? (channelLabels[channel]?.[locale] ?? channel)
     : null;
@@ -65,6 +66,9 @@ export function ArticleCard({
 
   return (
     <motion.div
+      initial={entrance ? { opacity: 0, y: 18 } : false}
+      whileInView={entrance ? { opacity: 1, y: 0 } : undefined}
+      viewport={{ once: true, margin: "-40px" }}
       whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 360, damping: 22 }}
       className={cn("will-change-transform h-full", className)}

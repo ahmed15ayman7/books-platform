@@ -1,8 +1,11 @@
+"use client";
+
 import type { Locale } from "@/lib/i18n";
 import { pickLocale } from "@/lib/content/types";
 import type { TeamMemberData } from "@/lib/content/team";
 import { TeamAvatar } from "./team-avatar";
 import { cn } from "@/lib/utils";
+import { AnimatedCard, StaggerContainer, StaggerItem, FadeIn, ScaleIn } from "@/components/motion";
 
 interface TeamGridProps {
   members: TeamMemberData[];
@@ -16,19 +19,23 @@ export function TeamGrid({ members, locale }: TeamGridProps) {
   return (
     <div className="space-y-10">
       {leadership.length > 0 && (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <StaggerContainer className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {leadership.map((member) => (
-            <TeamMemberCard key={member.slug} member={member} locale={locale} featured />
+            <StaggerItem key={member.slug}>
+              <TeamMemberCard member={member} locale={locale} featured />
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       )}
 
       {rest.length > 0 && (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <StaggerContainer className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {rest.map((member) => (
-            <TeamMemberCard key={member.slug} member={member} locale={locale} />
+            <StaggerItem key={member.slug}>
+              <TeamMemberCard member={member} locale={locale} />
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       )}
     </div>
   );
@@ -48,22 +55,26 @@ function TeamMemberCard({
   const bio = pickLocale(member.bio, locale);
 
   return (
-    <article
-      className={cn(
-        "rounded-2xl border border-[var(--brand-gray-200)] bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md",
-        featured && "ring-1 ring-[var(--brand-red-soft)]",
-      )}
-    >
-      <TeamAvatar
-        photoUrl={member.photoUrl}
-        initials={member.initials}
-        name={name}
-      />
-      <h3 className="mt-4 font-bold text-[var(--brand-gray-900)]">{name}</h3>
-      <p className="mt-1 text-sm font-medium text-[var(--brand-red)]">{role}</p>
-      <p className="mt-3 text-sm leading-relaxed text-[var(--brand-gray-600)] md:text-base">
-        {bio}
-      </p>
-    </article>
+    <AnimatedCard>
+      <article
+        className={cn(
+          "rounded-2xl border border-[var(--brand-gray-200)] bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md h-full",
+          featured && "ring-1 ring-[var(--brand-red-soft)]",
+        )}
+      >
+        <ScaleIn>
+          <TeamAvatar photoUrl={member.photoUrl} initials={member.initials} name={name} />
+        </ScaleIn>
+        <FadeIn delay={0.1}>
+          <h3 className="mt-4 font-bold text-[var(--brand-gray-900)]">{name}</h3>
+        </FadeIn>
+        <FadeIn delay={0.15}>
+          <p className="mt-1 text-sm font-medium text-[var(--brand-red)]">{role}</p>
+        </FadeIn>
+        <FadeIn delay={0.2}>
+          <p className="mt-3 text-sm leading-relaxed text-[var(--brand-gray-600)] md:text-base">{bio}</p>
+        </FadeIn>
+      </article>
+    </AnimatedCard>
   );
 }

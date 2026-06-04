@@ -1,3 +1,5 @@
+"use client";
+
 import { Compass, Eye, Shield, Target } from "lucide-react";
 import type { AboutValue } from "@/lib/content/about";
 import type { Locale } from "@/lib/i18n";
@@ -21,7 +23,7 @@ interface AboutValuesGridProps {
 
 export function AboutValuesGrid({ locale, eyebrow, title, items }: AboutValuesGridProps) {
   return (
-    <SectionBlock id="values" eyebrow={eyebrow} title={title}>
+    <SectionBlock id="values" eyebrow={eyebrow} title={title} staggerChildren={false}>
       <ValueCardGrid>
         {items.map((item) => {
           const localized = getLocalizedValue(item, locale);
@@ -32,6 +34,8 @@ export function AboutValuesGrid({ locale, eyebrow, title, items }: AboutValuesGr
               icon={Icon}
               title={localized.title}
               body={localized.body}
+              imageUrl={localized.imageUrl}
+              imageAlt={localized.imageAlt}
             />
           );
         })}

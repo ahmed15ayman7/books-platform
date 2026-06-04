@@ -1,3 +1,5 @@
+"use client";
+
 import { PageHero } from "@/components/sections/page-hero";
 import { ArticleCard } from "./article-card";
 import { BooksPagination } from "./books-pagination";
@@ -7,6 +9,7 @@ import {
   mapArticleForCard,
   type ArticleLinkedProduct,
 } from "@/lib/i18n/article-linked-book";
+import { ScaleIn, StaggerContainer, StaggerItem, FadeIn } from "@/components/motion";
 
 interface Article {
   id: string;
@@ -18,6 +21,7 @@ interface Article {
   channel?: string | null;
   readingTimeMinutes?: number | null;
   isFeatured?: boolean;
+  videoId?: string | null;
   products?: ArticleLinkedProduct[];
 }
 
@@ -70,9 +74,8 @@ export function ArticleChannelPage({
           />
         ) : (
           <>
-            {/* Featured article */}
             {featured && (
-              <div className="mb-8">
+              <ScaleIn className="mb-8">
                 <ArticleCard
                   {...featured}
                   date={featured.date ?? undefined}
@@ -80,27 +83,27 @@ export function ArticleChannelPage({
                   locale={locale}
                   featured
                 />
-              </div>
+              </ScaleIn>
             )}
 
-            {/* Article grid */}
             {rest.length > 0 && (
-              <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <StaggerContainer className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {rest.map((article) => (
-                  <ArticleCard
-                    key={article.id}
-                    {...article}
-                    date={article.date ?? undefined}
-                    channel={article.channel ?? undefined}
-                    locale={locale}
-                  />
+                  <StaggerItem key={article.id}>
+                    <ArticleCard
+                      {...article}
+                      date={article.date ?? undefined}
+                      channel={article.channel ?? undefined}
+                      locale={locale}
+                    />
+                  </StaggerItem>
                 ))}
-              </div>
+              </StaggerContainer>
             )}
 
-            <div className="mt-8">
+            <FadeIn className="mt-8">
               <BooksPagination pagination={pagination} />
-            </div>
+            </FadeIn>
           </>
         )}
       </div>

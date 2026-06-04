@@ -1,4 +1,7 @@
+"use client";
+
 import { cn } from "@/lib/utils";
+import { StaggerContainer, StaggerItem, ScaleIn, SlideIn } from "@/components/motion";
 
 interface NumberedFeatureListProps {
   items: string[];
@@ -12,29 +15,26 @@ export function NumberedFeatureList({
   className,
 }: NumberedFeatureListProps) {
   return (
-    <ol
-      className={cn(
-        "grid gap-4",
-        columns === 2 && "md:grid-cols-2",
-        className,
-      )}
+    <StaggerContainer
+      className={cn("grid gap-4", columns === 2 && "md:grid-cols-2", className)}
     >
       {items.map((item, index) => (
-        <li
-          key={index}
-          className="flex items-start gap-4 rounded-xl border border-[var(--brand-gray-200)] bg-white p-5 shadow-sm"
-        >
-          <span
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--brand-red)] text-sm font-bold text-white"
-            aria-hidden="true"
-          >
-            {index + 1}
-          </span>
-          <p className="text-sm leading-relaxed text-[var(--brand-gray-700)] md:text-base">
-            {item}
-          </p>
-        </li>
+        <StaggerItem key={index}>
+          <SlideIn from={index % 2 === 0 ? "start" : "end"}>
+            <li className="flex items-start gap-4 rounded-xl border border-[var(--brand-gray-200)] bg-white p-5 shadow-sm list-none">
+              <ScaleIn delay={index * 0.06}>
+                <span
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--brand-red)] text-sm font-bold text-white"
+                  aria-hidden="true"
+                >
+                  {index + 1}
+                </span>
+              </ScaleIn>
+              <p className="text-sm leading-relaxed text-[var(--brand-gray-700)] md:text-base">{item}</p>
+            </li>
+          </SlideIn>
+        </StaggerItem>
       ))}
-    </ol>
+    </StaggerContainer>
   );
 }
