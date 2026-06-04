@@ -11,6 +11,7 @@ import {
   resolveArticleWriteData,
 } from "@/lib/admin/article-payload";
 import { MEDIA_CHANNELS } from "@/lib/media/youtube";
+import { nextArticleOriginalId } from "@/lib/admin/legacy-ids";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth(request, "ADMIN", PERMISSIONS.articles.view);
@@ -99,6 +100,7 @@ export async function POST(request: NextRequest) {
       return ApiErrors.badRequest(err instanceof Error ? err.message : "Validation failed");
     }
 
+    const originalId = await nextArticleOriginalId();
     const slug =
       title
         .toLowerCase()
@@ -106,11 +108,11 @@ export async function POST(request: NextRequest) {
         .replace(/\s+/g, "-")
         .slice(0, 200) +
       "-" +
-      Date.now();
+      originalId;
 
     const article = await db.article.create({
       data: {
-        originalId: Date.now(),
+        originalId,
         title,
         titleEn: resolved.titleEn ?? titleEn ?? null,
         content: content ?? null,

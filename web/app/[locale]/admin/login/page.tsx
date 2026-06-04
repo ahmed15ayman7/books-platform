@@ -146,7 +146,7 @@ export default function AdminLoginPage() {
             </div>
 
             {status === "error" && (
-              <div className="rounded-md border border-[var(--error)]/30 bg-[var(--error)]/10 px-3 py-2 text-sm text-[var(--error)]">
+              <div className="form-error-banner rounded-md px-3 py-2 text-sm">
                 {errorMsg}
               </div>
             )}

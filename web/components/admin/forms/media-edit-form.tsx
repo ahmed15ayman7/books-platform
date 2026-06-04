@@ -255,7 +255,7 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
           </AdminCard>
 
           {error && (
-            <p className="rounded-lg border border-[var(--error)]/30 bg-[var(--error)]/10 px-4 py-2 text-sm text-[var(--error)]">
+            <p className="form-error-banner rounded-lg px-4 py-2 text-sm">
               {error}
             </p>
           )}

@@ -219,7 +219,7 @@ export default function AdminAuthorsPage() {
       />
 
       {listError && (
-        <p className="mb-4 rounded-lg border border-[var(--error)]/30 bg-[var(--error)]/10 px-4 py-2 text-sm text-[var(--error)]">
+        <p className="form-error-banner mb-4 rounded-lg px-4 py-2 text-sm">
           {listError}
         </p>
       )}
