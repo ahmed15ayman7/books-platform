@@ -62,10 +62,14 @@ class BookModel {
   final bool isNew;
 
   factory BookModel.fromJson(Map<String, dynamic> json) {
+    // $mobile-debug-skill | Problem: API returns `primaryCategory` (object|null) but code read non-existent `categories` array and `categorySlug`, so slug was always ''. Fix: read primaryCategory.slug first, then fall back to the legacy fields.
+    final primaryCat = json['primaryCategory'] as Map<String, dynamic>?;
     final categories = json['categories'] as List<dynamic>? ?? [];
-    final categorySlug = categories.isNotEmpty
-        ? (categories[0] as Map<String, dynamic>)['slug'] as String? ?? ''
-        : json['categorySlug'] as String? ?? '';
+    final categorySlug = primaryCat != null
+        ? primaryCat['slug'] as String? ?? ''
+        : categories.isNotEmpty
+            ? (categories[0] as Map<String, dynamic>)['slug'] as String? ?? ''
+            : json['categorySlug'] as String? ?? '';
 
     return BookModel(
       id: json['_id'] as String? ?? json['id'] as String? ?? '',

@@ -83,15 +83,18 @@ class BookCardWidget extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    _categoryName(book.categorySlug),
-                    style: GoogleFonts.tajawal(
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
+                  // $mobile-debug-skill | Problem: empty categorySlug always hit the wildcard case and showed "اخري". Fix: hide the chip entirely when no category is assigned.
+                  if (book.categorySlug.isNotEmpty) ...[
+                    Text(
+                      _categoryName(book.categorySlug),
+                      style: GoogleFonts.tajawal(
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 4.h),
+                    SizedBox(height: 4.h),
+                  ],
                   Text(
                     locale == 'ar' ? book.titleAr : book.titleEn,
                     style: GoogleFonts.cairo(

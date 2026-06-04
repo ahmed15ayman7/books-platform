@@ -41,11 +41,21 @@ class _NewsletterSheetContentState extends State<_NewsletterSheetContent> {
   String _selectedLocale = 'ar';
   bool _showResend = false;
   Timer? _resendTimer;
+  bool _localeInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    _selectedLocale = context.locale.languageCode;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // $mobile-debug-skill | Problem: context.locale in initState() called dependOnInheritedWidgetOfExactType before widget was mounted, crashing the bottom sheet. Fix: moved one-time locale read to didChangeDependencies, guarded by a flag so user selection isn't reset on subsequent dependency changes.
+    if (!_localeInitialized) {
+      _selectedLocale = context.locale.languageCode;
+      _localeInitialized = true;
+    }
   }
 
   @override
@@ -71,11 +81,15 @@ class _NewsletterSheetContentState extends State<_NewsletterSheetContent> {
   Widget build(BuildContext context) {
     return BlocListener<NewsletterCubit, NewsletterState>(
       listener: (ctx, state) {
+        debugPrint('[Newsletter] listener state: $state');
         if (state is NewsletterSuccess) {
           _resendTimer?.cancel();
-          getIt<SnackBarHelper>().showSuccess(state.message);
+          debugPrint('[Newsletter] success → popping sheet');
           Navigator.of(ctx).pop();
+          debugPrint('[Newsletter] pop called → showing snackbar');
+          getIt<SnackBarHelper>().showSuccess(state.message);
         } else if (state is NewsletterError) {
+          debugPrint('[Newsletter] error → ${state.message}');
           getIt<SnackBarHelper>().showError(state.message);
         }
       },
