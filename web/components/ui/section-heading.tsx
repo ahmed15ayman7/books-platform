@@ -51,7 +51,7 @@ export function SectionHeading({
         </div>
       )}
       {subtitle && (
-        <p className={cn("text-sm mt-1", subtitleColor)}>{subtitle}</p>
+        <p className={cn("mt-1 text-base", subtitleColor)}>{subtitle}</p>
       )}
     </div>
   );

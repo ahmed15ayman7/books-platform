@@ -117,6 +117,16 @@
     color: #ffffff;
   }
 
+  .site-chrome a.nav-publish-pill {
+    color: var(--brand-red);
+    background-color: #ffffff;
+  }
+
+  .site-chrome a.nav-publish-pill:hover {
+    color: var(--brand-red);
+    background-color: var(--brand-gray-100, #f3f4f6);
+  }
+
   .hero-embla__viewport {
     width: 100%;
     overflow: hidden;

@@ -123,7 +123,7 @@ export function MobileNavTrigger({ locale }: MobileNavTriggerProps) {
                       "block rounded-md px-3 py-2.5 text-sm font-medium",
                       "transition-colors hover:bg-[var(--brand-red-soft)] hover:text-[var(--brand-red)]",
                       group.isAccent
-                        ? "text-[var(--brand-red)] font-semibold"
+                        ? "mx-2 rounded-lg bg-white px-4 py-3 font-semibold text-[var(--brand-red)] shadow-sm hover:bg-[var(--brand-gray-100)]"
                         : "text-[var(--brand-gray-700)]"
                     )}
                   >
