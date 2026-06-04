@@ -3,9 +3,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Plus, Pencil, Video } from "lucide-react";
+import { Plus, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
+import { absoluteUrl } from "@/lib/seo/site";
+import { AdminEntityActions } from "@/components/admin/admin-entity-actions";
+import {
+  adminMediaEditPath,
+  adminMediaViewPath,
+  publicArticleUrl,
+} from "@/lib/admin/public-urls";
 import { appendListParams } from "@/lib/admin/list-query";
 import { useAdminViewMode } from "@/lib/admin/use-admin-view-mode";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
@@ -99,13 +106,16 @@ export default function AdminMediaPage() {
     );
   }, [items, channel, status, sort]);
 
-  const editBtn = (row: MediaItem) => (
-    <Link href={`/${locale}/admin/media/${row.id}`}>
-      <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-        <Pencil className="h-3 w-3" />
-        تعديل
-      </Button>
-    </Link>
+  const rowActions = (row: MediaItem) => (
+    <AdminEntityActions
+      viewHref={adminMediaViewPath(locale, row.id)}
+      editHref={adminMediaEditPath(locale, row.id)}
+      publicHref={
+        row.status === "publish"
+          ? absoluteUrl(publicArticleUrl(locale, row.slug))
+          : undefined
+      }
+    />
   );
 
   const columns = [
@@ -157,7 +167,7 @@ export default function AdminMediaPage() {
         <AdminStatusBadge status={row.status === "publish" ? "published" : "draft"} />
       ),
     },
-    { key: "actions", label: "", headerClassName: "w-16", render: editBtn },
+    { key: "actions", label: "", headerClassName: "w-28", render: rowActions },
   ];
 
   const renderCard = (row: MediaItem) => (
@@ -174,7 +184,7 @@ export default function AdminMediaPage() {
         </p>
         <AdminStatusBadge status={row.status === "publish" ? "published" : "draft"} />
       </AdminGridCardBody>
-      <AdminGridCardFooter>{editBtn(row)}</AdminGridCardFooter>
+      <AdminGridCardFooter>{rowActions(row)}</AdminGridCardFooter>
     </AdminGridCard>
   );
 

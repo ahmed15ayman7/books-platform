@@ -165,7 +165,7 @@ function NavLink({
         className,
         "relative flex items-center gap-1 whitespace-nowrap rounded-xl px-2.5 py-2 text-sm font-medium transition-all duration-[var(--motion-base)] md:px-3 hover:bg-white/8",
         accent
-          ? "bg-white font-semibold text-[var(--brand-red)] shadow-sm hover:bg-[var(--brand-gray-100)] active:scale-[0.98]"
+          ? "font-semibold bg-[var(--brand-red)] text-white hover:bg-[var(--brand-red-hover)] shadow-sm hover:bg-[var(--brand-gray-100)] active:scale-[0.98]"
           : "hover:text-white",
         active &&
           !accent &&

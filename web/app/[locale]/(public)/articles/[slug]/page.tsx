@@ -16,6 +16,9 @@ import type { Locale } from "@/lib/i18n";
 import { articleLinkedBookDisplay, mapArticleForCard } from "@/lib/i18n/article-linked-book";
 import { articleSeoMetadata } from "@/lib/seo/metadata";
 import { youtubeEmbedUrl, youtubeThumbnail } from "@/lib/media/youtube";
+import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-shell";
+import { isMediaChannel } from "@/lib/media/youtube";
+import { adminArticleEditPath, adminArticleViewPath } from "@/lib/admin/public-urls";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -92,13 +95,23 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
     });
   }
 
+  const isMedia = isMediaChannel(article.channel);
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd.length === 1 ? jsonLd[0] : jsonLd) }}
       />
-      <div className="min-h-screen bg-[var(--brand-gray-50)]">
+      <AdminEntityPublicShell
+        entityType={isMedia ? "media" : "article"}
+        entityId={article.id}
+        editHref={adminArticleEditPath(locale, article.id, article.channel)}
+        adminViewHref={adminArticleViewPath(locale, article.id, article.channel)}
+        publicHref={`/${locale}/articles/${article.slug}`}
+        title={article.title}
+      >
+      <div className="min-h-screen bg-[var(--brand-gray-50)] pb-24">
         {/* Hero Image */}
         {heroImageUrl && (
           <div className="relative h-64 w-full overflow-hidden bg-[var(--brand-gray-200)] md:h-96">
@@ -255,6 +268,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
           )}
         </div>
       </div>
+      </AdminEntityPublicShell>
     </>
   );
 }

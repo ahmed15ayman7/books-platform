@@ -84,6 +84,9 @@ export async function resolveArticleWriteData(
     youtubeUrl: data.youtubeUrl === "" ? null : youtubeUrl ?? undefined,
     imageUrl,
     productIds,
+    titleEn: data.titleEn !== undefined ? (data.titleEn || null) : undefined,
+    excerptEn: data.excerptEn !== undefined ? (data.excerptEn || null) : undefined,
+    contentEn: data.bodyEn !== undefined ? (data.bodyEn || null) : undefined,
   };
 }
 

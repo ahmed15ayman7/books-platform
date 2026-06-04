@@ -7,7 +7,7 @@ import { ArticleService } from "@/server/services/article.service";
 import { BookCarousel } from "@/components/sections/book-carousel";
 import { ArticleCarousel } from "@/components/sections/article-carousel";
 import { BookDetailHero } from "@/components/sections/book-detail-hero";
-import { BookAdminEditLink } from "@/components/admin/book-admin-edit-link";
+import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-shell";
 import { BookBiblioTable } from "@/components/sections/book-biblio-table";
 import { BookMediaSection } from "@/components/sections/book-media-section";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -127,10 +127,15 @@ export default async function BookDetailPage({ params }: BookPageProps) {
           </div>
         </nav>
 
-        <div className="container-platform py-8 space-y-10">
-          <div className="flex justify-end">
-            <BookAdminEditLink locale={locale} bookId={book.id} />
-          </div>
+        <AdminEntityPublicShell
+          entityType="book"
+          entityId={book.id}
+          editHref={`/${locale}/admin/books/${book.id}/edit`}
+          adminViewHref={`/${locale}/admin/books/${book.id}`}
+          publicHref={`/${locale}/books/${book.slug}`}
+          title={displayName}
+        >
+        <div className="container-platform py-8 space-y-10 pb-24">
           <BookDetailHero
             locale={locale}
             displayName={displayName}
@@ -207,6 +212,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             </section>
           )}
         </div>
+        </AdminEntityPublicShell>
       </div>
     </>
   );

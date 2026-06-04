@@ -16,6 +16,8 @@ import {
   localizedPublisherName,
 } from "@/lib/i18n/publisher-locale";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-shell";
+import { adminPublisherEditPath, adminPublisherViewPath } from "@/lib/admin/public-urls";
 
 interface PublisherPageProps {
   params: Promise<{ slug: string; locale: string }>;
@@ -63,7 +65,15 @@ export default async function PublisherDetailPage({
   const isSponsored = publisher.sponsored?.isActive && publisher.sponsored.endsAt > new Date();
 
   return (
-    <div className="min-h-screen bg-[var(--brand-gray-50)]">
+    <AdminEntityPublicShell
+      entityType="publisher"
+      entityId={publisher.id}
+      editHref={adminPublisherEditPath(locale, publisher.id)}
+      adminViewHref={adminPublisherViewPath(locale, publisher.id)}
+      publicHref={`/${locale}/publishers/${publisher.slug}`}
+      title={displayName}
+    >
+    <div className="min-h-screen bg-[var(--brand-gray-50)] pb-24">
       {/* Header */}
       <div className={`py-10 ${isSponsored ? "bg-gradient-to-r from-[var(--brand-black)] to-[#2a0a10]" : "bg-[var(--brand-black)]"}`}>
         <div className="container-platform">
@@ -181,5 +191,6 @@ export default async function PublisherDetailPage({
         )}
       </div>
     </div>
+    </AdminEntityPublicShell>
   );
 }

@@ -10,6 +10,7 @@ import {
   articleBodySchema,
   resolveArticleWriteData,
 } from "@/lib/admin/article-payload";
+import { formatArticleApiResponse } from "@/lib/admin/public-urls";
 
 export async function GET(
   request: NextRequest,
@@ -26,14 +27,7 @@ export async function GET(
     });
     if (!article) return ApiErrors.notFound("Article");
 
-    return apiSuccess({
-      ...article,
-      body: article.content,
-      productIds: article.products.map((p) => p.id),
-      titleEn: "",
-      excerptEn: "",
-      bodyEn: "",
-    });
+    return apiSuccess(formatArticleApiResponse(article));
   } catch (error) {
     console.error("[GET /api/v1/admin/articles/:id]", error);
     return ApiErrors.internal();
@@ -67,24 +61,40 @@ export async function PATCH(
       return ApiErrors.badRequest(err instanceof Error ? err.message : "Validation failed");
     }
 
-    const { body: content, title, excerpt, channel, status, date } = parsed.data;
+    const {
+      body: content,
+      title,
+      titleEn,
+      excerpt,
+      excerptEn,
+      bodyEn,
+      channel,
+      status,
+      date,
+    } = parsed.data;
 
     const article = await db.article.update({
       where: { id },
       data: {
         ...(title !== undefined && { title }),
+        ...(titleEn !== undefined && { titleEn: titleEn || null }),
         ...(content !== undefined && { content }),
+        ...(bodyEn !== undefined && { contentEn: bodyEn || null }),
         ...(excerpt !== undefined && { excerpt }),
+        ...(excerptEn !== undefined && { excerptEn: excerptEn || null }),
         ...(channel !== undefined && { channel }),
         ...(status !== undefined && { status }),
         ...(date !== undefined && { date }),
+        ...(resolved.titleEn !== undefined && { titleEn: resolved.titleEn }),
+        ...(resolved.excerptEn !== undefined && { excerptEn: resolved.excerptEn }),
+        ...(resolved.contentEn !== undefined && { contentEn: resolved.contentEn }),
         ...(resolved.imageUrl !== undefined && {
           imageUrl: resolved.imageUrl === "" ? null : resolved.imageUrl,
         }),
         ...(resolved.youtubeUrl !== undefined && { youtubeUrl: resolved.youtubeUrl }),
         ...(resolved.videoId !== undefined && { videoId: resolved.videoId }),
         ...(resolved.productIds !== undefined
-          ? { products: { set: resolved.productIds.map((id) => ({ id })) } }
+          ? { products: { set: resolved.productIds.map((pid) => ({ id: pid })) } }
           : {}),
         postModifiedDate: new Date(),
       },
@@ -100,7 +110,7 @@ export async function PATCH(
       },
     });
 
-    return apiSuccess(article);
+    return apiSuccess(formatArticleApiResponse(article));
   } catch (error) {
     console.error("[PATCH /api/v1/admin/articles/:id]", error);
     return ApiErrors.internal();

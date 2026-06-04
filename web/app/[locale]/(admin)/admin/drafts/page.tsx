@@ -40,9 +40,9 @@ function editHref(locale: string, type: DraftType, id: string): string {
     case "books":
       return `/${locale}/admin/books/${id}/edit`;
     case "articles":
-      return `/${locale}/admin/articles/${id}`;
+      return `/${locale}/admin/articles/${id}/edit`;
     case "publishers":
-      return `/${locale}/admin/publishers/${id}`;
+      return `/${locale}/admin/publishers/${id}/edit`;
     case "submissions":
       return `/${locale}/admin/submissions`;
   }

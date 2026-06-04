@@ -1,11 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { can } from "@/lib/admin/permissions-client";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { absoluteUrl } from "@/lib/seo/site";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminSearch, AdminPagination } from "@/components/admin/admin-table";
 import { useAdminViewMode } from "@/lib/admin/use-admin-view-mode";
@@ -20,9 +22,14 @@ import {
   adminCreatedAtColumn,
   adminUpdatedAtColumn,
 } from "@/components/admin/admin-timestamps";
+import { AdminEntityActions } from "@/components/admin/admin-entity-actions";
+import {
+  adminAuthorEditPath,
+  adminAuthorViewPath,
+  publicAuthorUrl,
+} from "@/lib/admin/public-urls";
 import {
   AuthorFormDialog,
-  type AuthorFormValues,
 } from "@/components/admin/author-form-dialog";
 
 interface Author {
@@ -40,6 +47,9 @@ interface Author {
 const PAGE_SIZE = 20;
 
 export default function AdminAuthorsPage() {
+  const params = useParams<{ locale?: string }>();
+  const router = useRouter();
+  const locale = params.locale ?? "ar";
   const { viewMode, setViewMode } = useAdminViewMode("authors");
 
   const [authors, setAuthors] = useState<Author[]>([]);
@@ -52,7 +62,6 @@ export default function AdminAuthorsPage() {
   const [listError, setListError] = useState("");
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingAuthor, setEditingAuthor] = useState<AuthorFormValues | null>(null);
 
   const canCreate = can(PERMISSIONS.authors.create);
   const canUpdate = can(PERMISSIONS.authors.update);
@@ -96,25 +105,6 @@ export default function AdminAuthorsPage() {
 
   const resetPage = () => setPage(1);
 
-  function openCreate() {
-    if (!canCreate) return;
-    setEditingAuthor(null);
-    setDialogOpen(true);
-  }
-
-  function openEdit(author: Author) {
-    if (!canUpdate) return;
-    setEditingAuthor({
-      id: author.id,
-      name: author.name,
-      nameAr: author.nameAr ?? "",
-      slug: author.slug,
-      bio: author.bio ?? "",
-      bioAr: author.bioAr ?? "",
-    });
-    setDialogOpen(true);
-  }
-
   async function handleDelete(row: Author) {
     if (!canDelete) return;
     const bookCount = row._count?.products ?? 0;
@@ -135,10 +125,6 @@ export default function AdminAuthorsPage() {
         setListError(data.error?.message ?? "فشل حذف المؤلف");
         return;
       }
-      if (editingAuthor?.id === row.id) {
-        setDialogOpen(false);
-        setEditingAuthor(null);
-      }
       if (authors.length === 1 && page > 1) {
         setPage((p) => p - 1);
       } else {
@@ -150,30 +136,14 @@ export default function AdminAuthorsPage() {
   }
 
   const rowActions = (row: Author) => (
-    <div className="flex items-center gap-1">
-      {canUpdate && (
-        <Button
-          size="sm"
-          variant="outline"
-          className="gap-1 text-xs"
-          onClick={() => openEdit(row)}
-        >
-          <Pencil className="h-3 w-3" />
-          تعديل
-        </Button>
-      )}
-      {canDelete && (
-        <Button
-          size="sm"
-          variant="outline"
-          className="gap-1 border-[var(--error)]/40 text-[var(--error)] text-xs hover:bg-[var(--error)]/10"
-          onClick={() => void handleDelete(row)}
-        >
-          <Trash2 className="h-3 w-3" />
-          حذف
-        </Button>
-      )}
-    </div>
+    <AdminEntityActions
+      viewHref={adminAuthorViewPath(locale, row.id)}
+      editHref={adminAuthorEditPath(locale, row.id)}
+      publicHref={absoluteUrl(publicAuthorUrl(locale, row.slug))}
+      onDelete={canDelete ? () => void handleDelete(row) : undefined}
+      canEdit={canUpdate}
+      canDelete={canDelete}
+    />
   );
 
   const renderCard = (row: Author) => (
@@ -210,7 +180,7 @@ export default function AdminAuthorsPage() {
     },
     {
       key: "products",
-      label: "الكتب",
+      label: "عدد الكتب",
       render: (row: Author) => (
         <span className="text-[var(--admin-text-muted)]">{row._count?.products ?? 0}</span>
       ),
@@ -239,7 +209,7 @@ export default function AdminAuthorsPage() {
               placeholder="بحث بالاسم أو Slug..."
             />
             {canCreate && (
-              <Button size="sm" className="gap-1.5" onClick={openCreate}>
+              <Button size="sm" className="gap-1.5" onClick={() => setDialogOpen(true)}>
                 <Plus className="h-4 w-4" />
                 مؤلف جديد
               </Button>
@@ -280,7 +250,11 @@ export default function AdminAuthorsPage() {
         loading={loading}
         emptyMessage="لا يوجد مؤلفون بعد"
         renderCard={renderCard}
-        onRowClick={canUpdate ? openEdit : undefined}
+        onRowClick={
+          canUpdate
+            ? (row) => router.push(adminAuthorViewPath(locale, row.id))
+            : undefined
+        }
       />
 
       <AdminPagination
@@ -291,12 +265,14 @@ export default function AdminAuthorsPage() {
         pageSize={PAGE_SIZE}
       />
 
-      {(canCreate || canUpdate) && (
+      {canCreate && (
         <AuthorFormDialog
           open={dialogOpen}
           onOpenChange={setDialogOpen}
-          author={editingAuthor}
-          onSaved={() => void load()}
+          author={null}
+          onSaved={(author) => {
+            router.push(adminAuthorViewPath(locale, author.id));
+          }}
         />
       )}
     </div>

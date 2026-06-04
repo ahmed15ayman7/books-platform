@@ -14,6 +14,8 @@ import {
   localizedAuthorName,
 } from "@/lib/i18n/book-locale";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-shell";
+import { adminAuthorEditPath, adminAuthorViewPath } from "@/lib/admin/public-urls";
 
 interface AuthorPageProps {
   params: Promise<{ slug: string; locale: string }>;
@@ -72,7 +74,15 @@ export default async function AuthorDetailPage({
   const bookCount = author._count.products;
 
   return (
-    <div className="min-h-screen bg-[var(--brand-gray-50)]">
+    <AdminEntityPublicShell
+      entityType="author"
+      entityId={author.id}
+      editHref={adminAuthorEditPath(locale, author.id)}
+      adminViewHref={adminAuthorViewPath(locale, author.id)}
+      publicHref={`/${locale}/authors/${author.slug}`}
+      title={displayName}
+    >
+    <div className="min-h-screen bg-[var(--brand-gray-50)] pb-24">
       <div className="bg-[var(--brand-black)] py-10">
         <div className="container-platform">
           <nav className="mb-4 flex items-center gap-2 text-sm text-[var(--brand-gray-400)]">
@@ -148,5 +158,6 @@ export default async function AuthorDetailPage({
         )}
       </div>
     </div>
+    </AdminEntityPublicShell>
   );
 }

@@ -113,8 +113,11 @@ model Article {
   id               String           @id @default(cuid())
   originalId       Int              @unique @map("original_id")
   title            String
+  titleEn          String?          @map("title_en")
   content          String?          @db.Text
+  contentEn        String?          @map("content_en") @db.Text
   excerpt          String?          @db.Text
+  excerptEn        String?          @map("excerpt_en") @db.Text
   date             DateTime?
   postType         String?          @map("post_type")
   permalink        String?

@@ -42,9 +42,9 @@ function editHref(locale: string, type: TrashType, id: string): string | null {
     case "books":
       return `/${locale}/admin/books/${id}/edit`;
     case "articles":
-      return `/${locale}/admin/articles/${id}`;
+      return `/${locale}/admin/articles/${id}/edit`;
     case "publishers":
-      return `/${locale}/admin/publishers/${id}`;
+      return `/${locale}/admin/publishers/${id}/edit`;
     case "hero":
       return `/${locale}/admin/home-slider`;
     case "users":

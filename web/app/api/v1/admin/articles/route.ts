@@ -59,6 +59,7 @@ export async function GET(request: NextRequest) {
           youtubeUrl: true,
           createdAt: true,
           updatedAt: true,
+          titleEn: true,
           products: { ...adminArticleProductSelect, take: 1 },
         },
       }),
@@ -88,7 +89,8 @@ export async function POST(request: NextRequest) {
     const parsed = articleCreateSchema.safeParse(body);
     if (!parsed.success) return ApiErrors.badRequest("Validation failed", parsed.error.issues);
 
-    const { title, body: content, excerpt, channel, status, date } = parsed.data;
+    const { title, body: content, excerpt, titleEn, excerptEn, bodyEn, channel, status, date } =
+      parsed.data;
 
     let resolved;
     try {
@@ -110,8 +112,11 @@ export async function POST(request: NextRequest) {
       data: {
         originalId: Date.now(),
         title,
+        titleEn: resolved.titleEn ?? titleEn ?? null,
         content: content ?? null,
+        contentEn: resolved.contentEn ?? bodyEn ?? null,
         excerpt: excerpt ?? null,
+        excerptEn: resolved.excerptEn ?? excerptEn ?? null,
         channel: channel ?? null,
         status,
         imageUrl:
