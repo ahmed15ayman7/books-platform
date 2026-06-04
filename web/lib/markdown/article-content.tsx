@@ -1,54 +1,60 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { SafeImage } from "@/components/ui/safe-image";
+import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { isImageUrl } from "./is-image-url";
 import { parseArticleContent } from "./parse-article-content";
 
+const INLINE_TOKEN =
+  /!\[([^\]]*)\]\(([^)]+)\)|\[([^\]]+)\]\(([^)]+)\)|(\*\*[^*]+\*\*|__[^_]+__|\*[^*]+\*|_[^_]+_)/g;
+
 function inlineFormat(text: string): ReactNode[] {
   const parts: ReactNode[] = [];
-  const re = /(\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g;
   let last = 0;
   let m: RegExpExecArray | null;
   let key = 0;
 
-  while ((m = re.exec(text)) !== null) {
+  while ((m = INLINE_TOKEN.exec(text)) !== null) {
     if (m.index > last) parts.push(text.slice(last, m.index));
-    const token = m[0];
-    if (token.startsWith("**")) {
+
+    if (m[1] !== undefined && m[2] !== undefined) {
       parts.push(
-        <strong key={key++} className="font-bold text-[var(--brand-gray-900)]">
-          {token.slice(2, -2)}
-        </strong>,
+        <InlineArticleImage key={key++} src={m[2].trim()} alt={m[1].trim() || "صورة"} compact />,
       );
-    } else if (token.startsWith("*")) {
-      parts.push(<em key={key++}>{token.slice(1, -1)}</em>);
-    } else if (token.startsWith("[")) {
-      const linkMatch = /\[([^\]]+)\]\(([^)]+)\)/.exec(token);
-      if (linkMatch) {
-        const label = linkMatch[1]!;
-        const href = linkMatch[2]!;
-        if (isImageUrl(href)) {
-          parts.push(
-            <InlineArticleImage key={key++} src={href} alt={label} compact />,
-          );
-        } else {
-          parts.push(
-            <a
-              key={key++}
-              href={href}
-              className="font-medium text-[var(--brand-red)] underline underline-offset-2 hover:text-[var(--brand-red-hover)]"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              {label}
-            </a>,
-          );
-        }
+    } else if (m[3] !== undefined && m[4] !== undefined) {
+      const label = m[3].trim();
+      const href = m[4].trim();
+      if (isImageUrl(href)) {
+        parts.push(
+          <InlineArticleImage key={key++} src={href} alt={label || "صورة"} compact />,
+        );
+      } else {
+        parts.push(
+          <a
+            key={key++}
+            href={href}
+            className="font-medium text-[var(--brand-red)] underline underline-offset-2 hover:text-[var(--brand-red-hover)]"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            {label || href}
+          </a>,
+        );
+      }
+    } else if (m[5]) {
+      const token = m[5];
+      if (token.startsWith("**") || token.startsWith("__")) {
+        parts.push(
+          <strong key={key++} className="font-bold text-[var(--brand-gray-900)]">
+            {token.slice(2, -2)}
+          </strong>,
+        );
+      } else {
+        parts.push(<em key={key++}>{token.slice(1, -1)}</em>);
       }
     }
-    last = m.index + token.length;
+
+    last = m.index + m[0].length;
   }
 
   if (last < text.length) parts.push(text.slice(last));
@@ -64,6 +70,8 @@ function InlineArticleImage({
   alt: string;
   compact?: boolean;
 }) {
+  const [failed, setFailed] = useState(false);
+
   return (
     <figure className={cn("my-6 w-full text-center", compact && "my-4")}>
       <div
@@ -72,14 +80,23 @@ function InlineArticleImage({
           compact ? "max-w-md" : "max-w-2xl",
         )}
       >
-        <SafeImage
-          src={src}
-          alt={alt}
-          width={960}
-          height={640}
-          className="h-auto w-full object-contain"
-          sizes="(max-width:768px) 100vw, 672px"
-        />
+        {!failed ? (
+          // Native img — article URLs are external/dynamic (gstatic, wp, etc.)
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={src}
+            alt={alt}
+            loading="lazy"
+            decoding="async"
+            referrerPolicy="no-referrer"
+            className="h-auto w-full object-contain"
+            onError={() => setFailed(true)}
+          />
+        ) : (
+          <div className="flex min-h-[120px] items-center justify-center px-4 py-8 text-sm text-[var(--brand-gray-500)]">
+            {alt || "صورة"}
+          </div>
+        )}
       </div>
       {alt && alt !== "صورة" && alt !== "image" && (
         <figcaption className="mt-2 text-sm text-[var(--brand-gray-500)]">{alt}</figcaption>
@@ -107,7 +124,7 @@ export function ArticleContent({ content, className }: ArticleContentProps) {
               return (
                 <h2
                   key={index}
-                  className="mt-8 mb-3 font-display text-2xl font-bold text-[var(--brand-red)] first:mt-0"
+                  className="mt-8 mb-3 font-display text-2xl font-bold text-[var(--brand-red)] first:mt-0 md:text-3xl"
                 >
                   {inner}
                 </h2>
@@ -117,7 +134,7 @@ export function ArticleContent({ content, className }: ArticleContentProps) {
               return (
                 <h3
                   key={index}
-                  className="mt-6 mb-2 text-xl font-bold text-[var(--brand-gray-900)] first:mt-0"
+                  className="mt-6 mb-2 text-xl font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-2xl"
                 >
                   {inner}
                 </h3>
@@ -126,7 +143,7 @@ export function ArticleContent({ content, className }: ArticleContentProps) {
             return (
               <h4
                 key={index}
-                className="mt-4 mb-2 text-lg font-semibold text-[var(--brand-gray-900)]"
+                className="mt-4 mb-2 text-lg font-semibold text-[var(--brand-gray-900)] md:text-xl"
               >
                 {inner}
               </h4>
@@ -143,7 +160,7 @@ export function ArticleContent({ content, className }: ArticleContentProps) {
             );
           case "list":
             return (
-              <ul key={index} className="my-3 list-disc space-y-2 ps-6">
+              <ul key={index} className="my-3 list-disc space-y-2 ps-6 md:text-lg">
                 {block.items.map((item, i) => (
                   <li key={i} className="text-base leading-relaxed text-[var(--brand-gray-700)]">
                     {inlineFormat(item)}

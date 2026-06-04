@@ -12,6 +12,14 @@ describe("isImageUrl", () => {
   it("detects wp upload paths", () => {
     expect(isImageUrl("https://booksplatform.net/wp-content/uploads/book.jpeg")).toBe(true);
   });
+
+  it("detects Google thumbnail CDN URLs without file extension", () => {
+    expect(
+      isImageUrl(
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0eH9-QMCxNn0rQWmiQ2y_IcWWK2EskO7V3w&s",
+      ),
+    ).toBe(true);
+  });
 });
 
 describe("parseArticleContent", () => {
@@ -46,5 +54,23 @@ describe("parseArticleContent", () => {
     );
     const blocks = parseArticleContent(source);
     expect(blocks[0]).toMatchObject({ type: "image" });
+  });
+
+  it("renders gstatic thumbnail as image block", () => {
+    const url =
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0eH9-QMCxNn0rQWmiQ2y_IcWWK2EskO7V3w&s";
+    const blocks = parseArticleContent(`${url}`);
+    expect(blocks[0]).toMatchObject({ type: "image", src: url });
+  });
+
+  it("preserves bold from HTML strong tags", () => {
+    const source = htmlToArticleSource("<p>Hello <strong>world</strong></p>");
+    const blocks = parseArticleContent(source);
+    expect(blocks.some((b) => b.type === "paragraph" && b.text.includes("**world**"))).toBe(true);
+  });
+
+  it("parses markdown headings", () => {
+    const blocks = parseArticleContent("## Section title\n\nBody text");
+    expect(blocks[0]).toMatchObject({ type: "heading", level: 2, text: "Section title" });
   });
 });
