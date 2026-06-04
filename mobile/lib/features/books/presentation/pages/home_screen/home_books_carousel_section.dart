@@ -58,7 +58,7 @@ class HomeBooksCarouselSection extends StatelessWidget {
                           book: b,
                           locale: locale,
                           width: 150.w,
-                          onTap: () => onBookTap(b.id, b.titleAr),
+                          onTap: () => onBookTap(b.slug, b.titleAr),
                         ),
                       ),
                     )

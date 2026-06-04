@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -37,18 +38,33 @@ class ArticlesArticleRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              width: 78.w,
-              height: 78.h,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.r),
-                gradient: LinearGradient(
-                  begin: AlignmentDirectional.topStart,
-                  end: AlignmentDirectional.bottomEnd,
-                  colors: article.coverColors.length >= 2
-                      ? [article.coverColors[1], article.coverColors[0]]
-                      : [AppColors.secondary, AppColors.primary],
-                ),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12.r),
+              child: Stack(
+                children: [
+                  Container(
+                    width: 78.w,
+                    height: 78.h,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: AlignmentDirectional.topStart,
+                        end: AlignmentDirectional.bottomEnd,
+                        colors: article.coverColors.length >= 2
+                            ? [article.coverColors[1], article.coverColors[0]]
+                            : [AppColors.secondary, AppColors.primary],
+                      ),
+                    ),
+                  ),
+                  if (article.imageUrl != null)
+                    Positioned.fill(
+                      child: CachedNetworkImage(
+                        imageUrl: article.imageUrl!,
+                        fit: BoxFit.cover,
+                        placeholder: (_, _) => const SizedBox.shrink(),
+                        errorWidget: (_, _, _) => const SizedBox.shrink(),
+                      ),
+                    ),
+                ],
               ),
             ),
             SizedBox(width: 13.w),

@@ -45,7 +45,7 @@ class HomeBody extends StatelessWidget {
                 book: state.featured.first,
                 locale: locale,
                 onTap: () => onBookTap(
-                  state.featured.first.id,
+                  state.featured.first.slug,
                   state.featured.first.titleAr,
                 ),
               ),

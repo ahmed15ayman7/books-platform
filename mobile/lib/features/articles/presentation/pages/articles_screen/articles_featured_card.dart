@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -47,6 +48,15 @@ class ArticlesFeaturedCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (article.imageUrl != null)
+                  Positioned.fill(
+                    child: CachedNetworkImage(
+                      imageUrl: article.imageUrl!,
+                      fit: BoxFit.cover,
+                      placeholder: (_, _) => const SizedBox.shrink(),
+                      errorWidget: (_, _, _) => const SizedBox.shrink(),
+                    ),
+                  ),
                 PositionedDirectional(
                   top: 12.h,
                   start: 12.w,

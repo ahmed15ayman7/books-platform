@@ -73,7 +73,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                         onArticleTap: (a) => Navigator.of(ctx).pushNamed(
                           AppRoutes.articleDetail,
                           arguments:
-                              ArticleDetailArgs(id: a.id, title: a.title),
+                              ArticleDetailArgs(id: a.slug, title: a.title),
                         ),
                         onRefresh: () =>
                             ctx.read<ArticlesListCubit>().refresh(),

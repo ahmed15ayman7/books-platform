@@ -119,7 +119,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             onTap: () => Navigator.of(ctx).pushNamed(
                               AppRoutes.bookDetail,
                               arguments: BookDetailArgs(
-                                slug: books[i].id,
+                                slug: books[i].slug,
                                 titleAr: books[i].titleAr,
                               ),
                             ),

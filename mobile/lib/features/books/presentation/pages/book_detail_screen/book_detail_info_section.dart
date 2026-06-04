@@ -104,7 +104,7 @@ class BookDetailInfoSection extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: onAddCart,
+            onPressed: book.price > 0 ? onAddCart : null,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

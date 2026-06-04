@@ -26,7 +26,6 @@ class ArticlesRemoteDataSourceImpl {
       _api.get<PaginatedResponse<Article>>(
         path: '/articles',
         queryParameters: {
-          'channel': ?channel,
           'page': page,
           'limit': limit,
           'sort': ?sort,
