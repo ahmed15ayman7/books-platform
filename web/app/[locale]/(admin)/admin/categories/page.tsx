@@ -20,7 +20,8 @@ import {
   adminUpdatedAtColumn,
 } from "@/components/admin/admin-timestamps";
 import { AdminCard } from "@/components/admin/admin-card";
-import { AdminInput, AdminCheckbox, AdminSlugInput } from "@/components/admin/admin-form-field";
+import { AdminCheckbox, AdminSlugInput } from "@/components/admin/admin-form-field";
+import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { autoSlugFromEnglish } from "@/lib/admin/slugify";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
@@ -222,25 +223,23 @@ export default function AdminCategoriesPage() {
               onResume={draft.resume}
               onDismiss={draft.dismiss}
             />
-            <AdminInput
-              label="الاسم (EN) *"
-              value={form.name}
-              onChange={(e) => {
-                const name = e.target.value;
-                setForm((p) => ({
-                  ...p,
-                  name,
-                  slug: autoSlugFromEnglish(name, p.slug, p.name),
-                }));
-              }}
-              dir="ltr"
-              required
-            />
-            <AdminInput
-              label="الاسم (AR)"
-              value={form.nameAr}
-              onChange={(e) => set("nameAr")(e.target.value)}
-            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <AdminBilingualField
+                arValue={form.nameAr}
+                enValue={form.name}
+                onArChange={(v) => setForm((p) => ({ ...p, nameAr: v }))}
+                onEnChange={(v) => {
+                  setForm((p) => ({
+                    ...p,
+                    name: v,
+                    slug: autoSlugFromEnglish(v, p.slug, p.name),
+                  }));
+                }}
+                labels={{ ar: "الاسم (AR)", en: "الاسم (EN) *" }}
+                layout="half"
+                enRequired
+              />
+            </div>
             <AdminSlugInput
               label="Slug *"
               value={form.slug}

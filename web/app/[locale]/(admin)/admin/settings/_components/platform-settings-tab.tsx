@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminInput, AdminCheckbox } from "@/components/admin/admin-form-field";
+import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { usePasskeyGate } from "@/lib/admin/use-passkey-gate";
 import { can } from "@/lib/admin/permissions-client";
 import { PERMISSIONS } from "@/lib/auth/permissions";
@@ -108,15 +109,13 @@ export function PlatformSettingsTab() {
       />
       <AdminCard title="معلومات المنصة">
         <div className="grid gap-4 sm:grid-cols-2">
-          <AdminInput
-            label="اسم المنصة (عربي)"
-            value={settings.platformNameAr}
-            onChange={set("platformNameAr")}
-          />
-          <AdminInput
-            label="Platform Name (EN)"
-            value={settings.platformNameEn}
-            onChange={set("platformNameEn")}
+          <AdminBilingualField
+            arValue={settings.platformNameAr}
+            enValue={settings.platformNameEn}
+            onArChange={(v) => setSettings((p) => ({ ...p, platformNameAr: v }))}
+            onEnChange={(v) => setSettings((p) => ({ ...p, platformNameEn: v }))}
+            labels={{ ar: "اسم المنصة (عربي)", en: "Platform Name (EN)" }}
+            layout="half"
           />
           <AdminInput
             label="بريد التواصل"

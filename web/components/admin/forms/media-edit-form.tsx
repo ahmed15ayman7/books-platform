@@ -14,9 +14,7 @@ import { YoutubeEmbed } from "@/components/sections/youtube-embed";
 import { parseYoutubeUrl, youtubeThumbnail } from "@/lib/media/youtube";
 import {
   AdminBilingualField,
-  AdminBilingualToolbar,
 } from "@/components/admin/admin-bilingual-field";
-import { useBilingualAutoTranslate } from "@/hooks/use-bilingual-auto-translate";
 import { adminMediaViewPath } from "@/lib/admin/public-urls";
 import { ArticleLivePreview } from "@/components/admin/article-live-preview";
 import { ArticleMarkdownHint } from "@/components/admin/article-markdown-hint";
@@ -80,13 +78,6 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
   const [timestamps, setTimestamps] = useState<{ createdAt?: string; updatedAt?: string }>({});
 
   const previewVideoId = useMemo(() => parseYoutubeUrl(form.youtubeUrl).videoId, [form.youtubeUrl]);
-
-  const titleTranslate = useBilingualAutoTranslate({
-    ar: form.title,
-    en: form.titleEn,
-    onArChange: (v) => setForm((p) => ({ ...p, title: v })),
-    onEnChange: (v) => setForm((p) => ({ ...p, titleEn: v })),
-  });
 
   const load = useCallback(async () => {
     if (isNew) return;
@@ -212,15 +203,6 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
               />
               <ArticleMarkdownHint />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <AdminBilingualToolbar
-                  translating={titleTranslate.translating}
-                  autoEnabled={titleTranslate.autoEnabled}
-                  onToggleAuto={() => titleTranslate.setAutoEnabled((v) => !v)}
-                  onArToEn={() => void titleTranslate.forceTranslateArToEn()}
-                  onEnToAr={() => void titleTranslate.forceTranslateEnToAr()}
-                  arDisabled={!form.title.trim()}
-                  enDisabled={!form.titleEn.trim()}
-                />
                 <AdminBilingualField
                   arValue={form.title}
                   enValue={form.titleEn}
@@ -228,8 +210,6 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
                   onEnChange={(v) => setForm((p) => ({ ...p, titleEn: v }))}
                   labels={{ ar: "العنوان (عربي) *", en: "Title (English)" }}
                   arRequired
-                  showToolbar={false}
-                  layout="full"
                 />
                 <AdminBilingualField
                   arValue={form.excerpt}
@@ -239,8 +219,6 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
                   labels={{ ar: "المقتطف (عربي)", en: "Excerpt (English)" }}
                   multiline
                   rows={2}
-                  showToolbar={false}
-                  layout="full"
                 />
                 <AdminBilingualField
                   arValue={form.body}
@@ -250,8 +228,6 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
                   labels={{ ar: "الوصف (عربي)", en: "Description (English)" }}
                   multiline
                   rows={4}
-                  showToolbar={false}
-                  layout="full"
                 />
               </div>
             </div>

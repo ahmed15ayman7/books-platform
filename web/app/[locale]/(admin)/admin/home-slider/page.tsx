@@ -4,9 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Plus, Pencil, Trash2, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { adminFieldClass } from "@/components/admin/admin-form-field";
+import { adminFieldClass, AdminInput } from "@/components/admin/admin-form-field";
+import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
@@ -169,13 +169,28 @@ export default function AdminHomeSliderPage() {
               onResume={draft.resume}
               onDismiss={draft.dismiss}
             />
-            <Field label="العنوان (عربي) *" value={form.titleAr} onChange={(v) => setForm({ ...form, titleAr: v })} required />
-            <Field label="العنوان (إنجليزي)" value={form.titleEn} onChange={(v) => setForm({ ...form, titleEn: v })} />
-            <Field label="الوصف (عربي)" value={form.subtitleAr} onChange={(v) => setForm({ ...form, subtitleAr: v })} multiline />
-            <Field label="الوصف (إنجليزي)" value={form.subtitleEn} onChange={(v) => setForm({ ...form, subtitleEn: v })} multiline />
-            <Field label="رابط صورة الخلفية *" value={form.imageUrl} onChange={(v) => setForm({ ...form, imageUrl: v })} />
-            <Field label="رابط صورة الكتاب (أمامية)" value={form.foregroundImageUrl} onChange={(v) => setForm({ ...form, foregroundImageUrl: v })} />
-            <Field label="رابط عند النقر" value={form.linkUrl} onChange={(v) => setForm({ ...form, linkUrl: v })} />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <AdminBilingualField
+                arValue={form.titleAr}
+                enValue={form.titleEn}
+                onArChange={(v) => setForm((p) => ({ ...p, titleAr: v }))}
+                onEnChange={(v) => setForm((p) => ({ ...p, titleEn: v }))}
+                labels={{ ar: "العنوان (عربي) *", en: "العنوان (إنجليزي)" }}
+                arRequired
+              />
+              <AdminBilingualField
+                arValue={form.subtitleAr}
+                enValue={form.subtitleEn}
+                onArChange={(v) => setForm((p) => ({ ...p, subtitleAr: v }))}
+                onEnChange={(v) => setForm((p) => ({ ...p, subtitleEn: v }))}
+                labels={{ ar: "الوصف (عربي)", en: "الوصف (إنجليزي)" }}
+                multiline
+                rows={2}
+              />
+            </div>
+            <AdminInput label="رابط صورة الخلفية *" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} required />
+            <AdminInput label="رابط صورة الكتاب (أمامية)" value={form.foregroundImageUrl} onChange={(e) => setForm({ ...form, foregroundImageUrl: e.target.value })} />
+            <AdminInput label="رابط عند النقر" value={form.linkUrl} onChange={(e) => setForm({ ...form, linkUrl: e.target.value })} />
             <div className="flex gap-4">
               <div className="flex-1">
                 <Label className="mb-1 text-xs text-[var(--admin-text-muted)]">الترتيب</Label>
@@ -267,43 +282,6 @@ export default function AdminHomeSliderPage() {
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-function Field({
-  label,
-  value,
-  onChange,
-  required,
-  multiline,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  required?: boolean;
-  multiline?: boolean;
-}) {
-  return (
-    <div>
-      <Label className="mb-1 text-xs text-[var(--admin-text-muted)]">{label}</Label>
-      {multiline ? (
-        <Textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          rows={2}
-          className={adminFieldClass}
-          required={required}
-        />
-      ) : (
-        <Input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={adminFieldClass}
-          required={required}
-        />
-      )}
     </div>
   );
 }
