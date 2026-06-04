@@ -12,7 +12,6 @@ import { BookCard } from "@/components/sections/book-card";
 import { CategoryGrid } from "@/components/sections/category-grid";
 import { ArticleCard } from "@/components/sections/article-card";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { StatsCounter } from "@/components/sections/stats-counter";
 import { NewsletterStrip } from "@/components/sections/newsletter-strip";
 import { PublishersMarquee } from "@/components/sections/publishers-marquee";
 import { PublisherCard } from "@/components/sections/publisher-card";
@@ -72,7 +71,7 @@ export default async function HomePage() {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("home");
 
-  const [homeBooks, stats, articlesMap, dbSlides, categories, articleCategories, latestMedia] = await Promise.all([
+  const [homeBooks, articlesMap, dbSlides, categories, articleCategories, latestMedia] = await Promise.all([
     BookService.getHomeData().catch(() => ({
       newlyReleased: [],
       translated: [],
@@ -80,12 +79,6 @@ export default async function HomePage() {
       publishers: [],
       publisherGrid: [],
       categorySections: [],
-    })),
-    BookService.getStats().catch(() => ({
-      totalBooks: 0,
-      totalPublishers: 0,
-      totalTranslatedBooks: 0,
-      totalCountries: 0,
     })),
     ArticleService.getFeaturedForHome().catch(() => ({})),
     HeroSlideService.listActive().catch(() => []),
@@ -372,7 +365,6 @@ export default async function HomePage() {
                     imageUrl={pub.imageUrl}
                     websiteUrl={pub.websiteUrl}
                     country={pub.country}
-                    bookCount={pub.bookCount}
                     locale={locale}
                   />
                 </StaggerItem>
@@ -448,11 +440,6 @@ export default async function HomePage() {
                     className="inline-flex items-center gap-1.5 rounded-full border border-[var(--brand-gray-200)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-gray-700)] transition-all hover:border-[var(--brand-red)] hover:bg-[var(--brand-red-soft)] hover:text-[var(--brand-red)]"
                   >
                     {locale === "ar" && cat.nameAr ? cat.nameAr : cat.name}
-                    {cat.linkedCount > 0 && (
-                      <span className="rounded-full bg-[var(--brand-gray-100)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--brand-gray-500)]">
-                        {cat.linkedCount}
-                      </span>
-                    )}
                   </Link>
                 </StaggerItem>
               ))}
@@ -558,15 +545,6 @@ export default async function HomePage() {
           </div>
         </div>
       </AnimatedSection>
-
-      {/* ── Stats ─────────────────────────────────────────────── */}
-      <StatsCounter
-        totalBooks={stats.totalBooks}
-        totalPublishers={stats.totalPublishers}
-        totalTranslatedBooks={stats.totalTranslatedBooks}
-        totalCountries={stats.totalCountries}
-        locale={locale}
-      />
 
       <HomeServicesPreview
         locale={locale}

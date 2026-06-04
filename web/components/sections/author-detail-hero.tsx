@@ -16,7 +16,6 @@ interface AuthorDetailHeroProps {
   name: string;
   alternateName?: string | null;
   bio?: string | null;
-  bookCount: number;
   imageUrl?: string | null;
   slug: string;
   homeHref: string;
@@ -37,7 +36,6 @@ export function AuthorDetailHero({
   name,
   alternateName,
   bio,
-  bookCount,
   imageUrl,
   slug,
   homeHref,
@@ -98,11 +96,6 @@ export function AuthorDetailHero({
               </FadeIn>
             )}
             <StaggerContainer className="mt-3 flex flex-wrap gap-2" delay={0.15}>
-              <StaggerItem>
-                <span className="inline-flex rounded-full bg-white/10 px-3 py-1 text-sm text-[var(--brand-gray-300)]">
-                  {bookCount} {isAr ? "كتاب" : "books"}
-                </span>
-              </StaggerItem>
               <StaggerItem>
                 <span className="inline-flex rounded-full bg-white/10 px-3 py-1 text-sm text-[var(--brand-gray-400)]">
                   {slug}

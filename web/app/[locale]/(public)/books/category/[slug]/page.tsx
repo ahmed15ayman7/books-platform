@@ -59,15 +59,18 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   const representativeBook = books[0];
   const categoryDescription =
     locale === "ar"
-      ? `استكشف كتب تصنيف ${categoryName} — ${pagination.total} إصدار على المنصة.`
-      : `Explore ${categoryName} books — ${pagination.total} titles on the platform.`;
+      ? `استكشف كتب تصنيف ${categoryName} على المنصة.`
+      : `Explore ${categoryName} books on the platform.`;
 
   return (
     <ContentPageShell
       locale={locale}
       hero={{
         title: categoryName,
-        subtitle: locale === "ar" ? `${pagination.total} كتاب` : `${pagination.total} books`,
+        subtitle:
+          locale === "ar"
+            ? "تصفّح الإصدارات في هذا التصنيف"
+            : "Browse titles in this category",
         breadcrumbs: [
           { label: locale === "ar" ? "الرئيسية" : "Home", href: `/${locale}` },
           { label: locale === "ar" ? "الكتب" : "Books", href: `/${locale}/books` },
@@ -123,7 +126,6 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                   className="rounded-full border border-[var(--brand-gray-200)] bg-white px-4 py-1.5 text-sm text-[var(--brand-gray-700)] transition-colors hover:border-[var(--brand-red)] hover:text-[var(--brand-red)]"
                 >
                   {locale === "ar" && cat.nameAr ? cat.nameAr : cat.name}
-                  <span className="ms-1 text-[var(--brand-gray-400)]">({cat.linkedCount})</span>
                 </Link>
               ))}
             </div>

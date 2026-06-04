@@ -17,8 +17,6 @@ interface CatalogCollageHeroProps {
   locale: Locale;
   title: string;
   subtitle: string;
-  totalCount: number;
-  statLabel: string;
   covers: CoverItem[];
   breadcrumbs?: BreadcrumbItem[];
   variant?: "translated" | "nominated";
@@ -31,8 +29,6 @@ export function CatalogCollageHero({
   locale,
   title,
   subtitle,
-  totalCount,
-  statLabel,
   covers,
   breadcrumbs = [],
   variant = "translated",
@@ -47,8 +43,6 @@ export function CatalogCollageHero({
     variant === "nominated"
       ? "from-amber-950 via-[var(--brand-black)] to-[var(--brand-black)]"
       : "from-[var(--brand-red)]/30 via-[var(--brand-black)] to-[var(--brand-black)]";
-
-  const statColor = variant === "nominated" ? "text-amber-400" : "text-[var(--brand-red-soft)]";
 
   return (
     <section
@@ -91,11 +85,6 @@ export function CatalogCollageHero({
             </StaggerContainer>
 
             <RevealText text={title} as="h1" className="font-display text-display-md font-bold text-white" />
-            <FadeIn delay={0.15}>
-              <p className={cn("mt-2 text-2xl font-bold md:text-3xl", statColor)}>
-                {totalCount}+ {statLabel}
-              </p>
-            </FadeIn>
             <FadeIn delay={0.2}>
               <p className="mt-3 max-w-xl text-base text-[var(--brand-gray-300)] md:text-lg">
                 {subtitle}

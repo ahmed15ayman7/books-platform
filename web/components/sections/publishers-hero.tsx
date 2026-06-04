@@ -18,8 +18,6 @@ interface PublishersHeroProps {
   locale: Locale;
   title: string;
   subtitle: string;
-  totalPublishers: number;
-  totalCountries: number;
   logos: PublisherLogo[];
   breadcrumbs?: BreadcrumbItem[];
 }
@@ -28,8 +26,6 @@ export function PublishersHero({
   locale,
   title,
   subtitle,
-  totalPublishers,
-  totalCountries,
   logos,
   breadcrumbs = [],
 }: PublishersHeroProps) {
@@ -37,10 +33,6 @@ export function PublishersHero({
   const homeLabel = isAr ? "الرئيسية" : "Home";
   const crumbs =
     breadcrumbs.length > 0 ? breadcrumbs : [{ label: homeLabel, href: `/${locale}` }];
-
-  const statLine = isAr
-    ? `${totalPublishers}+ ناشر من ${totalCountries} دولة`
-    : `${totalPublishers}+ publishers from ${totalCountries} countries`;
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-[var(--brand-black)] via-[#1a1a1a] to-[var(--brand-red)]/20 py-12 md:py-16">
@@ -78,9 +70,6 @@ export function PublishersHero({
           <div>
             <RevealText text={title} as="h1" className="font-display text-display-md font-bold text-white" />
             <FadeIn delay={0.15}>
-              <p className="mt-2 text-xl font-semibold text-[var(--brand-red-soft)]">{statLine}</p>
-            </FadeIn>
-            <FadeIn delay={0.2}>
               <p className="mt-3 max-w-lg text-base text-[var(--brand-gray-300)]">{subtitle}</p>
             </FadeIn>
           </div>

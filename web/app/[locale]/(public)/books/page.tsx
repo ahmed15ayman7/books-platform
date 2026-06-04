@@ -87,7 +87,11 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
         locale={locale}
         variant="light"
         title={t("catalog")}
-        subtitle={locale === "ar" ? `${pagination.total}+ كتاب` : `${pagination.total}+ books`}
+        subtitle={
+          locale === "ar"
+            ? "استكشف مكتبة الكتب من دور النشر العالمية"
+            : "Explore our library of books from publishers worldwide"
+        }
         className="relative overflow-hidden border-b border-[var(--brand-gray-200)] bg-gradient-to-br from-white via-[var(--brand-red-soft)]/25 to-[var(--brand-gray-50)]"
         breadcrumbs={[
           { label: locale === "ar" ? "الرئيسية" : "Home", href: `/${locale}` },

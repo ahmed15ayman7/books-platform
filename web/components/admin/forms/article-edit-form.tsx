@@ -21,6 +21,7 @@ import {
 } from "@/lib/admin/public-urls";
 import { ArticleLivePreview } from "@/components/admin/article-live-preview";
 import { ArticleMarkdownHint } from "@/components/admin/article-markdown-hint";
+import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
 
 interface ArticleForm {
   title: string;
@@ -147,8 +148,7 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
     void load();
   }, [load]);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submitArticle(asDraft = false) {
     setSaving(true);
     setError("");
     setSuccess(false);
@@ -159,6 +159,7 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
         headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          status: asDraft ? "draft" : form.status,
           productIds,
           date: form.date ? new Date(form.date) : null,
         }),
@@ -187,6 +188,16 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
       setSaving(false);
     }
   }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await submitArticle(false);
+  }
+
+  useAdminFormShortcuts({
+    onSave: () => void submitArticle(false),
+    onSaveDraft: () => void submitArticle(true),
+  });
 
   const set =
     (k: keyof ArticleForm) =>

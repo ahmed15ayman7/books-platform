@@ -14,6 +14,7 @@ import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 import { autoSlugFromEnglish } from "@/lib/admin/slugify";
 import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { adminAuthorViewPath } from "@/lib/admin/public-urls";
+import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
 
 interface AuthorForm {
   name: string;
@@ -77,8 +78,7 @@ export function AuthorEditForm({ locale, id }: AuthorEditFormProps) {
     void load();
   }, [load]);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submitAuthor() {
     if (!form.name.trim()) {
       setError("الاسم الإنجليزي مطلوب");
       return;
@@ -110,6 +110,15 @@ export function AuthorEditForm({ locale, id }: AuthorEditFormProps) {
       setSaving(false);
     }
   }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await submitAuthor();
+  }
+
+  useAdminFormShortcuts({
+    onSave: () => void submitAuthor(),
+  });
 
   if (loading) return <div className="text-[var(--admin-text-muted)]">جاري التحميل...</div>;
 

@@ -13,6 +13,7 @@ import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { adminPublisherViewPath } from "@/lib/admin/public-urls";
+import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
 
 interface PublisherForm {
   name: string;
@@ -91,8 +92,7 @@ export function PublisherEditForm({ locale, id }: PublisherEditFormProps) {
     void load();
   }, [load]);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submitPublisher(asDraft = false) {
     if (!form.nameAr.trim() && !form.name.trim()) {
       setError("أدخل اسم الناشر بالعربية أو الإنجليزية");
       return;
@@ -105,7 +105,10 @@ export function PublisherEditForm({ locale, id }: PublisherEditFormProps) {
       const res = await fetch(url, {
         method: isNew ? "POST" : "PATCH",
         headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          status: asDraft ? "draft" : form.status,
+        }),
       });
       const data = await res.json() as { success: boolean; error?: { message: string }; data?: { id: string } };
       if (!res.ok || !data.success) {
@@ -124,6 +127,16 @@ export function PublisherEditForm({ locale, id }: PublisherEditFormProps) {
       setSaving(false);
     }
   }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await submitPublisher(false);
+  }
+
+  useAdminFormShortcuts({
+    onSave: () => void submitPublisher(false),
+    onSaveDraft: () => void submitPublisher(true),
+  });
 
   const set = (key: keyof PublisherForm) => (v: string | boolean) =>
     setForm((prev) => ({ ...prev, [key]: v }));

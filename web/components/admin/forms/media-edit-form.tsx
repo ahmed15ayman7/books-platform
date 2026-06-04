@@ -18,6 +18,7 @@ import {
 import { adminMediaViewPath } from "@/lib/admin/public-urls";
 import { ArticleLivePreview } from "@/components/admin/article-live-preview";
 import { ArticleMarkdownHint } from "@/components/admin/article-markdown-hint";
+import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
 
 interface MediaForm {
   title: string;
@@ -120,8 +121,7 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
     void load();
   }, [load]);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submitMedia(asDraft = false) {
     if (!previewVideoId) {
       setError("رابط YouTube غير صالح");
       return;
@@ -132,6 +132,7 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
     try {
       const payload = {
         ...form,
+        status: asDraft ? "draft" : form.status,
         body: form.body,
         bodyEn: form.bodyEn,
         productIds,
@@ -160,6 +161,16 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
       setSaving(false);
     }
   }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await submitMedia(false);
+  }
+
+  useAdminFormShortcuts({
+    onSave: () => void submitMedia(false),
+    onSaveDraft: () => void submitMedia(true),
+  });
 
   const set =
     (k: keyof MediaForm) =>

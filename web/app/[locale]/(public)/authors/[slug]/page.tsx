@@ -73,7 +73,6 @@ export default async function AuthorDetailPage({
   const displayName = localizedAuthorName(author, locale);
   const alternateName = localizedAuthorAlternateName(author, locale);
   const bio = localizedAuthorBio(author, locale);
-  const bookCount = author._count.products;
   const coverImage = books[0]?.imageUrl ?? null;
 
   return (
@@ -91,7 +90,6 @@ export default async function AuthorDetailPage({
           name={displayName}
           alternateName={alternateName}
           bio={bio}
-          bookCount={bookCount}
           imageUrl={coverImage}
           slug={author.slug}
           homeHref={`/${locale}`}
@@ -111,7 +109,6 @@ export default async function AuthorDetailPage({
             <SectionBlock
               id="books"
               title={isAr ? `كتب ${displayName}` : `Books by ${displayName}`}
-              lead={`${pagination.total} ${isAr ? "كتاب" : "books"}`}
             >
               {books.length === 0 ? (
                 <div className="py-20 text-center text-[var(--brand-gray-500)]">

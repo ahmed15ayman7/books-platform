@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { PublisherService } from "@/server/services/publisher.service";
-import { BookService } from "@/server/services/book.service";
 import { PublishersHero } from "@/components/sections/publishers-hero";
 import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
 import { PublisherCard } from "@/components/sections/publisher-card";
@@ -45,7 +44,7 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
   const t = await getTranslations("publishers");
   const page = Math.max(1, parseInt(sp.page ?? "1", 10));
 
-  const [{ publishers, pagination }, stats, countries, sponsored, logoPublishers] =
+  const [{ publishers, pagination }, countries, sponsored, logoPublishers] =
     await Promise.all([
     PublisherService.list({
       page,
@@ -56,7 +55,6 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
       publishers: [],
       pagination: { page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false },
     })),
-    BookService.getStats().catch(() => ({ totalBooks: 0, totalPublishers: 0, totalTranslatedBooks: 0, totalCountries: 0 })),
     PublisherService.getAllCountries().catch(() => []),
     PublisherService.getSponsored(4).catch(() => []),
     PublisherService.list({ page: 1, limit: 8 }).catch(() => ({ publishers: [] })),
@@ -88,8 +86,6 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
             ? "دار نشر من كل أنحاء العالم — دليل دور النشر العالمية"
             : "Publishing houses from around the world — your global directory"
         }
-        totalPublishers={stats.totalPublishers}
-        totalCountries={stats.totalCountries}
         logos={heroLogos}
         breadcrumbs={[
           { label: locale === "ar" ? "الرئيسية" : "Home", href: `/${locale}` },
@@ -114,7 +110,6 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
                   slug={pub.slug}
                   imageUrl={pub.imageUrl}
                   locale={locale}
-                  bookCount={0}
                 />
               </StaggerItem>
             ))}
@@ -204,7 +199,6 @@ interface PublisherListingCardProps {
     nameAr?: string | null;
     slug: string;
     imageUrl?: string | null;
-    booksCount: number;
     isSponsored: boolean;
     countries: { name: string; nameAr?: string | null; slug: string }[];
   };
@@ -252,10 +246,6 @@ function PublisherListingCard({ publisher, locale }: PublisherListingCardProps) 
             {isAr && country.nameAr ? country.nameAr : country.name}
           </span>
         )}
-
-        <span className="mt-auto text-[10px] text-[var(--brand-gray-500)]">
-          {publisher.booksCount} {isAr ? "كتاب" : "books"}
-        </span>
       </div>
     </Link>
   );

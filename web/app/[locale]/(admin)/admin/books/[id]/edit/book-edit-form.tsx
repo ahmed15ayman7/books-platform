@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Save, Loader2, CheckCircle2, AlertCircle, ExternalLink } from "lucide-react";
+import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
 import { createBook, updateBook, type BookEditData } from "./actions";
 import { adminFieldClass } from "@/components/admin/admin-form-field";
 import { AdminMarkdownHint } from "@/components/admin/admin-markdown-hint";
@@ -207,8 +208,7 @@ export function BookEditForm({
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  function submitBook(asDraft = false) {
     setStatus("idle");
     setErrorMsg("");
     setSavedPublicSlug(null);
@@ -232,6 +232,7 @@ export function BookEditForm({
       ...form,
       nameEn: nameEn || nameAr,
       slug,
+      published: asDraft ? false : form.published,
     };
 
     startTransition(async () => {
@@ -265,6 +266,16 @@ export function BookEditForm({
       }
     });
   }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    submitBook(false);
+  }
+
+  useAdminFormShortcuts({
+    onSave: () => submitBook(false),
+    onSaveDraft: () => submitBook(true),
+  });
 
   const successMessage = isCreate ? "تم إنشاء الكتاب بنجاح" : "تم حفظ التغييرات بنجاح";
   const publicSlug = savedPublicSlug ?? bookSlug ?? (form.slug.trim() || null);

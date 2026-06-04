@@ -4,10 +4,9 @@ import { ContentPageShell } from "@/components/sections/content-page-shell";
 import { SectionBlock } from "@/components/sections/section-block";
 import { TeamGrid } from "@/components/sections/team-grid";
 import { TeamQuoteBlock } from "@/components/sections/team-quote-block";
-import { TeamStatsMini } from "@/components/sections/team-stats-mini";
 import { TeamDepartments } from "@/components/sections/team-departments";
 import { CtaBand } from "@/components/sections/cta-band";
-import { getTeamContent, TEAM_MEMBERS } from "@/lib/content/team";
+import { getTeamContent } from "@/lib/content/team";
 import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -34,7 +33,6 @@ export default async function TeamPage() {
   const locale = (await getLocale()) as Locale;
   const content = getTeamContent(locale);
   const isAr = locale === "ar";
-  const featuredCount = TEAM_MEMBERS.filter((m) => m.featured).length;
 
   return (
     <ContentPageShell
@@ -51,12 +49,6 @@ export default async function TeamPage() {
       }}
     >
       <SectionBlock lead={content.intro} />
-
-      <TeamStatsMini
-        locale={locale}
-        totalMembers={TEAM_MEMBERS.length}
-        featuredCount={featuredCount}
-      />
 
       <SectionBlock id="leadership" title={content.leadershipSection.title}>
         <TeamGrid members={content.members} locale={locale} filter="featured" />

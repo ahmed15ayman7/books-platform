@@ -68,8 +68,6 @@ export default async function NominatedForTranslationPage({ searchParams }: Prop
         locale={locale}
         title={t("nominatedTitle")}
         subtitle={t("nominatedSubtitle")}
-        totalCount={pagination.total}
-        statLabel={locale === "ar" ? "كتاب مرشح" : "nominated books"}
         covers={covers}
         variant="nominated"
         breadcrumbs={[

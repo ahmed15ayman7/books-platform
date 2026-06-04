@@ -63,8 +63,6 @@ export default async function TranslatedBooksPage({ searchParams }: Props) {
         locale={locale}
         title={t("translatedTitle")}
         subtitle={t("translatedSubtitle")}
-        totalCount={pagination.total}
-        statLabel={locale === "ar" ? "كتاب مترجم" : "translated books"}
         covers={covers}
         variant="translated"
         breadcrumbs={[
