@@ -179,7 +179,7 @@ export function AuthorEditForm({ locale, id }: AuthorEditFormProps) {
         </AdminCard>
 
         {error && (
-          <p className="rounded-lg bg-[var(--error)]/10 border border-[var(--error)]/30 px-4 py-2 text-sm text-[var(--error)]">
+          <p className="form-error-banner rounded-lg px-4 py-2 text-sm">
             {error}
           </p>
         )}

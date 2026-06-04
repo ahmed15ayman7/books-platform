@@ -1,3 +1,5 @@
+"use client";
+
 import { BookMarked, FileText, Mic, Newspaper, Search, Share2 } from "lucide-react";
 import type { ServicePillar } from "@/lib/content/services";
 import type { Locale } from "@/lib/i18n";

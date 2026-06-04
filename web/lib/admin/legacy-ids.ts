@@ -29,3 +29,8 @@ export async function nextPublisherOriginalId(): Promise<number> {
   const result = await db.publisher.aggregate({ _max: { originalId: true } });
   return nextSequentialId(result._max.originalId);
 }
+
+export async function nextArticleOriginalId(): Promise<number> {
+  const result = await db.article.aggregate({ _max: { originalId: true } });
+  return nextSequentialId(result._max.originalId);
+}
