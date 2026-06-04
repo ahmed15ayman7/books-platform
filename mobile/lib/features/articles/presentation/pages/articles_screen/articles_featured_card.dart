@@ -1,4 +1,5 @@
-import 'package:easy_localization/easy_localization.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -47,6 +48,15 @@ class ArticlesFeaturedCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (article.imageUrl != null)
+                  Positioned.fill(
+                    child: CachedNetworkImage(
+                      imageUrl: article.imageUrl!,
+                      fit: BoxFit.cover,
+                      placeholder: (_, _) => const SizedBox.shrink(),
+                      errorWidget: (_, _, _) => const SizedBox.shrink(),
+                    ),
+                  ),
                 PositionedDirectional(
                   top: 12.h,
                   start: 12.w,
@@ -75,7 +85,7 @@ class ArticlesFeaturedCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    article.categoryLabel,
+                    locale == 'ar' ? article.categoryLabelAr : article.categoryLabel,
                     style: GoogleFonts.cairo(
                       fontSize: 11.5.sp,
                       fontWeight: FontWeight.w700,
@@ -104,8 +114,10 @@ class ArticlesFeaturedCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 9.h),
+                  // $mobile-debug-skill | Problem: same Arabic BiDi issue as article row — "د" at end scrambles layout. Fix: force LTR direction on this metadata Text.
                   Text(
                     '${article.date} · ${article.readMinutes} ${'articles.min_read'.tr()}',
+                    textDirection: TextDirection.ltr,
                     style: GoogleFonts.inter(
                       fontSize: 11.5.sp,
                       color: AppColors.textHint,

@@ -62,22 +62,25 @@ class BookModel {
   final bool isNew;
 
   factory BookModel.fromJson(Map<String, dynamic> json) {
+    // $mobile-debug-skill | Problem: API returns `primaryCategory` (object|null) but code read non-existent `categories` array and `categorySlug`, so slug was always ''. Fix: read primaryCategory.slug first, then fall back to the legacy fields.
+    final primaryCat = json['primaryCategory'] as Map<String, dynamic>?;
     final categories = json['categories'] as List<dynamic>? ?? [];
-    final categorySlug = categories.isNotEmpty
-        ? (categories[0] as Map<String, dynamic>)['slug'] as String? ?? ''
-        : json['categorySlug'] as String? ?? '';
+    final categorySlug = primaryCat != null
+        ? primaryCat['slug'] as String? ?? ''
+        : categories.isNotEmpty
+            ? (categories[0] as Map<String, dynamic>)['slug'] as String? ?? ''
+            : json['categorySlug'] as String? ?? '';
 
     return BookModel(
       id: json['_id'] as String? ?? json['id'] as String? ?? '',
       slug: json['slug'] as String? ?? '',
       titleAr: json['nameAr'] as String? ?? json['titleAr'] as String? ?? '',
       titleEn: json['nameEn'] as String? ?? json['titleEn'] as String? ?? '',
-      publisher: (json['publisher'] as Map<String, dynamic>?)?['name'] as String? ??
-          json['publisher'] as String? ?? '',
+      publisher: (json['publisher'] as Map<String, dynamic>?)?['title'] as String? ?? '',
       publisherId: (json['publisher'] as Map<String, dynamic>?)?['slug'] as String? ??
           json['publisherId'] as String? ?? '',
-      countryAr: json['countryAr'] as String? ?? '',
-      countryEn: json['countryEn'] as String? ?? '',
+      countryAr: json['publishingCountry'] as String? ?? json['countryAr'] as String? ?? '',
+      countryEn: json['publishingCountry'] as String? ?? json['countryEn'] as String? ?? '',
       countryFlag: json['countryFlag'] as String? ?? '',
       originalLanguage: json['originalLanguage'] as String? ?? '',
       status: TranslationStatusX.fromString(json['translationStatus'] as String?),
@@ -85,7 +88,7 @@ class BookModel {
       categorySlug: categorySlug,
       coverColors: const [Color(0xFF2B2540), Color(0xFF46467F)],
       isbn: json['isbn'] as String? ?? '',
-      pages: (json['pages'] as num?)?.toInt() ?? 0,
+      pages: (json['pageCount'] as num?)?.toInt() ?? (json['pages'] as num?)?.toInt() ?? 0,
       edition: json['edition'] as String? ?? '',
       year: (json['year'] as num?)?.toInt() ?? 0,
       descriptionAr: json['descriptionAr'] as String? ?? '',

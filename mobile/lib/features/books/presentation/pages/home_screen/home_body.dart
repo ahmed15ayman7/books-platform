@@ -45,7 +45,7 @@ class HomeBody extends StatelessWidget {
                 book: state.featured.first,
                 locale: locale,
                 onTap: () => onBookTap(
-                  state.featured.first.id,
+                  state.featured.first.slug,
                   state.featured.first.titleAr,
                 ),
               ),
@@ -65,14 +65,15 @@ class HomeBody extends StatelessWidget {
               onSeeAll: onBrowse,
               onBookTap: onBookTap,
             ),
-          if (state.translatedBooks.isNotEmpty)
-            HomeBooksCarouselSection(
-              title: 'home.translated_books'.tr(),
-              books: state.translatedBooks,
-              locale: locale,
-              onSeeAll: onBrowse,
-              onBookTap: onBookTap,
-            ),
+          HomeBooksCarouselSection(
+            title: 'home.translated_books'.tr(),
+            books: state.translatedBooks,
+            locale: locale,
+            onSeeAll: onBrowse,
+            onBookTap: onBookTap,
+            emptyTitle: 'home.no_translated_books'.tr(),
+            emptySubtitle: 'home.no_translated_books_subtitle'.tr(),
+          ),
           if (state.topPublishers.isNotEmpty)
             HomePublishersSection(
               publishers: state.topPublishers,

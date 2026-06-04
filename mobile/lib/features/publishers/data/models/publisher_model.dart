@@ -36,9 +36,9 @@ class PublisherModel {
       countries: countriesRaw.map((e) => e.toString()).toList(),
       isSponsored: json['isSponsored'] as bool? ?? false,
       imageUrl: json['imageUrl'] as String? ?? json['logoUrl'] as String?,
-      excerpt: json['excerpt'] as String?,
+      excerpt: json['description'] as String? ?? json['excerpt'] as String?,
       website: json['website'] as String?,
-      email: json['email'] as String?,
+      email: json['contactEmail'] as String? ?? json['email'] as String?,
     );
   }
 

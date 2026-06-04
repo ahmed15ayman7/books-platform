@@ -4,7 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/di/injection_container.dart';
 import '../../../../core/helpers/regex_helper.dart';
+import '../../../../core/helpers/snack_bar_helper.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../cubit/comments_cubit.dart';
@@ -56,6 +58,7 @@ class _CommentFormState extends State<CommentForm> {
           _emailCtrl.clear();
           _commentCtrl.clear();
           setState(() => _attempted = false);
+          getIt<SnackBarHelper>().showSuccess('comments_submitted'.tr());
         }
       },
       builder: (context, state) {

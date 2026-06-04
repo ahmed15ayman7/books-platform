@@ -23,7 +23,7 @@ class BooksRemoteDataSourceImpl {
   Future<Either<Failure, List<Book>>> getFeaturedBooks() => _api.get(
         path: '/books',
         queryParameters: {
-          'status': 'TRANSLATED',
+          'translationStatus': 'TRANSLATED',
           'sort': 'newest',
           'limit': 10,
         },
@@ -43,8 +43,8 @@ class BooksRemoteDataSourceImpl {
       _api.get<PaginatedResponse<Book>>(
         path: '/books',
         queryParameters: {
-          'categorySlug': ?categorySlug,
-          if (status != null) 'status': _statusToString(status),
+          'category': ?categorySlug,
+          if (status != null) 'translationStatus': _statusToString(status),
           'sort': sort == SortOrder.newest ? 'newest' : 'oldest',
           'page': page,
           'limit': limit,
@@ -68,7 +68,7 @@ class BooksRemoteDataSourceImpl {
   Future<Either<Failure, List<Category>>> getCategories() => _api.get(
         path: '/books/categories',
         fromJson: (json) {
-          final list = json as List<dynamic>;
+          final list = (json as Map<String, dynamic>)['data'] as List<dynamic>;
           return list
               .map((e) => CategoryModel.fromJson(e as Map<String, dynamic>).toEntity())
               .toList();
@@ -85,19 +85,21 @@ class BooksRemoteDataSourceImpl {
       _api.get(
         path: '/books/$bookSlug/similar',
         queryParameters: {'limit': 6},
+        // $mobile-debug-skill | Problem: API wraps books under data.books (not data directly); casting data as List threw TypeError, caught as UnexpectedFailure, silently swallowed by getOrElse. Fix: read data['books'] as the list.
         fromJson: (json) {
-          final list = json as List<dynamic>;
+          final data = (json as Map<String, dynamic>)['data'] as Map<String, dynamic>;
+          final list = data['books'] as List<dynamic>;
           return list
               .map((e) => BookModel.fromJson(e as Map<String, dynamic>).toEntity())
               .toList();
         },
       );
 
-  Future<Either<Failure, List<Book>>> getBooksByPublisherId(String publisherId) =>
+  Future<Either<Failure, List<Book>>> getBooksByPublisherSlug(String publisherSlug) =>
       _api.get(
-        path: '/publishers/$publisherId/books',
+        path: '/publishers/$publisherSlug/books',
         fromJson: (json) {
-          final list = json as List<dynamic>;
+          final list = (json as Map<String, dynamic>)['data'] as List<dynamic>;
           return list
               .map((e) => BookModel.fromJson(e as Map<String, dynamic>).toEntity())
               .toList();
@@ -118,7 +120,7 @@ class BooksRemoteDataSourceImpl {
   }) =>
       _api.get<PaginatedResponse<Book>>(
         path: '/books',
-        queryParameters: {'status': 'TRANSLATED', 'page': page, 'limit': limit},
+        queryParameters: {'translationStatus': 'TRANSLATED', 'page': page, 'limit': limit},
         fromJson: (json) => PaginatedResponse<Book>.fromJson(
           json,
           fromJsonT: (item) => BookModel.fromJson(item).toEntity(),
@@ -131,7 +133,7 @@ class BooksRemoteDataSourceImpl {
   }) =>
       _api.get<PaginatedResponse<Book>>(
         path: '/books',
-        queryParameters: {'status': 'NOMINATED', 'page': page, 'limit': limit},
+        queryParameters: {'translationStatus': 'NOMINATED', 'page': page, 'limit': limit},
         fromJson: (json) => PaginatedResponse<Book>.fromJson(
           json,
           fromJsonT: (item) => BookModel.fromJson(item).toEntity(),

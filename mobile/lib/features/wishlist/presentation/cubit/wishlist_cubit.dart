@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 
 import 'package:booksplatform/core/network/failure_messages.dart' as core;
 
+import '../../domain/entities/wishlist_item.dart';
 import '../../domain/repositories/wishlist_repository.dart';
 import 'wishlist_state.dart';
 
@@ -17,18 +18,18 @@ class WishlistCubit extends Cubit<WishlistState> {
     final result = await _repository.getWishlist();
     result.fold(
       (failure) => emit(WishlistError(core.failureToMessage(failure))),
-      (slugs) => emit(WishlistLoaded(slugs)),
+      (items) => emit(WishlistLoaded(items)),
     );
   }
 
-  Future<void> toggle(String slug) async {
+  Future<void> toggle(WishlistItem item) async {
     final current = state;
     if (current is! WishlistLoaded) return;
 
-    if (current.slugs.contains(slug)) {
-      await _repository.removeFromWishlist(slug);
+    if (current.slugs.contains(item.bookSlug)) {
+      await _repository.removeFromWishlist(item.bookSlug);
     } else {
-      await _repository.addToWishlist(slug);
+      await _repository.addToWishlist(item);
     }
     await load();
   }

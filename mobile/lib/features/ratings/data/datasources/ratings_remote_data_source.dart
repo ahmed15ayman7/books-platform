@@ -35,18 +35,32 @@ class RatingsRemoteDataSource {
         fromJson: (_) => unit,
       );
 
-  Future<Either<Failure, PaginatedResponse<Comment>>> getComments(
-    String productId, {
+  Future<Either<Failure, PaginatedResponse<Comment>>> getComments({
+    String? productId,
+    String? articleId,
     int page = 1,
     int limit = 20,
   }) =>
       _api.get<PaginatedResponse<Comment>>(
         path: '/comments',
-        queryParameters: {'productId': productId, 'page': page, 'limit': limit},
-        fromJson: (json) => PaginatedResponse<Comment>.fromJson(
-          json,
-          fromJsonT: (item) => CommentModel.fromJson(item).toEntity(),
-        ),
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+          'productId': ?productId,
+          'articleId': ?articleId,
+        },
+        fromJson: (json) {
+          final outer = json as Map<String, dynamic>;
+          final inner = outer['data'] as Map<String, dynamic>;
+          return PaginatedResponse<Comment>(
+            data: (inner['comments'] as List<dynamic>)
+                .map((e) => CommentModel.fromJson(e as Map<String, dynamic>).toEntity())
+                .toList(),
+            pagination: PaginationMeta.fromJson(
+              inner['pagination'] as Map<String, dynamic>? ?? {},
+            ),
+          );
+        },
       );
 
   Future<Either<Failure, Unit>> submitComment({

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -33,6 +34,16 @@ class ArticleDetailHeroHeader extends StatelessWidget {
               ),
             ),
           ),
+          // $mobile-debug-skill | Problem: article detail hero showed only a solid gradient because imageUrl was missing from the entity. Fix: show the article image over the gradient when available.
+          if (article.imageUrl != null)
+            Positioned.fill(
+              child: CachedNetworkImage(
+                imageUrl: article.imageUrl!,
+                fit: BoxFit.cover,
+                placeholder: (_, _) => const SizedBox.shrink(),
+                errorWidget: (_, _, _) => const SizedBox.shrink(),
+              ),
+            ),
           PositionedDirectional(
             start: 0,
             end: 0,

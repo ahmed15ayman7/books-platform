@@ -100,6 +100,8 @@ import 'package:booksplatform/features/search/presentation/cubit/search_cubit.da
     as _i1073;
 import 'package:booksplatform/features/static_pages/presentation/cubit/static_page_cubit.dart'
     as _i101;
+import 'package:booksplatform/features/wishlist/data/datasources/wishlist_data_source.dart'
+    as _i1061;
 import 'package:booksplatform/features/wishlist/data/repositories/wishlist_repository_impl.dart'
     as _i140;
 import 'package:booksplatform/features/wishlist/domain/repositories/wishlist_repository.dart'
@@ -108,7 +110,6 @@ import 'package:booksplatform/features/wishlist/presentation/cubit/wishlist_cubi
     as _i232;
 import 'package:dio/dio.dart' as _i361;
 import 'package:flutter/material.dart' as _i409;
-import 'package:flutter/widgets.dart' as _i718;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' as _i558;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
@@ -116,17 +117,20 @@ import 'package:shared_preferences/shared_preferences.dart' as _i460;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
-  _i174.GetIt init({
+  Future<_i174.GetIt> init({
     String? environment,
     _i526.EnvironmentFilter? environmentFilter,
-  }) {
+  }) async {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerModule = _$RegisterModule();
     gh.factory<_i101.StaticPageCubit>(() => _i101.StaticPageCubit());
     gh.singleton<_i409.GlobalKey<_i409.NavigatorState>>(
       () => registerModule.navigatorKey,
     );
-    gh.singletonAsync<_i460.SharedPreferences>(() => registerModule.prefs);
+    await gh.singletonAsync<_i460.SharedPreferences>(
+      () => registerModule.prefs,
+      preResolve: true,
+    );
     gh.lazySingleton<_i558.FlutterSecureStorage>(
       () => registerModule.secureStorage,
     );
@@ -153,12 +157,18 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i409.GlobalKey<_i409.NavigatorState>>(),
       ),
     );
-    gh.lazySingletonAsync<_i498.CartStorage>(
-      () async => _i498.CartStorage(await getAsync<_i460.SharedPreferences>()),
+    gh.lazySingleton<_i498.CartStorage>(
+      () => _i498.CartStorage(gh<_i460.SharedPreferences>()),
     );
-    gh.lazySingletonAsync<_i421.WishlistStorage>(
-      () async =>
-          _i421.WishlistStorage(await getAsync<_i460.SharedPreferences>()),
+    gh.lazySingleton<_i421.WishlistStorage>(
+      () => _i421.WishlistStorage(gh<_i460.SharedPreferences>()),
+    );
+    gh.factory<_i377.NotificationSettingsCubit>(
+      () => _i377.NotificationSettingsCubit(
+        gh<_i460.SharedPreferences>(),
+        gh<_i438.FcmService>(),
+        gh<_i693.NotificationsRepository>(),
+      ),
     );
     gh.lazySingleton<_i502.DialogHelper>(
       () => _i502.DialogHelper(gh<_i409.GlobalKey<_i409.NavigatorState>>()),
@@ -166,30 +176,23 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i517.SnackBarHelper>(
       () => _i517.SnackBarHelper(gh<_i409.GlobalKey<_i409.NavigatorState>>()),
     );
+    gh.lazySingleton<_i1061.WishlistDataSource>(
+      () => _i1061.WishlistDataSource(gh<_i421.WishlistStorage>()),
+    );
     gh.lazySingleton<_i339.DioFactory>(
       () => _i339.DioFactory(
         gh<_i759.SecureStorageHelper>(),
         gh<_i409.GlobalKey<_i409.NavigatorState>>(),
       ),
     );
-    gh.lazySingletonAsync<_i230.WishlistRepository>(
-      () async =>
-          _i140.WishlistRepositoryImpl(await getAsync<_i421.WishlistStorage>()),
+    gh.lazySingleton<_i230.WishlistRepository>(
+      () => _i140.WishlistRepositoryImpl(gh<_i1061.WishlistDataSource>()),
     );
-    gh.factoryAsync<_i232.WishlistCubit>(
-      () async =>
-          _i232.WishlistCubit(await getAsync<_i230.WishlistRepository>()),
+    gh.factory<_i232.WishlistCubit>(
+      () => _i232.WishlistCubit(gh<_i230.WishlistRepository>()),
     );
-    gh.factoryAsync<_i377.NotificationSettingsCubit>(
-      () async => _i377.NotificationSettingsCubit(
-        await getAsync<_i460.SharedPreferences>(),
-        gh<_i438.FcmService>(),
-        gh<_i693.NotificationsRepository>(),
-        gh<_i718.GlobalKey<_i718.NavigatorState>>(),
-      ),
-    );
-    gh.lazySingletonAsync<_i309.CartCubit>(
-      () async => _i309.CartCubit(await getAsync<_i498.CartStorage>()),
+    gh.lazySingleton<_i309.CartCubit>(
+      () => _i309.CartCubit(gh<_i498.CartStorage>()),
     );
     gh.singleton<_i361.Dio>(() => registerModule.dio(gh<_i339.DioFactory>()));
     gh.lazySingleton<_i473.ApiManager>(() => _i473.ApiManager(gh<_i361.Dio>()));
@@ -268,11 +271,11 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i407.BooksRepository>(),
       ),
     );
-    gh.factoryAsync<_i557.PublishCubit>(
-      () async => _i557.PublishCubit(
+    gh.factory<_i557.PublishCubit>(
+      () => _i557.PublishCubit(
         gh<_i95.PublishRepository>(),
         gh<_i171.FileUploadService>(),
-        await getAsync<_i460.SharedPreferences>(),
+        gh<_i460.SharedPreferences>(),
       ),
     );
     gh.factory<_i47.NewsletterCubit>(

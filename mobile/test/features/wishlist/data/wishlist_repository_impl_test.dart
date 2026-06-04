@@ -1,43 +1,55 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:booksplatform/core/storage/wishlist_storage.dart';
+import 'package:booksplatform/features/wishlist/data/datasources/wishlist_data_source.dart';
 import 'package:booksplatform/features/wishlist/data/repositories/wishlist_repository_impl.dart';
+import 'package:booksplatform/features/wishlist/domain/entities/wishlist_item.dart';
 
-class MockWishlistStorage extends Mock implements WishlistStorage {}
+class MockWishlistDataSource extends Mock implements WishlistDataSource {}
 
 void main() {
-  late MockWishlistStorage mockStorage;
+  late MockWishlistDataSource mockDataSource;
   late WishlistRepositoryImpl repository;
 
   setUp(() {
-    mockStorage = MockWishlistStorage();
-    repository = WishlistRepositoryImpl(mockStorage);
+    mockDataSource = MockWishlistDataSource();
+    repository = WishlistRepositoryImpl(mockDataSource);
   });
 
   group('WishlistRepositoryImpl', () {
-    test('getWishlist returns Right with slug list', () async {
-      when(() => mockStorage.getSlugs()).thenReturn(['slug-1', 'slug-2']);
+    test('getWishlist returns Right with item list', () async {
+      const items = [
+        WishlistItem(bookSlug: 'slug-1'),
+        WishlistItem(bookSlug: 'slug-2'),
+      ];
+      when(() => mockDataSource.getWishlist())
+          .thenAnswer((_) async => const Right(items));
       final result = await repository.getWishlist();
       expect(result.isRight(), true);
-      result.fold((_) {}, (slugs) => expect(slugs, ['slug-1', 'slug-2']));
+      result.fold((_) {}, (list) => expect(list, items));
     });
 
-    test('addToWishlist calls WishlistStorage.addSlug', () async {
-      when(() => mockStorage.addSlug(any())).thenAnswer((_) async {});
-      await repository.addToWishlist('test-slug');
-      verify(() => mockStorage.addSlug('test-slug')).called(1);
+    test('addToWishlist delegates to data source', () async {
+      const item = WishlistItem(bookSlug: 'test-slug');
+      when(() => mockDataSource.addToWishlist(any()))
+          .thenAnswer((_) async => const Right(unit));
+      await repository.addToWishlist(item);
+      verify(() => mockDataSource.addToWishlist(item)).called(1);
     });
 
-    test('removeFromWishlist calls WishlistStorage.removeSlug', () async {
-      when(() => mockStorage.removeSlug(any())).thenAnswer((_) async {});
+    test('removeFromWishlist delegates to data source', () async {
+      when(() => mockDataSource.removeFromWishlist(any()))
+          .thenAnswer((_) async => const Right(unit));
       await repository.removeFromWishlist('test-slug');
-      verify(() => mockStorage.removeSlug('test-slug')).called(1);
+      verify(() => mockDataSource.removeFromWishlist('test-slug')).called(1);
     });
 
     test('isInWishlist returns correct bool', () async {
-      when(() => mockStorage.contains('in-list')).thenReturn(true);
-      when(() => mockStorage.contains('not-in-list')).thenReturn(false);
+      when(() => mockDataSource.isInWishlist('in-list'))
+          .thenAnswer((_) async => const Right(true));
+      when(() => mockDataSource.isInWishlist('not-in-list'))
+          .thenAnswer((_) async => const Right(false));
 
       final inList = await repository.isInWishlist('in-list');
       final notInList = await repository.isInWishlist('not-in-list');
@@ -48,10 +60,11 @@ void main() {
       notInList.fold((_) {}, (v) => expect(v, false));
     });
 
-    test('clearWishlist calls WishlistStorage.clear', () async {
-      when(() => mockStorage.clear()).thenAnswer((_) async {});
+    test('clearWishlist delegates to data source', () async {
+      when(() => mockDataSource.clearWishlist())
+          .thenAnswer((_) async => const Right(unit));
       await repository.clearWishlist();
-      verify(() => mockStorage.clear()).called(1);
+      verify(() => mockDataSource.clearWishlist()).called(1);
     });
   });
 }

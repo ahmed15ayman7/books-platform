@@ -31,7 +31,7 @@ abstract class BooksRepository {
     String categorySlug,
   );
 
-  Future<Either<Failure, List<Book>>> getBooksByPublisherId(String publisherId);
+  Future<Either<Failure, List<Book>>> getBooksByPublisherSlug(String publisherSlug);
 
   Future<Either<Failure, BookStats>> getStats();
 

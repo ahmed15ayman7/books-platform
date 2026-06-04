@@ -39,6 +39,7 @@ const articleListSelect = {
 
 export interface ArticleFilters {
   channel?: string;
+  categorySlug?: string;
   page?: number;
   limit?: number;
   sort?: "newest" | "oldest";
@@ -49,6 +50,7 @@ export const ArticleService = {
   async list(filters: ArticleFilters = {}) {
     const {
       channel,
+      categorySlug,
       page = 1,
       limit = PAGINATION.DEFAULT_PAGE_SIZE,
       sort = "newest",
@@ -61,6 +63,7 @@ export const ArticleService = {
       status: "publish",
       ...notDeleted,
       ...(channel && { channel }),
+      ...(categorySlug && { articleCategory: { slug: categorySlug } }),
       ...(featured !== undefined && { isFeatured: featured }),
     };
 

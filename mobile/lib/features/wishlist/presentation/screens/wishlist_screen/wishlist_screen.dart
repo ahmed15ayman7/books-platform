@@ -50,7 +50,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   );
                 }
                 if (state is WishlistLoaded) {
-                  if (state.slugs.isEmpty) {
+                  if (state.items.isEmpty) {
                     return EmptyStateWidget(
                       icon: Icons.favorite_border_rounded,
                       title: 'wishlist_empty_title'.tr(),
@@ -61,8 +61,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
                     top: false,
                     child: ListView(
                       children: [
-                        ...state.slugs.map(
-                          (slug) => WishlistItemCard(slug: slug),
+                        ...state.items.map(
+                          (item) => WishlistItemCard(item: item),
                         ),
                         Padding(
                           padding: EdgeInsetsDirectional.all(16.r),

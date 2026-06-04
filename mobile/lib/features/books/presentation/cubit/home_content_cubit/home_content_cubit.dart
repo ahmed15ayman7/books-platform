@@ -46,18 +46,14 @@ class HomeContentCubit extends Cubit<HomeContentState> {
       return;
     }
 
-    final allBooks = allResult.fold((_) => <Book>[], (p) => p.data);
-    final freshBooks = allBooks
-        .where((b) => b.isNew || b.status == TranslationStatus.nominated)
-        .take(6)
-        .toList();
-    final translatedBooks = allBooks
+    final freshBooks = allResult.fold((_) => <Book>[], (p) => p.data.take(10).toList());
+    final featured = featuredResult.getOrElse(() => []);
+    final translatedBooks = featured
         .where((b) => b.status == TranslationStatus.translated)
-        .take(6)
         .toList();
 
     emit(HomeContentSuccess(
-      featured: featuredResult.getOrElse(() => []),
+      featured: featured,
       categories: catResult.getOrElse(() => []),
       freshBooks: freshBooks,
       translatedBooks: translatedBooks,

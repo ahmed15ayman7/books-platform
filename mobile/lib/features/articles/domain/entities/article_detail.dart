@@ -21,6 +21,7 @@ class ArticleDetail extends Equatable {
     this.authorFirstName = '',
     this.authorLastName = '',
     this.videoUrl,
+    this.imageUrl,
   });
 
   final String id;
@@ -39,6 +40,7 @@ class ArticleDetail extends Equatable {
   final String authorFirstName;
   final String authorLastName;
   final String? videoUrl;
+  final String? imageUrl;
 
   @override
   List<Object?> get props => [id];

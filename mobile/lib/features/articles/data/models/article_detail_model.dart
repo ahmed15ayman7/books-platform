@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/helpers/date_formatter_helper.dart';
 import '../../domain/entities/article_detail.dart';
 import 'article_model.dart';
 
@@ -19,6 +20,7 @@ class ArticleDetailModel {
     this.pullQuote,
     this.hasVideo = false,
     this.videoUrl,
+    this.imageUrl,
   });
 
   final String id;
@@ -34,7 +36,17 @@ class ArticleDetailModel {
   final List<ArticleModel> relatedArticles;
   final String? pullQuote;
   final bool hasVideo;
-  final String? videoUrl; // TODO: confirm field name with backend (Risk #6)
+  final String? videoUrl;
+  final String? imageUrl;
+
+  static String? _encodeUrl(String? url) {
+    if (url == null) return null;
+    try {
+      return Uri.encodeFull(url);
+    } catch (_) {
+      return url;
+    }
+  }
 
   factory ArticleDetailModel.fromJson(Map<String, dynamic> json) {
     final author = json['author'] as Map<String, dynamic>?;
@@ -47,7 +59,8 @@ class ArticleDetailModel {
       authorFirstName: author?['firstName'] as String? ?? json['authorFirstName'] as String? ?? '',
       authorLastName: author?['lastName'] as String? ?? json['authorLastName'] as String? ?? '',
       date: json['createdAt'] as String? ?? json['date'] as String? ?? '',
-      readingTime: (json['readingTime'] as num?)?.toInt() ?? 5,
+      readingTime: (json['readingTimeMinutes'] as num?)?.toInt() ??
+          (json['readingTime'] as num?)?.toInt() ?? 5,
       channel: json['channel'] as String? ?? '',
       categoryLabel: json['categoryLabel'] as String? ?? json['channel'] as String? ?? '',
       bodyParagraphs: bodyRaw.map((e) => e.toString()).toList(),
@@ -57,6 +70,8 @@ class ArticleDetailModel {
       pullQuote: json['pullQuote'] as String?,
       hasVideo: json['hasVideo'] as bool? ?? false,
       videoUrl: json['videoUrl'] as String?,
+      // $mobile-debug-skill | Problem: article detail had no imageUrl field so the hero only showed a solid gradient. Fix: read imageUrl from API and percent-encode Arabic chars in the path.
+      imageUrl: _encodeUrl(json['imageUrl'] as String? ?? json['coverImageUrl'] as String?),
     );
   }
 
@@ -67,7 +82,8 @@ class ArticleDetailModel {
         authorName: '$authorFirstName $authorLastName'.trim(),
         authorFirstName: authorFirstName,
         authorLastName: authorLastName,
-        date: date,
+        // $mobile-debug-skill | Problem: raw ISO date string was passed to entity unchanged. Fix: parse and format here so the byline shows a human-readable date.
+        date: DateFormatterHelper.formatDate(date.isNotEmpty ? DateTime.tryParse(date) : null),
         readMinutes: readingTime,
         coverColors: const [Color(0xFF0D1B2A), Color(0xFF1B4F72)],
         channel: channel,
@@ -77,5 +93,6 @@ class ArticleDetailModel {
         pullQuote: pullQuote,
         hasVideo: hasVideo,
         videoUrl: videoUrl,
+        imageUrl: imageUrl,
       );
 }

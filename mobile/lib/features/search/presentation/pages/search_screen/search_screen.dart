@@ -147,7 +147,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             onBookTap: (b) => Navigator.of(ctx).pushNamed(
                               AppRoutes.bookDetail,
                               arguments:
-                                  BookDetailArgs(slug: b.id, titleAr: b.titleAr),
+                                  BookDetailArgs(slug: b.slug, titleAr: b.titleAr),
                             ),
                           ),
                         ),

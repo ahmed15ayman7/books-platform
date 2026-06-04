@@ -11,6 +11,7 @@ import '../../../../../core/widgets/error_state_widget.dart';
 import '../../cubit/article_detail_cubit/article_detail_cubit.dart';
 import '../../cubit/article_detail_cubit/article_detail_state.dart';
 import 'article_detail_body.dart';
+import '../../../../ratings/presentation/cubit/comments_cubit.dart';
 
 class ArticleDetailScreen extends StatefulWidget {
   const ArticleDetailScreen({super.key, required this.args});
@@ -21,18 +22,12 @@ class ArticleDetailScreen extends StatefulWidget {
 }
 
 class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
-  final _commentController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
     context.read<ArticleDetailCubit>().load(widget.args.id);
-  }
-
-  @override
-  void dispose() {
-    _commentController.dispose();
-    super.dispose();
+    // $mobile-debug-skill | Problem: CommentsCubit was provided in router but never loaded, so comment section was always empty. Fix: load comments with the article's ID on screen init.
+    context.read<CommentsCubit>().load(articleId: widget.args.id);
   }
 
   @override
@@ -66,7 +61,6 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
                       child: ArticleDetailBody(
                         article: article,
                         locale: locale,
-                        commentController: _commentController,
                         onBack: () => Navigator.of(ctx).pop(),
                         onRelatedTap: (a) =>
                             Navigator.of(ctx).pushReplacementNamed(

@@ -6,26 +6,26 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/empty_state_widget.dart';
 import '../../../domain/entities/article.dart';
-import '../../../domain/entities/article_channel.dart';
+import '../../../domain/entities/article_category.dart';
 import 'articles_article_row.dart';
 import 'articles_featured_card.dart';
 
 class ArticlesBody extends StatelessWidget {
   const ArticlesBody({
     super.key,
-    required this.channels,
+    required this.categories,
     required this.articles,
-    required this.activeChannel,
+    required this.activeSlug,
     required this.locale,
-    required this.onChannelTap,
+    required this.onCategoryTap,
     required this.onArticleTap,
     required this.onRefresh,
   });
-  final List<ArticleChannel> channels;
+  final List<ArticleCategory> categories;
   final List<Article> articles;
-  final String activeChannel;
+  final String activeSlug;
   final String locale;
-  final ValueChanged<String> onChannelTap;
+  final ValueChanged<String> onCategoryTap;
   final ValueChanged<Article> onArticleTap;
   final Future<void> Function() onRefresh;
 
@@ -43,12 +43,12 @@ class ArticlesBody extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               padding: EdgeInsetsDirectional.fromSTEB(16.w, 12.h, 16.w, 4.h),
               child: Row(
-                children: channels.map((c) {
-                  final active = c.key == activeChannel;
+                children: categories.map((c) {
+                  final active = c.slug == activeSlug;
                   return Padding(
                     padding: EdgeInsetsDirectional.only(end: 8.w),
                     child: GestureDetector(
-                      onTap: () => onChannelTap(c.key),
+                      onTap: () => onCategoryTap(c.slug),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 180),
                         padding: EdgeInsets.symmetric(
@@ -66,41 +66,48 @@ class ArticlesBody extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              ar ? c.nameAr : c.nameEn,
-                              style: GoogleFonts.cairo(
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.w700,
-                                color: active
-                                    ? Colors.white
-                                    : AppColors.textPrimary,
-                              ),
-                            ),
-                            SizedBox(width: 6.w),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 4.w, vertical: 1.h),
-                              constraints: BoxConstraints(
-                                  minWidth: 18.r, minHeight: 18.r),
-                              decoration: BoxDecoration(
-                                color: active
-                                    ? Colors.white.withValues(alpha: 0.25)
-                                    : AppColors.inputFill,
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '${c.count}',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 11.sp,
-                                    fontWeight: FontWeight.w700,
-                                    color: active
-                                        ? Colors.white
-                                        : AppColors.textSecondary,
-                                  ),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: 160.w),
+                              child: Text(
+                                ar ? c.nameAr : c.name,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: GoogleFonts.cairo(
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: active
+                                      ? Colors.white
+                                      : AppColors.textPrimary,
                                 ),
                               ),
                             ),
+                            if (c.linkedCount > 0) ...[
+                              SizedBox(width: 6.w),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 4.w, vertical: 1.h),
+                                constraints: BoxConstraints(
+                                    minWidth: 18.r, minHeight: 18.r),
+                                decoration: BoxDecoration(
+                                  color: active
+                                      ? Colors.white.withValues(alpha: 0.25)
+                                      : AppColors.inputFill,
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    '${c.linkedCount}',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 11.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: active
+                                          ? Colors.white
+                                          : AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),

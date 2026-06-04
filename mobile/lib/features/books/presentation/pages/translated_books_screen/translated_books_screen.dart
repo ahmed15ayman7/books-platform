@@ -8,10 +8,10 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/router/args/book_detail_args.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/app_bar_widget.dart';
-import '../../../../../core/widgets/app_loading_indicator.dart';
 import '../../../../../core/widgets/error_state_widget.dart';
 import '../../cubit/catalog_cubit/catalog_cubit.dart';
 import '../../cubit/catalog_cubit/catalog_state.dart';
+import '../../widgets/book_card_shimmer.dart';
 import '../../widgets/book_card_widget.dart';
 
 class TranslatedBooksScreen extends StatefulWidget {
@@ -44,7 +44,7 @@ class _TranslatedBooksScreenState extends State<TranslatedBooksScreen> {
           Expanded(
             child: BlocBuilder<CatalogCubit, CatalogState>(
               builder: (ctx, state) => switch (state) {
-                CatalogLoading() => const Center(child: AppLoadingIndicator()),
+                CatalogLoading() => const _BooksShimmer(),
                 CatalogError(:final message) => Center(
                     child: ErrorStateWidget(
                       message: message,
@@ -87,6 +87,26 @@ class _TranslatedBooksScreenState extends State<TranslatedBooksScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _BooksShimmer extends StatelessWidget {
+  const _BooksShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      padding: EdgeInsetsDirectional.all(16.r),
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12.w,
+        mainAxisSpacing: 14.h,
+        childAspectRatio: 0.46,
+      ),
+      itemCount: 6,
+      itemBuilder: (_, _) => const BookCardShimmer(),
     );
   }
 }

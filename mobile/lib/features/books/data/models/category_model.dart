@@ -20,7 +20,8 @@ class CategoryModel {
         nameAr: json['nameAr'] as String? ?? '',
         nameEn: json['name'] as String? ?? json['nameEn'] as String? ?? '',
         iconKey: json['iconKey'] as String? ?? '',
-        bookCount: (json['linkedCount'] as num?)?.toInt() ??
+        bookCount: (json['count'] as num?)?.toInt() ??
+            (json['linkedCount'] as num?)?.toInt() ??
             (json['bookCount'] as num?)?.toInt() ?? 0,
       );
 

@@ -11,6 +11,7 @@ class Article extends Equatable {
     required this.date,
     required this.readMinutes,
     required this.coverColors,
+    this.categoryLabelAr = '',
     this.hasVideo = false,
     this.slug = '',
     this.authorFirstName = '',
@@ -23,6 +24,7 @@ class Article extends Equatable {
   final String title;
   final String excerpt;
   final String categoryLabel;
+  final String categoryLabelAr;
   final String channel;
   final String date;
   final int readMinutes;

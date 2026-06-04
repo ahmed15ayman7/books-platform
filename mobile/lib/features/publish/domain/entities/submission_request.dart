@@ -32,14 +32,13 @@ class SubmissionRequest {
         'authorEmail': authorEmail,
         'authorPhone': authorPhone,
         'authorBio': authorBio,
-        'bookTitleAr': bookTitleAr,
-        'bookType': bookType,
+        'bookTitle': bookTitleAr,
         'bookSummary': bookSummary,
         'bookLanguage': bookLanguage,
         'bookCategory': bookCategory,
-        'website': '', // honeypot anti-spam field (FR-059)
-        if (coverImageUrl != null) 'coverImageUrl': coverImageUrl,
-        if (manuscriptFileUrl != null) 'manuscriptFileUrl': manuscriptFileUrl,
+        'website': '',
+        if (coverImageUrl != null) 'coverUrl': coverImageUrl,
+        if (manuscriptFileUrl != null) 'fileUrl': manuscriptFileUrl,
         'allowFreeDownload': allowFreeDownload,
       };
 }
