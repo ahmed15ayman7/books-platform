@@ -595,10 +595,7 @@ export function BookEditForm({
 
       {/* ── Status (أسفل النموذج) ─────────────────────────────────── */}
       {status === "success" && (
-        <div
-          role="status"
-          className="rounded-xl border border-green-800/50 bg-green-950/40 px-4 py-3 text-sm text-green-400"
-        >
+        <div role="status" className="form-success-banner flex flex-col gap-2 rounded-xl px-4 py-3 text-sm">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 shrink-0" />
             {successMessage}
@@ -608,7 +605,7 @@ export function BookEditForm({
               href={`/${locale}/books/${publicSlug}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-2 inline-flex items-center gap-1.5 text-[var(--brand-red)] hover:underline"
+              className="inline-flex items-center gap-1.5 hover:underline"
               dir="ltr"
             >
               <ExternalLink className="h-3.5 w-3.5 shrink-0" />
@@ -618,10 +615,7 @@ export function BookEditForm({
         </div>
       )}
       {status === "error" && (
-        <div
-          role="alert"
-          className="flex items-center gap-2 rounded-xl border border-red-800/50 bg-red-950/40 px-4 py-3 text-sm text-red-400"
-        >
+        <div role="alert" className="form-error-banner flex items-center gap-2 rounded-xl px-4 py-3 text-sm">
           <AlertCircle className="h-4 w-4 shrink-0" />
           {errorMsg}
         </div>

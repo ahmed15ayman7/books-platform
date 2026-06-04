@@ -1,0 +1,11 @@
+{
+  "NOMINATED": [],
+  "TRANSLATED": [],
+  "_meta": {
+    "description": "Optional manual slug overrides. Leave empty to fetch from booksplatform.net WooCommerce API.",
+    "wcCategorySlugs": {
+      "NOMINATED": ["books-nominated-for-translation", "كتب-مرشحة-للترجمة"],
+      "TRANSLATED": ["translated-books", "كتب-مترجمة"]
+    }
+  }
+}

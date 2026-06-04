@@ -4,59 +4,52 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  buildBookCategoryLinks,
+  buildMediaChannelLinks,
+  buildReadingChannelLinks,
+  bookCategoriesNavLabel,
+  mediaNavLabel,
+  readingsNavLabel,
+  type NavCategory,
+} from "@/lib/nav/site-nav";
 
 interface MobileNavTriggerProps {
   locale: string;
+  bookCategories?: NavCategory[];
 }
 
-export function MobileNavTrigger({ locale }: MobileNavTriggerProps) {
+export function MobileNavTrigger({ locale, bookCategories = [] }: MobileNavTriggerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const t = locale === "ar";
+  const isAr = locale === "ar";
   const base = `/${locale}`;
 
+  const categoryLinks = buildBookCategoryLinks(locale, bookCategories);
+  const readingLinks = buildReadingChannelLinks(locale);
+  const mediaLinks = buildMediaChannelLinks(locale);
+
   const navGroups = [
+    { label: isAr ? "الرئيسية" : "Home", href: base, items: null as null },
     {
-      label: t ? "الرئيسية" : "Home",
-      href: base,
-      items: null,
-    },
-    {
-      label: t ? "الكتب" : "Books",
+      label: bookCategoriesNavLabel(locale),
       href: null,
-      items: [
-        { href: `${base}/books`, label: t ? "كل الكتب" : "All Books" },
-        { href: `${base}/books/nominated-for-translation`, label: t ? "مرشحة للترجمة" : "For Translation" },
-        { href: `${base}/books/translated`, label: t ? "كتب مترجمة" : "Translated Books" },
-      ],
+      items: categoryLinks,
     },
     {
-      label: t ? "المقالات" : "Articles",
-      href: null,
-      items: [
-        { href: `${base}/articles/harvest`, label: t ? "حصاد الكتب" : "Book Harvest" },
-        { href: `${base}/articles/ideas`, label: t ? "زبدة الأفكار" : "Essence of Ideas" },
-        { href: `${base}/articles/world-reads`, label: t ? "العالم يقرأ" : "World Reads" },
-        { href: `${base}/articles/books-talk`, label: t ? "حديث الكتب" : "Book Talk" },
-        { href: `${base}/articles/watch-your-book`, label: t ? "شاهد كتابك" : "Watch Your Book" },
-        { href: `${base}/articles/novel-story`, label: t ? "رواية فحكاية" : "Novel & Story" },
-      ],
-    },
-    {
-      label: t ? "الناشرون" : "Publishers",
-      href: `${base}/publishers`,
+      label: isAr ? "كتب مرشحة للترجمة" : "For Translation",
+      href: `${base}/books/nominated-for-translation`,
       items: null,
     },
     {
-      label: t ? "انشر كتابك" : "Publish",
-      href: `${base}/publish`,
-      items: null,
-      isAccent: true,
-    },
-    {
-      label: t ? "من نحن" : "About",
-      href: `${base}/about`,
+      label: isAr ? "كتب مترجمة" : "Translated Books",
+      href: `${base}/books/translated`,
       items: null,
     },
+    { label: readingsNavLabel(locale), href: null, items: readingLinks },
+    { label: mediaNavLabel(locale), href: null, items: mediaLinks },
+    { label: isAr ? "الناشرون" : "Publishers", href: `${base}/publishers`, items: null },
+    { label: isAr ? "انشر كتابك" : "Publish", href: `${base}/publish`, items: null, isAccent: true },
+    { label: isAr ? "من نحن" : "About", href: `${base}/about`, items: null },
   ];
 
   return (
@@ -64,48 +57,42 @@ export function MobileNavTrigger({ locale }: MobileNavTriggerProps) {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex h-10 w-10 items-center justify-center rounded-lg text-white hover:bg-white/10 hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]"
-        aria-label={isOpen ? (t ? "إغلاق القائمة" : "Close menu") : (t ? "فتح القائمة" : "Open menu")}
+        aria-label={
+          isOpen ? (isAr ? "إغلاق القائمة" : "Close menu") : isAr ? "فتح القائمة" : "Open menu"
+        }
         aria-expanded={isOpen}
       >
         {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
 
-      {/* Mobile Menu Overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 z-50 flex flex-col"
           role="dialog"
           aria-modal="true"
-          aria-label={t ? "القائمة الرئيسية" : "Main menu"}
+          aria-label={isAr ? "القائمة الرئيسية" : "Main menu"}
         >
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setIsOpen(false)}
-          />
-          {/* Drawer */}
+          <div className="absolute inset-0 bg-black/50" onClick={() => setIsOpen(false)} />
           <div
             className={cn(
               "absolute inset-y-0 end-0 w-[280px] bg-white shadow-xl",
-              "flex flex-col overflow-y-auto"
+              "flex flex-col overflow-y-auto",
             )}
           >
-            {/* Drawer Header */}
             <div className="flex items-center justify-between bg-[var(--brand-black)] px-4 py-3">
               <span className="font-display font-bold text-white">
-                {t ? "القائمة" : "Menu"}
+                {isAr ? "القائمة" : "Menu"}
               </span>
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-[var(--brand-gray-300)] hover:text-white"
-                aria-label={t ? "إغلاق" : "Close"}
+                aria-label={isAr ? "إغلاق" : "Close"}
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            {/* Nav Items */}
-            <nav className="flex-1 p-4 space-y-1">
+            <nav className="flex-1 space-y-1 p-4">
               {navGroups.map((group) =>
                 group.items ? (
                   <MobileNavGroup
@@ -124,12 +111,12 @@ export function MobileNavTrigger({ locale }: MobileNavTriggerProps) {
                       "transition-colors hover:bg-[var(--brand-red-soft)] hover:text-[var(--brand-red)]",
                       group.isAccent
                         ? "mx-2 rounded-lg bg-white px-4 py-3 font-semibold text-[var(--brand-red)] shadow-sm hover:bg-[var(--brand-gray-100)]"
-                        : "text-[var(--brand-gray-700)]"
+                        : "text-[var(--brand-gray-700)]",
                     )}
                   >
                     {group.label}
                   </Link>
-                )
+                ),
               )}
             </nav>
           </div>
@@ -148,22 +135,22 @@ function MobileNavGroup({
   items: { href: string; label: string }[];
   onClose: () => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   return (
     <div>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setExpanded(!expanded)}
         className="flex w-full items-center justify-between rounded-md px-3 py-2.5 text-sm font-medium text-[var(--brand-gray-700)] hover:bg-[var(--brand-red-soft)] hover:text-[var(--brand-red)]"
-        aria-expanded={isOpen}
+        aria-expanded={expanded}
       >
         {label}
-        {isOpen ? (
+        {expanded ? (
           <ChevronUp className="h-4 w-4" aria-hidden="true" />
         ) : (
           <ChevronDown className="h-4 w-4" aria-hidden="true" />
         )}
       </button>
-      {isOpen && (
+      {expanded && (
         <div className="ms-3 mt-1 space-y-1 border-s-2 border-[var(--brand-red-soft)] ps-3">
           {items.map((item) => (
             <Link

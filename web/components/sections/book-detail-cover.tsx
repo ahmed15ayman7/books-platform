@@ -24,7 +24,14 @@ export function BookDetailCover({ src, alt, width, height }: BookDetailCoverProp
         className="relative h-full w-full overflow-hidden rounded-xl bg-[var(--brand-gray-100)] shadow-md ring-1 ring-[var(--brand-gray-200)]"
       >
         {src ? (
-          <SafeImage src={src} alt={alt} fill sizes={`${width}px`} className="object-cover" priority />
+          <SafeImage
+            src={src}
+            alt={alt}
+            fill
+            sizes="(min-width: 1024px) 360px, (min-width: 640px) 280px, 85vw"
+            className="object-contain p-2"
+            priority
+          />
         ) : (
           <div className="flex h-full items-center justify-center text-[var(--brand-gray-400)]">
             <BookOpen className="h-16 w-16" strokeWidth={1.25} aria-hidden="true" />

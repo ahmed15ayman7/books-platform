@@ -55,11 +55,14 @@ export default async function ContactPage() {
       >
         <ContactChannelCards
           phone={content.channels.phone}
+          mobile={content.channels.mobile}
           email={content.channels.email}
+          secondaryEmail={content.channels.secondaryEmail}
           locationTitle={content.location.title}
           locationBody={content.location.body}
           officeHours={content.channels.officeHours}
           phoneLabel={isAr ? "هاتف" : "Phone"}
+          mobileLabel={isAr ? "موبايل" : "Mobile"}
           emailLabel={isAr ? "بريد" : "Email"}
         />
       </ImageTextBand>

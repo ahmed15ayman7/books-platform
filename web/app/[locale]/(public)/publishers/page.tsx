@@ -3,7 +3,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { PublisherService } from "@/server/services/publisher.service";
 import { BookService } from "@/server/services/book.service";
-import { ContentPageShell } from "@/components/sections/content-page-shell";
+import { PublishersHero } from "@/components/sections/publishers-hero";
+import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
 import { PublisherCard } from "@/components/sections/publisher-card";
 import { SectionBlock } from "@/components/sections/section-block";
 import { StaggerContainer, StaggerItem } from "@/components/motion";
@@ -44,7 +45,8 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
   const t = await getTranslations("publishers");
   const page = Math.max(1, parseInt(sp.page ?? "1", 10));
 
-  const [{ publishers, pagination }, stats, countries, sponsored] = await Promise.all([
+  const [{ publishers, pagination }, stats, countries, sponsored, logoPublishers] =
+    await Promise.all([
     PublisherService.list({
       page,
       limit: 20,
@@ -57,23 +59,46 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
     BookService.getStats().catch(() => ({ totalBooks: 0, totalPublishers: 0, totalTranslatedBooks: 0, totalCountries: 0 })),
     PublisherService.getAllCountries().catch(() => []),
     PublisherService.getSponsored(4).catch(() => []),
+    PublisherService.list({ page: 1, limit: 8 }).catch(() => ({ publishers: [] })),
   ]);
 
+  const heroLogos = [
+    ...sponsored.filter((p) => p.imageUrl).map((p) => ({
+      src: p.imageUrl!,
+      alt: localizedPublisherName(p, locale),
+      slug: p.slug,
+    })),
+    ...logoPublishers.publishers
+      .filter((p) => p.imageUrl && !sponsored.some((s) => s.id === p.id))
+      .slice(0, 8 - sponsored.length)
+      .map((p) => ({
+        src: p.imageUrl!,
+        alt: localizedPublisherName(p, locale),
+        slug: p.slug,
+      })),
+  ].slice(0, 8);
+
   return (
-    <ContentPageShell
-      locale={locale}
-      hero={{
-        title: t("title"),
-        subtitle:
+    <div className="min-h-screen bg-[var(--brand-gray-50)]">
+      <PublishersHero
+        locale={locale}
+        title={t("title")}
+        subtitle={
           locale === "ar"
-            ? `${stats.totalPublishers} ناشر من ${stats.totalCountries} دولة`
-            : `${stats.totalPublishers} publishers from ${stats.totalCountries} countries`,
-        breadcrumbs: [
+            ? "دار نشر من كل أنحاء العالم — دليل دور النشر العالمية"
+            : "Publishing houses from around the world — your global directory"
+        }
+        totalPublishers={stats.totalPublishers}
+        totalCountries={stats.totalCountries}
+        logos={heroLogos}
+        breadcrumbs={[
           { label: locale === "ar" ? "الرئيسية" : "Home", href: `/${locale}` },
           { label: t("title") },
-        ],
-      }}
-    >
+        ]}
+      />
+
+      <div className="container-platform py-14 md:py-16">
+        <AnimatedContentSections>
       {sponsored.length > 0 && page === 1 && !sp.search && !sp.country && (
         <SectionBlock
           id="featured-publishers"
@@ -165,7 +190,9 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
           </>
         )}
       </div>
-    </ContentPageShell>
+        </AnimatedContentSections>
+      </div>
+    </div>
   );
 }
 

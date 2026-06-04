@@ -25,7 +25,9 @@
     "analyze": "ANALYZE=true next build",
     "prepare": "husky",
     "verify:images": "tsx scripts/verify-public-images.ts",
-    "assets:about": "tsx scripts/download-about-images.ts"
+    "assets:about": "tsx scripts/download-about-images.ts",
+    "backfill:translation": "tsx --env-file=.env scripts/backfill-translation-status.ts",
+    "backfill:translation:apply": "tsx --env-file=.env scripts/backfill-translation-status.ts --apply"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
