@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { ArticleContent } from "@/lib/markdown/article-content";
 
 interface AdminReadOnlyFieldProps {
   label: string;
@@ -93,9 +94,9 @@ function ProseOrText({
 }) {
   if (variant === "prose" && typeof value === "string") {
     return (
-      <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--admin-text-muted)]">
-        {value}
-      </p>
+      <div className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-muted)]/30 p-4">
+        <ArticleContent content={value} className="text-sm" />
+      </div>
     );
   }
   return <span className="text-sm text-[var(--admin-text)]">{value}</span>;

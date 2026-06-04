@@ -18,6 +18,8 @@ import {
 } from "@/components/admin/admin-bilingual-field";
 import { useBilingualAutoTranslate } from "@/hooks/use-bilingual-auto-translate";
 import { adminMediaViewPath } from "@/lib/admin/public-urls";
+import { ArticleLivePreview } from "@/components/admin/article-live-preview";
+import { ArticleMarkdownHint } from "@/components/admin/article-markdown-hint";
 
 interface MediaForm {
   title: string;
@@ -208,7 +210,8 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
                 placeholder="https://www.youtube.com/watch?v=..."
                 required
               />
-              <div className="grid gap-4 sm:grid-cols-2">
+              <ArticleMarkdownHint />
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <AdminBilingualToolbar
                   translating={titleTranslate.translating}
                   autoEnabled={titleTranslate.autoEnabled}
@@ -317,6 +320,17 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
             <AdminCard title="الكتاب">
               <p className="text-sm font-medium">{selectedBooks[0].nameAr ?? selectedBooks[0].nameEn}</p>
             </AdminCard>
+          )}
+          {(form.body || form.bodyEn) && (
+            <ArticleLivePreview
+              title={form.title}
+              titleEn={form.titleEn}
+              excerpt={form.excerpt}
+              excerptEn={form.excerptEn}
+              body={form.body}
+              bodyEn={form.bodyEn}
+              imageUrl={form.imageUrl || undefined}
+            />
           )}
         </aside>
       </form>

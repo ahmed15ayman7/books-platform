@@ -290,6 +290,10 @@
     color: var(--brand-red-hover);
   }
 
+  .article-prose figure {
+    margin-inline: auto;
+  }
+
   .transition-brand {
     transition: all var(--motion-base) var(--motion-smooth);
   }

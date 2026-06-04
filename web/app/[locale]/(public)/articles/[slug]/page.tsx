@@ -19,6 +19,7 @@ import { youtubeEmbedUrl, youtubeThumbnail } from "@/lib/media/youtube";
 import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-shell";
 import { isMediaChannel } from "@/lib/media/youtube";
 import { adminArticleEditPath, adminArticleViewPath } from "@/lib/admin/public-urls";
+import { ArticleContent } from "@/lib/markdown/article-content";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -199,10 +200,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
 
             {/* Article content */}
             {article.content ? (
-              <div
-                className="prose-brand text-[var(--brand-gray-800)]"
-                dangerouslySetInnerHTML={{ __html: article.content }}
-              />
+              <ArticleContent content={article.content} />
             ) : article.excerpt ? (
               <p className="text-[var(--brand-gray-700)] leading-relaxed text-lg">
                 {article.excerpt}

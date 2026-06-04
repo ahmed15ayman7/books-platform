@@ -21,6 +21,8 @@ import { useBilingualAutoTranslate } from "@/hooks/use-bilingual-auto-translate"
 import {
   adminArticleViewPath,
 } from "@/lib/admin/public-urls";
+import { ArticleLivePreview } from "@/components/admin/article-live-preview";
+import { ArticleMarkdownHint } from "@/components/admin/article-markdown-hint";
 
 interface ArticleForm {
   title: string;
@@ -224,13 +226,15 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
         />
       )}
 
-      <form onSubmit={handleSubmit} className="max-w-4xl space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <FormDraftNotice
           showBanner={draft.showBanner}
           status={draft.status}
           onResume={draft.resume}
           onDismiss={draft.dismiss}
         />
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] xl:items-start">
+          <div className="space-y-5">
         <AdminCard title="الإعدادات">
           <div className="grid gap-4 sm:grid-cols-3">
             <AdminSelect label="القناة" value={form.channel} onChange={set("channel")} options={channelOptions} required />
@@ -265,7 +269,8 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
         </AdminCard>
 
         <AdminCard title="المحتوى">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <ArticleMarkdownHint />
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <AdminBilingualToolbar
               translating={titleTranslate.translating}
               autoEnabled={titleTranslate.autoEnabled}
@@ -303,7 +308,7 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
               onEnChange={(v) => setForm((p) => ({ ...p, bodyEn: v }))}
               labels={{ ar: "المحتوى الكامل (عربي)", en: "Full body (English)" }}
               multiline
-              rows={12}
+              rows={16}
               showToolbar={false}
               layout="full"
             />
@@ -337,6 +342,32 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
               إلغاء
             </Button>
           </Link>
+        </div>
+          </div>
+
+          <aside className="hidden xl:block xl:sticky xl:top-4">
+            <ArticleLivePreview
+              title={form.title}
+              titleEn={form.titleEn}
+              excerpt={form.excerpt}
+              excerptEn={form.excerptEn}
+              body={form.body}
+              bodyEn={form.bodyEn}
+              imageUrl={form.imageUrl || undefined}
+            />
+          </aside>
+        </div>
+
+        <div className="xl:hidden">
+          <ArticleLivePreview
+            title={form.title}
+            titleEn={form.titleEn}
+            excerpt={form.excerpt}
+            excerptEn={form.excerptEn}
+            body={form.body}
+            bodyEn={form.bodyEn}
+            imageUrl={form.imageUrl || undefined}
+          />
         </div>
       </form>
     </div>
