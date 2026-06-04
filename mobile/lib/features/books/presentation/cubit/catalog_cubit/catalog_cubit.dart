@@ -16,10 +16,18 @@ class CatalogCubit extends Cubit<CatalogState> {
   String? _activeCategory;
   TranslationStatus? _activeStatus;
   SortOrder _sort = SortOrder.newest;
+  int _page = 1;
+  bool _isLoadingMore = false;
 
-  Future<void> refresh() => _fetch();
+  Future<void> load() {
+    _page = 1;
+    return _fetch();
+  }
 
-  Future<void> load() => _fetch();
+  Future<void> refresh() {
+    _page = 1;
+    return _fetch();
+  }
 
   Future<void> applyFilter({
     String? categorySlug,
@@ -29,7 +37,35 @@ class CatalogCubit extends Cubit<CatalogState> {
     _activeCategory = categorySlug;
     _activeStatus = status;
     if (sort != null) _sort = sort;
+    _page = 1;
     return _fetch();
+  }
+
+  Future<void> loadMore() async {
+    final current = state;
+    if (current is! CatalogSuccess || !current.hasMore || _isLoadingMore) return;
+    _isLoadingMore = true;
+    _page++;
+    final result = await _repo.getBooks(
+      categorySlug: _activeCategory,
+      status: _activeStatus,
+      sort: _sort,
+      page: _page,
+    );
+    result.fold(
+      (f) {
+        // $mobile-debug-skill | Problem: loadMore page increment would stick on failure leaving pagination in wrong state. Fix: roll back page counter so next attempt retries the same page.
+        _page--;
+        _isLoadingMore = false;
+      },
+      (paginated) {
+        _isLoadingMore = false;
+        emit(CatalogSuccess(
+          books: [...current.books, ...paginated.data],
+          hasMore: paginated.pagination.hasNextPage,
+        ));
+      },
+    );
   }
 
   Future<void> _fetch() async {

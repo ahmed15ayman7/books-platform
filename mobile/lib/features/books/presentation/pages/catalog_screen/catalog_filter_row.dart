@@ -19,7 +19,7 @@ class CatalogFilterRow extends StatelessWidget {
   final String locale;
   final TranslationStatus? activeStatus;
   final bool newest;
-  final ValueChanged<TranslationStatus> onStatusTap;
+  final ValueChanged<TranslationStatus?> onStatusTap;
   final ValueChanged<bool> onSortTap;
 
   @override
@@ -32,7 +32,8 @@ class CatalogFilterRow extends StatelessWidget {
           CatalogFilterChip(
             label: 'books.status.all'.tr(),
             active: activeStatus == null,
-            onTap: () {},
+            // $mobile-debug-skill | Problem: onTap was () {} so tapping "All" never cleared an active status filter. Fix: calls onStatusTap(null) which resets _status in the screen.
+            onTap: () => onStatusTap(null),
           ),
           SizedBox(width: 8.w),
           CatalogFilterChip(

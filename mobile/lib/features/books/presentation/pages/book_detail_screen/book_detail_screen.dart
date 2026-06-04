@@ -10,6 +10,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/app_loading_indicator.dart';
 import '../../../../../core/widgets/error_state_widget.dart';
 import '../../../../cart/presentation/cubit/cart_cubit.dart';
+import '../../../../wishlist/domain/entities/wishlist_item.dart';
 import '../../../../wishlist/presentation/cubit/wishlist_cubit.dart';
 import '../../../../wishlist/presentation/cubit/wishlist_state.dart';
 import '../../cubit/book_detail_cubit/book_detail_cubit.dart';
@@ -76,7 +77,12 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                             setState(() => _expanded = !_expanded),
                         onToggleSave: () {
                           final slug = book.slug.isNotEmpty ? book.slug : book.id;
-                          ctx.read<WishlistCubit>().toggle(slug);
+                          ctx.read<WishlistCubit>().toggle(WishlistItem(
+                            bookSlug: slug,
+                            titleAr: book.titleAr,
+                            titleEn: book.titleEn,
+                            imageUrl: book.imageUrl,
+                          ));
                           if (isSaved) {
                             getIt<SnackBarHelper>().showInfo('wishlist_removed'.tr());
                           } else {

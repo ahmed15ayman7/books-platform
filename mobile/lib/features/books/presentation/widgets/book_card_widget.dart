@@ -83,28 +83,33 @@ class BookCardWidget extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // $mobile-debug-skill | Problem: empty categorySlug always hit the wildcard case and showed "اخري". Fix: hide the chip entirely when no category is assigned.
-                  if (book.categorySlug.isNotEmpty) ...[
-                    Text(
-                      _categoryName(book.categorySlug),
-                      style: GoogleFonts.tajawal(
-                        fontSize: 11.sp,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
-                  ],
+                  // $mobile-debug-skill | Problem: category row was conditional + title could be 1 or 2 lines → cards had different heights in carousel. Fix: always render category row (empty string reserves the space) and fix title to a constant 2-line height.
                   Text(
-                    locale == 'ar' ? book.titleAr : book.titleEn,
-                    style: GoogleFonts.cairo(
-                      fontSize: 14.5.sp,
+                    book.categorySlug.isNotEmpty
+                        ? _categoryName(book.categorySlug)
+                        : '',
+                    style: GoogleFonts.tajawal(
+                      fontSize: 11.sp,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                      height: 1.45,
+                      color: AppColors.primary,
                     ),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4.h),
+                  SizedBox(
+                    height: 14.5.sp * 1.45 * 2,
+                    child: Text(
+                      locale == 'ar' ? book.titleAr : book.titleEn,
+                      style: GoogleFonts.cairo(
+                        fontSize: 14.5.sp,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                        height: 1.45,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   SizedBox(height: 4.h),
                   Text(

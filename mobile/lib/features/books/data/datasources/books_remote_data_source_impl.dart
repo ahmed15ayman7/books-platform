@@ -85,8 +85,10 @@ class BooksRemoteDataSourceImpl {
       _api.get(
         path: '/books/$bookSlug/similar',
         queryParameters: {'limit': 6},
+        // $mobile-debug-skill | Problem: API wraps books under data.books (not data directly); casting data as List threw TypeError, caught as UnexpectedFailure, silently swallowed by getOrElse. Fix: read data['books'] as the list.
         fromJson: (json) {
-          final list = (json as Map<String, dynamic>)['data'] as List<dynamic>;
+          final data = (json as Map<String, dynamic>)['data'] as Map<String, dynamic>;
+          final list = data['books'] as List<dynamic>;
           return list
               .map((e) => BookModel.fromJson(e as Map<String, dynamic>).toEntity())
               .toList();

@@ -17,8 +17,9 @@ class BookDetailCubit extends Cubit<BookDetailState> {
     bookResult.fold(
       (f) => emit(BookDetailError(core.failureToMessage(f))),
       (book) async {
-        final similarResult =
-            await _repo.getSimilarBooks(book.id, book.categorySlug);
+        // $mobile-debug-skill | Problem: book.id (DB primary key) was passed as bookSlug, hitting /books/<id>/similar instead of /books/<slug>/similar. Fix: use book.slug.
+      final similarResult =
+            await _repo.getSimilarBooks(book.slug, book.categorySlug);
         final similar = similarResult.getOrElse(() => []);
         emit(BookDetailSuccess(book: book, similarBooks: similar));
       },

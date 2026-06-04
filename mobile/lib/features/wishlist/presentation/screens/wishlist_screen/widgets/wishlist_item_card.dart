@@ -9,18 +9,21 @@ import 'package:booksplatform/core/theme/app_colors.dart';
 import 'package:booksplatform/core/widgets/book_cover_widget.dart';
 
 import '../../../cubit/wishlist_cubit.dart';
+import '../../../../domain/entities/wishlist_item.dart';
 
 class WishlistItemCard extends StatelessWidget {
-  const WishlistItemCard({super.key, required this.slug});
+  const WishlistItemCard({super.key, required this.item});
 
-  final String slug;
+  final WishlistItem item;
 
   @override
   Widget build(BuildContext context) {
+    // $mobile-debug-skill | Problem: card only had slug → fed slug as titleAr to BookCoverWidget (overflow) and imageUrl was null. Fix: card now takes WishlistItem with real title and imageUrl stored at add-time.
+    final displayTitle = item.titleAr.isNotEmpty ? item.titleAr : item.bookSlug;
     return Dismissible(
-      key: Key(slug),
+      key: Key(item.bookSlug),
       direction: DismissDirection.endToStart,
-      onDismissed: (_) => context.read<WishlistCubit>().toggle(slug),
+      onDismissed: (_) => context.read<WishlistCubit>().toggle(item),
       background: Container(
         alignment: AlignmentDirectional.centerEnd,
         color: AppColors.error,
@@ -30,7 +33,7 @@ class WishlistItemCard extends StatelessWidget {
       child: InkWell(
         onTap: () => Navigator.of(context).pushNamed(
           AppRoutes.bookDetail,
-          arguments: BookDetailArgs(slug: slug, titleAr: slug),
+          arguments: BookDetailArgs(slug: item.bookSlug, titleAr: displayTitle),
         ),
         child: Padding(
           padding: EdgeInsetsDirectional.symmetric(horizontal: 16.w, vertical: 8.h),
@@ -42,9 +45,10 @@ class WishlistItemCard extends StatelessWidget {
                   aspectRatio: 3 / 4,
                   child: BookCoverWidget(
                     coverColors: const [Color(0xFF2B2540), Color(0xFF46467F)],
-                    titleAr: slug,
-                    titleEn: '',
+                    titleAr: item.titleAr,
+                    titleEn: item.titleEn,
                     publisher: '',
+                    imageUrl: item.imageUrl,
                     borderRadius: 6,
                   ),
                 ),
@@ -52,7 +56,7 @@ class WishlistItemCard extends StatelessWidget {
               SizedBox(width: 12.w),
               Expanded(
                 child: Text(
-                  slug,
+                  displayTitle,
                   style: GoogleFonts.cairo(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,

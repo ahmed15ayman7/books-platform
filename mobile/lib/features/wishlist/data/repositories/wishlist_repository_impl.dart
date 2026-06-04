@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../core/network/failure.dart';
+import '../../domain/entities/wishlist_item.dart';
 import '../../domain/repositories/wishlist_repository.dart';
 import '../datasources/wishlist_data_source.dart';
 
@@ -12,12 +13,12 @@ class WishlistRepositoryImpl implements WishlistRepository {
   final WishlistDataSource _dataSource;
 
   @override
-  Future<Either<Failure, List<String>>> getWishlist() =>
+  Future<Either<Failure, List<WishlistItem>>> getWishlist() =>
       _dataSource.getWishlist();
 
   @override
-  Future<Either<Failure, Unit>> addToWishlist(String slug) =>
-      _dataSource.addToWishlist(slug);
+  Future<Either<Failure, Unit>> addToWishlist(WishlistItem item) =>
+      _dataSource.addToWishlist(item);
 
   @override
   Future<Either<Failure, Unit>> removeFromWishlist(String slug) =>

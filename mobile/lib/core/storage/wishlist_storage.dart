@@ -11,27 +11,33 @@ class WishlistStorage {
 
   final SharedPreferences _prefs;
 
-  List<String> getSlugs() {
+  // $mobile-debug-skill | Problem: old storage saved plain slugs List<String>; items had no title/imageUrl for display. Fix: save as JSON objects; backward-compat migration for plain string entries.
+  List<Map<String, dynamic>> getItemMaps() {
     final raw = _prefs.getString(kWishlistKey);
     if (raw == null) return [];
-    return (jsonDecode(raw) as List<dynamic>).cast<String>();
+    final list = jsonDecode(raw) as List<dynamic>;
+    return list.map<Map<String, dynamic>>((e) {
+      if (e is String) return {'slug': e};
+      return Map<String, dynamic>.from(e as Map);
+    }).toList();
   }
 
-  Future<void> saveSlugs(List<String> slugs) =>
-      _prefs.setString(kWishlistKey, jsonEncode(slugs));
+  Future<void> _saveItemMaps(List<Map<String, dynamic>> maps) =>
+      _prefs.setString(kWishlistKey, jsonEncode(maps));
 
-  Future<void> addSlug(String slug) {
-    final slugs = getSlugs();
-    if (!slugs.contains(slug)) slugs.add(slug);
-    return saveSlugs(slugs);
+  Future<void> addItem(Map<String, dynamic> item) {
+    final items = getItemMaps();
+    final slug = item['slug'] as String;
+    if (!items.any((m) => m['slug'] == slug)) items.add(item);
+    return _saveItemMaps(items);
   }
 
-  Future<void> removeSlug(String slug) {
-    final slugs = getSlugs()..remove(slug);
-    return saveSlugs(slugs);
+  Future<void> removeItem(String slug) {
+    final items = getItemMaps()..removeWhere((m) => m['slug'] == slug);
+    return _saveItemMaps(items);
   }
 
-  bool contains(String slug) => getSlugs().contains(slug);
+  bool contains(String slug) => getItemMaps().any((m) => m['slug'] == slug);
 
   Future<void> clear() => _prefs.remove(kWishlistKey);
 }

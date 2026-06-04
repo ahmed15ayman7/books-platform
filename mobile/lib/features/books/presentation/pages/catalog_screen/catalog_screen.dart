@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/enums/translation_status.dart';
 import '../../../../../core/router/app_routes.dart';
+import '../../../domain/entities/sort_order.dart';
 import '../../../../../core/router/args/book_detail_args.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/app_bar_widget.dart';
@@ -12,6 +13,7 @@ import '../../../../../core/widgets/bottom_nav_widget.dart';
 import '../../../../../core/widgets/error_state_widget.dart';
 import '../../cubit/catalog_cubit/catalog_cubit.dart';
 import '../../cubit/catalog_cubit/catalog_state.dart';
+import '../../widgets/book_card_shimmer.dart';
 import '../../widgets/book_card_widget.dart';
 import 'catalog_filter_row.dart';
 import 'catalog_shimmer.dart';
@@ -26,21 +28,42 @@ class CatalogScreen extends StatefulWidget {
 class _CatalogScreenState extends State<CatalogScreen> {
   TranslationStatus? _status;
   bool _newest = true;
+  late final ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
     context.read<CatalogCubit>().load();
+    _scrollController = ScrollController()..addListener(_onScroll);
   }
 
-  void _applyFilter({TranslationStatus? status, bool? newest}) {
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 300) {
+      context.read<CatalogCubit>().loadMore();
+    }
+  }
+
+  // $mobile-debug-skill | Problem: single _applyFilter never forwarded sort to the cubit (sort param omitted), so "Oldest" toggled the UI chip but the API always received sort=newest. Fix: split into two focused methods — each passes exactly what it owns to applyFilter.
+  void _onStatusChanged(TranslationStatus? status) {
     setState(() {
-      if (status != null) _status = status == _status ? null : status;
-      if (newest != null) _newest = newest;
+      _status = (status != null && status == _status) ? null : status;
     });
+    context.read<CatalogCubit>().applyFilter(status: _status);
+  }
+
+  void _onSortChanged(bool newest) {
+    setState(() => _newest = newest);
     context.read<CatalogCubit>().applyFilter(
-          status: _status,
-        );
+      status: _status,
+      sort: newest ? SortOrder.newest : SortOrder.oldest,
+    );
   }
 
   @override
@@ -80,8 +103,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
             locale: locale,
             activeStatus: _status,
             newest: _newest,
-            onStatusTap: (s) => _applyFilter(status: s),
-            onSortTap: (n) => _applyFilter(newest: n),
+            onStatusTap: _onStatusChanged,
+            onSortTap: _onSortChanged,
           ),
           Expanded(
             child: BlocBuilder<CatalogCubit, CatalogState>(
@@ -98,11 +121,13 @@ class _CatalogScreenState extends State<CatalogScreen> {
                           onRetry: () => ctx.read<CatalogCubit>().load(),
                         ),
                       ),
-                    CatalogSuccess(:final books) => RefreshIndicator(
+                    CatalogSuccess(:final books, :final hasMore) =>
+                      RefreshIndicator(
                         key: const ValueKey('success'),
                         onRefresh: () => ctx.read<CatalogCubit>().refresh(),
                         color: AppColors.primary,
                         child: GridView.builder(
+                          controller: _scrollController,
                           padding: EdgeInsetsDirectional.all(16.r),
                           physics: const AlwaysScrollableScrollPhysics(),
                           gridDelegate:
@@ -110,20 +135,25 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             crossAxisCount: 2,
                             crossAxisSpacing: 12.w,
                             mainAxisSpacing: 14.h,
-                            childAspectRatio: 0.46,
+                            childAspectRatio: 0.47,
                           ),
-                          itemCount: books.length,
-                          itemBuilder: (_, i) => BookCardWidget(
-                            book: books[i],
-                            locale: locale,
-                            onTap: () => Navigator.of(ctx).pushNamed(
-                              AppRoutes.bookDetail,
-                              arguments: BookDetailArgs(
-                                slug: books[i].slug,
-                                titleAr: books[i].titleAr,
+                          itemCount: books.length + (hasMore ? 2 : 0),
+                          itemBuilder: (_, i) {
+                            if (i >= books.length) {
+                              return const BookCardShimmer();
+                            }
+                            return BookCardWidget(
+                              book: books[i],
+                              locale: locale,
+                              onTap: () => Navigator.of(ctx).pushNamed(
+                                AppRoutes.bookDetail,
+                                arguments: BookDetailArgs(
+                                  slug: books[i].slug,
+                                  titleAr: books[i].titleAr,
+                                ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         ),
                       ),
                     _ => const SizedBox.shrink(key: ValueKey('initial')),
