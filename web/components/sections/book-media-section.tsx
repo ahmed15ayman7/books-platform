@@ -60,7 +60,7 @@ export function BookMediaSection({ locale, videos }: BookMediaSectionProps) {
       </div>
       <p className="mt-4 text-center">
         <Link
-          href={`/${locale}/articles/watch-your-book`}
+          href={`/${locale}/media`}
           className="text-sm font-medium text-[var(--brand-red)] hover:underline"
         >
           {isAr ? "المزيد في شاهد كتابك" : "More on Watch Your Book"}

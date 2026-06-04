@@ -47,7 +47,7 @@ export function HomeMediaSpotlight({
         <FadeIn className="mb-8 flex items-end justify-between gap-4">
           <SectionHeading id="media-spotlight-heading" title={title} subtitle={subtitle} />
           <Button asChild variant="outline" size="sm">
-            <Link href={`/${locale}/articles/watch-your-book`}>{cta}</Link>
+            <Link href={`/${locale}/media`}>{cta}</Link>
           </Button>
         </FadeIn>
         <div className="grid gap-6 lg:grid-cols-[1fr_240px]">

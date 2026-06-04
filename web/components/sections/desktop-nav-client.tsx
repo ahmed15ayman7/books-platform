@@ -7,11 +7,12 @@ import { cn } from "@/lib/utils";
 import { useState, useRef } from "react";
 import {
   buildBookCategoryLinks,
-  buildMediaChannelLinks,
   buildReadingChannelLinks,
+  buildMediaChannelLinks,
   bookCategoriesNavLabel,
   mediaNavLabel,
   readingsNavLabel,
+  mediaHubHref,
   type NavCategory,
 } from "@/lib/nav/site-nav";
 
@@ -45,7 +46,10 @@ export function DesktopNavClient({ locale, bookCategories = [] }: DesktopNavClie
   const readingChannels = buildReadingChannelLinks(locale);
   const mediaChannels = buildMediaChannelLinks(locale);
 
-  const mediaPaths = mediaChannels.map((c) => c.href);
+  const mediaPaths = [
+    mediaHubHref(locale),
+    ...mediaChannels.map((c) => c.href),
+  ];
 
   function isActive(href: string) {
     if (href === base) return pathname === base || pathname === `${base}/`;
@@ -56,7 +60,9 @@ export function DesktopNavClient({ locale, bookCategories = [] }: DesktopNavClie
     pathname.includes("/articles") &&
     !mediaPaths.some((p) => pathname.startsWith(p));
 
-  const mediaActive = mediaPaths.some((p) => pathname.startsWith(p));
+  const mediaActive =
+    pathname.includes("/media") ||
+    mediaPaths.some((p) => pathname.startsWith(p));
 
   return (
     <nav
@@ -135,7 +141,7 @@ export function DesktopNavClient({ locale, bookCategories = [] }: DesktopNavClie
         onBlurCapture={scheduleClose}
       >
         <NavLink
-          href={mediaChannels[0]?.href ?? `${base}/articles/watch-your-book`}
+          href={mediaHubHref(locale)}
           hasDropdown
           active={mediaActive}
           isOpen={openMenu === "media"}

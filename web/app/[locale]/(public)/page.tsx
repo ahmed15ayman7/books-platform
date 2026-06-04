@@ -53,12 +53,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const ARTICLE_CHANNELS = [
-  { key: "ideas",           ar: "زبدة الأفكار",  en: "Essence of Ideas", path: "ideas" },
-  { key: "harvest",         ar: "حصاد الكتب",     en: "Book Harvest",     path: "harvest" },
-  { key: "world-reads",     ar: "العالم يقرأ",    en: "World Reads",      path: "world-reads" },
-  { key: "watch-your-book", ar: "شاهد كتابك",     en: "Watch Your Book",  path: "watch-your-book" },
-  { key: "books-talk",      ar: "حديث الكتب",     en: "Books Talk",       path: "books-talk" },
-  { key: "novel-story",     ar: "رواية فحكاية",   en: "Novel & Story",    path: "novel-story" },
+  { key: "ideas",           ar: "زبدة الأفكار",  en: "Essence of Ideas", path: "articles/ideas" },
+  { key: "harvest",         ar: "حصاد الكتب",     en: "Book Harvest",     path: "articles/harvest" },
+  { key: "world-reads",     ar: "العالم يقرأ",    en: "World Reads",      path: "articles/world-reads" },
+  { key: "watch-your-book", ar: "شاهد كتابك",     en: "Watch Your Book",  path: "media/watch-your-book" },
+  { key: "books-talk",      ar: "حديث الكتب",     en: "Books Talk",       path: "media/books-talk" },
+  { key: "novel-story",     ar: "رواية فحكاية",   en: "Novel & Story",    path: "media/novel-story" },
 ] as const;
 
 // Alternates bg-white / bg-[#fff7f6] for each section rendered
@@ -492,7 +492,7 @@ export default async function HomePage() {
                   title={locale === "ar" ? ch.ar : ch.en}
                 />
                 <Button asChild variant="outline" size="sm">
-                  <Link href={`/${locale}/articles/${ch.path}`}>
+                  <Link href={`/${locale}/${ch.path}`}>
                     {locale === "ar" ? "عرض الكل" : "See All"}
                   </Link>
                 </Button>

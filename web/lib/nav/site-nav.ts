@@ -61,10 +61,17 @@ export function buildReadingChannelLinks(locale: string): NavLink[] {
 export function buildMediaChannelLinks(locale: string): NavLink[] {
   const base = `/${locale}`;
   const isAr = locale === "ar";
-  return MEDIA_CHANNELS.map((ch) => ({
-    href: `${base}/articles/${ch.slug}`,
-    label: isAr ? ch.labelAr : ch.labelEn,
-  }));
+  return [
+    { href: `${base}/media`, label: isAr ? "كل الفيديوهات" : "All Videos" },
+    ...MEDIA_CHANNELS.map((ch) => ({
+      href: `${base}/media/${ch.slug}`,
+      label: isAr ? ch.labelAr : ch.labelEn,
+    })),
+  ];
+}
+
+export function mediaHubHref(locale: string): string {
+  return `/${locale}/media`;
 }
 
 export function buildTopLevelBookLinks(locale: string): NavLink[] {

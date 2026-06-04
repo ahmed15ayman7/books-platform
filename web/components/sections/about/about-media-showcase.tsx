@@ -41,7 +41,7 @@ export function AboutMediaShowcase({
               {isAr ? "تابع أحدث الفيديوهات على قناة «شاهد كتابك»." : "Follow the latest videos on Watch Your Book."}
             </p>
             <Button asChild className="mt-4" variant="outline">
-              <Link href={`/${locale}/articles/watch-your-book`}>
+              <Link href={`/${locale}/media/watch-your-book`}>
                 {isAr ? "تصفّح القناة" : "Browse channel"}
               </Link>
             </Button>

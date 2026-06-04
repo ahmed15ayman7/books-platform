@@ -18,6 +18,7 @@ import { articleSeoMetadata } from "@/lib/seo/metadata";
 import { youtubeEmbedUrl, youtubeThumbnail } from "@/lib/media/youtube";
 import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-shell";
 import { isMediaChannel } from "@/lib/media/youtube";
+import { mediaHubHref, mediaNavLabel } from "@/lib/nav/site-nav";
 import { adminArticleEditPath, adminArticleViewPath } from "@/lib/admin/public-urls";
 import { ArticleContent } from "@/lib/markdown/article-content";
 import { ArticleCommentsSection } from "@/components/sections/article-comments-section";
@@ -138,12 +139,30 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
               {channelInfo && (
                 <>
                   <span>/</span>
-                  <Link
-                    href={`/${locale}/articles/${channelInfo.path}`}
-                    className="hover:text-[var(--brand-red)]"
-                  >
-                    {channelLabel}
-                  </Link>
+                  {isMedia ? (
+                    <>
+                      <Link
+                        href={mediaHubHref(locale)}
+                        className="hover:text-[var(--brand-red)]"
+                      >
+                        {mediaNavLabel(locale)}
+                      </Link>
+                      <span>/</span>
+                      <Link
+                        href={`/${locale}/media/${channelInfo.path}`}
+                        className="hover:text-[var(--brand-red)]"
+                      >
+                        {channelLabel}
+                      </Link>
+                    </>
+                  ) : (
+                    <Link
+                      href={`/${locale}/articles/${channelInfo.path}`}
+                      className="hover:text-[var(--brand-red)]"
+                    >
+                      {channelLabel}
+                    </Link>
+                  )}
                 </>
               )}
               <span>/</span>
