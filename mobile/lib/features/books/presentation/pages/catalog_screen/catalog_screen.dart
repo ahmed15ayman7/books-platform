@@ -10,6 +10,7 @@ import '../../../../../core/router/args/book_detail_args.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/app_bar_widget.dart';
 import '../../../../../core/widgets/bottom_nav_widget.dart';
+import '../../../../../core/widgets/empty_state_widget.dart';
 import '../../../../../core/widgets/error_state_widget.dart';
 import '../../cubit/catalog_cubit/catalog_cubit.dart';
 import '../../cubit/catalog_cubit/catalog_state.dart';
@@ -120,6 +121,17 @@ class _CatalogScreenState extends State<CatalogScreen> {
                           message: message,
                           onRetry: () => ctx.read<CatalogCubit>().load(),
                         ),
+                      ),
+                    CatalogSuccess(:final books) when books.isEmpty =>
+                      EmptyStateWidget(
+                        key: const ValueKey('empty'),
+                        icon: Icons.menu_book_outlined,
+                        title: _status == TranslationStatus.translated
+                            ? 'home.no_translated_books'.tr()
+                            : 'books.empty'.tr(),
+                        subtitle: _status == TranslationStatus.translated
+                            ? 'home.no_translated_books_subtitle'.tr()
+                            : null,
                       ),
                     CatalogSuccess(:final books, :final hasMore) =>
                       RefreshIndicator(

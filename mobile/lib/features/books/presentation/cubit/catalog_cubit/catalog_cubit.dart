@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 
 import '../../../../../core/enums/translation_status.dart';
 import '../../../../../core/network/failure_messages.dart' as core;
+import '../../../domain/entities/book.dart';
 import '../../../domain/entities/sort_order.dart';
 import '../../../domain/repositories/base_books_repository.dart';
 import 'catalog_state.dart';
@@ -60,9 +61,10 @@ class CatalogCubit extends Cubit<CatalogState> {
       },
       (paginated) {
         _isLoadingMore = false;
+        final incoming = _clientFilter(paginated.data);
         emit(CatalogSuccess(
-          books: [...current.books, ...paginated.data],
-          hasMore: paginated.pagination.hasNextPage,
+          books: [...current.books, ...incoming],
+          hasMore: paginated.pagination.hasNextPage && incoming.isNotEmpty,
         ));
       },
     );
@@ -77,10 +79,16 @@ class CatalogCubit extends Cubit<CatalogState> {
     );
     result.fold(
       (f) => emit(CatalogError(core.failureToMessage(f))),
+      // $mobile-debug-skill | Problem: backend ignores translationStatus param and returns all books. Fix: client-side filter mirrors home screen approach (home_content_cubit.dart:51) so empty status filter correctly shows EmptyStateWidget.
       (paginated) => emit(CatalogSuccess(
-        books: paginated.data,
+        books: _clientFilter(paginated.data),
         hasMore: paginated.pagination.hasNextPage,
       )),
     );
+  }
+
+  List<Book> _clientFilter(List<Book> books) {
+    if (_activeStatus == null) return books;
+    return books.where((b) => b.status == _activeStatus).toList();
   }
 }
