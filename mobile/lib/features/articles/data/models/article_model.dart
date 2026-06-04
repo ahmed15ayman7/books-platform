@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/helpers/date_formatter_helper.dart';
 import '../../domain/entities/article.dart';
 
 class ArticleModel {
@@ -57,7 +58,8 @@ class ArticleModel {
         excerpt: excerpt,
         channel: channel,
         categoryLabel: categoryLabel,
-        date: date,
+        // $mobile-debug-skill | Problem: raw ISO date string (e.g. "2026-05-18T21:00:00.000Z") was passed to entity unchanged and rendered verbatim in both featured card and article row. Fix: parse and format here at the model boundary so all consumers receive a human-readable date.
+        date: DateFormatterHelper.formatDate(date.isNotEmpty ? DateTime.tryParse(date) : null),
         readMinutes: readingTime,
         readingTime: readingTime,
         coverColors: const [Color(0xFF0D1B2A), Color(0xFF1B4F72)],
