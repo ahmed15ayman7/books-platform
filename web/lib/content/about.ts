@@ -1,5 +1,6 @@
 import type { Locale } from "@/lib/i18n";
 import { pickLocale, pickLocaleList, type BilingualString } from "./types";
+import { ABOUT_IMAGES } from "./image-assets";
 
 export interface AboutImage {
   src: string;
@@ -35,48 +36,39 @@ export interface AboutContent {
   efforts: { eyebrow: string; title: string; items: string[] };
   mediaSection: { eyebrow: string; title: string; lead: string };
   teamPreview: { eyebrow: string; title: string; memberSlugs: string[] };
+  partnersSection: { eyebrow: string; title: string };
   closing: { quote: string; tagline: string };
   cta: { primary: string; secondary: string };
 }
 
-const UNSPLASH = {
-  hero: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1200&q=80",
-  intro: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&q=80",
-  concept: "https://images.unsplash.com/photo-1524995997478-a55c2633f573?w=800&q=80",
-  vision: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600&q=80",
-  mission: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=600&q=80",
-  objectives: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600&q=80",
-  policies: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80",
-} as const;
-
 const storyGallery: Array<AboutImage & { caption: BilingualString }> = [
   {
-    src: "https://images.unsplash.com/photo-1497633763765-c8a3bd345e2f?w=600&q=80",
+    src: ABOUT_IMAGES.gallery1,
     alt: { ar: "كتب على رف", en: "Books on shelf" },
     caption: { ar: "اكتشاف الإصدارات", en: "Discovering releases" },
   },
   {
-    src: "https://images.unsplash.com/photo-1516979187450-637abb88f58e?w=600&q=80",
+    src: ABOUT_IMAGES.gallery2,
     alt: { ar: "قارئ", en: "Reader" },
     caption: { ar: "القراءة والوعي", en: "Reading & awareness" },
   },
   {
-    src: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&q=80",
+    src: ABOUT_IMAGES.gallery3,
     alt: { ar: "كتابة وبحث", en: "Writing & research" },
     caption: { ar: "المحتوى البحثي", en: "Research content" },
   },
   {
-    src: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=600&q=80",
+    src: ABOUT_IMAGES.gallery4,
     alt: { ar: "بودكast", en: "Podcast" },
     caption: { ar: "صوت ومرئي", en: "Audio & video" },
   },
   {
-    src: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80",
+    src: ABOUT_IMAGES.gallery5,
     alt: { ar: "فريق عمل", en: "Team collaboration" },
     caption: { ar: "شراكات", en: "Partnerships" },
   },
   {
-    src: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=600&q=80",
+    src: ABOUT_IMAGES.gallery6,
     alt: { ar: "عالم المعرفة", en: "World of knowledge" },
     caption: { ar: "نافذة على العالم", en: "Window to the world" },
   },
@@ -121,7 +113,7 @@ const values: AboutValue[] = [
       en: "To connect the Arab world with global societies by building a cultural bridge that enhances understanding between civilizations, promotes creativity, and makes global knowledge accessible through translation and innovative digital solutions.",
     },
     image: {
-      src: UNSPLASH.vision,
+      src: ABOUT_IMAGES.vision,
       alt: { ar: "رؤية المنصة", en: "Platform vision" },
     },
   },
@@ -133,7 +125,7 @@ const values: AboutValue[] = [
       en: "To support the Arab reader by delivering valuable cultural and scientific content that enriches thought, revives reading habits, raises awareness, and fosters a technologically advanced and knowledge-driven Arab environment.",
     },
     image: {
-      src: UNSPLASH.mission,
+      src: ABOUT_IMAGES.mission,
       alt: { ar: "رسالة المنصة", en: "Platform mission" },
     },
   },
@@ -145,7 +137,7 @@ const values: AboutValue[] = [
       en: "We seek to make Books Platform the leading Arab platform for cultural education and one of the world's prominent centers for disseminating knowledge, culture, awareness, and intellectual enlightenment.",
     },
     image: {
-      src: UNSPLASH.objectives,
+      src: ABOUT_IMAGES.objectives,
       alt: { ar: "أهداف المنصة", en: "Platform objectives" },
     },
   },
@@ -157,7 +149,7 @@ const values: AboutValue[] = [
       en: "We are committed to delivering all our services and activities in a professional and ethical manner, adhering to scientific, legal, and moral standards that safeguard intellectual property rights for all parties.",
     },
     image: {
-      src: UNSPLASH.policies,
+      src: ABOUT_IMAGES.policies,
       alt: { ar: "سياسات المنصة", en: "Platform policies" },
     },
   },
@@ -223,7 +215,7 @@ export function getAboutContent(locale: Locale): AboutContent {
       title: pickLocale(hero.title, locale),
       subtitle: pickLocale(hero.subtitle, locale),
       image: {
-        src: UNSPLASH.hero,
+        src: ABOUT_IMAGES.hero,
         alt: { ar: "مكتبة وكتب — رمز المعرفة", en: "Library and books — symbol of knowledge" },
       },
     },
@@ -232,7 +224,7 @@ export function getAboutContent(locale: Locale): AboutContent {
       title: isAr ? "البداية" : "Introduction",
       paragraphs: pickLocaleList(introParagraphs, locale),
       image: {
-        src: UNSPLASH.intro,
+        src: ABOUT_IMAGES.intro,
         alt: { ar: "قارئ مع كتاب", en: "Reader with a book" },
       },
       imagePosition: "right",
@@ -242,7 +234,7 @@ export function getAboutContent(locale: Locale): AboutContent {
       title: isAr ? "فكرة المنصة" : "The Platform Concept",
       paragraphs: pickLocaleList(conceptParagraphs, locale),
       image: {
-        src: UNSPLASH.concept,
+        src: ABOUT_IMAGES.concept,
         alt: { ar: "رفوف كتب", en: "Bookshelves" },
       },
       imagePosition: "left",
@@ -277,7 +269,17 @@ export function getAboutContent(locale: Locale): AboutContent {
     teamPreview: {
       eyebrow: isAr ? "فريقنا" : "Our Team",
       title: isAr ? "من يقف وراء المنصة" : "Who Stands Behind the Platform",
-      memberSlugs: ["atef-mazhar", "mariam-mazhar", "sara-mazhar"],
+      memberSlugs: [
+        "atef-mazhar",
+        "mariam-mazhar",
+        "sara-mazhar",
+        "mohamed-abou-elwafa",
+        "hany-mawafy",
+      ],
+    },
+    partnersSection: {
+      eyebrow: isAr ? "شركاؤنا" : "Partners",
+      title: isAr ? "ناشرون وشركاء استراتيجيون" : "Publishers & Strategic Partners",
     },
     closing: {
       quote: pickLocale(closing.quote, locale),

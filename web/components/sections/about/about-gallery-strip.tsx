@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { SafeImage } from "@/components/ui/safe-image";
 import { SectionBlock } from "@/components/sections/section-block";
 import { pickLocale } from "@/lib/content/types";
 import type { AboutImage } from "@/lib/content/about";
@@ -30,7 +30,7 @@ export function AboutGalleryStrip({ eyebrow, title, items, locale }: AboutGaller
                 <figure className="overflow-hidden rounded-xl border border-[var(--brand-gray-200)] bg-white shadow-sm">
                   <BlurIn>
                     <div className="relative aspect-[4/3]">
-                      <Image
+                      <SafeImage
                         src={item.src}
                         alt={pickLocale(item.alt, locale)}
                         fill

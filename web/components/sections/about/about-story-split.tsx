@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { SafeImage } from "@/components/ui/safe-image";
 import { SectionBlock } from "@/components/sections/section-block";
 import { pickLocale } from "@/lib/content/types";
 import type { AboutImage } from "@/lib/content/about";
@@ -35,7 +35,7 @@ export function AboutStorySplit({
       <div className={cn("grid items-center gap-8 lg:grid-cols-2", imageFirst && "lg:[direction:ltr]")}>
         <BlurIn className={cn(!imageFirst && "lg:order-2")}>
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
-            <Image src={image.src} alt={imageAlt} fill className="object-cover" sizes="(max-width:1024px) 100vw, 50vw" />
+            <SafeImage src={image.src} alt={imageAlt} fill className="object-cover" sizes="(max-width:1024px) 100vw, 50vw" />
           </div>
         </BlurIn>
         <SlideIn from={imageFirst ? "end" : "start"} className={cn(!imageFirst && "lg:order-1")}>

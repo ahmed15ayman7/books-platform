@@ -3,6 +3,7 @@ import { getLocale } from "next-intl/server";
 import { ContentPageShell } from "@/components/sections/content-page-shell";
 import { LegalProseLayout } from "@/components/sections/legal-prose-layout";
 import { getTermsHero, getTermsLastUpdated, getTermsSections } from "@/lib/content/terms";
+import { ABOUT_IMAGES } from "@/lib/content/image-assets";
 import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -32,6 +33,9 @@ export default async function TermsPage() {
         title: hero.title,
         subtitle: hero.subtitle,
         variant: "light",
+        size: "md",
+        backgroundImage: ABOUT_IMAGES.legal,
+        backgroundImageAlt: hero.title,
         breadcrumbs: [
           { label: isAr ? "الرئيسية" : "Home", href: `/${locale}` },
           { label: hero.title },

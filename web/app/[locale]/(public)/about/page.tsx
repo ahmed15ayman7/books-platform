@@ -6,6 +6,9 @@ import { AboutGalleryStrip } from "@/components/sections/about/about-gallery-str
 import { AboutStatsBand } from "@/components/sections/about/about-stats-band";
 import { AboutValuesGrid } from "@/components/sections/about/about-values-grid";
 import { AboutTimeline } from "@/components/sections/about/about-timeline";
+import { AboutUniquenessSplit } from "@/components/sections/about/about-uniqueness-split";
+import { AboutPartnersStrip } from "@/components/sections/about/about-partners-strip";
+import { AboutQuoteBand } from "@/components/sections/about/about-quote-band";
 import { AboutMediaShowcase } from "@/components/sections/about/about-media-showcase";
 import { AboutTeamPreview } from "@/components/sections/about/about-team-preview";
 import { AboutCta } from "@/components/sections/about/about-cta";
@@ -106,11 +109,11 @@ export default async function AboutPage() {
             locale={locale}
           />
 
-          <AboutTimeline
-            id="unique"
+          <AboutUniquenessSplit
             eyebrow={content.unique.eyebrow}
             title={content.unique.title}
             items={content.unique.items}
+            locale={locale}
           />
 
           <AboutTimeline
@@ -118,6 +121,12 @@ export default async function AboutPage() {
             eyebrow={content.efforts.eyebrow}
             title={content.efforts.title}
             items={content.efforts.items}
+          />
+
+          <AboutPartnersStrip
+            locale={locale}
+            eyebrow={content.partnersSection.eyebrow}
+            title={content.partnersSection.title}
           />
 
           <AboutMediaShowcase
@@ -134,6 +143,8 @@ export default async function AboutPage() {
             title={content.teamPreview.title}
             members={teamMembers}
           />
+
+          <AboutQuoteBand quote={content.closing.quote} tagline={content.closing.tagline} />
 
           <AboutCta
             quote={content.closing.quote}

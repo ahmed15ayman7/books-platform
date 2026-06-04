@@ -7,6 +7,7 @@ import {
   getPrivacyLastUpdated,
   getPrivacySections,
 } from "@/lib/content/privacy";
+import { ABOUT_IMAGES } from "@/lib/content/image-assets";
 import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -43,6 +44,9 @@ export default async function PrivacyPage() {
         title: hero.title,
         subtitle: hero.subtitle,
         variant: "light",
+        size: "md",
+        backgroundImage: ABOUT_IMAGES.legal,
+        backgroundImageAlt: hero.title,
         breadcrumbs: [
           { label: isAr ? "الرئيسية" : "Home", href: `/${locale}` },
           { label: hero.title },

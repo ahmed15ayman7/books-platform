@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { SafeImage } from "@/components/ui/safe-image";
 import type { Locale } from "@/lib/i18n";
 import { pickLocale } from "@/lib/content/types";
 import type { AboutImage } from "@/lib/content/about";
@@ -68,7 +68,7 @@ export function AboutHeroSplit({
           </div>
           <BlurIn>
             <ParallaxLayer className="relative aspect-[4/3] overflow-hidden rounded-2xl">
-              <Image src={image.src} alt={imageAlt} fill className="object-cover" priority sizes="(max-width:1024px) 100vw, 50vw" />
+              <SafeImage src={image.src} alt={imageAlt} fill className="object-cover" priority sizes="(max-width:1024px) 100vw, 50vw" />
               <div className="absolute inset-0 bg-gradient-to-t from-[var(--brand-black)]/40 to-transparent" />
             </ParallaxLayer>
           </BlurIn>

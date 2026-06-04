@@ -1,7 +1,7 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import Image from "next/image";
+import { SafeImage } from "@/components/ui/safe-image";
 import { cn } from "@/lib/utils";
 import { AnimatedCard, IconPulse, StaggerContainer, StaggerItem, BlurIn } from "@/components/motion";
 
@@ -25,7 +25,7 @@ export function ValueCard({ icon: Icon, title, body, className, imageUrl, imageA
       >
         {imageUrl && (
           <BlurIn className="relative mb-4 aspect-[16/10] overflow-hidden rounded-xl">
-            <Image src={imageUrl} alt={imageAlt ?? title} fill className="object-cover" sizes="(max-width:768px) 100vw, 25vw" />
+            <SafeImage src={imageUrl} alt={imageAlt ?? title} fill className="object-cover" sizes="(max-width:768px) 100vw, 25vw" />
           </BlurIn>
         )}
         <IconPulse>

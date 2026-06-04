@@ -9,7 +9,7 @@ import {
   mapArticleForCard,
   type ArticleLinkedProduct,
 } from "@/lib/i18n/article-linked-book";
-import { ScaleIn, StaggerContainer, StaggerItem, FadeIn } from "@/components/motion";
+import { ScaleIn, StaggerContainer, StaggerItem, FadeIn, BlurIn } from "@/components/motion";
 
 interface Article {
   id: string;
@@ -90,12 +90,14 @@ export function ArticleChannelPage({
               <StaggerContainer className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {rest.map((article) => (
                   <StaggerItem key={article.id}>
-                    <ArticleCard
-                      {...article}
-                      date={article.date ?? undefined}
-                      channel={article.channel ?? undefined}
-                      locale={locale}
-                    />
+                    <BlurIn>
+                      <ArticleCard
+                        {...article}
+                        date={article.date ?? undefined}
+                        channel={article.channel ?? undefined}
+                        locale={locale}
+                      />
+                    </BlurIn>
                   </StaggerItem>
                 ))}
               </StaggerContainer>

@@ -1,4 +1,7 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { SafeImage } from "@/components/ui/safe-image";
 import { cn } from "@/lib/utils";
 
 interface TeamAvatarProps {
@@ -17,8 +20,11 @@ export function TeamAvatar({
   className,
 }: TeamAvatarProps) {
   const dimension = size === "lg" ? 128 : 96;
+  const [failed, setFailed] = useState(false);
 
-  if (photoUrl) {
+  const showInitials = !photoUrl || failed;
+
+  if (!showInitials) {
     return (
       <div
         className={cn(
@@ -27,13 +33,14 @@ export function TeamAvatar({
           className,
         )}
       >
-        <Image
+        <SafeImage
           src={photoUrl}
           alt={name}
           width={dimension}
           height={dimension}
           className="h-full w-full object-cover"
           sizes={`${dimension}px`}
+          onFallback={() => setFailed(true)}
         />
       </div>
     );

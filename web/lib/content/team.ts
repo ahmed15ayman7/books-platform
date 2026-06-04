@@ -17,6 +17,13 @@ export interface TeamPageContent {
   members: TeamMemberData[];
   quote: string;
   cta: string;
+  departments: {
+    eyebrow: string;
+    title: string;
+    items: { key: string; title: string; body: string }[];
+  };
+  leadershipSection: { title: string };
+  teamSection: { title: string };
 }
 
 export const TEAM_MEMBERS: TeamMemberData[] = [
@@ -155,6 +162,33 @@ const quote: BilingualString = {
   en: "\"We believe that collaboration and expertise are the foundation of impactful and sustainable knowledge sharing.\"",
 };
 
+const departments: { key: string; title: BilingualString; body: BilingualString }[] = [
+  {
+    key: "editorial",
+    title: { ar: "التحرير", en: "Editorial" },
+    body: {
+      ar: "فريق تحرير متخصص يراجع المحتوى الثقافي والأدبي ويضمن جودة الإصدارات.",
+      en: "A specialized editorial team reviewing cultural and literary content and ensuring publication quality.",
+    },
+  },
+  {
+    key: "tech",
+    title: { ar: "التكنولوجيا", en: "Technology" },
+    body: {
+      ar: "تطوير المنصة الرقمية وتطبيق الهاتف والحلول المدعومة بالذكاء الاصطناعي.",
+      en: "Digital platform development, mobile app, and AI-powered solutions.",
+    },
+  },
+  {
+    key: "marketing",
+    title: { ar: "التسويق", en: "Marketing" },
+    body: {
+      ar: "بناء الحضور الرقمي وتعزيز التفاعل مع مجتمع القرّاء والناشرين.",
+      en: "Building digital presence and engaging the reading and publishing community.",
+    },
+  },
+];
+
 export function getTeamContent(locale: Locale): TeamPageContent {
   const isAr = locale === "ar";
   return {
@@ -166,6 +200,21 @@ export function getTeamContent(locale: Locale): TeamPageContent {
     members: TEAM_MEMBERS,
     quote: pickLocale(quote, locale),
     cta: isAr ? "تواصل معنا" : "Get in Touch",
+    departments: {
+      eyebrow: isAr ? "أقسام" : "Departments",
+      title: isAr ? "فرق العمل" : "Our Departments",
+      items: departments.map((d) => ({
+        key: d.key,
+        title: pickLocale(d.title, locale),
+        body: pickLocale(d.body, locale),
+      })),
+    },
+    leadershipSection: {
+      title: isAr ? "القيادة" : "Leadership",
+    },
+    teamSection: {
+      title: isAr ? "فريق العمل" : "The Team",
+    },
   };
 }
 

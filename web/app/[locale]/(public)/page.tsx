@@ -28,6 +28,7 @@ import {
   StaggerItem,
 } from "@/components/motion";
 import { getHomeEditorial } from "@/lib/content/home-editorial";
+import { ABOUT_IMAGES } from "@/lib/content/image-assets";
 import { HomeMissionStrip } from "@/components/sections/home/home-mission-strip";
 import { HomeReaderJourney } from "@/components/sections/home/home-reader-journey";
 import { HomeMediaSpotlight } from "@/components/sections/home/home-media-spotlight";
@@ -105,8 +106,7 @@ export default async function HomePage() {
             titleEn: t("heroTitle"),
             subtitleAr: t("heroSubtitle"),
             subtitleEn: t("heroSubtitle"),
-            imageUrl:
-              "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1920&q=80",
+            imageUrl: ABOUT_IMAGES.hero,
             foregroundImageUrl: null,
             linkUrl: `/${locale}/books`,
           },

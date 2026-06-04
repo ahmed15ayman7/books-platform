@@ -28,13 +28,14 @@ export function AboutTeamPreview({ locale, eyebrow, title, members }: AboutTeamP
 
   return (
     <SectionBlock id="team-preview" eyebrow={eyebrow} title={title} staggerChildren={false}>
-      <StaggerContainer className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <StaggerContainer className="flex gap-4">
         {members.map((member) => {
           const name = pickLocale(member.name, locale);
           const role = pickLocale(member.role, locale);
           const bio = pickLocale(member.bio, locale);
           return (
-            <StaggerItem key={member.slug}>
+            <StaggerItem key={member.slug} className="min-w-[260px] snap-start sm:min-w-[280px]">
               <AnimatedCard>
                 <article className="rounded-2xl border border-[var(--brand-gray-200)] bg-white p-6 text-center shadow-sm h-full">
                   <ScaleIn>
@@ -54,11 +55,12 @@ export function AboutTeamPreview({ locale, eyebrow, title, members }: AboutTeamP
             </StaggerItem>
           );
         })}
-      </StaggerContainer>
+        </StaggerContainer>
+      </div>
       <FadeIn delay={0.3} className="mt-8 text-center">
         <HoverLift className="inline-block">
           <Button asChild variant="outline">
-            <Link href={`/${locale}/team`}>{isAr ? "تعرّف على الفريق" : "Meet the team"}</Link>
+            <Link href={`/${locale}/team`}>{isAr ? "عرض الكل" : "View all"}</Link>
           </Button>
         </HoverLift>
       </FadeIn>

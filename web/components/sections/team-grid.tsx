@@ -10,11 +10,31 @@ import { AnimatedCard, StaggerContainer, StaggerItem, FadeIn, ScaleIn } from "@/
 interface TeamGridProps {
   members: TeamMemberData[];
   locale: Locale;
+  filter?: "all" | "featured" | "non-featured";
 }
 
-export function TeamGrid({ members, locale }: TeamGridProps) {
-  const leadership = members.filter((m) => m.featured);
-  const rest = members.filter((m) => !m.featured);
+export function TeamGrid({ members, locale, filter = "all" }: TeamGridProps) {
+  const filtered =
+    filter === "featured"
+      ? members.filter((m) => m.featured)
+      : filter === "non-featured"
+        ? members.filter((m) => !m.featured)
+        : members;
+
+  const leadership = filter === "all" ? filtered.filter((m) => m.featured) : [];
+  const rest = filter === "all" ? filtered.filter((m) => !m.featured) : filtered;
+
+  if (filter !== "all") {
+    return (
+      <StaggerContainer className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {filtered.map((member) => (
+          <StaggerItem key={member.slug}>
+            <TeamMemberCard member={member} locale={locale} featured={filter === "featured"} />
+          </StaggerItem>
+        ))}
+      </StaggerContainer>
+    );
+  }
 
   return (
     <div className="space-y-10">

@@ -23,7 +23,9 @@
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset",
     "analyze": "ANALYZE=true next build",
-    "prepare": "husky"
+    "prepare": "husky",
+    "verify:images": "tsx scripts/verify-public-images.ts",
+    "assets:about": "tsx scripts/download-about-images.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
