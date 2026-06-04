@@ -8,6 +8,7 @@ import { adminFieldClass } from "@/components/admin/admin-form-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { saveAdminSession } from "@/lib/admin/permissions-client";
+import { setAccessToken } from "@/lib/auth/author-client";
 import { cn } from "@/lib/utils";
 import type { Permission } from "@/lib/auth/permissions";
 
@@ -57,7 +58,7 @@ export default function AdminLoginPage() {
           setErrorMsg(isAr ? "هذا الحساب غير مصرح له بدخول لوحة التحكم" : "This account cannot access the admin panel");
           return;
         }
-        document.cookie = `access_token=${data.data.accessToken}; path=/; max-age=900; samesite=strict`;
+        setAccessToken(data.data.accessToken);
         saveAdminSession({
           id: data.data.user.id,
           email: data.data.user.email,

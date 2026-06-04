@@ -113,8 +113,11 @@ model Article {
   id               String           @id @default(cuid())
   originalId       Int              @unique @map("original_id")
   title            String
+  titleEn          String?          @map("title_en")
   content          String?          @db.Text
+  contentEn        String?          @map("content_en") @db.Text
   excerpt          String?          @db.Text
+  excerptEn        String?          @map("excerpt_en") @db.Text
   date             DateTime?
   postType         String?          @map("post_type")
   permalink        String?
@@ -125,6 +128,8 @@ model Article {
   imageAltText     String?          @map("image_alt_text")
   imageFeatured    String?          @map("image_featured")
   attachmentUrl    String?          @map("attachment_url")
+  youtubeUrl       String?          @map("youtube_url")
+  videoId          String?          @map("video_id")
   languageTag      String?          @map("language_tag")
   postTranslations String?          @map("post_translations")
   status           String           @default("publish")
@@ -165,6 +170,7 @@ model Article {
   @@index([channel])
   @@index([status])
   @@index([date])
+  @@index([videoId])
   @@index([deletedAt])
   @@map("articles")
 }
@@ -906,6 +912,26 @@ model HomeHeroSlide {
   @@index([isActive, position])
   @@index([deletedAt])
   @@map("home_hero_slides")
+}
+
+// ===================================
+// CONTACT
+// ===================================
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  topic     String?
+  message   String   @db.Text
+  locale    String?
+  status    String   @default("new")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("contact_messages")
 }
 
 // ===================================

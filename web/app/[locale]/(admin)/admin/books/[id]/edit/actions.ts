@@ -38,7 +38,7 @@ export interface BookEditData {
 }
 
 export type BookActionResult =
-  | { ok: true; id?: string }
+  | { ok: true; id?: string; slug?: string }
   | { ok: false; error: string };
 
 function resolveNameEn(nameEn: string, nameAr: string): string {
@@ -101,7 +101,7 @@ export async function updateBook(id: string, data: BookEditData): Promise<BookAc
     });
 
     revalidatePath(`/`, "layout");
-    return { ok: true, id };
+    return { ok: true, id, slug };
   } catch (err) {
     console.error("[updateBook]", err);
     return {
@@ -169,7 +169,7 @@ export async function createBook(data: BookEditData): Promise<BookActionResult> 
     });
 
     revalidatePath(`/`, "layout");
-    return { ok: true, id: book.id };
+    return { ok: true, id: book.id, slug: book.slug };
   } catch (err) {
     console.error("[createBook]", err);
     return {

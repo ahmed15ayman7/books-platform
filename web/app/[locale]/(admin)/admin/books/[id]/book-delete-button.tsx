@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { can } from "@/lib/admin/permissions-client";
 import { PERMISSIONS } from "@/lib/auth/permissions";
-import { usePasskeyGate } from "@/lib/admin/use-passkey-gate";
-import { PasskeyGateDialog } from "@/components/admin/passkey-gate-dialog";
 
 interface BookDeleteButtonProps {
   bookId: string;
@@ -31,10 +29,8 @@ export function BookDeleteButton({
 
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [passkeyOpen, setPasskeyOpen] = useState(false);
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
-  const { busy: passkeyBusy, error: passkeyError, runWithPasskey } = usePasskeyGate();
 
   function executeDelete() {
     setError("");
@@ -55,7 +51,6 @@ export function BookDeleteButton({
         }
 
         setOpen(false);
-        setPasskeyOpen(false);
         if (isBooksPage) {
           router.refresh();
         } else {
@@ -65,17 +60,6 @@ export function BookDeleteButton({
       } catch {
         setError("حدث خطأ في الاتصال");
       }
-    });
-  }
-
-  function handleConfirmDelete() {
-    setPasskeyOpen(true);
-  }
-
-  async function handlePasskeyConfirm() {
-    await runWithPasskey(async () => {
-      setPasskeyOpen(false);
-      executeDelete();
     });
   }
 
@@ -116,7 +100,7 @@ export function BookDeleteButton({
                     تأكيد حذف الكتاب
                   </h2>
                   <p className="mt-1 text-sm text-[var(--admin-text-muted)]">
-                    لا يمكن التراجع عن هذا الإجراء.
+                    سينقل الكتاب إلى سلة المحذوفات ويمكن استعادته لاحقاً.
                   </p>
                 </div>
               </div>
@@ -159,7 +143,7 @@ export function BookDeleteButton({
                   type="button"
                   className="gap-2 bg-red-700 text-white hover:bg-red-600"
                   disabled={isPending}
-                  onClick={handleConfirmDelete}
+                  onClick={executeDelete}
                 >
                   {isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -173,15 +157,6 @@ export function BookDeleteButton({
           </div>
         </div>
       )}
-
-      <PasskeyGateDialog
-        open={passkeyOpen}
-        onOpenChange={setPasskeyOpen}
-        busy={passkeyBusy || isPending}
-        error={passkeyError}
-        onConfirm={() => void handlePasskeyConfirm()}
-        title="تأكيد الحذف بـ Passkey"
-      />
     </>
   );
 }

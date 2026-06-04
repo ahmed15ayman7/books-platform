@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import Image from "next/image";
+import { SafeImage } from "@/components/ui/safe-image";
 import { cn } from "@/lib/utils";
 
 /** Unified 4:3 media strip for all site and admin cards */
@@ -44,7 +44,7 @@ export function CardMediaImage({
   priority?: boolean;
 }) {
   return (
-    <Image
+    <SafeImage
       src={src}
       alt={alt}
       fill

@@ -7,6 +7,10 @@ import { BooksFeaturedCarousel } from "@/components/sections/books-featured-caro
 import { BookCard } from "@/components/sections/book-card";
 import { BooksFilters } from "@/components/sections/books-filters";
 import { BooksPagination } from "@/components/sections/books-pagination";
+import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
+import { HomeMissionStrip } from "@/components/sections/home/home-mission-strip";
+import { BooksCatalogBody } from "@/components/sections/books-catalog-body";
+import { getHomeEditorial } from "@/lib/content/home-editorial";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SearchX } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
@@ -68,6 +72,8 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
     BookService.getCategories().catch(() => []),
   ]);
 
+  const editorial = getHomeEditorial(locale);
+
   const featuredBooks =
     featuredResult.books.length > 0
       ? featuredResult.books
@@ -90,6 +96,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
       />
 
       <div className="container-platform py-8">
+        <AnimatedContentSections>
         {featuredBooks.length > 0 && page === 1 && !params.q && (
           <section className="mb-10" aria-labelledby="featured-books-heading">
             <h2
@@ -100,6 +107,15 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
             </h2>
             <BooksFeaturedCarousel books={featuredBooks} locale={locale} />
           </section>
+        )}
+
+        {page === 1 && !params.q && (
+          <HomeMissionStrip
+            locale={locale}
+            quote={editorial.mission.quote}
+            primaryLabel={editorial.mission.primary}
+            secondaryLabel={editorial.mission.secondary}
+          />
         )}
 
         <div className="flex flex-col gap-6 lg:flex-row">
@@ -132,7 +148,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
               />
             ) : (
               <>
-                <div className="grid grid-cols-2 items-stretch gap-4 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+                <BooksCatalogBody>
                   {books.map((book) => (
                     <BookCard
                       key={book.id}
@@ -140,7 +156,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
                       locale={locale}
                     />
                   ))}
-                </div>
+                </BooksCatalogBody>
                 <div className="mt-8">
                   <BooksPagination pagination={pagination} />
                 </div>
@@ -148,6 +164,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
             )}
           </main>
         </div>
+        </AnimatedContentSections>
       </div>
     </div>
   );

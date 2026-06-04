@@ -3,7 +3,11 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { PublisherService } from "@/server/services/publisher.service";
 import { BookService } from "@/server/services/book.service";
-import { PageHero } from "@/components/sections/page-hero";
+import { ContentPageShell } from "@/components/sections/content-page-shell";
+import { PublisherCard } from "@/components/sections/publisher-card";
+import { SectionBlock } from "@/components/sections/section-block";
+import { StaggerContainer, StaggerItem } from "@/components/motion";
+import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
 import { Badge } from "@/components/ui/badge";
 import {
   CardMedia,
@@ -14,7 +18,6 @@ import { BooksPagination } from "@/components/sections/books-pagination";
 import { Input } from "@/components/ui/input";
 import { Globe } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
-import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -41,7 +44,7 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
   const t = await getTranslations("publishers");
   const page = Math.max(1, parseInt(sp.page ?? "1", 10));
 
-  const [{ publishers, pagination }, stats, countries] = await Promise.all([
+  const [{ publishers, pagination }, stats, countries, sponsored] = await Promise.all([
     PublisherService.list({
       page,
       limit: 20,
@@ -53,25 +56,48 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
     })),
     BookService.getStats().catch(() => ({ totalBooks: 0, totalPublishers: 0, totalTranslatedBooks: 0, totalCountries: 0 })),
     PublisherService.getAllCountries().catch(() => []),
+    PublisherService.getSponsored(4).catch(() => []),
   ]);
 
   return (
-    <div className="min-h-screen bg-[var(--brand-gray-50)]">
-      <PageHero
-        locale={locale}
-        title={t("title")}
-        subtitle={
+    <ContentPageShell
+      locale={locale}
+      hero={{
+        title: t("title"),
+        subtitle:
           locale === "ar"
             ? `${stats.totalPublishers} ناشر من ${stats.totalCountries} دولة`
-            : `${stats.totalPublishers} publishers from ${stats.totalCountries} countries`
-        }
-        breadcrumbs={[
+            : `${stats.totalPublishers} publishers from ${stats.totalCountries} countries`,
+        breadcrumbs: [
           { label: locale === "ar" ? "الرئيسية" : "Home", href: `/${locale}` },
           { label: t("title") },
-        ]}
-      />
+        ],
+      }}
+    >
+      {sponsored.length > 0 && page === 1 && !sp.search && !sp.country && (
+        <SectionBlock
+          id="featured-publishers"
+          eyebrow={locale === "ar" ? "مميزون" : "Featured"}
+          title={locale === "ar" ? "ناشرون مميزون" : "Featured Publishers"}
+        >
+          <StaggerContainer className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {sponsored.map((pub) => (
+              <StaggerItem key={pub.id}>
+                <PublisherCard
+                  id={pub.id}
+                  title={pub.title}
+                  slug={pub.slug}
+                  imageUrl={pub.imageUrl}
+                  locale={locale}
+                  bookCount={0}
+                />
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        </SectionBlock>
+      )}
 
-      <div className="container-platform py-8">
+      <div>
         {/* Search + Country Filters */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center">
           <form className="flex-1" method="get">
@@ -139,7 +165,7 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
           </>
         )}
       </div>
-    </div>
+    </ContentPageShell>
   );
 }
 

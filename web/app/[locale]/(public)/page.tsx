@@ -27,6 +27,12 @@ import {
   StaggerContainer,
   StaggerItem,
 } from "@/components/motion";
+import { getHomeEditorial } from "@/lib/content/home-editorial";
+import { ABOUT_IMAGES } from "@/lib/content/image-assets";
+import { HomeMissionStrip } from "@/components/sections/home/home-mission-strip";
+import { HomeReaderJourney } from "@/components/sections/home/home-reader-journey";
+import { HomeMediaSpotlight } from "@/components/sections/home/home-media-spotlight";
+import { HomeServicesPreview } from "@/components/sections/home/home-services-preview";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as Locale;
@@ -66,7 +72,7 @@ export default async function HomePage() {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("home");
 
-  const [homeBooks, stats, articlesMap, dbSlides, categories, articleCategories] = await Promise.all([
+  const [homeBooks, stats, articlesMap, dbSlides, categories, articleCategories, latestMedia] = await Promise.all([
     BookService.getHomeData().catch(() => ({
       newlyReleased: [],
       translated: [],
@@ -85,7 +91,10 @@ export default async function HomePage() {
     HeroSlideService.listActive().catch(() => []),
     BookService.getCategories().catch(() => []),
     ArticleService.getCategories().catch(() => []),
+    ArticleService.getLatestMedia(4).catch(() => []),
   ]);
+
+  const editorial = getHomeEditorial(locale);
 
   const heroSlides =
     dbSlides.length > 0
@@ -97,8 +106,7 @@ export default async function HomePage() {
             titleEn: t("heroTitle"),
             subtitleAr: t("heroSubtitle"),
             subtitleEn: t("heroSubtitle"),
-            imageUrl:
-              "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1920&q=80",
+            imageUrl: ABOUT_IMAGES.hero,
             foregroundImageUrl: null,
             linkUrl: `/${locale}/books`,
           },
@@ -126,6 +134,7 @@ export default async function HomePage() {
     imageUrl: string | null;
     date: Date | null;
     channel: string | null;
+    videoId?: string | null;
     products: Array<{
       slug: string;
       nameEn: string;
@@ -161,6 +170,13 @@ export default async function HomePage() {
 
       {/* ── Hero ─────────────────────────────────────────────── */}
       <HomeHeroCarousel slides={heroSlides} locale={locale} />
+
+      <HomeMissionStrip
+        locale={locale}
+        quote={editorial.mission.quote}
+        primaryLabel={editorial.mission.primary}
+        secondaryLabel={editorial.mission.secondary}
+      />
 
       {/* ── تصفّح حسب التصنيف ──────────────────────────────── */}
       {categories.length > 0 && (
@@ -202,6 +218,12 @@ export default async function HomePage() {
           </div>
         </AnimatedSection>
       )}
+
+      <HomeReaderJourney
+        locale={locale}
+        title={editorial.readerJourney.title}
+        steps={editorial.readerJourney.steps}
+      />
 
       {/* ── Category sections — first batch ─────────────────── */}
       {catsBefore.map(({ category, books }) => (
@@ -284,6 +306,14 @@ export default async function HomePage() {
           </div>
         </AnimatedSection>
       ))}
+
+      <HomeMediaSpotlight
+        locale={locale}
+        title={editorial.mediaSpotlight.title}
+        subtitle={editorial.mediaSpotlight.subtitle}
+        cta={editorial.mediaSpotlight.cta}
+        videos={latestMedia}
+      />
 
       {/* ── دور النشر — dark ────────────────────────────────── */}
       {publishers.length > 0 && (
@@ -476,6 +506,7 @@ export default async function HomePage() {
                     title={featured.title ?? ""}
                     excerpt={featured.excerpt}
                     imageUrl={featured.imageUrl}
+                    videoId={featured.videoId}
                     linkedBook={featured.linkedBook}
                     date={featured.date ?? undefined}
                     channel={featured.channel ?? undefined}
@@ -490,6 +521,7 @@ export default async function HomePage() {
                       title={a.title ?? ""}
                       excerpt={a.excerpt}
                       imageUrl={a.imageUrl}
+                      videoId={a.videoId}
                       linkedBook={a.linkedBook}
                       date={a.date ?? undefined}
                       channel={a.channel ?? undefined}
@@ -534,6 +566,14 @@ export default async function HomePage() {
         totalTranslatedBooks={stats.totalTranslatedBooks}
         totalCountries={stats.totalCountries}
         locale={locale}
+      />
+
+      <HomeServicesPreview
+        locale={locale}
+        title={editorial.servicesPreview.title}
+        subtitle={editorial.servicesPreview.subtitle}
+        cta={editorial.servicesPreview.cta}
+        items={editorial.servicesPreview.items}
       />
 
       {/* ── Newsletter ────────────────────────────────────────── */}

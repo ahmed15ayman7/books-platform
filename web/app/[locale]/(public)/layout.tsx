@@ -9,7 +9,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <main id="main-content" className="flex-1 animate-page-in">
+      <main id="main-content" className="flex-1">
         {children}
       </main>
       <Footer />

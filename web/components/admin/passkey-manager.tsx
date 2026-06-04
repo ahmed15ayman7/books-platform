@@ -18,7 +18,7 @@ interface PasskeyRow {
 export function PasskeyManager() {
   const [passkeys, setPasskeys] = useState<PasskeyRow[]>([]);
   const [deviceName, setDeviceName] = useState("");
-  const { busy, error, registerPasskey, runWithPasskey } = usePasskeyGate();
+  const { busy, error, registerPasskey } = usePasskeyGate();
 
   const load = useCallback(async () => {
     const res = await fetch("/api/v1/admin/passkey", { headers: adminAuthHeaders() });
@@ -42,19 +42,17 @@ export function PasskeyManager() {
   }
 
   async function handleDelete(id: string) {
-    await runWithPasskey(async () => {
-      await fetch(`/api/v1/admin/passkey/${id}`, {
-        method: "DELETE",
-        headers: adminAuthHeaders(),
-      });
-      void load();
+    await fetch(`/api/v1/admin/passkey/${id}`, {
+      method: "DELETE",
+      headers: adminAuthHeaders(),
     });
+    void load();
   }
 
   return (
-    <AdminCard title="مفاتيح Passkey">
+    <AdminCard title="مفاتيح Passkey (اختياري)">
       <p className="mb-4 text-xs text-[var(--brand-gray-500)]">
-        مطلوبة للعمليات الحساسة بعد التسجيل الأول
+        يمكنك إضافة مفتاح أمان أو بصمة للدخول السريع — غير مطلوب لأي عملية
       </p>
       <div className="space-y-4 -mt-2">
         <div className="flex flex-wrap gap-2">
@@ -80,7 +78,7 @@ export function PasskeyManager() {
         <ul className="divide-y divide-[var(--admin-border)] rounded-lg border border-[var(--admin-border)]">
           {passkeys.length === 0 ? (
             <li className="px-4 py-6 text-center text-sm text-[var(--admin-text-subtle)]">
-              لا توجد مفاتيح — سجّل واحداً لتأمين الحذف والإعدادات
+              لا توجد مفاتيح — يمكنك إضافة واحد اختيارياً
             </li>
           ) : (
             passkeys.map((p) => (

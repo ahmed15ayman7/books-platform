@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ExternalLink } from "lucide-react";
 import { db } from "@/lib/db";
 import { notDeleted } from "@/lib/admin/audit-fields";
+import { absoluteUrl } from "@/lib/seo/site";
+import { Button } from "@/components/ui/button";
 import { BookEditForm } from "./book-edit-form";
 import { BookDeleteButton } from "../book-delete-button";
 
@@ -31,6 +33,7 @@ export default async function BookEditPage({ params }: Props) {
 
   if (!book) notFound();
 
+  const publicUrl = absoluteUrl(`/${locale}/books/${book.slug}`);
   const linkedAuthorIds = book.authors.map((a) => a.id);
 
   const [publishers, categories, allAuthors] = await Promise.all([
@@ -71,17 +74,26 @@ export default async function BookEditPage({ params }: Props) {
             تعديل: {book.nameAr ?? book.nameEn}
           </h1>
         </div>
-        <BookDeleteButton
-          bookId={id}
-          bookTitle={book.nameAr ?? book.nameEn}
-          locale={locale}
-        />
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          <Button asChild variant="outline" className="gap-2">
+            <a href={publicUrl} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="h-4 w-4" />
+              الصفحة العامة
+            </a>
+          </Button>
+          <BookDeleteButton
+            bookId={id}
+            bookTitle={book.nameAr ?? book.nameEn}
+            locale={locale}
+          />
+        </div>
       </div>
 
       <div className="mx-auto max-w-5xl">
         <BookEditForm
           bookId={book.id}
           locale={locale}
+          bookSlug={book.slug}
           initial={{
             nameEn: book.nameEn,
             nameAr: book.nameAr ?? "",

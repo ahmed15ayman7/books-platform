@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminCard } from "@/components/admin/admin-card";
-import { AdminInput, AdminTextarea } from "@/components/admin/admin-form-field";
+import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
@@ -28,13 +28,10 @@ const PAGE_SLUGS = [
   { slug: "contact", label: "اتصل بنا" },
 ];
 
-type LangTab = "ar" | "en";
-
 export default function AdminPagesPage() {
   const [pages, setPages] = useState<StaticPage[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<StaticPage | null>(null);
-  const [tab, setTab] = useState<LangTab>("ar");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -140,53 +137,23 @@ export default function AdminPagesPage() {
                 onDismiss={draft.dismiss}
               />
               <AdminCard>
-                <div className="mb-4 flex gap-2 border-b border-[var(--admin-border)] pb-3">
-                  {(["ar", "en"] as LangTab[]).map((l) => (
-                    <button
-                      key={l}
-                      type="button"
-                      onClick={() => setTab(l)}
-                      className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors ${
-                        tab === l
-                          ? "bg-[var(--brand-red)] text-white"
-                          : "text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)]"
-                      }`}
-                    >
-                      {l === "ar" ? "العربية" : "English"}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="space-y-4">
-                  {tab === "ar" ? (
-                    <>
-                      <AdminInput
-                        label="العنوان (عربي)"
-                        value={editing.titleAr}
-                        onChange={(e) => setEditing((p) => p ? { ...p, titleAr: e.target.value } : p)}
-                      />
-                      <AdminTextarea
-                        label="المحتوى (عربي)"
-                        rows={12}
-                        value={editing.bodyAr}
-                        onChange={(e) => setEditing((p) => p ? { ...p, bodyAr: e.target.value } : p)}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <AdminInput
-                        label="Title (English)"
-                        value={editing.titleEn}
-                        onChange={(e) => setEditing((p) => p ? { ...p, titleEn: e.target.value } : p)}
-                      />
-                      <AdminTextarea
-                        label="Content (English)"
-                        rows={12}
-                        value={editing.bodyEn}
-                        onChange={(e) => setEditing((p) => p ? { ...p, bodyEn: e.target.value } : p)}
-                      />
-                    </>
-                  )}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <AdminBilingualField
+                    arValue={editing.titleAr}
+                    enValue={editing.titleEn}
+                    onArChange={(v) => setEditing((p) => (p ? { ...p, titleAr: v } : p))}
+                    onEnChange={(v) => setEditing((p) => (p ? { ...p, titleEn: v } : p))}
+                    labels={{ ar: "العنوان (عربي)", en: "Title (English)" }}
+                  />
+                  <AdminBilingualField
+                    arValue={editing.bodyAr}
+                    enValue={editing.bodyEn}
+                    onArChange={(v) => setEditing((p) => (p ? { ...p, bodyAr: v } : p))}
+                    onEnChange={(v) => setEditing((p) => (p ? { ...p, bodyEn: v } : p))}
+                    labels={{ ar: "المحتوى (عربي)", en: "Content (English)" }}
+                    multiline
+                    rows={12}
+                  />
                 </div>
               </AdminCard>
 

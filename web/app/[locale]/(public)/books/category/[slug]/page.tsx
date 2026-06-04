@@ -5,7 +5,9 @@ import { BookService } from "@/server/services/book.service";
 import { BookCard } from "@/components/sections/book-card";
 import { BooksPagination } from "@/components/sections/books-pagination";
 import { EmptyState } from "@/components/ui/empty-state";
-import { PageHero } from "@/components/sections/page-hero";
+import { ContentPageShell } from "@/components/sections/content-page-shell";
+import { EditorialSplit } from "@/components/sections/editorial-split";
+import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
 import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -54,20 +56,41 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   // Related categories (up to 4 others)
   const relatedCategories = categories.filter((c) => c.slug !== slug).slice(0, 4);
 
+  const representativeBook = books[0];
+  const categoryDescription =
+    locale === "ar"
+      ? `استكشف كتب تصنيف ${categoryName} — ${pagination.total} إصدار على المنصة.`
+      : `Explore ${categoryName} books — ${pagination.total} titles on the platform.`;
+
   return (
-    <div className="min-h-screen bg-[var(--brand-gray-50)]">
-      <PageHero
-        locale={locale}
-        title={categoryName}
-        subtitle={locale === "ar" ? `${pagination.total} كتاب` : `${pagination.total} books`}
-        breadcrumbs={[
+    <ContentPageShell
+      locale={locale}
+      hero={{
+        title: categoryName,
+        subtitle: locale === "ar" ? `${pagination.total} كتاب` : `${pagination.total} books`,
+        breadcrumbs: [
           { label: locale === "ar" ? "الرئيسية" : "Home", href: `/${locale}` },
           { label: locale === "ar" ? "الكتب" : "Books", href: `/${locale}/books` },
           { label: categoryName },
-        ]}
-      />
+        ],
+      }}
+    >
+      <AnimatedContentSections>
+        {representativeBook && (
+          <EditorialSplit
+            id="category-intro"
+            title={categoryName}
+            lead={categoryDescription}
+            image={{
+              src: representativeBook.imageUrl ?? "/about/author-default.webp",
+              alt: categoryName,
+            }}
+            imagePosition="right"
+            locale={locale}
+          />
+        )}
 
-      <div className="container-platform py-8">
+      <div>
         {/* Books Grid */}
         {books.length === 0 ? (
           <EmptyState
@@ -107,6 +130,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
           </div>
         )}
       </div>
-    </div>
+      </AnimatedContentSections>
+    </ContentPageShell>
   );
 }

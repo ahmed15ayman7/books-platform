@@ -12,10 +12,10 @@ import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import {
   AdminInput,
-  AdminTextarea,
   AdminSelect,
   AdminCheckbox,
 } from "@/components/admin/admin-form-field";
+import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
@@ -135,17 +135,14 @@ export function CreatePublisherDialog({
               البيانات الأساسية
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
-              <AdminInput
-                label="الاسم (عربي) *"
-                value={form.nameAr}
-                onChange={(e) => set("nameAr")(e.target.value)}
-                required
-              />
-              <AdminInput
-                label="الاسم (إنجليزي)"
-                value={form.name}
-                onChange={(e) => set("name")(e.target.value)}
-                dir="ltr"
+              <AdminBilingualField
+                arValue={form.nameAr}
+                enValue={form.name}
+                onArChange={(v) => set("nameAr")(v)}
+                onEnChange={(v) => set("name")(v)}
+                labels={{ ar: "الاسم (عربي) *", en: "الاسم (إنجليزي)" }}
+                layout="half"
+                arRequired
               />
               <AdminInput
                 label="الدولة"
@@ -188,19 +185,15 @@ export function CreatePublisherDialog({
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--admin-text-subtle)]">
               الوصف
             </p>
-            <div className="space-y-3">
-              <AdminTextarea
-                label="الوصف (عربي)"
+            <div className="grid gap-3 sm:grid-cols-2">
+              <AdminBilingualField
+                arValue={form.contentAr}
+                enValue={form.content}
+                onArChange={(v) => set("contentAr")(v)}
+                onEnChange={(v) => set("content")(v)}
+                labels={{ ar: "الوصف (عربي)", en: "الوصف (إنجليزي)" }}
+                multiline
                 rows={4}
-                value={form.contentAr}
-                onChange={(e) => set("contentAr")(e.target.value)}
-              />
-              <AdminTextarea
-                label="الوصف (إنجليزي)"
-                rows={4}
-                value={form.content}
-                onChange={(e) => set("content")(e.target.value)}
-                dir="ltr"
               />
             </div>
           </div>

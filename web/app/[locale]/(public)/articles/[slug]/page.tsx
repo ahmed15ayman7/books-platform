@@ -5,7 +5,8 @@ import Link from "next/link";
 import { getLocale } from "next-intl/server";
 import { ArticleService } from "@/server/services/article.service";
 import { ArticleCard } from "@/components/sections/article-card";
-import { BookCard } from "@/components/sections/book-card";
+import { YoutubeEmbed } from "@/components/sections/youtube-embed";
+import { RelatedBooksSection } from "@/components/sections/related-books-section";
 import { Badge } from "@/components/ui/badge";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Clock, Calendar } from "lucide-react";
@@ -14,6 +15,12 @@ import readingTime from "reading-time";
 import type { Locale } from "@/lib/i18n";
 import { articleLinkedBookDisplay, mapArticleForCard } from "@/lib/i18n/article-linked-book";
 import { articleSeoMetadata } from "@/lib/seo/metadata";
+import { youtubeEmbedUrl, youtubeThumbnail } from "@/lib/media/youtube";
+import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-shell";
+import { isMediaChannel } from "@/lib/media/youtube";
+import { adminArticleEditPath, adminArticleViewPath } from "@/lib/admin/public-urls";
+import { ArticleContent } from "@/lib/markdown/article-content";
+import { ArticleCommentsSection } from "@/components/sections/article-comments-section";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -67,22 +74,46 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   const rt = article.content ? readingTime(article.content) : null;
   const readingTimeMin = rt ? Math.ceil(rt.minutes) : null;
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: article.title,
-    image: article.imageUrl,
-    datePublished: article.date?.toISOString(),
-    description: article.excerpt,
-  };
+  const jsonLd: Record<string, unknown>[] = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: article.title,
+      image: article.imageUrl,
+      datePublished: article.date?.toISOString(),
+      description: article.excerpt,
+    },
+  ];
+
+  if (article.videoId) {
+    jsonLd.push({
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+      name: article.title,
+      description: article.excerpt ?? article.title,
+      thumbnailUrl: youtubeThumbnail(article.videoId),
+      embedUrl: youtubeEmbedUrl(article.videoId),
+      uploadDate: article.date?.toISOString(),
+    });
+  }
+
+  const isMedia = isMediaChannel(article.channel);
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd.length === 1 ? jsonLd[0] : jsonLd) }}
       />
-      <div className="min-h-screen bg-[var(--brand-gray-50)]">
+      <AdminEntityPublicShell
+        entityType={isMedia ? "media" : "article"}
+        entityId={article.id}
+        editHref={adminArticleEditPath(locale, article.id, article.channel)}
+        adminViewHref={adminArticleViewPath(locale, article.id, article.channel)}
+        publicHref={`/${locale}/articles/${article.slug}`}
+        title={article.title}
+      >
+      <div className="min-h-screen bg-[var(--brand-gray-50)] pb-24">
         {/* Hero Image */}
         {heroImageUrl && (
           <div className="relative h-64 w-full overflow-hidden bg-[var(--brand-gray-200)] md:h-96">
@@ -158,29 +189,19 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
             {/* Divider */}
             <hr className="my-6 border-[var(--brand-gray-200)]" />
 
-            {linkedBook && article.products?.[0] && (
-              <section className="mb-8" aria-labelledby="linked-book-heading">
-                <SectionHeading
-                  id="linked-book-heading"
-                  title={locale === "ar" ? "الكتاب" : "The Book"}
-                  className="mb-4"
-                />
-                <div className="max-w-xs">
-                  <BookCard
-                    {...article.products[0]}
-                    locale={locale}
-                    compact
-                  />
-                </div>
-              </section>
+            {article.videoId && (
+              <div className="mb-8">
+                <YoutubeEmbed videoId={article.videoId} title={article.title} />
+              </div>
+            )}
+
+            {article.products && article.products.length > 0 && (
+              <RelatedBooksSection locale={locale} books={article.products} />
             )}
 
             {/* Article content */}
             {article.content ? (
-              <div
-                className="prose-brand text-[var(--brand-gray-800)]"
-                dangerouslySetInnerHTML={{ __html: article.content }}
-              />
+              <ArticleContent content={article.content} />
             ) : article.excerpt ? (
               <p className="text-[var(--brand-gray-700)] leading-relaxed text-lg">
                 {article.excerpt}
@@ -188,37 +209,16 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
             ) : null}
 
             {/* Comments Section */}
-            <section className="mt-12" aria-labelledby="comments-heading">
-              <h2 id="comments-heading" className="mb-4 font-bold text-[var(--brand-gray-900)]">
-                {locale === "ar" ? "التعليقات" : "Comments"}
-              </h2>
-              {article.comments.length === 0 ? (
-                <p className="text-sm text-[var(--brand-gray-500)]">
-                  {locale === "ar" ? "لا توجد تعليقات بعد" : "No comments yet"}
-                </p>
-              ) : (
-                <div className="space-y-4">
-                  {article.comments.map((comment) => (
-                    <div
-                      key={comment.id}
-                      className="rounded-lg bg-white p-4 shadow-sm border border-[var(--brand-gray-200)]"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-semibold text-sm text-[var(--brand-gray-900)]">
-                          {comment.authorName}
-                        </span>
-                        {comment.commentDate && (
-                          <span className="text-xs text-[var(--brand-gray-400)]">
-                            {formatDate(comment.commentDate, locale, "PP")}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-[var(--brand-gray-700)]">{comment.content}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
+            <ArticleCommentsSection
+              articleId={article.id}
+              locale={locale}
+              initialComments={article.comments.map((comment) => ({
+                id: comment.id,
+                authorName: comment.authorName,
+                content: comment.content,
+                commentDate: comment.commentDate,
+              }))}
+            />
           </div>
 
           {/* Related Articles */}
@@ -246,6 +246,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
           )}
         </div>
       </div>
+      </AdminEntityPublicShell>
     </>
   );
 }

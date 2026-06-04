@@ -8,8 +8,18 @@ import {
   type MotionProps,
 } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { MOTION } from "./motion-config";
+import { useReducedMotion } from "./use-reduced-motion";
+import { PublicPageTransition } from "./page-transition";
 
-// ─── Shared Variants ──────────────────────────────────────────────
+export { MOTION } from "./motion-config";
+export { useReducedMotion } from "./use-reduced-motion";
+export { ParallaxLayer } from "./parallax-layer";
+export { RevealText, RevealLines } from "./animated-text";
+export { BlurIn } from "./blur-in";
+export { SlideIn } from "./slide-in";
+export { PublicPageTransition } from "./page-transition";
+export { HoverLift, PressScale, IconPulse } from "./micro-interactions";
 
 const fadeUpVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -40,8 +50,8 @@ const staggerContainerVariants: Variants = {
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.05,
+      staggerChildren: MOTION.stagger.children,
+      delayChildren: MOTION.stagger.delayChildren,
     },
   },
 };
@@ -51,11 +61,9 @@ const staggerItemVariants: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.45, ease: [0.25, 0.8, 0.25, 1] },
+    transition: { duration: 0.45, ease: MOTION.ease },
   },
 };
-
-// ─── FadeIn ──────────────────────────────────────────────────────
 
 interface FadeInProps extends MotionProps {
   children: React.ReactNode;
@@ -76,7 +84,8 @@ export function FadeIn({
   ...props
 }: FadeInProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once, margin: "-60px 0px" });
+  const inView = useInView(ref, { once, margin: MOTION.inViewMargin });
+  const reduced = useReducedMotion();
 
   const variants =
     direction === "up"
@@ -89,13 +98,21 @@ export function FadeIn({
             ? fadeInVariants
             : fadeUpVariants;
 
+  if (reduced) {
+    return (
+      <div className={className} {...(props as React.HTMLAttributes<HTMLDivElement>)}>
+        {children}
+      </div>
+    );
+  }
+
   return (
     <motion.div
       ref={ref}
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
       variants={variants}
-      transition={{ duration, delay, ease: [0.25, 0.8, 0.25, 1] }}
+      transition={{ duration, delay, ease: MOTION.ease }}
       className={className}
       {...props}
     >
@@ -103,8 +120,6 @@ export function FadeIn({
     </motion.div>
   );
 }
-
-// ─── StaggerContainer ────────────────────────────────────────────
 
 interface StaggerContainerProps {
   children: React.ReactNode;
@@ -120,7 +135,12 @@ export function StaggerContainer({
   delay = 0,
 }: StaggerContainerProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once, margin: "-60px 0px" });
+  const inView = useInView(ref, { once, margin: MOTION.inViewMargin });
+  const reduced = useReducedMotion();
+
+  if (reduced) {
+    return <div className={className}>{children}</div>;
+  }
 
   return (
     <motion.div
@@ -131,7 +151,7 @@ export function StaggerContainer({
         hidden: {},
         visible: {
           transition: {
-            staggerChildren: 0.08,
+            staggerChildren: MOTION.stagger.children,
             delayChildren: delay,
           },
         },
@@ -143,22 +163,22 @@ export function StaggerContainer({
   );
 }
 
-// ─── StaggerItem ─────────────────────────────────────────────────
-
 interface StaggerItemProps {
   children: React.ReactNode;
   className?: string;
 }
 
 export function StaggerItem({ children, className }: StaggerItemProps) {
+  const reduced = useReducedMotion();
+  if (reduced) {
+    return <div className={className}>{children}</div>;
+  }
   return (
     <motion.div variants={staggerItemVariants} className={className}>
       {children}
     </motion.div>
   );
 }
-
-// ─── ScaleIn ─────────────────────────────────────────────────────
 
 interface ScaleInProps {
   children: React.ReactNode;
@@ -175,6 +195,11 @@ export function ScaleIn({
 }: ScaleInProps) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once, margin: "-40px 0px" });
+  const reduced = useReducedMotion();
+
+  if (reduced) {
+    return <div className={className}>{children}</div>;
+  }
 
   return (
     <motion.div
@@ -182,16 +207,13 @@ export function ScaleIn({
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
       variants={scaleInVariants}
-      transition={{ duration: 0.45, delay, ease: [0.25, 0.8, 0.25, 1] }}
+      transition={{ duration: 0.45, delay, ease: MOTION.ease }}
       className={className}
     >
       {children}
     </motion.div>
   );
 }
-
-// ─── AnimatedSection ─────────────────────────────────────────────
-// Drop-in replacement for <section> with scroll-triggered fade-up
 
 interface AnimatedSectionProps {
   children: React.ReactNode;
@@ -209,14 +231,23 @@ export function AnimatedSection({
   ...props
 }: AnimatedSectionProps) {
   const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px 0px" });
+  const inView = useInView(ref, { once: true, margin: MOTION.sectionMargin });
+  const reduced = useReducedMotion();
+
+  if (reduced) {
+    return (
+      <section className={className} {...props}>
+        {children}
+      </section>
+    );
+  }
 
   return (
     <motion.section
       ref={ref}
       initial={{ opacity: 0, y: 24 }}
       animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-      transition={{ duration: 0.55, delay, ease: [0.25, 0.8, 0.25, 1] as [number, number, number, number] }}
+      transition={{ duration: 0.55, delay, ease: MOTION.ease }}
       className={className}
       {...props}
     >
@@ -225,20 +256,23 @@ export function AnimatedSection({
   );
 }
 
-// ─── AnimatedCard ─────────────────────────────────────────────────
-// Spring hover card with depth shadow
-
 interface AnimatedCardProps {
   children: React.ReactNode;
   className?: string;
 }
 
 export function AnimatedCard({ children, className }: AnimatedCardProps) {
+  const reduced = useReducedMotion();
+
+  if (reduced) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       whileHover={{ y: -5, scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
-      transition={{ type: "spring", stiffness: 380, damping: 22 }}
+      transition={MOTION.easeSpring}
       className={cn("will-change-transform", className)}
     >
       {children}
@@ -246,30 +280,15 @@ export function AnimatedCard({ children, className }: AnimatedCardProps) {
   );
 }
 
-// ─── MotionButton ─────────────────────────────────────────────────
-
 export const MotionButton = motion.button;
 export const MotionDiv = motion.div;
 export const MotionH1 = motion.h1;
 export const MotionP = motion.p;
 export const MotionSpan = motion.span;
 
-// ─── PageTransition ───────────────────────────────────────────────
-
 export function PageTransition({ children }: { children: React.ReactNode }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 8 }}
-      transition={{ duration: 0.3, ease: [0.25, 0.8, 0.25, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <PublicPageTransition>{children}</PublicPageTransition>;
 }
-
-// ─── Exports ──────────────────────────────────────────────────────
 
 export {
   fadeUpVariants,

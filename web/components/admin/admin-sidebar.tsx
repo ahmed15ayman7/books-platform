@@ -23,6 +23,8 @@ import {
   LogOut,
   Globe,
   Shield,
+  Trash2,
+  FilePenLine,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccessNav, clearAdminSession } from "@/lib/admin/permissions-client";
@@ -63,6 +65,7 @@ const navGroups: NavGroup[] = [
       { icon: Inbox, label: "طلبات النشر", href: "/admin/submissions" },
       { icon: ShoppingBag, label: "الطلبات", href: "/admin/orders" },
       { icon: MessageSquare, label: "التعليقات", href: "/admin/comments" },
+      { icon: MessageSquare, label: "رسائل التواصل", href: "/admin/contact" },
       { icon: Mail, label: "النشرة البريدية", href: "/admin/newsletter" },
     ],
   },
@@ -76,6 +79,8 @@ const navGroups: NavGroup[] = [
   {
     label: "النظام",
     items: [
+      { icon: FilePenLine, label: "المسودات", href: "/admin/drafts" },
+      { icon: Trash2, label: "سلة المحذوفات", href: "/admin/trash" },
       { icon: Bell, label: "الإشعارات", href: "/admin/notifications" },
       { icon: FileEdit, label: "الصفحات الثابتة", href: "/admin/pages" },
       { icon: Globe, label: "الإعدادات العامة", href: "/admin/settings" },

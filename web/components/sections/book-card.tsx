@@ -40,7 +40,8 @@ export function BookCard({
   isNew = false,
   className,
   compact = false,
-}: BookCardProps) {
+  entrance = true,
+}: BookCardProps & { entrance?: boolean }) {
   const bookFields = { nameEn, nameAr, shortDesc, shortDescAr };
   const displayName = localizedBookName(bookFields, locale);
   const excerpt = localizedBookShortDesc(bookFields, locale);
@@ -79,6 +80,9 @@ export function BookCard({
 
   return (
     <motion.div
+      initial={entrance ? { opacity: 0, y: 18 } : false}
+      whileInView={entrance ? { opacity: 1, y: 0 } : undefined}
+      viewport={{ once: true, margin: "-40px" }}
       whileHover={{ y: -6, scale: 1.015 }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 360, damping: 20 }}

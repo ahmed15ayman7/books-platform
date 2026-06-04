@@ -1,3 +1,9 @@
+import {
+  clearClientAccessToken,
+  setClientAccessToken,
+} from "@/lib/auth/access-token-cookie";
+import { ACCESS_TOKEN_MAX_AGE_SECONDS } from "@/lib/auth/session-config";
+
 /** Author/public auth helpers (shared access_token cookie with admin). */
 
 export function getAccessToken(): string | null {
@@ -9,14 +15,33 @@ export function getAccessToken(): string | null {
 }
 
 export function setAccessToken(token: string) {
-  if (typeof document === "undefined") return;
-  document.cookie = `access_token=${encodeURIComponent(token)}; path=/; max-age=900; samesite=strict`;
+  setClientAccessToken(token);
 }
 
 export function clearAccessToken() {
-  if (typeof document === "undefined") return;
-  document.cookie = "access_token=; path=/; max-age=0; samesite=strict";
+  clearClientAccessToken();
 }
+
+/** Renew access token using httpOnly refresh cookie (keeps session alive). */
+export async function refreshAccessToken(): Promise<boolean> {
+  try {
+    const res = await fetch("/api/v1/auth/refresh", {
+      method: "POST",
+      credentials: "include",
+    });
+    const data = (await res.json()) as {
+      success: boolean;
+      data?: { accessToken: string };
+    };
+    if (!res.ok || !data.success || !data.data?.accessToken) return false;
+    setAccessToken(data.data.accessToken);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export { ACCESS_TOKEN_MAX_AGE_SECONDS };
 
 const DRAFT_TOKEN_KEY = "publish_draft_token";
 const DRAFT_ID_KEY = "publish_draft_id";

@@ -1,242 +1,216 @@
-"use client";
-
-import { useCallback, useEffect, useState } from "react";
+import { notFound } from "next/navigation";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { adminAuthHeaders } from "@/lib/admin/auth-client";
-import { AdminCard } from "@/components/admin/admin-card";
+import Image from "next/image";
+import { db } from "@/lib/db";
+import { notDeleted } from "@/lib/admin/audit-fields";
+import { absoluteUrl } from "@/lib/seo/site";
+import { AdminDetailShell } from "@/components/admin/admin-detail-shell";
+import { AdminReadOnlyField } from "@/components/admin/admin-readonly-field";
+import { AdminStatusBadge } from "@/components/admin/admin-table";
+import { AdminEntityDeleteButton } from "@/components/admin/admin-entity-delete-button";
+import { isMediaChannel } from "@/lib/media/youtube";
 import {
-  AdminInput,
-  AdminTextarea,
-  AdminSelect,
-} from "@/components/admin/admin-form-field";
-import { AdminTimestamps } from "@/components/admin/admin-timestamps";
-import { FormDraftNotice } from "@/components/forms/form-draft-notice";
-import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
+  adminArticleEditPath,
+  adminBookViewPath,
+  publicArticleUrl,
+  publicBookUrl,
+} from "@/lib/admin/public-urls";
+import { redirect } from "next/navigation";
 
-interface ArticleForm {
-  title: string;
-  titleEn: string;
-  excerpt: string;
-  excerptEn: string;
-  body: string;
-  bodyEn: string;
-  channel: string;
-  status: string;
-  imageUrl: string;
-  date: string;
+interface Props {
+  params: Promise<{ id: string; locale: string }>;
 }
 
-const empty: ArticleForm = {
-  title: "",
-  titleEn: "",
-  excerpt: "",
-  excerptEn: "",
-  body: "",
-  bodyEn: "",
-  channel: "harvest",
-  status: "draft",
-  imageUrl: "",
-  date: new Date().toISOString().split("T")[0] ?? "",
+const CHANNEL_LABELS: Record<string, string> = {
+  harvest: "حصاد الكتب",
+  ideas: "زبدة الأفكار",
+  "world-reads": "العالم يقرأ",
+  "watch-your-book": "شاهد كتابك",
+  "books-talk": "حديث الكتب",
+  "novel-story": "رواية فحكاية",
 };
 
-const channelOptions = [
-  { value: "harvest", label: "حصاد الكتب" },
-  { value: "ideas", label: "زبدة الأفكار" },
-  { value: "world-reads", label: "العالم يقرأ" },
-  { value: "watch-your-book", label: "شاهد كتابك" },
-  { value: "books-talk", label: "حديث الكتب" },
-  { value: "novel-story", label: "رواية فحكاية" },
-];
+function formatDate(value: Date | null | undefined) {
+  if (!value) return null;
+  try {
+    return new Intl.DateTimeFormat("ar-EG", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(new Date(value));
+  } catch {
+    return new Date(value).toISOString().slice(0, 10);
+  }
+}
 
-const statusOptions = [
-  { value: "draft", label: "مسودة" },
-  { value: "publish", label: "منشور" },
-  { value: "scheduled", label: "مجدول" },
-];
+export async function generateMetadata({ params }: Props) {
+  const { id } = await params;
+  const article = await db.article.findFirst({
+    where: { id, ...notDeleted },
+    select: { title: true },
+  });
+  return { title: article?.title ?? "عرض مقال" };
+}
 
-type LangTab = "ar" | "en";
+export default async function AdminArticleViewPage({ params }: Props) {
+  const { id, locale } = await params;
 
-export default function AdminArticleEditPage() {
-  const params = useParams<{ locale?: string; id: string }>();
-  const locale = params.locale ?? "ar";
-  const id = params.id;
-  const isNew = id === "new";
+  const article = await db.article.findFirst({
+    where: { id, ...notDeleted },
+    include: {
+      products: {
+        select: { id: true, slug: true, nameEn: true, nameAr: true, imageUrl: true },
+      },
+      createdBy: { select: { fullName: true } },
+    },
+  });
 
-  const [form, setForm] = useState<ArticleForm>(empty);
-  const [tab, setTab] = useState<LangTab>("ar");
-  const [loading, setLoading] = useState(!isNew);
-  const draft = useFormDraft(formDraftId.adminArticle(id), form, setForm, { ready: !loading });
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [timestamps, setTimestamps] = useState<{
-    createdAt?: string;
-    updatedAt?: string;
-  }>({});
+  if (!article) notFound();
 
-  const load = useCallback(async () => {
-    if (isNew) return;
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/v1/admin/articles/${id}`, { headers: adminAuthHeaders() });
-      const data = await res.json() as { success: boolean; data?: Record<string, unknown> };
-      if (data.success && data.data) {
-        const d = data.data;
-        setForm({
-          title: String(d.title ?? ""),
-          titleEn: String(d.titleEn ?? ""),
-          excerpt: String(d.excerpt ?? ""),
-          excerptEn: String(d.excerptEn ?? ""),
-          body: String(d.body ?? ""),
-          bodyEn: String(d.bodyEn ?? ""),
-          channel: String(d.channel ?? "harvest"),
-          status: String(d.status ?? "draft"),
-          imageUrl: String(d.imageUrl ?? ""),
-          date: d.date ? (new Date(d.date as string).toISOString().split("T")[0] ?? "") : empty.date,
-        });
-        setTimestamps({
-          createdAt: d.createdAt as string | undefined,
-          updatedAt: d.updatedAt as string | undefined,
-        });
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [id, isNew]);
-
-  useEffect(() => { void load(); }, [load]);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setSaving(true);
-    setError("");
-    setSuccess(false);
-    try {
-      const url = isNew ? "/api/v1/admin/articles" : `/api/v1/admin/articles/${id}`;
-      const res = await fetch(url, {
-        method: isNew ? "POST" : "PATCH",
-        headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, date: form.date ? new Date(form.date) : null }),
-      });
-      const data = await res.json() as { success: boolean; error?: { message: string } };
-      if (!res.ok || !data.success) { setError(data.error?.message ?? "فشل الحفظ"); return; }
-      draft.clearDraft();
-      setSuccess(true);
-    } catch { setError("حدث خطأ في الاتصال"); }
-    finally { setSaving(false); }
+  if (isMediaChannel(article.channel)) {
+    redirect(`/${locale}/admin/media/${id}`);
   }
 
-  const set = (k: keyof ArticleForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    setForm((p) => ({ ...p, [k]: e.target.value }));
-
-  if (loading) return <div className="text-[var(--admin-text-muted)]">جاري التحميل...</div>;
+  const publicUrl = absoluteUrl(publicArticleUrl(locale, article.slug));
+  const editHref = adminArticleEditPath(locale, id, article.channel);
 
   return (
-    <div className="text-[var(--admin-text)]">
-      <Link
-        href={`/${locale}/admin/articles`}
-        className="mb-5 inline-flex items-center gap-2 text-sm text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] transition-colors"
-      >
-        <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
-        العودة للمقالات
-      </Link>
-
-      <h1 className="mb-2 text-2xl font-bold">{isNew ? "إضافة مقال جديد" : "تعديل المقال"}</h1>
-      {!isNew && (
-        <AdminTimestamps
-          createdAt={timestamps.createdAt}
-          updatedAt={timestamps.updatedAt}
-          compact
-          className="mb-5"
+    <AdminDetailShell
+      locale={locale}
+      backHref={`/${locale}/admin/articles`}
+      backLabel="العودة للمقالات"
+      title={article.title}
+      subtitle={article.titleEn ?? undefined}
+      timestamps={{ createdAt: article.createdAt, updatedAt: article.updatedAt }}
+      editHref={editHref}
+      publicHref={publicUrl}
+      badges={
+        <>
+          <AdminStatusBadge
+            status={article.status === "publish" ? "published" : article.status === "scheduled" ? "pending" : "draft"}
+          />
+          {article.channel && (
+            <span className="rounded-full bg-[var(--admin-surface-muted)] px-2.5 py-0.5 text-xs font-medium">
+              {CHANNEL_LABELS[article.channel] ?? article.channel}
+            </span>
+          )}
+        </>
+      }
+      actions={
+        <AdminEntityDeleteButton
+          apiPath={`/api/v1/admin/articles/${id}`}
+          entityTitle={article.title}
+          redirectHref={`/${locale}/admin/articles`}
+          confirmTitle="تأكيد حذف المقال"
+          entityLabel="المقال"
         />
-      )}
-
-      <form onSubmit={handleSubmit} className="max-w-4xl space-y-5">
-        <FormDraftNotice
-          showBanner={draft.showBanner}
-          status={draft.status}
-          onResume={draft.resume}
-          onDismiss={draft.dismiss}
-        />
-        <AdminCard title="الإعدادات">
-          <div className="grid gap-4 sm:grid-cols-3">
-            <AdminSelect
-              label="القناة"
-              value={form.channel}
-              onChange={set("channel")}
-              options={channelOptions}
-              required
-            />
-            <AdminSelect
-              label="الحالة"
-              value={form.status}
-              onChange={set("status")}
-              options={statusOptions}
-            />
-            <AdminInput
-              label="تاريخ النشر"
-              type="date"
-              value={form.date}
-              onChange={set("date")}
-            />
-          </div>
-          <div className="mt-4">
-            <AdminInput
-              label="رابط صورة المقال"
-              value={form.imageUrl}
-              onChange={set("imageUrl")}
-              placeholder="https://..."
-            />
-          </div>
-        </AdminCard>
-
-        {/* Language tabs */}
-        <AdminCard>
-          <div className="mb-4 flex gap-2 border-b border-[var(--admin-border)] pb-3">
-            {(["ar", "en"] as LangTab[]).map((l) => (
-              <button
-                key={l}
-                type="button"
-                onClick={() => setTab(l)}
-                className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors ${
-                  tab === l
-                    ? "bg-[var(--brand-red)] text-white"
-                    : "text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)]"
-                }`}
-              >
-                {l === "ar" ? "العربية" : "English"}
-              </button>
-            ))}
+      }
+    >
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-5">
+            <h2 className="border-b border-[var(--admin-border)] py-3 text-xs font-bold uppercase tracking-widest text-[var(--admin-text-subtle)]">
+              الإعدادات
+            </h2>
+            <dl>
+              <AdminReadOnlyField label="Slug" value={`/articles/${article.slug}`} dir="ltr" />
+              <AdminReadOnlyField label="تاريخ النشر" value={formatDate(article.date)} />
+              <AdminReadOnlyField label="صورة" value={article.imageUrl} variant="url" />
+              {article.youtubeUrl && (
+                <AdminReadOnlyField label="YouTube" value={article.youtubeUrl} variant="url" />
+              )}
+              {article.createdBy && (
+                <AdminReadOnlyField label="أنشأه" value={article.createdBy.fullName} />
+              )}
+            </dl>
           </div>
 
-          <div className="space-y-4">
-            {tab === "ar" ? (
-              <>
-                <AdminInput label="العنوان (عربي) *" value={form.title} onChange={set("title")} required />
-                <AdminTextarea label="المقتطف (عربي)" rows={2} value={form.excerpt} onChange={set("excerpt")} />
-                <AdminTextarea label="المحتوى الكامل (عربي)" rows={12} value={form.body} onChange={set("body")} />
-              </>
-            ) : (
-              <>
-                <AdminInput label="Title (English)" value={form.titleEn} onChange={set("titleEn")} />
-                <AdminTextarea label="Excerpt (English)" rows={2} value={form.excerptEn} onChange={set("excerptEn")} />
-                <AdminTextarea label="Full body (English)" rows={12} value={form.bodyEn} onChange={set("bodyEn")} />
-              </>
-            )}
+          <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-5">
+            <h2 className="border-b border-[var(--admin-border)] py-3 text-xs font-bold uppercase tracking-widest text-[var(--admin-text-subtle)]">
+              المحتوى
+            </h2>
+            <dl>
+              <AdminReadOnlyField
+                label="العنوان"
+                bilingual={{ ar: article.title, en: article.titleEn }}
+              />
+              <AdminReadOnlyField
+                label="المقتطف"
+                bilingual={{ ar: article.excerpt, en: article.excerptEn }}
+                variant="prose"
+              />
+              <AdminReadOnlyField
+                label="المحتوى"
+                bilingual={{ ar: article.content, en: article.contentEn }}
+                variant="prose"
+              />
+            </dl>
           </div>
-        </AdminCard>
 
-        {error && <p className="rounded-lg bg-[var(--error)]/10 border border-[var(--error)]/30 px-4 py-2 text-sm text-[var(--error)]">{error}</p>}
-        {success && <p className="rounded-lg bg-[var(--success-soft)] border border-[var(--success)]/30 px-4 py-2 text-sm text-[var(--success)]">تم الحفظ بنجاح</p>}
-
-        <div className="flex gap-3">
-          <Button type="submit" disabled={saving}>{saving ? "جاري الحفظ..." : isNew ? "نشر المقال" : "حفظ التغييرات"}</Button>
-          <Link href={`/${locale}/admin/articles`}><Button variant="outline" type="button">إلغاء</Button></Link>
+          {article.products.length > 0 && (
+            <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-5">
+              <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-[var(--admin-text-subtle)]">
+                الكتب المرتبطة
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-[var(--admin-border)] text-[var(--admin-text-subtle)]">
+                      <th className="py-2 text-start font-medium">الكتاب</th>
+                      <th className="py-2 text-start font-medium">Slug</th>
+                      <th className="py-2 text-start font-medium">إجراءات</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {article.products.map((book) => (
+                      <tr key={book.id} className="border-b border-[var(--admin-border)] last:border-0">
+                        <td className="py-3">{book.nameAr ?? book.nameEn}</td>
+                        <td className="py-3 font-mono text-xs text-[var(--admin-text-muted)]" dir="ltr">
+                          {book.slug}
+                        </td>
+                        <td className="py-3">
+                          <div className="flex gap-2">
+                            <Link
+                              href={adminBookViewPath(locale, book.id)}
+                              className="text-xs text-[var(--brand-red)] hover:underline"
+                            >
+                              عرض في الأدمن
+                            </Link>
+                            <a
+                              href={absoluteUrl(publicBookUrl(locale, book.slug))}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-[var(--admin-text-muted)] hover:underline"
+                            >
+                              الموقع
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
-      </form>
-    </div>
+
+        <aside className="space-y-4">
+          {article.imageUrl && (
+            <div className="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
+              <div className="relative aspect-video w-full">
+                <Image
+                  src={article.imageUrl}
+                  alt={article.title}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+              </div>
+            </div>
+          )}
+        </aside>
+      </div>
+    </AdminDetailShell>
   );
 }

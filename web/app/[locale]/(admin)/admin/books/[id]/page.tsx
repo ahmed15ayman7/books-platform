@@ -10,6 +10,13 @@ import { AdminStatusBadge } from "@/components/admin/admin-table";
 import { BookMarketingDialog } from "./book-marketing-dialog";
 import { BookDeleteButton } from "./book-delete-button";
 import { AdminTimestamps } from "@/components/admin/admin-timestamps";
+import {
+  adminArticleEditPath,
+  adminArticleViewPath,
+  adminAuthorViewPath,
+  adminPublisherViewPath,
+  publicArticleUrl,
+} from "@/lib/admin/public-urls";
 
 interface Props {
   params: Promise<{ id: string; locale: string }>;
@@ -107,6 +114,22 @@ export default async function AdminBookViewPage({ params }: Props) {
   });
 
   if (!book) notFound();
+
+  const linkedArticles = await db.article.findMany({
+    where: { ...notDeleted, products: { some: { id } } },
+    orderBy: { date: "desc" },
+    take: 20,
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      titleEn: true,
+      channel: true,
+      status: true,
+      videoId: true,
+      date: true,
+    },
+  });
 
   const title = book.nameAr ?? book.nameEn;
   const publicUrl = absoluteUrl(`/${locale}/books/${book.slug}`);
@@ -305,14 +328,22 @@ export default async function AdminBookViewPage({ params }: Props) {
                     className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-muted)] p-4"
                   >
                     <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-                      <h3 className="text-sm font-bold text-[var(--admin-text)]">
-                        {author.nameAr ?? author.name}
-                      </h3>
-                      {author.nameAr && author.name && author.nameAr !== author.name && (
-                        <span className="text-xs text-[var(--admin-text-muted)]" dir="ltr">
-                          {author.name}
-                        </span>
-                      )}
+                      <div>
+                        <h3 className="text-sm font-bold text-[var(--admin-text)]">
+                          {author.nameAr ?? author.name}
+                        </h3>
+                        {author.nameAr && author.name && author.nameAr !== author.name && (
+                          <span className="text-xs text-[var(--admin-text-muted)]" dir="ltr">
+                            {author.name}
+                          </span>
+                        )}
+                      </div>
+                      <Link
+                        href={adminAuthorViewPath(locale, author.id)}
+                        className="text-xs text-[var(--brand-red)] hover:underline"
+                      >
+                        عرض في الأدمن
+                      </Link>
                     </div>
                     <p className="text-xs text-[var(--admin-text-subtle)]" dir="ltr">
                       /{author.slug}
@@ -350,6 +381,14 @@ export default async function AdminBookViewPage({ params }: Props) {
               <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-[var(--admin-text-subtle)]">
                 دار النشر
               </h2>
+              <div className="mb-3">
+                <Link
+                  href={adminPublisherViewPath(locale, book.publisher.id)}
+                  className="text-xs text-[var(--brand-red)] hover:underline"
+                >
+                  عرض في لوحة التحكم
+                </Link>
+              </div>
               <div className="flex flex-col gap-4 sm:flex-row">
                 {book.publisher.imageUrl && (
                   <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-muted)]">
@@ -460,6 +499,80 @@ export default async function AdminBookViewPage({ params }: Props) {
                   </p>
                 </div>
               )}
+            </div>
+          )}
+
+          {linkedArticles.length > 0 && (
+            <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-5">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--admin-text-subtle)]">
+                  المقالات المرتبطة ({linkedArticles.length})
+                </h2>
+                <Link
+                  href={`/${locale}/admin/articles/new?bookId=${id}`}
+                  className="text-xs text-[var(--brand-red)] hover:underline"
+                >
+                  + مقال جديد
+                </Link>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-[var(--admin-border)] text-[var(--admin-text-subtle)]">
+                      <th className="py-2 text-start font-medium">العنوان</th>
+                      <th className="py-2 text-start font-medium">القناة</th>
+                      <th className="py-2 text-start font-medium">الحالة</th>
+                      <th className="py-2 text-start font-medium">إجراءات</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {linkedArticles.map((article) => (
+                      <tr key={article.id} className="border-b border-[var(--admin-border)] last:border-0">
+                        <td className="max-w-[200px] truncate py-3">{article.title}</td>
+                        <td className="py-3 text-xs text-[var(--admin-text-muted)]">
+                          {article.channel ?? "—"}
+                          {article.videoId ? " · فيديو" : ""}
+                        </td>
+                        <td className="py-3">
+                          <AdminStatusBadge
+                            status={
+                              article.status === "publish"
+                                ? "published"
+                                : article.status === "scheduled"
+                                  ? "pending"
+                                  : "draft"
+                            }
+                          />
+                        </td>
+                        <td className="py-3">
+                          <div className="flex flex-wrap gap-2">
+                            <Link
+                              href={adminArticleViewPath(locale, article.id, article.channel)}
+                              className="text-xs text-[var(--brand-red)] hover:underline"
+                            >
+                              عرض
+                            </Link>
+                            <Link
+                              href={adminArticleEditPath(locale, article.id, article.channel)}
+                              className="text-xs text-[var(--admin-text-muted)] hover:underline"
+                            >
+                              تعديل
+                            </Link>
+                            <a
+                              href={absoluteUrl(publicArticleUrl(locale, article.slug))}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-[var(--admin-text-muted)] hover:underline"
+                            >
+                              الموقع
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 

@@ -66,6 +66,9 @@ const config: Config = {
         sans: ["var(--font-arabic)", "var(--font-latin)", "system-ui", "sans-serif"],
       },
       fontSize: {
+        xs: ["0.8125rem", { lineHeight: "1.25" }],
+        sm: ["0.9375rem", { lineHeight: "1.375" }],
+        base: ["1.0625rem", { lineHeight: "1.5" }],
         "display-2xl": ["4.5rem", { lineHeight: "1.1", letterSpacing: "-0.02em" }],
         "display-xl": ["3.75rem", { lineHeight: "1.1", letterSpacing: "-0.02em" }],
         "display-lg": ["3rem", { lineHeight: "1.15", letterSpacing: "-0.01em" }],

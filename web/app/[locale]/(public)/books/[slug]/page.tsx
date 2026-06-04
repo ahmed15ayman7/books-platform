@@ -7,7 +7,9 @@ import { ArticleService } from "@/server/services/article.service";
 import { BookCarousel } from "@/components/sections/book-carousel";
 import { ArticleCarousel } from "@/components/sections/article-carousel";
 import { BookDetailHero } from "@/components/sections/book-detail-hero";
+import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-shell";
 import { BookBiblioTable } from "@/components/sections/book-biblio-table";
+import { BookMediaSection } from "@/components/sections/book-media-section";
 import { SectionHeading } from "@/components/ui/section-heading";
 import type { Locale } from "@/lib/i18n";
 import { mapArticleForCard } from "@/lib/i18n/article-linked-book";
@@ -20,9 +22,6 @@ import {
 } from "@/lib/i18n/book-locale";
 import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
 import { bookSeoMetadata } from "@/lib/seo/metadata";
-import { loadAdminSession } from "@/lib/admin/permissions-client";
-import { MotionButton } from "@/components/motion";
-import { Edit } from "lucide-react";
 
 interface BookPageProps {
   params: Promise<{ slug: string; locale: string }>;
@@ -40,12 +39,12 @@ export default async function BookDetailPage({ params }: BookPageProps) {
   const { slug } = await params;
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("books");
-  const session = loadAdminSession();
 
-  const [book, similarResult, linkedArticlesRaw] = await Promise.all([
+  const [book, similarResult, linkedArticlesRaw, mediaVideos] = await Promise.all([
     BookService.getBySlug(slug).catch(() => null),
     BookService.getSimilar(slug, 12).catch(() => ({ books: [], isGeneralFallback: false })),
     ArticleService.getByProductSlug(slug, 12).catch(() => []),
+    ArticleService.getMediaByProductSlug(slug, 6).catch(() => []),
   ]);
 
   const similarBooks = similarResult.books;
@@ -127,14 +126,16 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             </span>
           </div>
         </nav>
-        { session && <div className=" absolute top-44 rtl:left-10 right-10 w-40 z-50">
-        <Link href={`/admin/books/${book.id}`} className="">
-        <MotionButton className=" text-[var(--brand-red)] flex gap-2 cursor-pointer">
-        <Edit/>
-        </MotionButton>
-        </Link>
-      </div>}
-        <div className="container-platform py-8 space-y-10">
+
+        <AdminEntityPublicShell
+          entityType="book"
+          entityId={book.id}
+          editHref={`/${locale}/admin/books/${book.id}/edit`}
+          adminViewHref={`/${locale}/admin/books/${book.id}`}
+          publicHref={`/${locale}/books/${book.slug}`}
+          title={displayName}
+        >
+        <div className="container-platform py-8 space-y-10 pb-24">
           <BookDetailHero
             locale={locale}
             displayName={displayName}
@@ -175,6 +176,19 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             locale={locale}
           />
 
+          {mediaVideos.length > 0 && (
+            <BookMediaSection
+              locale={locale}
+              videos={mediaVideos.map((v) => ({
+                slug: v.slug,
+                title: v.title,
+                videoId: v.videoId,
+                imageUrl: v.imageUrl,
+                channel: v.channel,
+              }))}
+            />
+          )}
+
           {linkedArticles.length > 0 && (
             <section aria-labelledby="linked-articles-heading">
               <SectionHeading
@@ -198,6 +212,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             </section>
           )}
         </div>
+        </AdminEntityPublicShell>
       </div>
     </>
   );

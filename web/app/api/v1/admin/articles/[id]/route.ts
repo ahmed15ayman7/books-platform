@@ -1,22 +1,16 @@
 import { type NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { z } from "zod";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
-
-const updateSchema = z.object({
-  title: z.string().min(1).max(500).optional(),
-  titleEn: z.string().max(500).optional(),
-  excerpt: z.string().optional(),
-  excerptEn: z.string().optional(),
-  body: z.string().optional(),
-  bodyEn: z.string().optional(),
-  channel: z.string().max(50).optional(),
-  status: z.enum(["draft", "publish", "scheduled"]).optional(),
-  imageUrl: z.string().url().optional().or(z.literal("")),
-  date: z.coerce.date().optional().nullable(),
-});
+import { notDeleted, withSoftDelete } from "@/lib/admin/audit-fields";
+import { requirePasskeyVerification } from "@/lib/auth/require-passkey";
+import {
+  adminArticleProductSelect,
+  articleBodySchema,
+  resolveArticleWriteData,
+} from "@/lib/admin/article-payload";
+import { formatArticleApiResponse } from "@/lib/admin/public-urls";
 
 export async function GET(
   request: NextRequest,
@@ -27,16 +21,13 @@ export async function GET(
 
   const { id } = await params;
   try {
-    const article = await db.article.findUnique({ where: { id } });
+    const article = await db.article.findFirst({
+      where: { id, ...notDeleted },
+      include: { products: adminArticleProductSelect },
+    });
     if (!article) return ApiErrors.notFound("Article");
 
-    return apiSuccess({
-      ...article,
-      body: article.content,
-      titleEn: "",
-      excerptEn: "",
-      bodyEn: "",
-    });
+    return apiSuccess(formatArticleApiResponse(article));
   } catch (error) {
     console.error("[GET /api/v1/admin/articles/:id]", error);
     return ApiErrors.internal();
@@ -53,32 +44,111 @@ export async function PATCH(
   const { id } = await params;
   try {
     const body = await request.json() as unknown;
-    const parsed = updateSchema.safeParse(body);
+    const parsed = articleBodySchema.safeParse(body);
     if (!parsed.success) return ApiErrors.badRequest("Validation failed", parsed.error.issues);
 
-    const { body: content, title, excerpt, channel, status, imageUrl, date } = parsed.data;
+    const existing = await db.article.findFirst({ where: { id, ...notDeleted } });
+    if (!existing) return ApiErrors.notFound("Article");
+
+    let resolved;
+    try {
+      resolved = await resolveArticleWriteData(parsed.data, {
+        channel: existing.channel,
+        imageUrl: existing.imageUrl,
+        videoId: existing.videoId,
+      });
+    } catch (err) {
+      return ApiErrors.badRequest(err instanceof Error ? err.message : "Validation failed");
+    }
+
+    const {
+      body: content,
+      title,
+      titleEn,
+      excerpt,
+      excerptEn,
+      bodyEn,
+      channel,
+      status,
+      date,
+    } = parsed.data;
 
     const article = await db.article.update({
       where: { id },
       data: {
         ...(title !== undefined && { title }),
+        ...(titleEn !== undefined && { titleEn: titleEn || null }),
         ...(content !== undefined && { content }),
+        ...(bodyEn !== undefined && { contentEn: bodyEn || null }),
         ...(excerpt !== undefined && { excerpt }),
+        ...(excerptEn !== undefined && { excerptEn: excerptEn || null }),
         ...(channel !== undefined && { channel }),
         ...(status !== undefined && { status }),
-        ...(imageUrl !== undefined && { imageUrl: imageUrl || null }),
         ...(date !== undefined && { date }),
+        ...(resolved.titleEn !== undefined && { titleEn: resolved.titleEn }),
+        ...(resolved.excerptEn !== undefined && { excerptEn: resolved.excerptEn }),
+        ...(resolved.contentEn !== undefined && { contentEn: resolved.contentEn }),
+        ...(resolved.imageUrl !== undefined && {
+          imageUrl: resolved.imageUrl === "" ? null : resolved.imageUrl,
+        }),
+        ...(resolved.youtubeUrl !== undefined && { youtubeUrl: resolved.youtubeUrl }),
+        ...(resolved.videoId !== undefined && { videoId: resolved.videoId }),
+        ...(resolved.productIds !== undefined
+          ? { products: { set: resolved.productIds.map((pid) => ({ id: pid })) } }
+          : {}),
         postModifiedDate: new Date(),
       },
+      include: { products: adminArticleProductSelect },
     });
 
     await db.auditLog.create({
-      data: { userId: auth.payload.userId, action: "UPDATE_ARTICLE", entity: "Article", entityId: id },
+      data: {
+        userId: auth.payload.userId,
+        action: "UPDATE_ARTICLE",
+        entity: "Article",
+        entityId: id,
+      },
     });
 
-    return apiSuccess(article);
+    return apiSuccess(formatArticleApiResponse(article));
   } catch (error) {
     console.error("[PATCH /api/v1/admin/articles/:id]", error);
+    return ApiErrors.internal();
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const auth = await requireAuth(request, "ADMIN", PERMISSIONS.articles.delete);
+  if (isErrorResponse(auth)) return auth;
+
+  const passkeyErr = await requirePasskeyVerification(request, auth.payload.userId);
+  if (passkeyErr) return passkeyErr;
+
+  const { id } = await params;
+  try {
+    const existing = await db.article.findFirst({ where: { id, ...notDeleted } });
+    if (!existing) return ApiErrors.notFound("Article");
+
+    await db.article.update({
+      where: { id },
+      data: withSoftDelete(auth.payload.userId),
+    });
+
+    await db.auditLog.create({
+      data: {
+        userId: auth.payload.userId,
+        action: "DELETE_ARTICLE",
+        entity: "Article",
+        entityId: id,
+      },
+    });
+
+    return apiSuccess({ deleted: true });
+  } catch (error) {
+    console.error("[DELETE /api/v1/admin/articles/:id]", error);
     return ApiErrors.internal();
   }
 }

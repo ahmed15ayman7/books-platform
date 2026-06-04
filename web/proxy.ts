@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { locales, defaultLocale } from "@/lib/i18n/config";
 import { verifyAccessToken } from "@/lib/auth/jwt";
+import { accessTokenCookieOptions } from "@/lib/auth/access-token-cookie";
 
 const intlMiddleware = createMiddleware({
   locales,
@@ -11,7 +12,6 @@ const intlMiddleware = createMiddleware({
   localeDetection: true,
 });
 
-// Protected route patterns (login pages must stay public)
 const ADMIN_PATTERN = /^\/[a-z]{2}\/admin(?:\/|$)/;
 const ADMIN_LOGIN_PATTERN = /^\/[a-z]{2}\/admin\/login\/?$/;
 const AMBASSADOR_PATTERN = /^\/[a-z]{2}\/ambassador(?:\/|$)/;
@@ -19,10 +19,61 @@ const AMBASSADOR_LOGIN_PATTERN = /^\/[a-z]{2}\/ambassador\/login\/?$/;
 const AUTHOR_PATTERN = /^\/[a-z]{2}\/author(?:\/|$)/;
 const AUTH_PATTERN = /^\/[a-z]{2}\/auth(?:\/|$)/;
 
+type AuthPayload = Awaited<ReturnType<typeof verifyAccessToken>>;
+
+async function resolveAccessToken(request: NextRequest): Promise<{
+  token: string | null;
+  payload: AuthPayload;
+  refreshed: boolean;
+}> {
+  let token = request.cookies.get("access_token")?.value ?? null;
+  let payload = token ? await verifyAccessToken(token) : null;
+
+  if (payload) {
+    return { token, payload, refreshed: false };
+  }
+
+  const refreshToken = request.cookies.get("refresh_token")?.value;
+  if (!refreshToken) {
+    return { token: null, payload: null, refreshed: false };
+  }
+
+  try {
+    const refreshUrl = new URL("/api/v1/auth/refresh", request.url);
+    const refreshRes = await fetch(refreshUrl, {
+      method: "POST",
+      headers: { cookie: request.headers.get("cookie") ?? "" },
+    });
+    const data = (await refreshRes.json()) as {
+      success: boolean;
+      data?: { accessToken: string };
+    };
+    if (refreshRes.ok && data.success && data.data?.accessToken) {
+      token = data.data.accessToken;
+      payload = await verifyAccessToken(token);
+      return { token, payload, refreshed: true };
+    }
+  } catch {
+    // fall through
+  }
+
+  return { token: null, payload: null, refreshed: false };
+}
+
+function applyRefreshedToken(response: NextResponse, token: string) {
+  response.cookies.set(accessTokenCookieOptions(token));
+}
+
+function roleAllowed(
+  payload: NonNullable<AuthPayload>,
+  allowed: string[],
+): boolean {
+  return allowed.includes(payload.role);
+}
+
 export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Skip API, static, etc.
   if (
     pathname.startsWith("/api/") ||
     pathname.startsWith("/_next/") ||
@@ -31,56 +82,34 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Protect admin routes (except login — otherwise infinite redirect loop)
+  const locale = pathname.split("/")[1] ?? "ar";
+  let refreshedToken: string | null = null;
+
+  const needsAuth =
+    (ADMIN_PATTERN.test(pathname) && !ADMIN_LOGIN_PATTERN.test(pathname))
+    || (AMBASSADOR_PATTERN.test(pathname) && !AMBASSADOR_LOGIN_PATTERN.test(pathname))
+    || (AUTHOR_PATTERN.test(pathname) && !AUTH_PATTERN.test(pathname));
+
+  let auth: Awaited<ReturnType<typeof resolveAccessToken>> | null = null;
+  if (needsAuth) {
+    auth = await resolveAccessToken(request);
+    if (auth.refreshed && auth.token) refreshedToken = auth.token;
+  }
+
   if (ADMIN_PATTERN.test(pathname) && !ADMIN_LOGIN_PATTERN.test(pathname)) {
-    const token = request.cookies.get("access_token")?.value
-      ?? request.headers.get("authorization")?.replace("Bearer ", "");
-
-    if (!token) {
-      const locale = pathname.split("/")[1] ?? "ar";
-      return NextResponse.redirect(new URL(`/${locale}/admin/login`, request.url));
-    }
-
-    const payload = await verifyAccessToken(token);
-    if (!payload || payload.role !== "ADMIN") {
-      const locale = pathname.split("/")[1] ?? "ar";
+    if (!auth?.payload || !roleAllowed(auth.payload, ["ADMIN"])) {
       return NextResponse.redirect(new URL(`/${locale}/admin/login`, request.url));
     }
   }
 
-  // Protect ambassador routes (except login)
   if (AMBASSADOR_PATTERN.test(pathname) && !AMBASSADOR_LOGIN_PATTERN.test(pathname)) {
-    const token = request.cookies.get("access_token")?.value
-      ?? request.headers.get("authorization")?.replace("Bearer ", "");
-
-    if (!token) {
-      const locale = pathname.split("/")[1] ?? "ar";
-      return NextResponse.redirect(new URL(`/${locale}/ambassador/login`, request.url));
-    }
-
-    const payload = await verifyAccessToken(token);
-    if (!payload || (payload.role !== "AMBASSADOR" && payload.role !== "ADMIN")) {
-      const locale = pathname.split("/")[1] ?? "ar";
+    if (!auth?.payload || !roleAllowed(auth.payload, ["AMBASSADOR", "ADMIN"])) {
       return NextResponse.redirect(new URL(`/${locale}/ambassador/login`, request.url));
     }
   }
 
-  // Protect author portal (auth login/register stay public)
   if (AUTHOR_PATTERN.test(pathname) && !AUTH_PATTERN.test(pathname)) {
-    const token = request.cookies.get("access_token")?.value
-      ?? request.headers.get("authorization")?.replace("Bearer ", "");
-
-    if (!token) {
-      const locale = pathname.split("/")[1] ?? "ar";
-      const redirect = encodeURIComponent(pathname + request.nextUrl.search);
-      return NextResponse.redirect(
-        new URL(`/${locale}/auth/login?redirect=${redirect}`, request.url),
-      );
-    }
-
-    const payload = await verifyAccessToken(token);
-    if (!payload || (payload.role !== "AUTHOR" && payload.role !== "ADMIN")) {
-      const locale = pathname.split("/")[1] ?? "ar";
+    if (!auth?.payload || !roleAllowed(auth.payload, ["AUTHOR", "ADMIN"])) {
       const redirect = encodeURIComponent(pathname + request.nextUrl.search);
       return NextResponse.redirect(
         new URL(`/${locale}/auth/login?redirect=${redirect}`, request.url),
@@ -88,7 +117,9 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
-  return intlMiddleware(request);
+  const response = intlMiddleware(request);
+  if (refreshedToken) applyRefreshedToken(response, refreshedToken);
+  return response;
 }
 
 export const config = {

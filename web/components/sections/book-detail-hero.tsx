@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
-import { BookOpen, ExternalLink, Heart, Share2, ShoppingCart, Star } from "lucide-react";
+import { ExternalLink, Heart, Share2, ShoppingCart, Star } from "lucide-react";
+import { BookDetailCover } from "@/components/sections/book-detail-cover";
 import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BookSummaryMarkdown } from "@/lib/markdown/book-summary-markdown";
@@ -129,29 +129,12 @@ export function BookDetailHero({
 
   const coverColumn = (
     <div className="mx-auto flex w-full max-w-sm flex-col gap-4 sm:max-w-none sm:mx-0 lg:w-[360px] lg:shrink-0">
-      <div
-        className="relative mx-auto overflow-hidden rounded-xl bg-[var(--brand-gray-100)] shadow-md ring-1 ring-[var(--brand-gray-200)] sm:mx-0"
-        style={{
-          width: BOOK_DETAIL_COVER_WIDTH,
-          height: BOOK_DETAIL_COVER_HEIGHT,
-          maxWidth: "100%",
-        }}
-      >
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={displayName}
-            fill
-            sizes={`${BOOK_DETAIL_COVER_WIDTH}px`}
-            className="object-cover"
-            priority
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center text-[var(--brand-gray-400)]">
-            <BookOpen className="h-16 w-16" strokeWidth={1.25} aria-hidden="true" />
-          </div>
-        )}
-      </div>
+      <BookDetailCover
+        src={imageUrl}
+        alt={displayName}
+        width={BOOK_DETAIL_COVER_WIDTH}
+        height={BOOK_DETAIL_COVER_HEIGHT}
+      />
 
       <div className="flex flex-col gap-2">
         {purchaseOption === "DIRECT" && price != null && (

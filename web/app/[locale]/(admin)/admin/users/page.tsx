@@ -26,8 +26,6 @@ import {
   type Permission,
 } from "@/lib/auth/permissions";
 import { can, loadAdminSession } from "@/lib/admin/permissions-client";
-import { usePasskeyGate } from "@/lib/admin/use-passkey-gate";
-import { PasskeyGateDialog } from "@/components/admin/passkey-gate-dialog";
 import { adminFieldClass } from "@/components/admin/admin-form-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -71,9 +69,6 @@ export default function AdminUsersPage() {
   const locale = (params.locale as string) ?? "ar";
   const session = loadAdminSession();
   const isSuper = session?.isSuperAdmin ?? false;
-  const { runWithPasskey, busy: passkeyBusy, error: passkeyError } = usePasskeyGate();
-  const [passkeyOpen, setPasskeyOpen] = useState(false);
-  const [pendingAction, setPendingAction] = useState<(() => Promise<void>) | null>(null);
 
   const { viewMode, setViewMode } = useAdminViewMode("users");
   const [users, setUsers] = useState<AdminUserRow[]>([]);
@@ -168,17 +163,7 @@ export default function AdminUsersPage() {
   }
 
   function runSensitive(action: () => Promise<void>) {
-    setPendingAction(() => action);
-    setPasskeyOpen(true);
-  }
-
-  async function handlePasskeyContinue() {
-    if (!pendingAction) return;
-    await runWithPasskey(async () => {
-      setPasskeyOpen(false);
-      await pendingAction();
-      setPendingAction(null);
-    });
+    void action();
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -519,14 +504,6 @@ export default function AdminUsersPage() {
         loading={loading}
         emptyMessage="لا يوجد مديرون — أضف مديراً جديداً"
         renderCard={renderCard}
-      />
-
-      <PasskeyGateDialog
-        open={passkeyOpen}
-        onOpenChange={setPasskeyOpen}
-        busy={passkeyBusy}
-        error={passkeyError}
-        onConfirm={() => void handlePasskeyContinue()}
       />
     </div>
   );

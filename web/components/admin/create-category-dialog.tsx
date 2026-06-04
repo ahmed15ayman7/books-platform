@@ -11,7 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { slugify, autoSlugFromEnglish } from "@/lib/admin/slugify";
-import { AdminInput, AdminSlugInput } from "@/components/admin/admin-form-field";
+import { AdminSlugInput } from "@/components/admin/admin-form-field";
+import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 import type { EntityOption } from "@/components/admin/admin-entity-combobox";
@@ -121,25 +122,23 @@ export function CreateCategoryDialog({
             onResume={draft.resume}
             onDismiss={draft.dismiss}
           />
-          <AdminInput
-            label="الاسم (EN) *"
-            value={form.name}
-            onChange={(e) => {
-              const name = e.target.value;
-              setForm((prev) => ({
-                ...prev,
-                name,
-                slug: autoSlugFromEnglish(name, prev.slug, prev.name),
-              }));
-            }}
-            dir="ltr"
-            required
-          />
-          <AdminInput
-            label="الاسم (AR)"
-            value={form.nameAr}
-            onChange={(e) => set("nameAr")(e.target.value)}
-          />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <AdminBilingualField
+              arValue={form.nameAr}
+              enValue={form.name}
+              onArChange={(v) => setForm((prev) => ({ ...prev, nameAr: v }))}
+              onEnChange={(v) => {
+                setForm((prev) => ({
+                  ...prev,
+                  name: v,
+                  slug: autoSlugFromEnglish(v, prev.slug, prev.name),
+                }));
+              }}
+              labels={{ ar: "الاسم (AR)", en: "الاسم (EN) *" }}
+              layout="half"
+              enRequired
+            />
+          </div>
           <AdminSlugInput
             label="Slug"
             value={form.slug}

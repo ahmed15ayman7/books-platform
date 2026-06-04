@@ -5,6 +5,7 @@ import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { buildOrderBy, parseOptionalBool, parseSortParam } from "@/lib/admin/list-query";
+import { notDeleted } from "@/lib/admin/audit-fields";
 import { publisherBilingualDbData } from "@/lib/admin/publisher-fields";
 import { slugify } from "@/lib/admin/slugify";
 
@@ -36,6 +37,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     const where = {
+      ...notDeleted,
       ...(status && status !== "all" ? { status } : {}),
       ...(sponsoredFilter === true ? { sponsored: { isNot: null } } : {}),
       ...(sponsoredFilter === false ? { sponsored: null } : {}),

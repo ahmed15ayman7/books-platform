@@ -185,6 +185,32 @@ export const PublisherService = {
     });
   },
 
+  async getSponsored(limit = 8) {
+    const rows = await db.sponsoredPublisher.findMany({
+      where: {
+        isActive: true,
+        endsAt: { gt: new Date() },
+        publisher: { status: "publish" },
+      },
+      orderBy: { priority: "desc" },
+      take: limit,
+      select: {
+        publisher: {
+          select: {
+            id: true,
+            title: true,
+            name: true,
+            nameAr: true,
+            slug: true,
+            imageUrl: true,
+            imageFeatured: true,
+          },
+        },
+      },
+    });
+    return rows.map((r) => mapPublisherImage(r.publisher));
+  },
+
   async listSlugsForSitemap(limit = 2000) {
     return db.publisher.findMany({
       where: {

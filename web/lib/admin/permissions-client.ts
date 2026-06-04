@@ -2,6 +2,10 @@ import {
   NAV_PERMISSION_BY_HREF,
   type Permission,
 } from "@/lib/auth/permissions";
+import {
+  canAccessTrashHub,
+  canAccessDraftsHub,
+} from "@/lib/admin/content-hub-permissions";
 
 const SESSION_KEY = "admin_session";
 
@@ -47,7 +51,26 @@ export function canAccessNav(href: string): boolean {
   if (!session) return false;
   if (session.isSuperAdmin) return true;
 
+  if (href === "/admin/trash") {
+    return canAccessTrashHub(session);
+  }
+  if (href === "/admin/drafts") {
+    return canAccessDraftsHub(session);
+  }
+
   const required = NAV_PERMISSION_BY_HREF[href];
   if (!required) return true;
   return session.permissions.includes(required);
+}
+
+export function canAccessTrashNav(): boolean {
+  const session = loadAdminSession();
+  if (!session) return false;
+  return canAccessTrashHub(session);
+}
+
+export function canAccessDraftsNav(): boolean {
+  const session = loadAdminSession();
+  if (!session) return false;
+  return canAccessDraftsHub(session);
 }

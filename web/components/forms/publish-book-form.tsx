@@ -373,7 +373,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
                       <SelectTrigger className={inputClass(!!errors.bookLanguage)}>
                         <SelectValue placeholder={isAr ? "اختر اللغة" : "Select language"} />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="border-[var(--brand-gray-200)] bg-white text-[var(--brand-gray-900)]">
                         <SelectItem value="_empty">{isAr ? "اختر اللغة" : "Select language"}</SelectItem>
                         <SelectItem value="ar">{isAr ? "العربية" : "Arabic"}</SelectItem>
                         <SelectItem value="en">{isAr ? "الإنجليزية" : "English"}</SelectItem>
@@ -440,7 +440,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
         )}
 
         {status === "error" && (
-          <div className="rounded-md bg-[var(--error-soft)] border border-[var(--error)] p-3 text-sm text-[var(--error)]">
+          <div className="form-error-banner rounded-md px-3 py-2 text-sm">
             {isAr ? "حدث خطأ، حاول مرة أخرى" : "An error occurred. Please try again."}
           </div>
         )}

@@ -129,7 +129,12 @@ export function DesktopNavClient({ locale, articleCategories = [] }: DesktopNavC
         {t ? "ناشرون" : "Publishers"}
       </NavLink>
 
-      <NavLink href={`${base}/publish`} active={pathname.includes("/publish")} accent>
+      <NavLink
+        href={`${base}/publish`}
+        active={pathname.includes("/publish")}
+        accent
+        className="nav-publish-pill"
+      >
         {t ? "انشر كتابك" : "Publish"}
       </NavLink>
     </nav>
@@ -143,6 +148,7 @@ function NavLink({
   active,
   accent,
   isOpen,
+  className,
 }: {
   href: string;
   children: React.ReactNode;
@@ -150,24 +156,30 @@ function NavLink({
   active?: boolean;
   accent?: boolean;
   isOpen?: boolean;
+  className?: string;
 }) {
   return (
     <Link
       href={href}
       className={cn(
-        "relative flex items-center gap-1 whitespace-nowrap rounded-xl px-2.5 py-2 text-[13px] font-medium transition-all duration-[var(--motion-base)] md:px-3 md:text-sm hover:bg-white/8",
-        accent ? "hover:text-[#e85a68]" : "hover:text-white",
+        className,
+        "relative flex items-center gap-1 whitespace-nowrap rounded-xl px-2.5 py-2 text-sm font-medium transition-all duration-[var(--motion-base)] md:px-3 hover:bg-white/8",
+        accent
+          ? "font-semibold bg-[var(--brand-red)] text-white hover:bg-[var(--brand-red-hover)] shadow-sm  active:scale-[0.98]"
+          : "hover:text-white",
         active &&
           !accent &&
           "after:absolute after:bottom-0 after:inset-x-1 after:h-[3px] after:rounded-full after:bg-[var(--brand-red)]",
         accent &&
           active &&
-          "after:absolute after:bottom-0 after:inset-x-1 after:h-[3px] after:rounded-full after:bg-[var(--brand-red)]",
+          "ring-2 ring-[var(--brand-red)] ring-offset-2 ring-offset-[var(--brand-black)]",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--brand-black)]"
       )}
-      style={{
-        color: accent ? "var(--brand-red)" : active ? "#ffffff" : "rgba(255,255,255,0.95)",
-      }}
+      style={
+        accent
+          ? undefined
+          : { color: active ? "#ffffff" : "rgba(255,255,255,0.95)" }
+      }
       aria-current={active ? "page" : undefined}
     >
       {children}
@@ -216,7 +228,7 @@ function DropdownMenu({
 }
 
 function ArticlesDropdown({
-  channels,
+  channels: _channels,
   categories,
   locale,
   onMouseEnter,
@@ -230,7 +242,7 @@ function ArticlesDropdown({
 }) {
   const isAr = locale === "ar";
   const base = `/${locale}`;
-console.log(channels);
+
   return (
     <div
       className="absolute top-full start-0 z-50 mt-1 min-w-[280px] max-h-[70vh] overflow-y-auto animate-scale-in rounded-2xl border border-[var(--brand-gray-700)] bg-[#141414] py-2 shadow-2xl"

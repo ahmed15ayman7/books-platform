@@ -14,6 +14,41 @@ describe("Comment validation", () => {
     expect(result.success).toBe(true);
   });
 
+  it("accepts comment without email", () => {
+    const result = createCommentSchema.safeParse({
+      authorName: "John Doe",
+      content: "Great article! I really enjoyed reading it.",
+      articleId: "cloez2d8i0000yz9qexampleid1",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.email).toBeUndefined();
+    }
+  });
+
+  it("accepts empty email string as omitted", () => {
+    const result = createCommentSchema.safeParse({
+      authorName: "John Doe",
+      email: "",
+      content: "Great article! I really enjoyed reading it.",
+      articleId: "cloez2d8i0000yz9qexampleid1",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.email).toBeUndefined();
+    }
+  });
+
+  it("rejects invalid email when provided", () => {
+    const result = createCommentSchema.safeParse({
+      authorName: "John Doe",
+      email: "not-an-email",
+      content: "Great article! I really enjoyed reading it.",
+      articleId: "cloez2d8i0000yz9qexampleid1",
+    });
+    expect(result.success).toBe(false);
+  });
+
   it("rejects comment with no product or article", () => {
     const result = createCommentSchema.safeParse({
       authorName: "John",

@@ -3,9 +3,16 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Plus, Pencil, Star, Building2 } from "lucide-react";
+import { Plus, Star, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
+import { absoluteUrl } from "@/lib/seo/site";
+import { AdminEntityActions } from "@/components/admin/admin-entity-actions";
+import {
+  adminPublisherEditPath,
+  adminPublisherViewPath,
+  publicPublisherUrl,
+} from "@/lib/admin/public-urls";
 import { appendListParams } from "@/lib/admin/list-query";
 import { useAdminViewMode } from "@/lib/admin/use-admin-view-mode";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
@@ -85,13 +92,16 @@ export default function AdminPublishersPage() {
 
   const resetPage = () => setPage(1);
 
-  const editBtn = (row: Publisher) => (
-    <Link href={`/${locale}/admin/publishers/${row.id}`}>
-      <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-        <Pencil className="h-3 w-3" />
-        تعديل
-      </Button>
-    </Link>
+  const rowActions = (row: Publisher) => (
+    <AdminEntityActions
+      viewHref={adminPublisherViewPath(locale, row.id)}
+      editHref={adminPublisherEditPath(locale, row.id)}
+      publicHref={
+        row.status === "publish"
+          ? absoluteUrl(publicPublisherUrl(locale, row.slug))
+          : undefined
+      }
+    />
   );
 
   const columns = [
@@ -140,7 +150,7 @@ export default function AdminPublishersPage() {
     },
     adminCreatedAtColumn<Publisher>(),
     adminUpdatedAtColumn<Publisher>(),
-    { key: "actions", label: "", headerClassName: "w-16", render: editBtn },
+    { key: "actions", label: "", headerClassName: "w-28", render: rowActions },
   ];
 
   const renderCard = (row: Publisher) => (
@@ -161,7 +171,7 @@ export default function AdminPublishersPage() {
         </p>
         <AdminStatusBadge status={row.status === "publish" ? "published" : "draft"} />
       </AdminGridCardBody>
-      <AdminGridCardFooter>{editBtn(row)}</AdminGridCardFooter>
+      <AdminGridCardFooter>{rowActions(row)}</AdminGridCardFooter>
     </AdminGridCard>
   );
 

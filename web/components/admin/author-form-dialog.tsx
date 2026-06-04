@@ -11,7 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { slugify, autoSlugFromEnglish } from "@/lib/admin/slugify";
-import { AdminInput, AdminTextarea, AdminSlugInput } from "@/components/admin/admin-form-field";
+import { AdminSlugInput } from "@/components/admin/admin-form-field";
+import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
@@ -156,24 +157,20 @@ export function AuthorFormDialog({
             onDismiss={draft.dismiss}
           />
           <div className="grid gap-3 sm:grid-cols-2">
-            <AdminInput
-              label="الاسم (إنجليزي) *"
-              value={form.name}
-              onChange={(e) => {
-                const name = e.target.value;
+            <AdminBilingualField
+              arValue={form.nameAr}
+              enValue={form.name}
+              onArChange={(v) => set("nameAr")(v)}
+              onEnChange={(v) => {
                 setForm((prev) => ({
                   ...prev,
-                  name,
-                  slug: autoSlugFromEnglish(name, prev.slug, prev.name),
+                  name: v,
+                  slug: autoSlugFromEnglish(v, prev.slug, prev.name),
                 }));
               }}
-              dir="ltr"
-              required
-            />
-            <AdminInput
-              label="الاسم (عربي)"
-              value={form.nameAr}
-              onChange={(e) => set("nameAr")(e.target.value)}
+              labels={{ ar: "الاسم (عربي)", en: "الاسم (إنجليزي) *" }}
+              layout="half"
+              enRequired
             />
           </div>
 
@@ -184,19 +181,17 @@ export function AuthorFormDialog({
             required
           />
 
-          <AdminTextarea
-            label="نبذة (إنجليزي)"
-            value={form.bio}
-            onChange={(e) => set("bio")(e.target.value)}
-            rows={4}
-            dir="ltr"
-          />
-          <AdminTextarea
-            label="نبذة (عربي)"
-            value={form.bioAr}
-            onChange={(e) => set("bioAr")(e.target.value)}
-            rows={4}
-          />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <AdminBilingualField
+              arValue={form.bioAr}
+              enValue={form.bio}
+              onArChange={(v) => set("bioAr")(v)}
+              onEnChange={(v) => set("bio")(v)}
+              labels={{ ar: "نبذة (عربي)", en: "نبذة (إنجليزي)" }}
+              multiline
+              rows={4}
+            />
+          </div>
 
           {error && <p className="text-xs text-[var(--error)]">{error}</p>}
           <DialogFooter className="gap-2 sm:gap-0">

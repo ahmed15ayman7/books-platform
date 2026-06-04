@@ -3,9 +3,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Plus, Pencil, Video } from "lucide-react";
+import { Plus, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
+import { absoluteUrl } from "@/lib/seo/site";
+import { AdminEntityActions } from "@/components/admin/admin-entity-actions";
+import {
+  adminMediaEditPath,
+  adminMediaViewPath,
+  publicArticleUrl,
+} from "@/lib/admin/public-urls";
 import { appendListParams } from "@/lib/admin/list-query";
 import { useAdminViewMode } from "@/lib/admin/use-admin-view-mode";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
@@ -32,6 +39,8 @@ interface MediaItem {
   status: string;
   date: string | null;
   imageUrl?: string | null;
+  videoId?: string | null;
+  products?: Array<{ nameAr: string | null; nameEn: string }>;
 }
 
 const mediaChannelLabel: Record<string, string> = {
@@ -59,7 +68,7 @@ export default function AdminMediaPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const q = new URLSearchParams({ page: String(page), limit: "20" });
+      const q = new URLSearchParams({ page: String(page), limit: "20", mediaOnly: "true" });
       if (search.trim()) q.set("search", search.trim());
       appendListParams(q, { sort, channel, status });
       const res = await fetch(`/api/v1/admin/articles?${q}`, { headers: adminAuthHeaders() });
@@ -69,8 +78,7 @@ export default function AdminMediaPage() {
         pagination?: { totalPages: number };
       };
       if (data.success && data.data) {
-        const media = data.data.filter((a) => MEDIA_CHANNELS.includes(a.channel ?? ""));
-        setItems(media);
+        setItems(data.data);
         setTotalPages(data.pagination?.totalPages ?? 1);
       }
     } finally {
@@ -98,13 +106,16 @@ export default function AdminMediaPage() {
     );
   }, [items, channel, status, sort]);
 
-  const editBtn = (row: MediaItem) => (
-    <Link href={`/${locale}/admin/articles/${row.id}`}>
-      <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-        <Pencil className="h-3 w-3" />
-        تعديل
-      </Button>
-    </Link>
+  const rowActions = (row: MediaItem) => (
+    <AdminEntityActions
+      viewHref={adminMediaViewPath(locale, row.id)}
+      editHref={adminMediaEditPath(locale, row.id)}
+      publicHref={
+        row.status === "publish"
+          ? absoluteUrl(publicArticleUrl(locale, row.slug))
+          : undefined
+      }
+    />
   );
 
   const columns = [
@@ -113,6 +124,22 @@ export default function AdminMediaPage() {
       label: "العنوان",
       render: (row: MediaItem) => (
         <span className="block max-w-[280px] truncate font-medium">{row.title}</span>
+      ),
+    },
+    {
+      key: "book",
+      label: "الكتاب",
+      render: (row: MediaItem) => (
+        <span className="block max-w-[140px] truncate text-xs text-[var(--admin-text-muted)]">
+          {row.products?.[0]?.nameAr ?? row.products?.[0]?.nameEn ?? "—"}
+        </span>
+      ),
+    },
+    {
+      key: "video",
+      label: "فيديو",
+      render: (row: MediaItem) => (
+        <span className="text-xs text-[var(--admin-text-muted)]">{row.videoId ? "YouTube" : "—"}</span>
       ),
     },
     {
@@ -140,7 +167,7 @@ export default function AdminMediaPage() {
         <AdminStatusBadge status={row.status === "publish" ? "published" : "draft"} />
       ),
     },
-    { key: "actions", label: "", headerClassName: "w-16", render: editBtn },
+    { key: "actions", label: "", headerClassName: "w-28", render: rowActions },
   ];
 
   const renderCard = (row: MediaItem) => (
@@ -157,7 +184,7 @@ export default function AdminMediaPage() {
         </p>
         <AdminStatusBadge status={row.status === "publish" ? "published" : "draft"} />
       </AdminGridCardBody>
-      <AdminGridCardFooter>{editBtn(row)}</AdminGridCardFooter>
+      <AdminGridCardFooter>{rowActions(row)}</AdminGridCardFooter>
     </AdminGridCard>
   );
 
@@ -177,7 +204,7 @@ export default function AdminMediaPage() {
               onSubmit={() => void load()}
               placeholder="بحث..."
             />
-            <Link href={`/${locale}/admin/articles/new`}>
+            <Link href={`/${locale}/admin/media/new`}>
               <Button size="sm" className="gap-1.5">
                 <Plus className="h-4 w-4" />
                 إضافة محتوى
