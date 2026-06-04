@@ -1,24 +1,15 @@
 import { type NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { z } from "zod";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { notDeleted, withSoftDelete } from "@/lib/admin/audit-fields";
 import { requirePasskeyVerification } from "@/lib/auth/require-passkey";
-
-const updateSchema = z.object({
-  title: z.string().min(1).max(500).optional(),
-  titleEn: z.string().max(500).optional(),
-  excerpt: z.string().optional(),
-  excerptEn: z.string().optional(),
-  body: z.string().optional(),
-  bodyEn: z.string().optional(),
-  channel: z.string().max(50).optional(),
-  status: z.enum(["draft", "publish", "scheduled"]).optional(),
-  imageUrl: z.string().url().optional().or(z.literal("")),
-  date: z.coerce.date().optional().nullable(),
-});
+import {
+  adminArticleProductSelect,
+  articleBodySchema,
+  resolveArticleWriteData,
+} from "@/lib/admin/article-payload";
 
 export async function GET(
   request: NextRequest,
@@ -29,12 +20,16 @@ export async function GET(
 
   const { id } = await params;
   try {
-    const article = await db.article.findFirst({ where: { id, ...notDeleted } });
+    const article = await db.article.findFirst({
+      where: { id, ...notDeleted },
+      include: { products: adminArticleProductSelect },
+    });
     if (!article) return ApiErrors.notFound("Article");
 
     return apiSuccess({
       ...article,
       body: article.content,
+      productIds: article.products.map((p) => p.id),
       titleEn: "",
       excerptEn: "",
       bodyEn: "",
@@ -55,13 +50,24 @@ export async function PATCH(
   const { id } = await params;
   try {
     const body = await request.json() as unknown;
-    const parsed = updateSchema.safeParse(body);
+    const parsed = articleBodySchema.safeParse(body);
     if (!parsed.success) return ApiErrors.badRequest("Validation failed", parsed.error.issues);
 
     const existing = await db.article.findFirst({ where: { id, ...notDeleted } });
     if (!existing) return ApiErrors.notFound("Article");
 
-    const { body: content, title, excerpt, channel, status, imageUrl, date } = parsed.data;
+    let resolved;
+    try {
+      resolved = await resolveArticleWriteData(parsed.data, {
+        channel: existing.channel,
+        imageUrl: existing.imageUrl,
+        videoId: existing.videoId,
+      });
+    } catch (err) {
+      return ApiErrors.badRequest(err instanceof Error ? err.message : "Validation failed");
+    }
+
+    const { body: content, title, excerpt, channel, status, date } = parsed.data;
 
     const article = await db.article.update({
       where: { id },
@@ -71,14 +77,27 @@ export async function PATCH(
         ...(excerpt !== undefined && { excerpt }),
         ...(channel !== undefined && { channel }),
         ...(status !== undefined && { status }),
-        ...(imageUrl !== undefined && { imageUrl: imageUrl || null }),
         ...(date !== undefined && { date }),
+        ...(resolved.imageUrl !== undefined && {
+          imageUrl: resolved.imageUrl === "" ? null : resolved.imageUrl,
+        }),
+        ...(resolved.youtubeUrl !== undefined && { youtubeUrl: resolved.youtubeUrl }),
+        ...(resolved.videoId !== undefined && { videoId: resolved.videoId }),
+        ...(resolved.productIds !== undefined
+          ? { products: { set: resolved.productIds.map((id) => ({ id })) } }
+          : {}),
         postModifiedDate: new Date(),
       },
+      include: { products: adminArticleProductSelect },
     });
 
     await db.auditLog.create({
-      data: { userId: auth.payload.userId, action: "UPDATE_ARTICLE", entity: "Article", entityId: id },
+      data: {
+        userId: auth.payload.userId,
+        action: "UPDATE_ARTICLE",
+        entity: "Article",
+        entityId: id,
+      },
     });
 
     return apiSuccess(article);
@@ -109,7 +128,12 @@ export async function DELETE(
     });
 
     await db.auditLog.create({
-      data: { userId: auth.payload.userId, action: "DELETE_ARTICLE", entity: "Article", entityId: id },
+      data: {
+        userId: auth.payload.userId,
+        action: "DELETE_ARTICLE",
+        entity: "Article",
+        entityId: id,
+      },
     });
 
     return apiSuccess({ deleted: true });

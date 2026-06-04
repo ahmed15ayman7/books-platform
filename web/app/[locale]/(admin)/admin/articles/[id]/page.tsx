@@ -16,6 +16,9 @@ import { AdminTimestamps } from "@/components/admin/admin-timestamps";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
+import { BookMultiPicker, type BookPickerItem } from "@/components/admin/book-multi-picker";
+import { isMediaChannel } from "@/lib/media/youtube";
+
 interface ArticleForm {
   title: string;
   titleEn: string;
@@ -26,6 +29,7 @@ interface ArticleForm {
   channel: string;
   status: string;
   imageUrl: string;
+  youtubeUrl: string;
   date: string;
 }
 
@@ -39,6 +43,7 @@ const empty: ArticleForm = {
   channel: "harvest",
   status: "draft",
   imageUrl: "",
+  youtubeUrl: "",
   date: new Date().toISOString().split("T")[0] ?? "",
 };
 
@@ -66,6 +71,8 @@ export default function AdminArticleEditPage() {
   const isNew = id === "new";
 
   const [form, setForm] = useState<ArticleForm>(empty);
+  const [productIds, setProductIds] = useState<string[]>([]);
+  const [selectedBooks, setSelectedBooks] = useState<BookPickerItem[]>([]);
   const [tab, setTab] = useState<LangTab>("ar");
   const [loading, setLoading] = useState(!isNew);
   const draft = useFormDraft(formDraftId.adminArticle(id), form, setForm, { ready: !loading });
@@ -82,7 +89,10 @@ export default function AdminArticleEditPage() {
     setLoading(true);
     try {
       const res = await fetch(`/api/v1/admin/articles/${id}`, { headers: adminAuthHeaders() });
-      const data = await res.json() as { success: boolean; data?: Record<string, unknown> };
+      const data = await res.json() as {
+        success: boolean;
+        data?: Record<string, unknown> & { products?: BookPickerItem[]; productIds?: string[] };
+      };
       if (data.success && data.data) {
         const d = data.data;
         setForm({
@@ -95,8 +105,12 @@ export default function AdminArticleEditPage() {
           channel: String(d.channel ?? "harvest"),
           status: String(d.status ?? "draft"),
           imageUrl: String(d.imageUrl ?? ""),
+          youtubeUrl: String(d.youtubeUrl ?? ""),
           date: d.date ? (new Date(d.date as string).toISOString().split("T")[0] ?? "") : empty.date,
         });
+        const products = (d.products ?? []) as BookPickerItem[];
+        setProductIds(d.productIds ?? products.map((p) => p.id));
+        setSelectedBooks(products);
         setTimestamps({
           createdAt: d.createdAt as string | undefined,
           updatedAt: d.updatedAt as string | undefined,
@@ -119,7 +133,11 @@ export default function AdminArticleEditPage() {
       const res = await fetch(url, {
         method: isNew ? "POST" : "PATCH",
         headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, date: form.date ? new Date(form.date) : null }),
+        body: JSON.stringify({
+          ...form,
+          productIds,
+          date: form.date ? new Date(form.date) : null,
+        }),
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
       if (!res.ok || !data.success) { setError(data.error?.message ?? "فشل الحفظ"); return; }
@@ -191,6 +209,28 @@ export default function AdminArticleEditPage() {
               placeholder="https://..."
             />
           </div>
+          {(isMediaChannel(form.channel) || form.youtubeUrl) && (
+            <div className="mt-4">
+              <AdminInput
+                label="رابط YouTube"
+                value={form.youtubeUrl}
+                onChange={set("youtubeUrl")}
+                placeholder="https://www.youtube.com/watch?v=..."
+              />
+            </div>
+          )}
+        </AdminCard>
+
+        <AdminCard title="الكتب المرتبطة">
+          <BookMultiPicker
+            value={productIds}
+            selectedBooks={selectedBooks}
+            onChange={(ids, books) => {
+              setProductIds(ids);
+              setSelectedBooks(books);
+            }}
+            label="الكتب التابعة للمقالة"
+          />
         </AdminCard>
 
         {/* Language tabs */}

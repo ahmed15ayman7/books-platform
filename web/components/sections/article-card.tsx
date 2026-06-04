@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { BookOpen, Clock } from "lucide-react";
+import { BookOpen, Clock, Play } from "lucide-react";
+import { youtubeThumbnail } from "@/lib/media/youtube";
 import { Badge } from "@/components/ui/badge";
 import {
   CardMedia,
@@ -22,6 +23,7 @@ interface ArticleCardProps {
   date?: Date | string | null;
   channel?: string | null;
   readingTimeMinutes?: number | null;
+  videoId?: string | null;
   linkedBook?: ArticleLinkedBookDisplay;
   locale: Locale;
   className?: string;
@@ -45,6 +47,7 @@ export function ArticleCard({
   date,
   channel,
   readingTimeMinutes,
+  videoId,
   linkedBook,
   locale,
   className,
@@ -54,9 +57,11 @@ export function ArticleCard({
     ? (channelLabels[channel]?.[locale] ?? channel)
     : null;
 
-  const coverUrl = linkedBook?.imageUrl ?? imageUrl;
+  const coverUrl = videoId
+    ? youtubeThumbnail(videoId)
+    : (linkedBook?.imageUrl ?? imageUrl);
   const coverAlt = linkedBook ? linkedBook.name : title;
-  const bookCover = Boolean(linkedBook?.imageUrl);
+  const bookCover = Boolean(linkedBook?.imageUrl) && !videoId;
 
   return (
     <motion.div
@@ -93,6 +98,13 @@ export function ArticleCard({
                   aria-hidden="true"
                 />
               </CardMediaPlaceholder>
+            )}
+            {videoId && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/25">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--brand-red)] text-white shadow-lg">
+                  <Play className="h-6 w-6 fill-current" aria-hidden="true" />
+                </span>
+              </div>
             )}
             <div className="absolute inset-0 bg-[var(--brand-red)]/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           </CardMedia>

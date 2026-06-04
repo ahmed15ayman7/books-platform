@@ -1,24 +1,16 @@
 import { type NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { z } from "zod";
 import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { buildOrderBy, parseSortParam } from "@/lib/admin/list-query";
 import { notDeleted } from "@/lib/admin/audit-fields";
-
-const createSchema = z.object({
-  title: z.string().min(1).max(500),
-  titleEn: z.string().max(500).optional(),
-  excerpt: z.string().optional(),
-  excerptEn: z.string().optional(),
-  body: z.string().optional(),
-  bodyEn: z.string().optional(),
-  channel: z.string().max(50).optional(),
-  status: z.enum(["draft", "publish", "scheduled"]).default("draft"),
-  imageUrl: z.string().url().optional().or(z.literal("")),
-  date: z.coerce.date().optional().nullable(),
-});
+import {
+  adminArticleProductSelect,
+  articleCreateSchema,
+  resolveArticleWriteData,
+} from "@/lib/admin/article-payload";
+import { MEDIA_CHANNELS } from "@/lib/media/youtube";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth(request, "ADMIN", PERMISSIONS.articles.view);
@@ -31,6 +23,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") ?? undefined;
     const status = searchParams.get("status") ?? undefined;
     const channel = searchParams.get("channel") ?? undefined;
+    const mediaOnly = searchParams.get("mediaOnly") === "true";
+    const hasVideo = searchParams.get("hasVideo") === "true";
     const { sortBy, sortOrder } = parseSortParam(searchParams.get("sort"), "updatedAt");
     const skip = (page - 1) * limit;
 
@@ -38,6 +32,8 @@ export async function GET(request: NextRequest) {
       ...notDeleted,
       ...(status && status !== "all" ? { status } : {}),
       ...(channel && channel !== "all" ? { channel } : {}),
+      ...(mediaOnly ? { channel: { in: [...MEDIA_CHANNELS] } } : {}),
+      ...(hasVideo ? { videoId: { not: null } } : {}),
       ...(search
         ? { OR: [{ title: { contains: search, mode: "insensitive" as const } }] }
         : {}),
@@ -59,8 +55,11 @@ export async function GET(request: NextRequest) {
           date: true,
           slug: true,
           imageUrl: true,
+          videoId: true,
+          youtubeUrl: true,
           createdAt: true,
           updatedAt: true,
+          products: { ...adminArticleProductSelect, take: 1 },
         },
       }),
       db.article.count({ where }),
@@ -86,16 +85,26 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json() as unknown;
-    const parsed = createSchema.safeParse(body);
+    const parsed = articleCreateSchema.safeParse(body);
     if (!parsed.success) return ApiErrors.badRequest("Validation failed", parsed.error.issues);
 
-    const { title, body: content, excerpt, channel, status, imageUrl, date } = parsed.data;
+    const { title, body: content, excerpt, channel, status, date } = parsed.data;
 
-    const slug = title
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .slice(0, 200) + "-" + Date.now();
+    let resolved;
+    try {
+      resolved = await resolveArticleWriteData(parsed.data);
+    } catch (err) {
+      return ApiErrors.badRequest(err instanceof Error ? err.message : "Validation failed");
+    }
+
+    const slug =
+      title
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .slice(0, 200) +
+      "-" +
+      Date.now();
 
     const article = await db.article.create({
       data: {
@@ -105,14 +114,30 @@ export async function POST(request: NextRequest) {
         excerpt: excerpt ?? null,
         channel: channel ?? null,
         status,
-        imageUrl: imageUrl || null,
+        imageUrl:
+          resolved.imageUrl === undefined
+            ? null
+            : resolved.imageUrl === ""
+              ? null
+              : resolved.imageUrl,
+        youtubeUrl: resolved.youtubeUrl ?? null,
+        videoId: resolved.videoId ?? null,
         date: date ?? null,
         slug,
+        ...(resolved.productIds !== undefined
+          ? { products: { connect: resolved.productIds.map((id) => ({ id })) } }
+          : {}),
       },
+      include: { products: adminArticleProductSelect },
     });
 
     await db.auditLog.create({
-      data: { userId: auth.payload.userId, action: "CREATE_ARTICLE", entity: "Article", entityId: article.id },
+      data: {
+        userId: auth.payload.userId,
+        action: "CREATE_ARTICLE",
+        entity: "Article",
+        entityId: article.id,
+      },
     });
 
     return apiCreated(article);

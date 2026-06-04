@@ -374,6 +374,7 @@ export const NAV_PERMISSION_BY_HREF: Record<string, Permission> = {
   "/admin/ambassadors": PERMISSIONS.ambassadors.view,
   "/admin/notifications": PERMISSIONS.notifications.broadcast,
   "/admin/pages": PERMISSIONS.pages.view,
+  "/admin/contact": PERMISSIONS.settings.view,
   "/admin/settings": PERMISSIONS.settings.view,
   "/admin/audit-log": PERMISSIONS.audit.view,
   "/admin/users": PERMISSIONS.users.view,

@@ -9,6 +9,7 @@ import { ArticleCarousel } from "@/components/sections/article-carousel";
 import { BookDetailHero } from "@/components/sections/book-detail-hero";
 import { BookAdminEditLink } from "@/components/admin/book-admin-edit-link";
 import { BookBiblioTable } from "@/components/sections/book-biblio-table";
+import { BookMediaSection } from "@/components/sections/book-media-section";
 import { SectionHeading } from "@/components/ui/section-heading";
 import type { Locale } from "@/lib/i18n";
 import { mapArticleForCard } from "@/lib/i18n/article-linked-book";
@@ -39,10 +40,11 @@ export default async function BookDetailPage({ params }: BookPageProps) {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("books");
 
-  const [book, similarResult, linkedArticlesRaw] = await Promise.all([
+  const [book, similarResult, linkedArticlesRaw, mediaVideos] = await Promise.all([
     BookService.getBySlug(slug).catch(() => null),
     BookService.getSimilar(slug, 12).catch(() => ({ books: [], isGeneralFallback: false })),
     ArticleService.getByProductSlug(slug, 12).catch(() => []),
+    ArticleService.getMediaByProductSlug(slug, 6).catch(() => []),
   ]);
 
   const similarBooks = similarResult.books;
@@ -168,6 +170,19 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             authors={book.authors}
             locale={locale}
           />
+
+          {mediaVideos.length > 0 && (
+            <BookMediaSection
+              locale={locale}
+              videos={mediaVideos.map((v) => ({
+                slug: v.slug,
+                title: v.title,
+                videoId: v.videoId,
+                imageUrl: v.imageUrl,
+                channel: v.channel,
+              }))}
+            />
+          )}
 
           {linkedArticles.length > 0 && (
             <section aria-labelledby="linked-articles-heading">

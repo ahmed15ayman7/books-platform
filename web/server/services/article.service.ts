@@ -1,19 +1,41 @@
 import { db } from "@/lib/db";
 import { notDeleted } from "@/lib/admin/audit-fields";
 import { PAGINATION } from "@/lib/utils/constants";
+import { MEDIA_CHANNELS } from "@/lib/media/youtube";
 import readingTime from "reading-time";
 
 const linkedProductSelect = {
   where: { ...notDeleted, published: true },
-  take: 1,
+  take: 12,
   orderBy: { position: "desc" as const },
   select: {
+    id: true,
     slug: true,
     nameEn: true,
     nameAr: true,
     imageUrl: true,
   },
 };
+
+const articleListSelect = {
+  id: true,
+  slug: true,
+  title: true,
+  excerpt: true,
+  imageUrl: true,
+  channel: true,
+  date: true,
+  content: true,
+  videoId: true,
+  youtubeUrl: true,
+  authorFirstName: true,
+  authorLastName: true,
+  isFeatured: true,
+  articleCategory: {
+    select: { name: true, nameAr: true, slug: true },
+  },
+  products: linkedProductSelect,
+} as const;
 
 export interface ArticleFilters {
   channel?: string;
@@ -48,23 +70,7 @@ export const ArticleService = {
         skip,
         take: limit,
         orderBy: sort === "newest" ? { date: "desc" } : { date: "asc" },
-        select: {
-          id: true,
-          slug: true,
-          title: true,
-          excerpt: true,
-          imageUrl: true,
-          channel: true,
-          date: true,
-          content: true,
-          authorFirstName: true,
-          authorLastName: true,
-          isFeatured: true,
-          articleCategory: {
-            select: { name: true, nameAr: true, slug: true },
-          },
-          products: linkedProductSelect,
-        },
+        select: articleListSelect,
       }),
       db.article.count({ where }),
     ]);
@@ -93,7 +99,7 @@ export const ArticleService = {
 
   async getBySlug(slug: string) {
     return db.article.findFirst({
-      where: { slug, status: "publish" },
+      where: { slug, status: "publish", ...notDeleted },
       include: {
         articleCategory: true,
         postTags: true,
@@ -137,6 +143,7 @@ export const ArticleService = {
         imageUrl: true,
         date: true,
         channel: true,
+        videoId: true,
         products: linkedProductSelect,
       },
     });
@@ -152,6 +159,33 @@ export const ArticleService = {
     const articles = await db.article.findMany({
       where: {
         status: "publish",
+        ...notDeleted,
+        products: { some: { id: product.id } },
+      },
+      take: limit,
+      orderBy: { date: "desc" },
+      select: articleListSelect,
+    });
+
+    return articles.map(({ content, ...rest }) => ({
+      ...rest,
+      readingTimeMinutes: content ? Math.ceil(readingTime(content).minutes) : null,
+    }));
+  },
+
+  async getMediaByProductSlug(productSlug: string, limit = 6) {
+    const product = await db.product.findFirst({
+      where: { slug: productSlug, ...notDeleted, published: true },
+      select: { id: true },
+    });
+    if (!product) return [];
+
+    const articles = await db.article.findMany({
+      where: {
+        status: "publish",
+        ...notDeleted,
+        videoId: { not: null },
+        channel: { in: [...MEDIA_CHANNELS] },
         products: { some: { id: product.id } },
       },
       take: limit,
@@ -164,15 +198,38 @@ export const ArticleService = {
         imageUrl: true,
         date: true,
         channel: true,
-        content: true,
+        videoId: true,
+        youtubeUrl: true,
         products: linkedProductSelect,
       },
     });
 
-    return articles.map(({ content, ...rest }) => ({
-      ...rest,
-      readingTimeMinutes: content ? Math.ceil(readingTime(content).minutes) : null,
-    }));
+    return articles;
+  },
+
+  async getLatestMedia(limit = 4) {
+    return db.article.findMany({
+      where: {
+        status: "publish",
+        ...notDeleted,
+        videoId: { not: null },
+        channel: { in: [...MEDIA_CHANNELS] },
+      },
+      take: limit,
+      orderBy: { date: "desc" },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        excerpt: true,
+        imageUrl: true,
+        date: true,
+        channel: true,
+        videoId: true,
+        youtubeUrl: true,
+        products: linkedProductSelect,
+      },
+    });
   },
 
   async getCategories() {
@@ -196,18 +253,7 @@ export const ArticleService = {
         skip: (page - 1) * limit,
         take: limit,
         orderBy: { date: "desc" },
-        select: {
-          id: true,
-          slug: true,
-          title: true,
-          excerpt: true,
-          imageUrl: true,
-          date: true,
-          channel: true,
-          isFeatured: true,
-          content: true,
-          products: linkedProductSelect,
-        },
+        select: articleListSelect,
       }),
       db.article.count({ where: { status: "publish", articleCategoryId: category.id } }),
     ]);
@@ -232,28 +278,19 @@ export const ArticleService = {
   },
 
   async getFeaturedForHome() {
-    const channels = ["harvest", "ideas", "world-reads", "books-talk", "watch-your-book", "novel-story"];
-
-    type ArticleSnippet = {
-      id: string;
-      slug: string;
-      title: string;
-      excerpt: string | null;
-      imageUrl: string | null;
-      date: Date | null;
-      channel: string | null;
-      products: Array<{
-        slug: string;
-        nameEn: string;
-        nameAr: string | null;
-        imageUrl: string | null;
-      }>;
-    };
+    const channels = [
+      "harvest",
+      "ideas",
+      "world-reads",
+      "books-talk",
+      "watch-your-book",
+      "novel-story",
+    ];
 
     const results = await Promise.all(
       channels.map((channel) =>
         db.article.findMany({
-          where: { status: "publish", channel },
+          where: { status: "publish", channel, ...notDeleted },
           orderBy: { date: "desc" },
           take: 3,
           select: {
@@ -264,10 +301,11 @@ export const ArticleService = {
             imageUrl: true,
             date: true,
             channel: true,
+            videoId: true,
             products: linkedProductSelect,
           },
-        })
-      )
+        }),
+      ),
     );
 
     return channels.reduce(
@@ -275,7 +313,7 @@ export const ArticleService = {
         acc[channel] = results[index] ?? [];
         return acc;
       },
-      {} as Record<string, ArticleSnippet[]>
+      {} as Record<string, typeof results[number]>,
     );
   },
 };

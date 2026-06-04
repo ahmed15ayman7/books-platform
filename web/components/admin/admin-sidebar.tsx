@@ -65,6 +65,7 @@ const navGroups: NavGroup[] = [
       { icon: Inbox, label: "طلبات النشر", href: "/admin/submissions" },
       { icon: ShoppingBag, label: "الطلبات", href: "/admin/orders" },
       { icon: MessageSquare, label: "التعليقات", href: "/admin/comments" },
+      { icon: MessageSquare, label: "رسائل التواصل", href: "/admin/contact" },
       { icon: Mail, label: "النشرة البريدية", href: "/admin/newsletter" },
     ],
   },

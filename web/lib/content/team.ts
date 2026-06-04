@@ -54,18 +54,6 @@ export const TEAM_MEMBERS: TeamMemberData[] = [
     featured: true,
   },
   {
-    slug: "ahmed-ayman",
-    name: { ar: "أحمد أيمن", en: "Ahmed Ayman" },
-    role: { ar: "مدير التكنولوجيا", en: "Chief Technology Officer" },
-    bio: {
-      ar: "قيادة الهندسة المعمارية للمنصة والتطوير التقني.",
-      en: "Platform architecture and engineering leadership.",
-    },
-    photoUrl: null,
-    initials: "AA",
-    featured: true,
-  },
-  {
     slug: "mohamed-abou-elwafa",
     name: { ar: "محمد أبو الوفا", en: "Mohamed Abou Elwafa" },
     role: { ar: "رئيس التحرير (إنجليزي)", en: "Editor-in-Chief (English)" },
@@ -124,6 +112,17 @@ export const TEAM_MEMBERS: TeamMemberData[] = [
       en: "Responsible for technical development and search engine optimization to maximize content visibility and reach.",
     },
     photoUrl: "/team/ahmed-elshal.webp",
+  },
+  {
+    slug: "ahmed-ayman",
+    name: { ar: "أحمد أيمن", en: "Ahmed Ayman" },
+    role: { ar: "مطور الموقع", en: "FullStack & AI Developer" },
+    bio: {
+      ar: "مطور الموقع والتطوير التقني والذكاء الاصطناعي.",
+      en: "FullStack (Next.js, React, Tailwind CSS, TypeScript) and AI Developer.",
+    },
+    photoUrl: "/team/ahmed-ayman.jpeg",
+    initials: "AA",
   },
   {
     slug: "youssef-emad",
