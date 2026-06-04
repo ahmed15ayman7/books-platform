@@ -126,15 +126,16 @@
     "title": "المقالات",
     "empty": "لا مقالات بعد",
     "featured": "مميز",
-    "min_read": "د قراءة",
-    "min": "د",
+    "min_read": "min read",
+    "min": "min",
     "related": "مقالات ذات صلة"
   },
 
   "article_detail": {
     "comments": "التعليقات",
     "comment_hint": "أضف تعليقك...",
-    "video_badge": "يتضمن هذا المقال مقطع فيديو"
+    "video_badge": "يتضمن هذا المقال مقطع فيديو",
+    "no_comments": "لا تعليقات بعد"
   },
 
   "search": {
@@ -217,6 +218,7 @@
   "comments_email_error": "الرجاء إدخال بريد إلكتروني صحيح",
   "comments_too_short": "يجب أن يكون التعليق 10 أحرف على الأقل",
   "comments_awaiting_review": "تعليقك قيد المراجعة.",
+  "comments_submitted": "تم إرسال تعليقك بنجاح!",
 
   "newsletter_title": "ابقَ على اطلاع",
   "newsletter_subtitle": "احصل على توصيات كتب منتقاة، وأخبار الترجمة، وعروض حصرية.",

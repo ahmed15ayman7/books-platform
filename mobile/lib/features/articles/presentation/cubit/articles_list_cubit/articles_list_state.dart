@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../domain/entities/article.dart';
-import '../../../domain/entities/article_channel.dart';
+import '../../../domain/entities/article_category.dart';
 
 sealed class ArticlesListState extends Equatable {
   const ArticlesListState();
@@ -19,19 +19,19 @@ final class ArticlesListLoading extends ArticlesListState {
 
 final class ArticlesListSuccess extends ArticlesListState {
   const ArticlesListSuccess({
-    required this.channels,
+    required this.categories,
     required this.articles,
-    required this.activeChannel,
+    required this.activeSlug,
     this.hasNextPage = false,
     this.page = 1,
   });
-  final List<ArticleChannel> channels;
+  final List<ArticleCategory> categories;
   final List<Article> articles;
-  final String activeChannel;
+  final String activeSlug;
   final bool hasNextPage;
   final int page;
   @override
-  List<Object?> get props => [channels, articles, activeChannel, hasNextPage, page];
+  List<Object?> get props => [categories, articles, activeSlug, hasNextPage, page];
 }
 
 final class ArticlesListError extends ArticlesListState {

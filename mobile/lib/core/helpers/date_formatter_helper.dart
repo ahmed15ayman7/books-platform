@@ -5,22 +5,22 @@ class DateFormatterHelper {
 
   static String formatDate(DateTime? date) {
     if (date == null) return '';
-    return DateFormat('dd MMM yyyy').format(date);
+    return DateFormat('dd MMM yyyy', 'en_US').format(date);
   }
 
   static String formatDateTime(DateTime? date) {
     if (date == null) return '';
-    return DateFormat('dd MMM yyyy • hh:mm a').format(date);
+    return DateFormat('dd MMM yyyy • hh:mm a', 'en_US').format(date);
   }
 
   static String formatDayMonth(DateTime? date) {
     if (date == null) return '';
-    return DateFormat('dd MMM').format(date);
+    return DateFormat('dd MMM', 'en_US').format(date);
   }
 
   static String formatMonthYear(DateTime? date) {
     if (date == null) return '';
-    return DateFormat('MMM yyyy').format(date);
+    return DateFormat('MMM yyyy', 'en_US').format(date);
   }
 
   static String formatTimeAgo(DateTime? date) {

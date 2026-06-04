@@ -73,7 +73,7 @@ class ArticlesArticleRow extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    article.categoryLabel,
+                    locale == 'ar' ? article.categoryLabelAr : article.categoryLabel,
                     style: GoogleFonts.cairo(
                       fontSize: 11.sp,
                       fontWeight: FontWeight.w700,

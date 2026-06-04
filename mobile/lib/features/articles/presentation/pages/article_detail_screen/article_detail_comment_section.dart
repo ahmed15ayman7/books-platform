@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/app_loading_indicator.dart';
+import '../../../../../core/widgets/empty_state_widget.dart';
 import '../../../../ratings/presentation/cubit/comments_cubit.dart';
 import '../../../../ratings/presentation/cubit/comments_state.dart';
 import '../../../../ratings/presentation/widgets/comment_card.dart';
@@ -45,12 +46,9 @@ class ArticleDetailCommentSection extends StatelessWidget {
                 ],
               ),
             CommentsLoaded(:final comments) when comments.isEmpty =>
-              Text(
-                'article_detail.no_comments'.tr(),
-                style: GoogleFonts.tajawal(
-                  fontSize: 13.sp,
-                  color: AppColors.textHint,
-                ),
+              EmptyStateWidget(
+                icon: Icons.chat_bubble_outline_rounded,
+                title: 'article_detail.no_comments'.tr(),
               ),
             CommentsLoaded(:final comments) => Column(
                 children: comments.map((c) => CommentCard(comment: c)).toList(),

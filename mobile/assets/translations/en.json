@@ -134,7 +134,8 @@
   "article_detail": {
     "comments": "Comments",
     "comment_hint": "Add a comment...",
-    "video_badge": "This article includes a video"
+    "video_badge": "This article includes a video",
+    "no_comments": "No comments yet"
   },
 
   "search": {
@@ -217,6 +218,7 @@
   "comments_email_error": "Please enter a valid email address",
   "comments_too_short": "Comment must be at least 10 characters",
   "comments_awaiting_review": "Your comment is awaiting review.",
+  "comments_submitted": "Your comment was submitted!",
 
   "newsletter_title": "Stay in the Know",
   "newsletter_subtitle": "Get curated book recommendations, translation news, and exclusive offers.",

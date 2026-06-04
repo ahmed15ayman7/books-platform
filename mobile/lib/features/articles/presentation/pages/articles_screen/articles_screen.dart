@@ -58,18 +58,18 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                         ),
                       ),
                     ArticlesListSuccess(
-                      :final channels,
+                      :final categories,
                       :final articles,
-                      :final activeChannel,
+                      :final activeSlug,
                     ) =>
                       ArticlesBody(
                         key: const ValueKey('success'),
-                        channels: channels,
+                        categories: categories,
                         articles: articles,
-                        activeChannel: activeChannel,
+                        activeSlug: activeSlug,
                         locale: locale,
-                        onChannelTap: (c) =>
-                            ctx.read<ArticlesListCubit>().switchChannel(c),
+                        onCategoryTap: (slug) =>
+                            ctx.read<ArticlesListCubit>().switchCategory(slug),
                         onArticleTap: (a) => Navigator.of(ctx).pushNamed(
                           AppRoutes.articleDetail,
                           arguments:

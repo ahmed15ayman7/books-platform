@@ -5,8 +5,9 @@ import '../../../../core/network/api_envelope.dart';
 import '../../../../core/network/api_manager.dart';
 import '../../../../core/network/failure.dart';
 import '../../domain/entities/article.dart';
-import '../../domain/entities/article_channel.dart';
+import '../../domain/entities/article_category.dart';
 import '../../domain/entities/article_detail.dart';
+import '../models/article_category_model.dart';
 import '../models/article_detail_model.dart';
 import '../models/article_model.dart';
 
@@ -16,8 +17,20 @@ class ArticlesRemoteDataSourceImpl {
 
   final ApiManager _api;
 
+  Future<Either<Failure, List<ArticleCategory>>> getCategories() =>
+      _api.get(
+        path: '/articles/categories',
+        fromJson: (json) {
+          final map = json as Map<String, dynamic>;
+          final list = map['data'] as List<dynamic>;
+          return list
+              .map((e) => ArticleCategoryModel.fromJson(e as Map<String, dynamic>).toEntity())
+              .toList();
+        },
+      );
+
   Future<Either<Failure, PaginatedResponse<Article>>> getArticles({
-    String? channel,
+    String? categorySlug,
     int page = 1,
     int limit = 20,
     String? sort,
@@ -30,6 +43,7 @@ class ArticlesRemoteDataSourceImpl {
           'limit': limit,
           'sort': ?sort,
           'locale': ?locale,
+          'categorySlug': ?categorySlug,
         },
         fromJson: (json) => PaginatedResponse<Article>.fromJson(
           json,
@@ -65,12 +79,4 @@ class ArticlesRemoteDataSourceImpl {
         },
       );
 
-  List<ArticleChannel> getChannels() => const [
-        ArticleChannel(key: Article.kChannelHarvest, nameAr: 'حصاد الكتب', nameEn: 'Book Harvest', count: 0),
-        ArticleChannel(key: Article.kChannelIdeas, nameAr: 'جوهر الأفكار', nameEn: 'Essence of Ideas', count: 0),
-        ArticleChannel(key: Article.kChannelWorldReads, nameAr: 'قراءات عالمية', nameEn: 'World Reads', count: 0),
-        ArticleChannel(key: Article.kChannelBooksTalk, nameAr: 'حديث الكتب', nameEn: 'Book Talk', count: 0),
-        ArticleChannel(key: Article.kChannelWatchYourBook, nameAr: 'شاهد كتابك', nameEn: 'Watch Your Book', count: 0),
-        ArticleChannel(key: Article.kChannelNovelStory, nameAr: 'رواية وقصة', nameEn: 'Novel & Story', count: 0),
-      ];
 }

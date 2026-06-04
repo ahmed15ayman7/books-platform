@@ -13,6 +13,7 @@ class ArticleModel {
     required this.categoryLabel,
     required this.date,
     required this.readingTime,
+    this.categoryLabelAr = '',
     this.authorFirstName = '',
     this.authorLastName = '',
     this.imageUrl,
@@ -25,6 +26,7 @@ class ArticleModel {
   final String excerpt;
   final String channel;
   final String categoryLabel;
+  final String categoryLabelAr;
   final String date;
   final int readingTime;
   final String authorFirstName;
@@ -34,13 +36,15 @@ class ArticleModel {
 
   factory ArticleModel.fromJson(Map<String, dynamic> json) {
     final author = json['author'] as Map<String, dynamic>?;
+    final category = json['articleCategory'] as Map<String, dynamic>?;
     return ArticleModel(
       id: json['_id'] as String? ?? json['id'] as String? ?? '',
       slug: json['slug'] as String? ?? '',
       title: json['title'] as String? ?? json['titleAr'] as String? ?? '',
       excerpt: json['excerpt'] as String? ?? json['summary'] as String? ?? '',
       channel: json['channel'] as String? ?? '',
-      categoryLabel: json['categoryLabel'] as String? ?? json['channel'] as String? ?? '',
+      categoryLabel: category?['name'] as String? ?? json['channel'] as String? ?? '',
+      categoryLabelAr: category?['nameAr'] as String? ?? '',
       date: json['createdAt'] as String? ?? json['date'] as String? ?? '',
       readingTime: (json['readingTimeMinutes'] as num?)?.toInt() ??
           (json['readingTime'] as num?)?.toInt() ?? 5,
@@ -68,6 +72,7 @@ class ArticleModel {
         excerpt: excerpt,
         channel: channel,
         categoryLabel: categoryLabel,
+        categoryLabelAr: categoryLabelAr,
         // $mobile-debug-skill | Problem: raw ISO date string (e.g. "2026-05-18T21:00:00.000Z") was passed to entity unchanged and rendered verbatim in both featured card and article row. Fix: parse and format here at the model boundary so all consumers receive a human-readable date.
         date: DateFormatterHelper.formatDate(date.isNotEmpty ? DateTime.tryParse(date) : null),
         readMinutes: readingTime,
