@@ -20,6 +20,7 @@ import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-s
 import { isMediaChannel } from "@/lib/media/youtube";
 import { adminArticleEditPath, adminArticleViewPath } from "@/lib/admin/public-urls";
 import { ArticleContent } from "@/lib/markdown/article-content";
+import { ArticleCommentsSection } from "@/components/sections/article-comments-section";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -208,37 +209,16 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
             ) : null}
 
             {/* Comments Section */}
-            <section className="mt-12" aria-labelledby="comments-heading">
-              <h2 id="comments-heading" className="mb-4 font-bold text-[var(--brand-gray-900)]">
-                {locale === "ar" ? "التعليقات" : "Comments"}
-              </h2>
-              {article.comments.length === 0 ? (
-                <p className="text-sm text-[var(--brand-gray-500)]">
-                  {locale === "ar" ? "لا توجد تعليقات بعد" : "No comments yet"}
-                </p>
-              ) : (
-                <div className="space-y-4">
-                  {article.comments.map((comment) => (
-                    <div
-                      key={comment.id}
-                      className="rounded-lg bg-white p-4 shadow-sm border border-[var(--brand-gray-200)]"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-semibold text-sm text-[var(--brand-gray-900)]">
-                          {comment.authorName}
-                        </span>
-                        {comment.commentDate && (
-                          <span className="text-xs text-[var(--brand-gray-400)]">
-                            {formatDate(comment.commentDate, locale, "PP")}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-[var(--brand-gray-700)]">{comment.content}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
+            <ArticleCommentsSection
+              articleId={article.id}
+              locale={locale}
+              initialComments={article.comments.map((comment) => ({
+                id: comment.id,
+                authorName: comment.authorName,
+                content: comment.content,
+                commentDate: comment.commentDate,
+              }))}
+            />
           </div>
 
           {/* Related Articles */}

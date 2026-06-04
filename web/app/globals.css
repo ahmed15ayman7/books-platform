@@ -1,4 +1,30 @@
 @import "tailwindcss";
+@config "../tailwind.config.ts";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
 
 /* ===================================
    BRAND DESIGN TOKENS — Books Platform
@@ -110,6 +136,37 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Form surfaces — white bg + readable text (inputs, selects, autofill) */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="range"]):not([type="color"]),
+  textarea,
+  select {
+    background-color: var(--brand-white);
+    color: var(--brand-gray-900);
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  select:-webkit-autofill:hover,
+  select:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--brand-white) inset !important;
+    box-shadow: 0 0 0 1000px var(--brand-white) inset !important;
+    -webkit-text-fill-color: var(--brand-gray-900) !important;
+    caret-color: var(--brand-gray-900);
+    transition: background-color 99999s ease-in-out 0s;
+  }
+
+  [role="listbox"],
+  [data-radix-select-content],
+  [data-radix-popper-content-wrapper] [role="listbox"] {
+    background-color: var(--brand-white);
+    color: var(--brand-gray-900);
   }
 
   .site-chrome,
@@ -397,5 +454,15 @@
 
   .text-balance {
     text-wrap: balance;
+  }
+
+  .form-error-banner {
+    border: 1px solid color-mix(in srgb, var(--error) 35%, transparent);
+    background-color: var(--error-soft);
+    color: #991b1b;
+  }
+
+  .form-error-text {
+    color: var(--error);
   }
 }

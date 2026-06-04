@@ -42,7 +42,7 @@ export function AdminFormField({
       {hint && !error && (
         <p className="text-[11px] text-[var(--admin-text-subtle)]">{hint}</p>
       )}
-      {error && <p className="text-[11px] text-[var(--error)]">{error}</p>}
+      {error && <p className="form-error-text text-[11px]">{error}</p>}
     </div>
   );
 }

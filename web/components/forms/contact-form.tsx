@@ -117,7 +117,7 @@ export function ContactForm({ locale, topics }: ContactFormProps) {
         <Label htmlFor="contact-message">{isAr ? "رسالتك" : "Message"}</Label>
         <Textarea id="contact-message" required rows={5} minLength={20} value={values.message} onChange={(e) => setValues((p) => ({ ...p, message: e.target.value }))} />
       </div>
-      {errorMsg && <p className="text-sm text-[var(--brand-red)]">{errorMsg}</p>}
+      {errorMsg && <p className="form-error-banner rounded-md px-3 py-2 text-sm">{errorMsg}</p>}
       <Button type="submit" disabled={status === "loading"} className="w-full gap-2">
         {status === "loading" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         {isAr ? "إرسال" : "Send"}

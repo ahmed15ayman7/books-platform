@@ -1,9 +1,18 @@
 import { z } from "zod";
 
+const optionalEmailSchema = z.preprocess(
+  (val) => {
+    if (val === undefined || val === null) return undefined;
+    if (typeof val === "string" && val.trim() === "") return undefined;
+    return val;
+  },
+  z.string().email().max(254).optional(),
+);
+
 export const createCommentSchema = z.object({
-  authorName: z.string().min(2).max(100),
-  email: z.string().email().max(254),
-  content: z.string().min(5).max(2000),
+  authorName: z.string().trim().min(2).max(100),
+  email: optionalEmailSchema,
+  content: z.string().trim().min(5).max(2000),
   productId: z.string().cuid().optional(),
   articleId: z.string().cuid().optional(),
   parentId: z.string().cuid().optional(),

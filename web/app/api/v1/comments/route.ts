@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       return ApiErrors.badRequest("Validation failed", parsed.error.issues);
     }
 
-    const { website, ...data } = parsed.data;
+    const { website, email, ...data } = parsed.data;
 
     // Honeypot check
     if (website) {
@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
     const comment = await db.comment.create({
       data: {
         ...data,
+        ...(email ? { email } : {}),
         commentDate: new Date(),
         status,
       },

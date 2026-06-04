@@ -155,7 +155,7 @@ export function AdminEntityCombobox({
 
   return (
     <div>
-      <Label htmlFor={id} className="mb-1.5 block text-sm font-medium text-[var(--brand-gray-300)]">
+      <Label htmlFor={id} className="mb-1.5 block text-sm font-medium text-[var(--admin-text-muted)]">
         {label}
       </Label>
 
