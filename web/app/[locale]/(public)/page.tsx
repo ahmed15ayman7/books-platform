@@ -353,7 +353,7 @@ export default async function HomePage() {
         pageOrder={nextCarouselOrder()}
       />
 
-      {/* ── تصنيفات المقالات ─────────────────────────────────── */}
+      {/* ── تصنيفات المقالات ───────────────────────────────────
       {articleCategories.length > 0 && (
         <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="article-cats-heading">
           <div className="container-platform">
@@ -383,7 +383,7 @@ export default async function HomePage() {
             </StaggerContainer>
           </div>
         </AnimatedSection>
-      )}
+      )} */}
 
           {/* ── أقسام المقالات (زبدة الأفكار | حصاد الكتب | العالم يقرأ) ── */}
           <HomeArticlesShowcase locale={locale} channels={readingArticleChannels} />

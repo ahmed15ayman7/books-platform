@@ -294,7 +294,7 @@ export const ArticleService = {
       Promise.all(
         readingChannels.map((channel) =>
           db.article.findMany({
-            where: { status: "publish", channel, ...notDeleted },
+            where: { status: "publish", channel,imageUrl:{$not:null}, ...notDeleted },
             orderBy: { date: "desc" },
             take: 24,
             select: {

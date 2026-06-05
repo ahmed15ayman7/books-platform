@@ -7,6 +7,7 @@ export const BOOK_CATEGORY_LABELS_AR = [
   "أديان وعقائد",
   "اقتصاد وتنمية",
   "أفكار وسياسات",
+  "اخرى"
 ] as const;
 
 export type BookCategoryLabelAr = (typeof BOOK_CATEGORY_LABELS_AR)[number];
@@ -20,4 +21,5 @@ export const BOOK_CATEGORY_LABELS_EN: Record<BookCategoryLabelAr, string> = {
   "أديان وعقائد": "Religions & Beliefs",
   "اقتصاد وتنمية": "Economy & Development",
   "أفكار وسياسات": "Ideas & Politics",
+  "اخري":"Other"
 };
