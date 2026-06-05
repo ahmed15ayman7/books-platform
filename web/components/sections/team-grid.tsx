@@ -49,9 +49,9 @@ export function TeamGrid({ members, locale, filter = "all" }: TeamGridProps) {
       )}
 
       {rest.length > 0 && (
-        <StaggerContainer className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <StaggerContainer className="flex flex-wrap gap-6 justify-between items-center">
           {rest.map((member) => (
-            <StaggerItem key={member.slug}>
+            <StaggerItem key={member.slug} className="w-[30%]">
               <TeamMemberCard member={member} locale={locale} />
             </StaggerItem>
           ))}

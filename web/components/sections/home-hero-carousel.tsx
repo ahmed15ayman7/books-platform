@@ -5,6 +5,8 @@ import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { carouselAutoplayReverse } from "@/lib/carousel/autoplay";
+import { useEmblaAutoplay } from "@/hooks/use-embla-autoplay";
 import { cn } from "@/lib/utils";
 
 export interface HeroSlideData {
@@ -21,6 +23,9 @@ export interface HeroSlideData {
 interface HomeHeroCarouselProps {
   slides: HeroSlideData[];
   locale: string;
+  pageOrder?: number;
+  autoplayMs?: number;
+  autoplayReverse?: boolean;
 }
 
 function HeroSlideContent({
@@ -89,8 +94,15 @@ function HeroSlideContent({
   );
 }
 
-export function HomeHeroCarousel({ slides, locale }: HomeHeroCarouselProps) {
+export function HomeHeroCarousel({
+  slides,
+  locale,
+  pageOrder = 0,
+  autoplayMs = 7000,
+  autoplayReverse: autoplayReverseProp,
+}: HomeHeroCarouselProps) {
   const isAr = locale === "ar";
+  const autoplayReverse = autoplayReverseProp ?? carouselAutoplayReverse(pageOrder);
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: slides.length > 1,
     align: "start",
@@ -113,11 +125,11 @@ export function HomeHeroCarousel({ slides, locale }: HomeHeroCarouselProps) {
     };
   }, [emblaApi, slides.length]);
 
-  useEffect(() => {
-    if (!emblaApi || slides.length <= 1) return;
-    const timer = setInterval(() => emblaApi.scrollNext(), 7000);
-    return () => clearInterval(timer);
-  }, [emblaApi, slides.length]);
+  useEmblaAutoplay(emblaApi, slides.length, {
+    intervalMs: autoplayMs,
+    reverse: autoplayReverse,
+    enabled: slides.length > 1,
+  });
 
   if (slides.length === 0) return null;
 

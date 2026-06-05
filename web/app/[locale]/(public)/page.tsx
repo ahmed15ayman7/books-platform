@@ -154,13 +154,16 @@ export default async function HomePage() {
   const preBg  = () => preDarkBgs[preIdx++]  ?? "bg-white";
   const postBg = () => postDarkBgs[postIdx++] ?? "bg-white";
 
+  let carouselOrder = 0;
+  const nextCarouselOrder = () => carouselOrder++;
+
   return (
     <div>
       <JsonLd data={websiteJsonLd(locale)} />
       <JsonLd data={organizationJsonLd(locale)} />
 
       {/* ── Hero ─────────────────────────────────────────────── */}
-      <HomeHeroCarousel slides={heroSlides} locale={locale} />
+      <HomeHeroCarousel slides={heroSlides} locale={locale} pageOrder={nextCarouselOrder()} />
 
       <HomeMissionStrip
         locale={locale}
@@ -186,7 +189,7 @@ export default async function HomePage() {
                 </Link>
               </Button>
             </FadeIn>
-            <BookCarousel books={newlyReleased} locale={locale} />
+            <BookCarousel books={newlyReleased} locale={locale} pageOrder={nextCarouselOrder()} />
           </div>
         </AnimatedSection>
       )}
@@ -216,7 +219,7 @@ export default async function HomePage() {
                 </Link>
               </Button>
             </FadeIn>
-            <BookCarousel books={books} locale={locale} />
+            <BookCarousel books={books} locale={locale} pageOrder={nextCarouselOrder()} />
           </div>
         </AnimatedSection>
       ))}
@@ -274,7 +277,7 @@ export default async function HomePage() {
                 </Link>
               </Button>
             </FadeIn>
-            <BookCarousel books={books} locale={locale} />
+            <BookCarousel books={books} locale={locale} pageOrder={nextCarouselOrder()} />
           </div>
         </AnimatedSection>
       ))}
@@ -313,7 +316,7 @@ export default async function HomePage() {
                 </Link>
               </Button>
             </FadeIn>
-            <PublishersMarquee publishers={publishers} locale={locale} />
+            <PublishersMarquee publishers={publishers} locale={locale} pageOrder={nextCarouselOrder()} />
           </div>
         </AnimatedSection>
       )}
@@ -388,7 +391,7 @@ export default async function HomePage() {
                 </Link>
               </Button>
             </FadeIn>
-            <BookCarousel books={translated} locale={locale} />
+            <BookCarousel books={translated} locale={locale} pageOrder={nextCarouselOrder()} />
           </div>
         </AnimatedSection>
       )}
@@ -409,7 +412,7 @@ export default async function HomePage() {
                 </Link>
               </Button>
             </FadeIn>
-            <BookCarousel books={nominated} locale={locale} />
+            <BookCarousel books={nominated} locale={locale} pageOrder={nextCarouselOrder()} />
           </div>
         </AnimatedSection>
       )}

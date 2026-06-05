@@ -196,7 +196,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
                 title={t("linkedArticles")}
                 className="mb-6"
               />
-              <ArticleCarousel articles={linkedArticles} locale={locale} />
+              <ArticleCarousel articles={linkedArticles} locale={locale} pageOrder={0} />
             </section>
           )}
 
@@ -208,7 +208,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
                 subtitle={similarBooksGeneral ? t("similarBooksGeneral") : undefined}
                 className="mb-6"
               />
-              <BookCarousel books={similarBooks} locale={locale} />
+              <BookCarousel books={similarBooks} locale={locale} pageOrder={1} />
             </section>
           )}
         </div>

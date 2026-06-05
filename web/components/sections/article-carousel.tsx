@@ -3,6 +3,8 @@
 import { useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { carouselAutoplayReverse } from "@/lib/carousel/autoplay";
+import { useEmblaAutoplay } from "@/hooks/use-embla-autoplay";
 import { cn } from "@/lib/utils";
 import { ArticleCard } from "./article-card";
 import type { ArticleLinkedBookDisplay } from "@/lib/i18n/article-linked-book";
@@ -24,11 +26,24 @@ interface ArticleCarouselProps {
   articles: Article[];
   locale: Locale;
   className?: string;
+  pageOrder?: number;
+  autoplayMs?: number;
+  autoplayReverse?: boolean;
 }
 
-export function ArticleCarousel({ articles, locale, className }: ArticleCarouselProps) {
+export function ArticleCarousel({
+  articles,
+  locale,
+  className,
+  pageOrder = 0,
+  autoplayMs = 5000,
+  autoplayReverse: autoplayReverseProp,
+}: ArticleCarouselProps) {
+  const autoplayReverse = autoplayReverseProp ?? carouselAutoplayReverse(pageOrder);
+
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
+    loop: articles.length > 3,
     direction: locale === "ar" ? "rtl" : "ltr",
     slidesToScroll: 2,
     breakpoints: {
@@ -39,6 +54,12 @@ export function ArticleCarousel({ articles, locale, className }: ArticleCarousel
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+
+  useEmblaAutoplay(emblaApi, articles.length, {
+    intervalMs: autoplayMs,
+    reverse: autoplayReverse,
+    enabled: articles.length > 1,
+  });
 
   if (!articles.length) return null;
 
@@ -64,6 +85,7 @@ export function ArticleCarousel({ articles, locale, className }: ArticleCarousel
       </div>
 
       <button
+        type="button"
         onClick={locale === "ar" ? scrollNext : scrollPrev}
         className={cn(
           "absolute top-1/2 -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center",
@@ -77,6 +99,7 @@ export function ArticleCarousel({ articles, locale, className }: ArticleCarousel
         <ChevronLeft className="h-5 w-5" />
       </button>
       <button
+        type="button"
         onClick={locale === "ar" ? scrollPrev : scrollNext}
         className={cn(
           "absolute top-1/2 -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center",

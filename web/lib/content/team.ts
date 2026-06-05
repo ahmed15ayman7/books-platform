@@ -134,12 +134,12 @@ export const TEAM_MEMBERS: TeamMemberData[] = [
   {
     slug: "youssef-emad",
     name: { ar: "يوسف عماد", en: "Youssef Emad" },
-    role: { ar: "مطور Flutter", en: "Flutter Developer" },
+    role: { ar: "مطور الابلكيشن", en: "App Developer" },
     bio: {
-      ar: "تطوير تطبيق المنصة للهاتف المحمول باستخدام Flutter.",
+      ar: "تطوير تطبيق المنصة للهاتف المحمول باستخدام ابلكيشن.",
       en: "Mobile application development for the platform using Flutter.",
     },
-    photoUrl: null,
+    photoUrl: "/team/youssef-emad.jpeg",
     initials: "YE",
   },
 ];
