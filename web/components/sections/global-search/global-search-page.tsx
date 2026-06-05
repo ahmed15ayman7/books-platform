@@ -182,8 +182,8 @@ export function GlobalSearchPageClient({
                 : "Books, articles, videos, publishers, and authors — in one place"}
             </p>
 
-            <form onSubmit={handleSubmit} className="relative mt-8 flex items-center">
-              <div className="group relative overflow-hidden rounded-2xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.25)] ring-1 ring-white/20 transition-shadow focus-within:shadow-[0_0_0_4px_rgba(177,30,46,0.35)]">
+            <form onSubmit={handleSubmit} className="relative mt-8 flex items-center gap-2 justify-center">
+              <div className="group relative overflow-hidden rounded-2xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.25)] ring-1 ring-white/20 transition-shadow focus-within:shadow-[0_0_0_4px_rgba(177,30,46,0.35)] flex-grow">
                 <Search
                   className={`pointer-events-none absolute top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--brand-gray-400)] ${
                     isAr ? "end-4" : "start-4"
