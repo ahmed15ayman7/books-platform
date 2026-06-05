@@ -342,6 +342,17 @@ export default async function HomePage() {
           </div>
         </AnimatedSection>
       )}
+            {/* ── انشر كتابك + آخر الكتب المنشورة ─────────────────── */}
+            <HomePublishSection
+        locale={locale}
+        title={editorial.publishStrip.title}
+        description={editorial.publishStrip.description}
+        ctaLabel={editorial.publishStrip.cta}
+        booksTitle={editorial.publishStrip.booksTitle}
+        books={newlyReleased}
+        pageOrder={nextCarouselOrder()}
+      />
+
       {/* ── تصنيفات المقالات ─────────────────────────────────── */}
       {articleCategories.length > 0 && (
         <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="article-cats-heading">
@@ -382,6 +393,27 @@ export default async function HomePage() {
         title={editorial.mediaSpotlight.title}
         channels={mediaChannels}
       />
+ {/* ── تصفّح حسب التصنيف ──────────────────────────────── */}
+ {categories.length > 0 && (
+        <AnimatedSection className={`section-spacing ${preBg()}`} aria-labelledby="categories-heading">
+          <div className="container-platform">
+            <FadeIn className="mb-8 flex items-end justify-between gap-4">
+              <SectionHeading
+                id="categories-heading"
+                title={locale === "ar" ? "تصفّح حسب التصنيف" : "Browse by Category"}
+                subtitle={locale === "ar" ? "مجالات المعرفة والترجمات" : "Knowledge domains"}
+              />
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/${locale}/books`}>
+                  {locale === "ar" ? "كل الكتب" : "All Books"}
+                </Link>
+              </Button>
+            </FadeIn>
+            <CategoryGrid categories={categories} locale={locale} />
+          </div>
+        </AnimatedSection>
+      )}
+
 
       {/* ── دور النشر — dark ────────────────────────────────── */}
       {publishers.length > 0 && (
@@ -449,37 +481,6 @@ export default async function HomePage() {
         </AnimatedSection>
       )}
 
-
-      {/* ── انشر كتابك + آخر الكتب المنشورة ─────────────────── */}
-      <HomePublishSection
-        locale={locale}
-        title={editorial.publishStrip.title}
-        description={editorial.publishStrip.description}
-        ctaLabel={editorial.publishStrip.cta}
-        booksTitle={editorial.publishStrip.booksTitle}
-        books={newlyReleased}
-        pageOrder={nextCarouselOrder()}
-      />
- {/* ── تصفّح حسب التصنيف ──────────────────────────────── */}
- {categories.length > 0 && (
-        <AnimatedSection className={`section-spacing ${preBg()}`} aria-labelledby="categories-heading">
-          <div className="container-platform">
-            <FadeIn className="mb-8 flex items-end justify-between gap-4">
-              <SectionHeading
-                id="categories-heading"
-                title={locale === "ar" ? "تصفّح حسب التصنيف" : "Browse by Category"}
-                subtitle={locale === "ar" ? "مجالات المعرفة والترجمات" : "Knowledge domains"}
-              />
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/${locale}/books`}>
-                  {locale === "ar" ? "كل الكتب" : "All Books"}
-                </Link>
-              </Button>
-            </FadeIn>
-            <CategoryGrid categories={categories} locale={locale} />
-          </div>
-        </AnimatedSection>
-      )}
 
 
       <HomeServicesPreview
