@@ -29,6 +29,7 @@ import { cn } from "@/lib/utils";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
+import { adminDropdownItemClass, adminDropdownPanelClass } from "@/lib/admin/dropdown-styles";
 
 /* ─── Types ─────────────────────────────────────────────────────────── */
 interface Publisher  { id: string; title: string; name: string; nameAr?: string | null; slug: string }
@@ -90,7 +91,7 @@ function BookSelect({
       <SelectTrigger id={id} className={fieldCls}>
         <SelectValue placeholder={placeholder ?? "اختر..."} />
       </SelectTrigger>
-      <SelectContent className="border-[var(--admin-border-strong)] bg-[var(--admin-surface)] text-[var(--admin-text)]">
+      <SelectContent className={adminDropdownPanelClass}>
         {children}
       </SelectContent>
     </Select>
@@ -359,7 +360,7 @@ export function BookEditForm({
             onValueChange={(v) => set("language", v)}
             placeholder="— اختر اللغة —"
           >
-            <SelectItem value="_empty" className="focus:bg-[var(--admin-hover)]">
+            <SelectItem value="_empty" className={adminDropdownItemClass}>
               — اختر اللغة —
             </SelectItem>
             {(
@@ -379,7 +380,7 @@ export function BookEditForm({
                 ["ur", "الأردية"],
               ] as [string, string][]
             ).map(([code, name]) => (
-              <SelectItem key={code} value={code} className="focus:bg-[var(--admin-hover)]">
+              <SelectItem key={code} value={code} className={adminDropdownItemClass}>
                 {name} ({code.toUpperCase()})
               </SelectItem>
             ))}
@@ -425,9 +426,9 @@ export function BookEditForm({
             value={form.translationStatus}
             onValueChange={(v) => set("translationStatus", v)}
           >
-            <SelectItem value="NOT_TRANSLATED" className="focus:bg-[var(--admin-hover)]">غير مترجم</SelectItem>
-            <SelectItem value="NOMINATED" className="focus:bg-[var(--admin-hover)]">مرشح للترجمة</SelectItem>
-            <SelectItem value="TRANSLATED" className="focus:bg-[var(--admin-hover)]">مترجم</SelectItem>
+            <SelectItem value="NOT_TRANSLATED" className={adminDropdownItemClass}>غير مترجم</SelectItem>
+            <SelectItem value="NOMINATED" className={adminDropdownItemClass}>مرشح للترجمة</SelectItem>
+            <SelectItem value="TRANSLATED" className={adminDropdownItemClass}>مترجم</SelectItem>
           </BookSelect>
         </Field>
       </SectionCard>
@@ -519,9 +520,9 @@ export function BookEditForm({
             value={form.purchaseOption}
             onValueChange={(v) => set("purchaseOption", v)}
           >
-            <SelectItem value="NOT_AVAILABLE" className="focus:bg-[var(--admin-hover)]">غير متاح للشراء</SelectItem>
-            <SelectItem value="DIRECT" className="focus:bg-[var(--admin-hover)]">شراء مباشر</SelectItem>
-            <SelectItem value="REFERRAL" className="focus:bg-[var(--admin-hover)]">رابط إحالة</SelectItem>
+            <SelectItem value="NOT_AVAILABLE" className={adminDropdownItemClass}>غير متاح للشراء</SelectItem>
+            <SelectItem value="DIRECT" className={adminDropdownItemClass}>شراء مباشر</SelectItem>
+            <SelectItem value="REFERRAL" className={adminDropdownItemClass}>رابط إحالة</SelectItem>
           </BookSelect>
         </Field>
 
@@ -529,7 +530,7 @@ export function BookEditForm({
           <FieldLabel htmlFor="currency">العملة</FieldLabel>
           <BookSelect id="currency" value={form.currency} onValueChange={(v) => set("currency", v)}>
             {["USD","EUR","GBP","SAR","AED","EGP","KWD","BHD","QAR","OMR","JOD"].map((c) => (
-              <SelectItem key={c} value={c} className="focus:bg-[var(--admin-hover)]">
+              <SelectItem key={c} value={c} className={adminDropdownItemClass}>
                 {c}
               </SelectItem>
             ))}

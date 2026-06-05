@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { adminDropdownItemClass, adminDropdownPanelClass } from "@/lib/admin/dropdown-styles";
 import { AUTO_SLUG_HINT } from "@/lib/admin/slugify";
 
 interface AdminFormFieldProps {
@@ -158,13 +159,9 @@ export function AdminSelect({
         >
           <SelectValue placeholder={placeholder ?? "اختر..."} />
         </SelectTrigger>
-        <SelectContent className="border-[var(--admin-input-border)] bg-[var(--admin-surface)] text-[var(--admin-text)]">
+        <SelectContent className={adminDropdownPanelClass}>
           {options.map((opt) => (
-            <SelectItem
-              key={opt.value}
-              value={opt.value}
-              className="focus:bg-[var(--admin-hover)] focus:text-[var(--admin-text)]"
-            >
+            <SelectItem key={opt.value} value={opt.value} className={adminDropdownItemClass}>
               {opt.label}
             </SelectItem>
           ))}

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminInput } from "@/components/admin/admin-form-field";
+import { adminAutocompleteListClass } from "@/lib/admin/dropdown-styles";
 import { adminToast } from "@/lib/admin/admin-toast";
 
 export interface BookPickerItem {
@@ -86,13 +87,13 @@ export function BookMultiPicker({
       />
       {loading && <p className="text-xs text-[var(--admin-text-muted)]">جاري البحث...</p>}
       {results.length > 0 && (
-        <ul className="max-h-48 overflow-y-auto rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)]">
+        <ul className={adminAutocompleteListClass}>
           {results.map((book) => (
             <li key={book.id}>
               <button
                 type="button"
                 onClick={() => addBook(book)}
-                className="flex w-full items-center gap-3 px-3 py-2 text-start text-sm hover:bg-[var(--admin-surface-muted)]"
+                className="flex w-full items-center gap-3 bg-white px-3 py-2 text-start text-sm text-[var(--brand-gray-900)] hover:bg-[var(--brand-gray-100)]"
               >
                 <div className="relative h-10 w-8 shrink-0 overflow-hidden rounded bg-[var(--admin-surface-muted)]">
                   {book.imageUrl ? (

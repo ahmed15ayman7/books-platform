@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { adminFieldClass } from "@/components/admin/admin-form-field";
+import { adminDropdownItemClass, adminDropdownPanelClass } from "@/lib/admin/dropdown-styles";
 import type { AdminViewMode } from "@/lib/admin/list-query";
 
 export interface AdminSelectOption {
@@ -42,13 +43,9 @@ export function AdminFilterSelect({
         <SelectTrigger className={cn(adminFieldClass, "min-w-[140px] h-9")}>
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="border-[var(--admin-input-border)] bg-white text-[var(--admin-text)]">
+        <SelectContent className={adminDropdownPanelClass}>
           {options.map((o) => (
-            <SelectItem
-              key={o.value}
-              value={o.value}
-              className="focus:bg-[var(--admin-hover)] focus:text-[var(--admin-text)]"
-            >
+            <SelectItem key={o.value} value={o.value} className={adminDropdownItemClass}>
               {o.label}
             </SelectItem>
           ))}
@@ -75,13 +72,9 @@ export function AdminSortSelect({ value, onChange, options, className }: AdminSo
         <SelectTrigger className={cn(adminFieldClass, "min-w-[140px] h-9")}>
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="border-[var(--admin-input-border)] bg-[var(--admin-surface)] text-[var(--admin-text)]">
+        <SelectContent className={adminDropdownPanelClass}>
           {options.map((o) => (
-            <SelectItem
-              key={o.value}
-              value={o.value}
-              className="focus:bg-[var(--admin-hover)] focus:text-[var(--admin-text)]"
-            >
+            <SelectItem key={o.value} value={o.value} className={adminDropdownItemClass}>
               {o.label}
             </SelectItem>
           ))}

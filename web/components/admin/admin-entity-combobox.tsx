@@ -6,6 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { adminFieldClass } from "@/components/admin/admin-form-field";
+import {
+  adminAutocompleteItemClass,
+  adminAutocompleteListClass,
+} from "@/lib/admin/dropdown-styles";
 
 export interface EntityOption {
   id: string;
@@ -189,9 +193,9 @@ export function AdminEntityCombobox({
         className={cn(adminFieldClass, "mb-1")}
       />
 
-      <div className="max-h-48 overflow-y-auto rounded-lg border border-[var(--admin-input-border)] bg-[var(--admin-surface)]">
+      <div className={adminAutocompleteListClass}>
         {remoteLoading && (
-          <div className="flex items-center gap-2 border-b border-[var(--admin-border)] px-3 py-2 text-xs text-[var(--admin-text-subtle)]">
+          <div className="flex items-center gap-2 border-b border-[var(--brand-gray-200)] bg-white px-3 py-2 text-xs text-[var(--brand-gray-500)]">
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
             جاري البحث…
           </div>
@@ -201,7 +205,7 @@ export function AdminEntityCombobox({
           <button
             type="button"
             onClick={() => onCreateNew(query)}
-            className="flex w-full items-center gap-2 border-b border-[var(--admin-border)] bg-[var(--admin-accent-soft)] px-3 py-2.5 text-sm font-medium text-[var(--admin-accent)] hover:bg-[var(--admin-hover)]"
+            className="flex w-full items-center gap-2 border-b border-[var(--brand-gray-200)] bg-[var(--brand-red-soft)] px-3 py-2.5 text-sm font-medium text-[var(--brand-red)] hover:bg-[var(--brand-gray-100)]"
           >
             <Plus className="h-4 w-4 shrink-0" />
             {createLabel}: «{query}»
@@ -226,10 +230,9 @@ export function AdminEntityCombobox({
                 type="button"
                 onClick={() => toggleOption(o.id)}
                 className={cn(
-                  "flex w-full items-center justify-between gap-2 border-b border-[var(--admin-border)] px-3 py-2 text-start text-sm last:border-0",
-                  isSelected
-                    ? "bg-[var(--admin-accent-soft)] text-[var(--admin-text)]"
-                    : "text-[var(--admin-text)] hover:bg-[var(--admin-hover)]",
+                  adminAutocompleteItemClass,
+                  "flex w-full items-center justify-between gap-2 border-b border-[var(--brand-gray-200)] px-3 py-2 text-start text-sm last:border-0",
+                  isSelected && "bg-[var(--brand-red-soft)]",
                 )}
               >
                 <span className="min-w-0 truncate">
@@ -256,7 +259,7 @@ export function AdminEntityCombobox({
         <button
           type="button"
           onClick={() => onCreateNew(query)}
-          className="sticky bottom-0 flex w-full items-center gap-2 border-t border-[var(--admin-border)] bg-[var(--admin-surface-muted)] px-3 py-2.5 text-sm text-[var(--admin-text-muted)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-accent)]"
+          className="sticky bottom-0 flex w-full items-center gap-2 border-t border-[var(--brand-gray-200)] bg-white px-3 py-2.5 text-sm text-[var(--brand-gray-600)] hover:bg-[var(--brand-gray-100)] hover:text-[var(--brand-red)]"
         >
           <Plus className="h-4 w-4 shrink-0 text-[var(--brand-red)]" />
           {createLabel}
