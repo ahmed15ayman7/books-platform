@@ -302,6 +302,7 @@ export const ArticleService = {
               slug: true,
               title: true,
               excerpt: true,
+              content: true,
               imageUrl: true,
               date: true,
               channel: true,

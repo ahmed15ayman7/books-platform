@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Bookmark, ChevronDown } from "lucide-react";
@@ -11,7 +12,7 @@ export interface HomeArticleItem {
   slug: string;
   title: string;
   excerpt: string | null;
-  imageUrl: string | null;
+  imageUrl: string;
 }
 
 export interface HomeArticleChannel {
@@ -30,10 +31,14 @@ function ArticleTitleBar({
   title,
   className,
   compact,
+  onExpand,
+  expandLabel,
 }: {
   title: string;
   className?: string;
   compact?: boolean;
+  onExpand?: () => void;
+  expandLabel?: string;
 }) {
   return (
     <div
@@ -50,12 +55,23 @@ function ArticleTitleBar({
       >
         {title}
       </p>
-      <span
-        className="flex w-10 shrink-0 items-center justify-center bg-[var(--brand-red)] sm:w-11"
-        aria-hidden="true"
-      >
-        <ChevronDown className="h-5 w-5 text-white" strokeWidth={2.5} />
-      </span>
+      {onExpand ? (
+        <button
+          type="button"
+          onClick={onExpand}
+          className="flex w-10 shrink-0 items-center justify-center bg-[var(--brand-red)] transition-colors hover:bg-[var(--brand-red-hover)] sm:w-11"
+          aria-label={expandLabel ?? title}
+        >
+          <ChevronDown className="h-5 w-5 text-white" strokeWidth={2.5} />
+        </button>
+      ) : (
+        <span
+          className="flex w-10 shrink-0 items-center justify-center bg-[var(--brand-red)] sm:w-11"
+          aria-hidden="true"
+        >
+          <ChevronDown className="h-5 w-5 text-white" strokeWidth={2.5} />
+        </span>
+      )}
     </div>
   );
 }
@@ -67,11 +83,14 @@ function ArticleColumn({
   locale: Locale;
   channel: HomeArticleChannel;
 }) {
-  const articles = channel.articles.filter((a) => a.slug && a.title);
+  const articles = channel.articles.filter((a) => a.slug && a.title && a.imageUrl);
+  const [featuredSlug, setFeaturedSlug] = useState(articles[0]?.slug ?? "");
+
   if (articles.length === 0) return null;
 
-  const featured = articles[0]!;
-  const list = articles.slice(1, 4);
+  const featured = articles.find((a) => a.slug === featuredSlug) ?? articles[0]!;
+  const list = articles.filter((a) => a.slug !== featured.slug).slice(0, 3);
+  const articleHref = `/${locale}/articles/${featured.slug}`;
 
   return (
     <div className="flex min-w-0 flex-col">
@@ -91,40 +110,39 @@ function ArticleColumn({
       </Link>
 
       <article className="flex flex-1 flex-col">
-        <Link href={`/${locale}/articles/${featured.slug}`} className="group block">
-          <ArticleTitleBar title={featured.title} />
-          <div className="relative aspect-video overflow-hidden bg-[var(--brand-gray-200)]">
-            {featured.imageUrl ? (
-              <Image
-                src={featured.imageUrl}
-                alt=""
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                sizes="(max-width: 768px) 100vw, 33vw"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-[var(--brand-gray-100)] text-sm text-[var(--brand-gray-400)]">
-                —
-              </div>
-            )}
-          </div>
-          {featured.excerpt && (
-            <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-[var(--brand-gray-800)]">
-              {featured.excerpt}
-            </p>
-          )}
+        <ArticleTitleBar title={featured.title} />
+
+        <Link
+          href={articleHref}
+          className="group relative block aspect-video overflow-hidden bg-[var(--brand-gray-200)]"
+        >
+          <Image
+            src={featured.imageUrl}
+            alt=""
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
         </Link>
+
+        {featured.excerpt && (
+          <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-[var(--brand-gray-800)]">
+            {featured.excerpt}
+          </p>
+        )}
 
         {list.length > 0 && (
           <div className="mt-4 flex flex-col gap-2">
             {list.map((article) => (
-              <Link
+              <ArticleTitleBar
                 key={article.slug}
-                href={`/${locale}/articles/${article.slug}`}
-                className="group block transition-opacity hover:opacity-90"
-              >
-                <ArticleTitleBar title={article.title} compact />
-              </Link>
+                title={article.title}
+                compact
+                onExpand={() => setFeaturedSlug(article.slug)}
+                expandLabel={
+                  locale === "ar" ? `عرض مقال: ${article.title}` : `Show article: ${article.title}`
+                }
+              />
             ))}
           </div>
         )}

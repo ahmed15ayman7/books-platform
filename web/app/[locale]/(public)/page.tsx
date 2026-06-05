@@ -31,6 +31,7 @@ import { HomeMediaSpotlight } from "@/components/sections/home/home-media-spotli
 import { HomeArticlesShowcase } from "@/components/sections/home/home-articles-showcase";
 import { HomeServicesPreview } from "@/components/sections/home/home-services-preview";
 import { shuffleArray } from "@/lib/utils/shuffle";
+import { resolveArticleDisplayImage } from "@/lib/articles/resolve-display-image";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as Locale;
@@ -146,6 +147,7 @@ export default async function HomePage() {
     slug: string;
     title: string;
     excerpt: string | null;
+    content?: string | null;
     imageUrl: string | null;
     date: Date | null;
     channel: string | null;
@@ -168,13 +170,23 @@ export default async function HomePage() {
     href: `/${locale}/${ch.path}`,
     articles: shuffleArray(articles[ch.key] ?? [])
       .filter((a) => a.slug && a.title)
-      .slice(0, 4)
-      .map((a) => ({
-        slug: a.slug,
-        title: a.title ?? "",
-        excerpt: stripExcerpt(a.excerpt),
-        imageUrl: a.imageUrl,
-      })),
+      .map((a) => {
+        const imageUrl = resolveArticleDisplayImage({
+          imageUrl: a.imageUrl,
+          bookImageUrl: a.products?.[0]?.imageUrl,
+          excerpt: a.excerpt,
+          content: a.content,
+        });
+        if (!imageUrl) return null;
+        return {
+          slug: a.slug,
+          title: a.title ?? "",
+          excerpt: stripExcerpt(a.excerpt),
+          imageUrl,
+        };
+      })
+      .filter((a): a is NonNullable<typeof a> => a !== null)
+      .slice(0, 4),
   }));
 
   // Split category sections: first 3, then interleave "آخر الكتب المنشورة", rest

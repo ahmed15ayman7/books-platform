@@ -29,7 +29,7 @@ export interface TeamPageContent {
 export const TEAM_MEMBERS: TeamMemberData[] = [
   {
     slug: "atef-mazhar",
-    name: { ar: "عاطف مزار", en: "Atef Mazhar" },
+    name: { ar: "عاطف مظهر", en: "Atef Mazhar" },
     role: { ar: "المدير العام", en: "General Manager" },
     bio: {
       ar: "المؤسس والرؤية الاستراتيجية — الإدارة العليا والإشراف العام.",
@@ -40,7 +40,7 @@ export const TEAM_MEMBERS: TeamMemberData[] = [
   },
   {
     slug: "mariam-mazhar",
-    name: { ar: "مريم مزار", en: "Mariam Mazhar" },
+    name: { ar: "مريم مظهر", en: "Mariam Mazhar" },
     role: { ar: "الرئيس التنفيذي", en: "CEO" },
     bio: {
       ar: "مسؤولة عن استراتيجية التسويق وتعزيز الحضور الرقمي وبناء تفاعل مجتمع القراءة والنشر.",
@@ -51,7 +51,7 @@ export const TEAM_MEMBERS: TeamMemberData[] = [
   },
   {
     slug: "sara-mazhar",
-    name: { ar: "سارة مزار", en: "Sara Mazhar" },
+    name: { ar: "سارة مظهر", en: "Sara Mazhar" },
     role: { ar: "مديرة التكنولوجيا", en: "Chief Technology Officer" },
     bio: {
       ar: "تشرف على البنية التقنية والتطوير الرقمي للمنصة، وتضمن تجربة مستخدم آمنة وسلسة.",
