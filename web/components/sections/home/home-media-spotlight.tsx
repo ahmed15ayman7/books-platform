@@ -104,12 +104,12 @@ function MediaChannelBlock({
                   type="button"
                   onClick={() => setFeaturedSlug(video.slug)}
                   className={cn(
-                    "relative aspect-video w-full overflow-hidden bg-[var(--brand-gray-200)] ring-1 ring-[var(--brand-gray-200)] transition-all",
+                    "relative aspect-video w-full  overflow-hidden bg-[var(--brand-gray-200)] ring-1 ring-[var(--brand-gray-200)] transition-all",
                     "hover:ring-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]",
                   )}
                   aria-label={video.title}
                 >
-                  <Image src={thumb} alt="" fill className="object-cover" sizes="60px" />
+                  <Image src={thumb} alt="" fill className="object-cover" sizes="100px" />
                   <span className="absolute inset-0 flex items-center justify-center bg-black/20">
                     <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/95 shadow">
                       <Play className="ms-0.5 h-2.5 w-2.5 fill-[var(--brand-red)] text-[var(--brand-red)]" aria-hidden="true" />
@@ -146,7 +146,7 @@ export function HomeMediaSpotlight({ locale, title, channels }: HomeMediaSpotlig
         <div
           className={cn(
             "mx-auto grid gap-5",
-            visible.length > 1 ? "max-w-3xl md:grid-cols-2 md:gap-6" : "max-w-sm",
+            visible.length > 1 ? "max-w-6xl md:grid-cols-2 md:gap-6" : "max-w-sm",
           )}
         >
           {visible.map((channel) => (
