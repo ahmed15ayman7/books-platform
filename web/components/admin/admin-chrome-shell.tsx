@@ -8,9 +8,11 @@ import { AdminCommandPalette } from "@/components/admin/admin-command-palette";
 export function AdminChromeShell({ children }: { children: ReactNode }) {
   return (
     <AdminChromeProvider>
-      <AdminKeyboardListener />
-      <AdminCommandPalette />
-      {children}
+      <div className="admin-shell relative min-h-screen bg-[var(--admin-bg)] text-[var(--admin-text)]">
+        <AdminKeyboardListener />
+        <AdminCommandPalette />
+        {children}
+      </div>
     </AdminChromeProvider>
   );
 }

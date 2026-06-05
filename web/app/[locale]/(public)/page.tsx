@@ -171,26 +171,7 @@ export default async function HomePage() {
         secondaryLabel={editorial.mission.secondary}
       />
 
-      {/* ── تصفّح حسب التصنيف ──────────────────────────────── */}
-      {categories.length > 0 && (
-        <AnimatedSection className={`section-spacing ${preBg()}`} aria-labelledby="categories-heading">
-          <div className="container-platform">
-            <FadeIn className="mb-8 flex items-end justify-between gap-4">
-              <SectionHeading
-                id="categories-heading"
-                title={locale === "ar" ? "تصفّح حسب التصنيف" : "Browse by Category"}
-                subtitle={locale === "ar" ? "مجالات المعرفة والترجمات" : "Knowledge domains"}
-              />
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/${locale}/books`}>
-                  {locale === "ar" ? "كل الكتب" : "All Books"}
-                </Link>
-              </Button>
-            </FadeIn>
-            <CategoryGrid categories={categories} locale={locale} />
-          </div>
-        </AnimatedSection>
-      )}
+     
 
       {/* ── صدر حديثًا ─────────────────────────────────────── */}
       {newlyReleased.length > 0 && (
@@ -212,11 +193,11 @@ export default async function HomePage() {
         </AnimatedSection>
       )}
 
-      <HomeReaderJourney
+      {/* <HomeReaderJourney
         locale={locale}
         title={editorial.readerJourney.title}
         steps={editorial.readerJourney.steps}
-      />
+      /> */}
 
       {/* ── Category sections — first batch ─────────────────── */}
       {catsBefore.map(({ category, books }) => (
@@ -373,7 +354,26 @@ export default async function HomePage() {
           </div>
         </AnimatedSection>
       )}
-
+ {/* ── تصفّح حسب التصنيف ──────────────────────────────── */}
+ {categories.length > 0 && (
+        <AnimatedSection className={`section-spacing ${preBg()}`} aria-labelledby="categories-heading">
+          <div className="container-platform">
+            <FadeIn className="mb-8 flex items-end justify-between gap-4">
+              <SectionHeading
+                id="categories-heading"
+                title={locale === "ar" ? "تصفّح حسب التصنيف" : "Browse by Category"}
+                subtitle={locale === "ar" ? "مجالات المعرفة والترجمات" : "Knowledge domains"}
+              />
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/${locale}/books`}>
+                  {locale === "ar" ? "كل الكتب" : "All Books"}
+                </Link>
+              </Button>
+            </FadeIn>
+            <CategoryGrid categories={categories} locale={locale} />
+          </div>
+        </AnimatedSection>
+      )}
       {/* ── كتب مترجمة ──────────────────────────────────────── */}
       {translated.length > 0 && (
         <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="translated-heading">

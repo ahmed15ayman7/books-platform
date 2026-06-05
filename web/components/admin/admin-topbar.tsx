@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Bell, ChevronRight, Home, Search } from "lucide-react";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { useAdminChrome } from "@/lib/admin/admin-chrome-context";
-import { modKeyLabel } from "@/lib/admin/shortcut-labels";
+import { modKeyLabel } from "@/lib/search/shortcut-labels";
 import { AdminHubLinks } from "@/components/admin/admin-hub-links";
 
 const routeLabels: Record<string, string> = {

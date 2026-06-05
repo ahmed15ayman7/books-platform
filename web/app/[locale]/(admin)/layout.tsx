@@ -12,7 +12,7 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <AdminChromeShell>
-      <div className="admin-shell flex min-h-screen bg-[var(--admin-bg)] text-[var(--admin-text)]">
+      <div className="flex min-h-screen flex-1">
         <AdminSidebar />
         <div className="flex flex-1 flex-col overflow-hidden">
           <AdminTopbar />
