@@ -27,50 +27,78 @@ interface HomeArticlesShowcaseProps {
   channels: HomeArticleChannel[];
 }
 
-function ArticleTitleBar({
-  title,
-  className,
+function ArticleAccordionItem({
+  article,
+  locale,
+  isOpen,
+  onToggle,
   compact,
-  onExpand,
-  expandLabel,
 }: {
-  title: string;
-  className?: string;
+  article: HomeArticleItem;
+  locale: Locale;
+  isOpen: boolean;
+  onToggle: () => void;
   compact?: boolean;
-  onExpand?: () => void;
-  expandLabel?: string;
 }) {
+  const articleHref = `/${locale}/articles/${article.slug}`;
+  const toggleLabel =
+    locale === "ar" ? `عرض مقال: ${article.title}` : `Show article: ${article.title}`;
+
   return (
-    <div
-      className={cn(
-        "flex min-h-[44px] items-stretch overflow-hidden bg-[var(--brand-gray-900)]",
-        className,
-      )}
-    >
-      <p
+    <div className="overflow-hidden">
+      <div
         className={cn(
-          "flex flex-1 items-center px-3 py-2 font-semibold leading-snug text-white",
-          compact ? "text-xs line-clamp-2" : "text-sm line-clamp-2 sm:text-base",
+          "flex min-h-[44px] items-stretch overflow-hidden bg-[var(--brand-gray-900)]",
+          !isOpen && compact !== false && "rounded-sm",
         )}
       >
-        {title}
-      </p>
-      {onExpand ? (
         <button
           type="button"
-          onClick={onExpand}
-          className="flex w-10 shrink-0 items-center justify-center bg-[var(--brand-red)] transition-colors hover:bg-[var(--brand-red-hover)] sm:w-11"
-          aria-label={expandLabel ?? title}
+          onClick={onToggle}
+          className={cn(
+            "flex flex-1 items-center px-3 py-2 text-start font-semibold leading-snug text-white transition-opacity hover:opacity-90",
+            compact ? "text-xs line-clamp-2" : "text-sm line-clamp-2 sm:text-base",
+          )}
         >
-          <ChevronDown className="h-5 w-5 text-white" strokeWidth={2.5} />
+          {article.title}
         </button>
-      ) : (
-        <span
-          className="flex w-10 shrink-0 items-center justify-center bg-[var(--brand-red)] sm:w-11"
-          aria-hidden="true"
+        <button
+          type="button"
+          onClick={onToggle}
+          className="flex w-10 shrink-0 items-center justify-center bg-[var(--brand-red)] transition-colors hover:bg-[var(--brand-red-hover)] sm:w-11"
+          aria-expanded={isOpen}
+          aria-label={toggleLabel}
         >
-          <ChevronDown className="h-5 w-5 text-white" strokeWidth={2.5} />
-        </span>
+          <ChevronDown
+            className={cn(
+              "h-5 w-5 text-white transition-transform duration-300",
+              isOpen && "rotate-180",
+            )}
+            strokeWidth={2.5}
+          />
+        </button>
+      </div>
+
+      {isOpen && (
+        <div className="pb-1">
+          <Link
+            href={articleHref}
+            className="group relative block aspect-video overflow-hidden bg-[var(--brand-gray-200)]"
+          >
+            <Image
+              src={article.imageUrl}
+              alt=""
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
+          </Link>
+          {article.excerpt && (
+            <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-[var(--brand-gray-800)]">
+              {article.excerpt}
+            </p>
+          )}
+        </div>
       )}
     </div>
   );
@@ -84,13 +112,9 @@ function ArticleColumn({
   channel: HomeArticleChannel;
 }) {
   const articles = channel.articles.filter((a) => a.slug && a.title && a.imageUrl);
-  const [featuredSlug, setFeaturedSlug] = useState(articles[0]?.slug ?? "");
+  const [openSlug, setOpenSlug] = useState(articles[0]?.slug ?? "");
 
   if (articles.length === 0) return null;
-
-  const featured = articles.find((a) => a.slug === featuredSlug) ?? articles[0]!;
-  const list = articles.filter((a) => a.slug !== featured.slug).slice(0, 3);
-  const articleHref = `/${locale}/articles/${featured.slug}`;
 
   return (
     <div className="flex min-w-0 flex-col">
@@ -109,44 +133,18 @@ function ArticleColumn({
         </span>
       </Link>
 
-      <article className="flex flex-1 flex-col">
-        <ArticleTitleBar title={featured.title} />
-
-        <Link
-          href={articleHref}
-          className="group relative block aspect-video overflow-hidden bg-[var(--brand-gray-200)]"
-        >
-          <Image
-            src={featured.imageUrl}
-            alt=""
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-            sizes="(max-width: 768px) 100vw, 33vw"
+      <div className="flex flex-col gap-2" role="presentation">
+        {articles.map((article) => (
+          <ArticleAccordionItem
+            key={article.slug}
+            article={article}
+            locale={locale}
+            isOpen={openSlug === article.slug}
+            compact={openSlug !== article.slug}
+            onToggle={() => setOpenSlug(article.slug)}
           />
-        </Link>
-
-        {featured.excerpt && (
-          <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-[var(--brand-gray-800)]">
-            {featured.excerpt}
-          </p>
-        )}
-
-        {list.length > 0 && (
-          <div className="mt-4 flex flex-col gap-2">
-            {list.map((article) => (
-              <ArticleTitleBar
-                key={article.slug}
-                title={article.title}
-                compact
-                onExpand={() => setFeaturedSlug(article.slug)}
-                expandLabel={
-                  locale === "ar" ? `عرض مقال: ${article.title}` : `Show article: ${article.title}`
-                }
-              />
-            ))}
-          </div>
-        )}
-      </article>
+        ))}
+      </div>
     </div>
   );
 }
