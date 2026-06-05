@@ -39,22 +39,22 @@ class MoreBottomSheet extends StatelessWidget {
         _MoreTile(
           icon: Icons.info_outline_rounded,
           titleKey: 'about_us_title',
-          onTap: () => _navigateStatic(
-            context,
-            AppRoutes.aboutUs,
-            'about',
-            'about_us_title'.tr(),
-          ),
+          onTap: () => _navigate(context, AppRoutes.aboutUs),
+        ),
+        _MoreTile(
+          icon: Icons.work_outline_rounded,
+          titleKey: 'services_title',
+          onTap: () => _navigate(context, AppRoutes.services),
+        ),
+        _MoreTile(
+          icon: Icons.people_outline_rounded,
+          titleKey: 'team_title',
+          onTap: () => _navigate(context, AppRoutes.team),
         ),
         _MoreTile(
           icon: Icons.mail_outline_rounded,
           titleKey: 'contact_us_title',
-          onTap: () => _navigateStatic(
-            context,
-            AppRoutes.contactUs,
-            'contact',
-            'contact_us_title'.tr(),
-          ),
+          onTap: () => _navigate(context, AppRoutes.contactUs),
         ),
         _MoreTile(
           icon: Icons.privacy_tip_outlined,

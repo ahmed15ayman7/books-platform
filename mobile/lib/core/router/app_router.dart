@@ -31,7 +31,11 @@ import '../../features/ratings/presentation/cubit/ratings_cubit.dart';
 import '../../features/search/presentation/cubit/search_cubit.dart';
 import '../../features/search/presentation/pages/search_screen/search_screen.dart';
 import '../../features/static_pages/presentation/cubit/static_page_cubit.dart';
+import '../../features/static_pages/presentation/screens/about_screen/about_screen.dart';
+import '../../features/static_pages/presentation/screens/contact_screen/contact_screen.dart';
+import '../../features/static_pages/presentation/screens/services_screen/services_screen.dart';
 import '../../features/static_pages/presentation/screens/static_page_screen/static_page_screen.dart';
+import '../../features/static_pages/presentation/screens/team_screen/team_screen.dart';
 import '../../features/wishlist/presentation/cubit/wishlist_cubit.dart';
 import '../../features/wishlist/presentation/screens/wishlist_screen/wishlist_screen.dart';
 import '../di/injection_container.dart';
@@ -213,9 +217,31 @@ class AppRouter {
       //     ),
       //   );
 
-      case AppRoutes.staticPage:
       case AppRoutes.aboutUs:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const AboutScreen(),
+        );
+
       case AppRoutes.contactUs:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const ContactScreen(),
+        );
+
+      case AppRoutes.services:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const ServicesScreen(),
+        );
+
+      case AppRoutes.team:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const TeamScreen(),
+        );
+
+      case AppRoutes.staticPage:
       case AppRoutes.privacyPolicy:
       case AppRoutes.termsOfUse:
         final args = settings.arguments as StaticPageArgs?;

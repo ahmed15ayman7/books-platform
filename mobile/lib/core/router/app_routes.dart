@@ -34,6 +34,8 @@ class AppRoutes {
   static const String staticPage = '/static-page';
   static const String aboutUs = '/about-us';
   static const String contactUs = '/contact-us';
+  static const String services = '/services';
+  static const String team = '/team';
   static const String privacyPolicy = '/privacy-policy';
   static const String termsOfUse = '/terms-of-use';
 
