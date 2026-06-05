@@ -18,18 +18,23 @@ class SearchResponseModel {
   final int totalResults;
 
   factory SearchResponseModel.fromJson(Map<String, dynamic> json) {
-    final data = json['data'] as Map<String, dynamic>? ?? json;
+    // $mobile-debug-skill | Problem: API returns books/articles/publishers as {items:[…], total:N} objects, not flat arrays — casting to List<dynamic> threw '_Map is not a subtype of List'. Fix: extract 'items' from each nested object before mapping.
+    final booksObj = json['books'] as Map<String, dynamic>?;
+    final articlesObj = json['articles'] as Map<String, dynamic>?;
+    final publishersObj = json['publishers'] as Map<String, dynamic>?;
     return SearchResponseModel(
-      books: (data['books'] as List<dynamic>? ?? [])
+      books: (booksObj?['items'] as List<dynamic>? ?? [])
           .map((e) => BookModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-      articles: (data['articles'] as List<dynamic>? ?? [])
+      articles: (articlesObj?['items'] as List<dynamic>? ?? [])
           .map((e) => ArticleModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-      publishers: (data['publishers'] as List<dynamic>? ?? [])
+      publishers: (publishersObj?['items'] as List<dynamic>? ?? [])
           .map((e) => PublisherModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-      totalResults: (data['totalResults'] as num?)?.toInt() ?? 0,
+      totalResults: ((booksObj?['total'] as num?)?.toInt() ?? 0) +
+          ((articlesObj?['total'] as num?)?.toInt() ?? 0) +
+          ((publishersObj?['total'] as num?)?.toInt() ?? 0),
     );
   }
 

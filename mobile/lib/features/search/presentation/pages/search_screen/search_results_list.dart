@@ -5,8 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_shadows.dart';
-import '../../../../../core/widgets/book_cover_widget.dart';
 import '../../../domain/entities/search_result.dart';
+import 'search_book_thumbnail.dart';
 
 class SearchResultsList extends StatelessWidget {
   const SearchResultsList({
@@ -14,10 +14,13 @@ class SearchResultsList extends StatelessWidget {
     required this.results,
     required this.locale,
     required this.onBookTap,
+    required this.onPublisherTap,
   });
   final List<SearchResult> results;
   final String locale;
   final ValueChanged<dynamic> onBookTap;
+  // $mobile-debug-skill | Problem: publisher results had no GestureDetector — taps were silently dropped. Fix: onPublisherTap callback added; wrapped publisher Container in GestureDetector.
+  final ValueChanged<dynamic> onPublisherTap;
 
   @override
   Widget build(BuildContext context) {
@@ -47,11 +50,9 @@ class SearchResultsList extends StatelessWidget {
                         aspectRatio: 3 / 4,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(6.r),
-                          child: BookCoverWidget(
+                          child: SearchBookThumbnail(
                             coverColors: book.coverColors,
-                            titleAr: book.titleAr,
-                            titleEn: book.titleEn,
-                            publisher: book.publisher,
+                            imageUrl: book.imageUrl,
                           ),
                         ),
                       ),
@@ -103,7 +104,9 @@ class SearchResultsList extends StatelessWidget {
                 ),
               ),
             ),
-          PublisherSearchResult(:final publisher) => Container(
+          PublisherSearchResult(:final publisher) => GestureDetector(
+              onTap: () => onPublisherTap(publisher),
+              child: Container(
               padding: EdgeInsetsDirectional.all(11.r),
               decoration: BoxDecoration(
                 color: AppColors.surface,
@@ -178,6 +181,7 @@ class SearchResultsList extends StatelessWidget {
                 ],
               ),
             ),
+          ),
         };
       },
     );

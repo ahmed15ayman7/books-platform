@@ -62,7 +62,9 @@ class BookCoverWidget extends StatelessWidget {
               ),
             ),
 
-            Padding(
+            // $fullstack-debug-skill | Problem: Padding+Column with Spacer() was a non-positioned Stack child — Stack could not bound its height, so Spacer caused RenderFlex overflow. Fix: Positioned.fill gives Column a tight height constraint so Spacer divides space correctly.
+            Positioned.fill(
+              child: Padding(
               padding: EdgeInsetsDirectional.fromSTEB(
                 14.w, 12.h, 14.w, 12.h,
               ),
@@ -115,6 +117,7 @@ class BookCoverWidget extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
             ),
 
             // Actual cover photo — overlays gradient when loaded; gradient acts as placeholder/fallback

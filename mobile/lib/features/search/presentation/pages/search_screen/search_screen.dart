@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/router/args/book_detail_args.dart';
+import '../../../../../core/router/args/publisher_detail_args.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/app_loading_indicator.dart';
 import '../../../../../core/widgets/error_state_widget.dart';
@@ -24,11 +25,29 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final _controller = TextEditingController();
+  // $mobile-debug-skill | Problem: border was always AppColors.primary (red) regardless of focus, making unfocused state look like an error. Fix: FocusNode drives border colour — divider when idle, primary when focused.
+  final _focusNode = FocusNode();
+  bool _isFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      setState(() => _isFocused = _focusNode.hasFocus);
+    });
+  }
 
   @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
+  }
+
+  void _fillField(BuildContext ctx, String text) {
+    _controller.text = text;
+    _controller.selection = TextSelection.collapsed(offset: text.length);
+    ctx.read<SearchCubit>().onQueryChanged(text);
   }
 
   @override
@@ -50,12 +69,22 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               child: Row(
                 children: [
+                  // $mobile-debug-skill | Problem: back button was a bare unstyled Icon with tiny tap area. Fix: wrapped in a styled circular container matching AppBarWidget._BackButton pattern.
                   GestureDetector(
                     onTap: () => Navigator.of(context).pop(),
-                    child: Icon(
-                      Icons.arrow_back_rounded,
-                      size: 22.r,
-                      color: AppColors.textPrimary,
+                    child: Container(
+                      width: 38.r,
+                      height: 38.r,
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        border: Border.all(color: AppColors.divider),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Icon(
+                        Icons.arrow_back_rounded,
+                        size: 20.r,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                   ),
                   SizedBox(width: 10.w),
@@ -65,7 +94,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       decoration: BoxDecoration(
                         color: AppColors.inputFill,
                         borderRadius: BorderRadius.circular(999),
-                        border: Border.all(color: AppColors.primary, width: 1.5),
+                        border: Border.all(
+                          color: _isFocused
+                              ? AppColors.primary
+                              : AppColors.divider,
+                          width: _isFocused ? 1.5 : 1.0,
+                        ),
                       ),
                       padding:
                           EdgeInsetsDirectional.symmetric(horizontal: 16.w),
@@ -74,12 +108,15 @@ class _SearchScreenState extends State<SearchScreen> {
                           Icon(
                             Icons.search_rounded,
                             size: 18.r,
-                            color: AppColors.textSecondary,
+                            color: _isFocused
+                                ? AppColors.primary
+                                : AppColors.textHint,
                           ),
                           SizedBox(width: 9.w),
                           Expanded(
                             child: TextField(
                               controller: _controller,
+                              focusNode: _focusNode,
                               autofocus: true,
                               style: GoogleFonts.cairo(
                                 fontSize: 14.sp,
@@ -133,7 +170,11 @@ class _SearchScreenState extends State<SearchScreen> {
                     child: switch (state) {
                       SearchInitial() => KeyedSubtree(
                           key: const ValueKey('initial'),
-                          child: SearchRecentChips(locale: locale),
+                          // $mobile-debug-skill | Problem: recent chips had no tap handler — tapping did nothing. Fix: onChipTap fills the controller and triggers the cubit.
+                          child: SearchRecentChips(
+                            locale: locale,
+                            onChipTap: (s) => _fillField(ctx, s),
+                          ),
                         ),
                       SearchLoading() => const Center(
                           key: ValueKey('loading'),
@@ -149,6 +190,12 @@ class _SearchScreenState extends State<SearchScreen> {
                               arguments:
                                   BookDetailArgs(slug: b.slug, titleAr: b.titleAr),
                             ),
+                            // $mobile-debug-skill | Problem: publisher results had no tap handler — tapping was silently ignored. Fix: onPublisherTap navigates to publisher detail using slug and name.
+                            onPublisherTap: (p) => Navigator.of(ctx).pushNamed(
+                              AppRoutes.publisherDetail,
+                              arguments:
+                                  PublisherDetailArgs(slug: p.id, name: p.name),
+                            ),
                           ),
                         ),
                       SearchEmpty(:final query) => KeyedSubtree(
@@ -156,10 +203,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           child: SearchNoResults(
                             query: query,
                             locale: locale,
-                            onSuggestion: (s) {
-                              _controller.text = s;
-                              ctx.read<SearchCubit>().onQueryChanged(s);
-                            },
+                            onSuggestion: (s) => _fillField(ctx, s),
                           ),
                         ),
                       SearchError(:final message) => Center(
