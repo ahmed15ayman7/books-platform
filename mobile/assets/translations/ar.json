@@ -211,6 +211,7 @@
   "comments_leave_comment": "اترك تعليقاً",
   "comments_author_name": "الاسم المعروض",
   "comments_email": "البريد الإلكتروني",
+  "comments_email_optional": "البريد الإلكتروني (اختياري)",
   "comments_content": "تعليقك",
   "comments_submit": "نشر التعليق",
   "comments_name_error": "يجب أن يكون الاسم أكثر من حرفين",

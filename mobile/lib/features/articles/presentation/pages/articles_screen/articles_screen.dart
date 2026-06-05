@@ -21,10 +21,27 @@ class ArticlesScreen extends StatefulWidget {
 }
 
 class _ArticlesScreenState extends State<ArticlesScreen> {
+  late final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     context.read<ArticlesListCubit>().load();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final position = _scrollController.position;
+    if (position.pixels >= position.maxScrollExtent - 300) {
+      context.read<ArticlesListCubit>().loadMore();
+    }
   }
 
   @override
@@ -61,13 +78,16 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                       :final categories,
                       :final articles,
                       :final activeSlug,
+                      :final hasNextPage,
                     ) =>
                       ArticlesBody(
                         key: const ValueKey('success'),
                         categories: categories,
                         articles: articles,
                         activeSlug: activeSlug,
+                        hasNextPage: hasNextPage,
                         locale: locale,
+                        scrollController: _scrollController,
                         onCategoryTap: (slug) =>
                             ctx.read<ArticlesListCubit>().switchCategory(slug),
                         onArticleTap: (a) => Navigator.of(ctx).pushNamed(

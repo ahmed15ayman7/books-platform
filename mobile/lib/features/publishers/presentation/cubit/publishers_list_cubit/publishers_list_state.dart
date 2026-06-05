@@ -21,12 +21,14 @@ final class PublishersListSuccess extends PublishersListState {
     required this.publishers,
     required this.countries,
     this.activeCountry,
+    this.activeSearch = '',
   });
   final List<Publisher> publishers;
   final List<String> countries;
   final String? activeCountry;
+  final String activeSearch;
   @override
-  List<Object?> get props => [publishers, countries, activeCountry];
+  List<Object?> get props => [publishers, countries, activeCountry, activeSearch];
 }
 
 final class PublishersListError extends PublishersListState {

@@ -21,10 +21,19 @@ class PublishersScreen extends StatefulWidget {
 }
 
 class _PublishersScreenState extends State<PublishersScreen> {
+  late final TextEditingController _searchController;
+
   @override
   void initState() {
     super.initState();
+    _searchController = TextEditingController();
     context.read<PublishersListCubit>().load();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -69,6 +78,9 @@ class _PublishersScreenState extends State<PublishersScreen> {
                         countries: countries,
                         activeCountry: activeCountry,
                         locale: locale,
+                        searchController: _searchController,
+                        onSearch: (q) =>
+                            ctx.read<PublishersListCubit>().search(q),
                         onCountryTap: (c) =>
                             ctx.read<PublishersListCubit>().filterByCountry(
                                   c == activeCountry ? null : c,

@@ -20,22 +20,68 @@ class ArticleDetailCommentSection extends StatelessWidget {
 
   final String articleId;
 
+  void _showCommentSheet(BuildContext context) {
+    final cubit = context.read<CommentsCubit>();
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: AppColors.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (sheetCtx) => BlocProvider.value(
+        value: cubit,
+        child: _CommentSheet(articleId: articleId),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'article_detail.comments'.tr(),
-          style: GoogleFonts.cairo(
-            fontSize: 17.sp,
-            fontWeight: FontWeight.w800,
-            color: AppColors.textPrimary,
-          ),
+        Row(
+          children: [
+            Text(
+              'article_detail.comments'.tr(),
+              style: GoogleFonts.cairo(
+                fontSize: 17.sp,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const Spacer(),
+            GestureDetector(
+              onTap: () => _showCommentSheet(context),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add_comment_rounded,
+                        color: Colors.white, size: 16.r),
+                    SizedBox(width: 6.w),
+                    Text(
+                      'comments_leave_comment'.tr(),
+                      style: GoogleFonts.cairo(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
-        SizedBox(height: 14.h),
-        CommentForm(articleId: articleId),
-        SizedBox(height: 20.h),
+        SizedBox(height: 16.h),
         BlocBuilder<CommentsCubit, CommentsState>(
           builder: (context, state) => switch (state) {
             CommentsLoading() => const Center(child: AppLoadingIndicator()),
@@ -64,6 +110,45 @@ class ArticleDetailCommentSection extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+}
+
+class _CommentSheet extends StatelessWidget {
+  const _CommentSheet({required this.articleId});
+
+  final String articleId;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: SingleChildScrollView(
+        padding: EdgeInsetsDirectional.fromSTEB(20.w, 0, 20.w, 24.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(height: 12.h),
+            Center(
+              child: Container(
+                width: 36.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: AppColors.divider,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ),
+            SizedBox(height: 20.h),
+            CommentForm(
+              articleId: articleId,
+              onSubmitted: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -14,6 +14,8 @@ class PublishersRemoteDataSourceImpl {
   final ApiManager _api;
 
   List<String>? _cachedCountries;
+  // $mobile-debug-skill | Problem: filter chips display Arabic names but the API expects English names — sending Arabic returns total:0. Fix: cache the AR→EN mapping and translate before the API call.
+  final Map<String, String> _arToEnCountry = {};
 
   Future<Either<Failure, PaginatedResponse<Publisher>>> getPublishers({
     String? country,
@@ -52,6 +54,12 @@ class PublishersRemoteDataSourceImpl {
     return result.fold(
       (f) => left(f),
       (paginated) {
+        _arToEnCountry.clear();
+        for (final p in paginated.data) {
+          if (p.countryAr.isNotEmpty && p.countrySlug.isNotEmpty) {
+            _arToEnCountry[p.countryAr] = p.countrySlug;
+          }
+        }
         final countries = paginated.data
             .expand((p) => [p.countryAr].where((c) => c.isNotEmpty))
             .toSet()
@@ -66,8 +74,16 @@ class PublishersRemoteDataSourceImpl {
   // Kept for backward compatibility with mock-data callers (e.g. the home cubit)
   Future<Either<Failure, List<Publisher>>> getPublishersLegacy({
     String? countryName,
+    String? search,
   }) async {
-    final result = await getPublishers(country: countryName, limit: 20);
+    final englishCountry = countryName != null
+        ? (_arToEnCountry[countryName] ?? countryName)
+        : null;
+    final result = await getPublishers(
+      country: englishCountry,
+      search: search,
+      limit: 20,
+    );
     return result.fold(
       (f) => left(f),
       (paginated) => right(paginated.data),

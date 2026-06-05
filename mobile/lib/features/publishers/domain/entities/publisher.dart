@@ -8,6 +8,7 @@ class Publisher extends Equatable {
     required this.countryEn,
     required this.countryFlag,
     required this.bookCount,
+    this.countrySlug = '',
     this.isSponsored = false,
     this.website,
     this.aboutAr,
@@ -17,6 +18,7 @@ class Publisher extends Equatable {
   final String name;
   final String countryAr;
   final String countryEn;
+  final String countrySlug;
   final String countryFlag;
   final int bookCount;
   final bool isSponsored;

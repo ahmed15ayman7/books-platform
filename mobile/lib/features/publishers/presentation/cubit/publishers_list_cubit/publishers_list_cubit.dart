@@ -11,10 +11,13 @@ class PublishersListCubit extends Cubit<PublishersListState> {
 
   final PublishersRepository _repo;
   String? _activeCountry;
+  String _activeSearch = '';
 
   Future<void> refresh() => load();
 
   Future<void> load() async {
+    _activeCountry = null;
+    _activeSearch = '';
     emit(const PublishersListLoading());
 
     final countriesResult = await _repo.getCountries();
@@ -39,6 +42,7 @@ class PublishersListCubit extends Cubit<PublishersListState> {
 
   Future<void> filterByCountry(String? country) async {
     _activeCountry = country;
+    _activeSearch = '';
     final current = state;
     if (current is! PublishersListSuccess) return;
     final result = await _repo.getPublishers(countryName: country);
@@ -48,6 +52,24 @@ class PublishersListCubit extends Cubit<PublishersListState> {
         publishers: pubs,
         countries: current.countries,
         activeCountry: _activeCountry,
+      )),
+    );
+  }
+
+  Future<void> search(String query) async {
+    _activeSearch = query.trim();
+    _activeCountry = null;
+    final current = state;
+    if (current is! PublishersListSuccess) return;
+    final result = await _repo.getPublishers(
+      search: _activeSearch.isEmpty ? null : _activeSearch,
+    );
+    result.fold(
+      (f) => emit(PublishersListError(core.failureToMessage(f))),
+      (pubs) => emit(PublishersListSuccess(
+        publishers: pubs,
+        countries: current.countries,
+        activeSearch: _activeSearch,
       )),
     );
   }

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/widgets/app_loading_indicator.dart';
 import '../../../../../core/widgets/empty_state_widget.dart';
 import '../../../domain/entities/article.dart';
 import '../../../domain/entities/article_category.dart';
@@ -16,7 +17,9 @@ class ArticlesBody extends StatelessWidget {
     required this.categories,
     required this.articles,
     required this.activeSlug,
+    required this.hasNextPage,
     required this.locale,
+    required this.scrollController,
     required this.onCategoryTap,
     required this.onArticleTap,
     required this.onRefresh,
@@ -24,7 +27,9 @@ class ArticlesBody extends StatelessWidget {
   final List<ArticleCategory> categories;
   final List<Article> articles;
   final String activeSlug;
+  final bool hasNextPage;
   final String locale;
+  final ScrollController scrollController;
   final ValueChanged<String> onCategoryTap;
   final ValueChanged<Article> onArticleTap;
   final Future<void> Function() onRefresh;
@@ -36,6 +41,7 @@ class ArticlesBody extends StatelessWidget {
       onRefresh: onRefresh,
       color: AppColors.primary,
       child: CustomScrollView(
+        controller: scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           SliverToBoxAdapter(
@@ -154,6 +160,13 @@ class ArticlesBody extends StatelessWidget {
               ),
             ),
           ],
+          if (hasNextPage)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.h),
+                child: const Center(child: AppLoadingIndicator()),
+              ),
+            ),
           SliverToBoxAdapter(child: SizedBox(height: 24.h)),
         ],
       ),

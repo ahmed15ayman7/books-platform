@@ -211,6 +211,7 @@
   "comments_leave_comment": "Leave a Comment",
   "comments_author_name": "Display Name",
   "comments_email": "Email Address",
+  "comments_email_optional": "Email Address (optional)",
   "comments_content": "Your Comment",
   "comments_submit": "Post Comment",
   "comments_name_error": "Name must be at least 2 characters",

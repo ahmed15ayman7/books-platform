@@ -13,10 +13,11 @@ import '../cubit/comments_cubit.dart';
 import '../cubit/comments_state.dart';
 
 class CommentForm extends StatefulWidget {
-  const CommentForm({super.key, this.productId, this.articleId});
+  const CommentForm({super.key, this.productId, this.articleId, this.onSubmitted});
 
   final String? productId;
   final String? articleId;
+  final VoidCallback? onSubmitted;
 
   @override
   State<CommentForm> createState() => _CommentFormState();
@@ -59,6 +60,7 @@ class _CommentFormState extends State<CommentForm> {
           _commentCtrl.clear();
           setState(() => _attempted = false);
           getIt<SnackBarHelper>().showSuccess('comments_submitted'.tr());
+          widget.onSubmitted?.call();
         }
       },
       builder: (context, state) {
@@ -91,10 +93,11 @@ class _CommentFormState extends State<CommentForm> {
               SizedBox(height: 10.h),
               AppTextField(
                 controller: _emailCtrl,
-                label: 'comments_email'.tr(),
+                label: 'comments_email_optional'.tr(),
                 keyboardType: TextInputType.emailAddress,
                 validator: (v) {
-                  if (v == null || !RegexHelper.validate(RegexHelper.email, v.trim())) {
+                  final trimmed = v?.trim() ?? '';
+                  if (trimmed.isNotEmpty && !RegexHelper.validate(RegexHelper.email, trimmed)) {
                     return 'comments_email_error'.tr();
                   }
                   return null;

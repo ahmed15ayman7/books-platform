@@ -124,13 +124,16 @@ class _PublishScreenState extends State<PublishScreen> {
         }
 
         final currentStep = state is PublishStep ? state.step : 0;
-        final formData =
-            state is PublishStep ? state.formData : <String, dynamic>{};
-        final isLoading = state is PublishSubmitting ||
+        final formData = state is PublishStep
+            ? state.formData
+            : <String, dynamic>{};
+        final isLoading =
+            state is PublishSubmitting ||
             state is UploadingFile ||
             state is CheckingEligibility;
-        final isEligible =
-            state is EligibilityLoaded ? state.isEligibleForFree : null;
+        final isEligible = state is EligibilityLoaded
+            ? state.isEligibleForFree
+            : null;
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -143,77 +146,84 @@ class _PublishScreenState extends State<PublishScreen> {
               onPrimary: currentStep < _totalSteps - 1
                   ? () => _onNext(ctx, currentStep)
                   : (_agreedToContentStandards && !isLoading)
-                      ? () => ctx.read<PublishCubit>().submit()
-                      : null,
+                  ? () => ctx.read<PublishCubit>().submit()
+                  : null,
               isLoading: isLoading,
             ),
           ),
-          body: SafeArea(bottom: false, child: Column(
-            children: [
-              AppBarWidget(
-                variant: AppBarVariant.title,
-                title: 'publish.title'.tr(),
-                showBack: true,
-                currentLocale: locale,
-                onLocaleChanged: (l) => context.setLocale(Locale(l)),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsetsDirectional.fromSTEB(16.w, 18.h, 16.w, 8.h),
-                  child: Column(
-                    children: [
-                      PublishStepIndicator(
-                        step: currentStep,
-                        labels: stepLabels,
-                      ),
-                      SizedBox(height: 24.h),
-                      if (currentStep == 0)
-                        Form(
-                          key: _authorFormKey,
-                          child: PublishAuthorStep(
-                            nameCtrl: _nameCtrl,
-                            emailCtrl: _emailCtrl,
-                            phoneCtrl: _phoneCtrl,
-                            bioCtrl: _bioCtrl,
-                          ),
+          body: SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                AppBarWidget(
+                  variant: AppBarVariant.title,
+                  title: 'publish.title'.tr(),
+                  showBack: true,
+                  currentLocale: locale,
+                  onLocaleChanged: (l) => context.setLocale(Locale(l)),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsetsDirectional.fromSTEB(
+                      16.w,
+                      18.h,
+                      16.w,
+                      8.h,
+                    ),
+                    child: Column(
+                      children: [
+                        PublishStepIndicator(
+                          step: currentStep,
+                          labels: stepLabels,
                         ),
-                      if (currentStep == 0 && isEligible != null)
-                        _EligibilityBadge(isEligibleForFree: isEligible),
-                      if (currentStep == 1)
-                        Form(
-                          key: _bookFormKey,
-                          child: PublishBookStep(
-                            titleCtrl: _titleCtrl,
-                            summaryCtrl: _summaryCtrl,
-                            categoryCtrl: _categoryCtrl,
-                            onPickFile: () =>
-                                ctx.read<PublishCubit>().pickFile(),
-                            onPickCover: () =>
-                                ctx.read<PublishCubit>().pickCoverImage(),
+                        SizedBox(height: 24.h),
+                        if (currentStep == 0)
+                          Form(
+                            key: _authorFormKey,
+                            child: PublishAuthorStep(
+                              nameCtrl: _nameCtrl,
+                              emailCtrl: _emailCtrl,
+                              phoneCtrl: _phoneCtrl,
+                              bioCtrl: _bioCtrl,
+                            ),
+                          ),
+                        if (currentStep == 0 && isEligible != null)
+                          _EligibilityBadge(isEligibleForFree: isEligible),
+                        if (currentStep == 1)
+                          Form(
+                            key: _bookFormKey,
+                            child: PublishBookStep(
+                              titleCtrl: _titleCtrl,
+                              summaryCtrl: _summaryCtrl,
+                              categoryCtrl: _categoryCtrl,
+                              onPickFile: () =>
+                                  ctx.read<PublishCubit>().pickFile(),
+                              onPickCover: () =>
+                                  ctx.read<PublishCubit>().pickCoverImage(),
+                              formData: formData,
+                            ),
+                          ),
+                        if (currentStep == 2)
+                          PublishReviewStep(
                             formData: formData,
+                            onAgreedChanged: (v) =>
+                                setState(() => _agreedToContentStandards = v),
                           ),
-                        ),
-                      if (currentStep == 2)
-                        PublishReviewStep(
-                          formData: formData,
-                          onAgreedChanged: (v) =>
-                              setState(() => _agreedToContentStandards = v),
-                        ),
-                      SizedBox(height: 16.h),
-                      const PublishPromoSection(),
-                      SizedBox(height: 18.h),
-                    ],
+                        SizedBox(height: 16.h),
+                        const PublishPromoSection(),
+                        SizedBox(height: 18.h),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              BottomNavWidget(
-                activeTab: null,
-                onTabSelected: (tab) => _onTabSelected(context, tab),
-                onPublishTap: () {},
-                currentLocale: locale,
-              ),
-            ],
-          ),
+                BottomNavWidget(
+                  activeTab: null,
+                  onTabSelected: (tab) => _onTabSelected(context, tab),
+                  onPublishTap: () {},
+                  currentLocale: locale,
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -243,7 +253,10 @@ class _EligibilityBadge extends StatelessWidget {
     return Padding(
       padding: EdgeInsetsDirectional.only(top: 8.h),
       child: Container(
-        padding: EdgeInsetsDirectional.symmetric(horizontal: 12.w, vertical: 8.h),
+        padding: EdgeInsetsDirectional.symmetric(
+          horizontal: 12.w,
+          vertical: 8.h,
+        ),
         decoration: BoxDecoration(
           color: isEligibleForFree
               ? AppColors.success.withValues(alpha: 0.1)
@@ -257,8 +270,7 @@ class _EligibilityBadge extends StatelessWidget {
               isEligibleForFree
                   ? Icons.check_circle_outline
                   : Icons.info_outline,
-              color:
-                  isEligibleForFree ? AppColors.success : AppColors.warning,
+              color: isEligibleForFree ? AppColors.success : AppColors.warning,
               size: 16.sp,
             ),
             SizedBox(width: 6.w),

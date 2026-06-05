@@ -19,6 +19,8 @@ class PublishersBody extends StatelessWidget {
     required this.onCountryTap,
     required this.onPublisherTap,
     required this.onRefresh,
+    required this.onSearch,
+    required this.searchController,
   });
   final List<Publisher> publishers;
   final List<String> countries;
@@ -27,6 +29,8 @@ class PublishersBody extends StatelessWidget {
   final ValueChanged<String> onCountryTap;
   final ValueChanged<Publisher> onPublisherTap;
   final Future<void> Function() onRefresh;
+  final ValueChanged<String> onSearch;
+  final TextEditingController searchController;
 
   @override
   Widget build(BuildContext context) {
@@ -56,11 +60,25 @@ class PublishersBody extends StatelessWidget {
                       color: AppColors.textHint,
                     ),
                     SizedBox(width: 10.w),
-                    Text(
-                      'publishers.search_hint'.tr(),
-                      style: GoogleFonts.tajawal(
-                        fontSize: 14.sp,
-                        color: AppColors.textHint,
+                    Expanded(
+                      child: TextField(
+                        controller: searchController,
+                        onChanged: onSearch,
+                        textInputAction: TextInputAction.search,
+                        style: GoogleFonts.tajawal(
+                          fontSize: 14.sp,
+                          color: AppColors.textPrimary,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'publishers.search_hint'.tr(),
+                          hintStyle: GoogleFonts.tajawal(
+                            fontSize: 14.sp,
+                            color: AppColors.textHint,
+                          ),
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                        ),
                       ),
                     ),
                   ],
