@@ -38,7 +38,7 @@ const servicesPreview: { key: string; title: BilingualString; desc: BilingualStr
   {
     key: "av",
     title: { ar: "مرئي", en: "Video" },
-    desc: { ar: "شاهد كتابك على YouTube", en: "Watch Your Book on YouTube" },
+    desc: { ar: "فيديوهات على YouTube", en: "Videos on YouTube" },
   },
   {
     key: "journal",

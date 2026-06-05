@@ -55,7 +55,6 @@ const ARTICLE_CHANNELS = [
   { key: "ideas",           ar: "زبدة الأفكار",  en: "Essence of Ideas", path: "articles/ideas" },
   { key: "harvest",         ar: "حصاد الكتب",     en: "Book Harvest",     path: "articles/harvest" },
   { key: "world-reads",     ar: "العالم يقرأ",    en: "World Reads",      path: "articles/world-reads" },
-  { key: "watch-your-book", ar: "شاهد كتابك",     en: "Watch Your Book",  path: "media/watch-your-book" },
   { key: "books-talk",      ar: "حديث الكتب",     en: "Books Talk",       path: "media/books-talk" },
   { key: "novel-story",     ar: "رواية فحكاية",   en: "Novel & Story",    path: "media/novel-story" },
 ] as const;
@@ -148,7 +147,7 @@ export default async function HomePage() {
 
   // After dark publishers section backgrounds reset to 0
   const postDarkBgs = buildBgList(
-    4 + ARTICLE_CHANNELS.length, // publishers grid + translated + nominated + article categories + 6 channels
+    4 + ARTICLE_CHANNELS.length, // publishers grid + translated + nominated + article categories + media/reading channels
   );
 
   let preIdx  = 0;

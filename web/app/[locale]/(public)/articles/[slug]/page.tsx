@@ -46,7 +46,6 @@ const channelNames: Record<string, { ar: string; en: string; path: string }> = {
   ideas: { ar: "زبدة الأفكار", en: "Essence of Ideas", path: "ideas" },
   "world-reads": { ar: "العالم يقرأ", en: "World Reads", path: "world-reads" },
   "books-talk": { ar: "حديث الكتب", en: "Book Talk", path: "books-talk" },
-  "watch-your-book": { ar: "شاهد كتابك", en: "Watch Your Book", path: "watch-your-book" },
   "novel-story": { ar: "رواية فحكاية", en: "Novel & Story", path: "novel-story" },
 };
 

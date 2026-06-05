@@ -35,7 +35,6 @@ const channelLabels: Record<string, { ar: string; en: string }> = {
   ideas: { ar: "زبدة الأفكار", en: "Essence of Ideas" },
   "world-reads": { ar: "العالم يقرأ", en: "World Reads" },
   "books-talk": { ar: "حديث الكتب", en: "Book Talk" },
-  "watch-your-book": { ar: "شاهد كتابك", en: "Watch Your Book" },
   "novel-story": { ar: "رواية فحكاية", en: "Novel & Story" },
 };
 

@@ -55,7 +55,6 @@ const channelOptions = [
   { value: "harvest", label: "حصاد الكتب" },
   { value: "ideas", label: "زبدة الأفكار" },
   { value: "world-reads", label: "العالم يقرأ" },
-  { value: "watch-your-book", label: "شاهد كتابك" },
   { value: "books-talk", label: "حديث الكتب" },
   { value: "novel-story", label: "رواية فحكاية" },
 ];

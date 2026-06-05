@@ -1,8 +1,7 @@
-export const MEDIA_CHANNELS = [
-  "watch-your-book",
-  "books-talk",
-  "novel-story",
-] as const;
+export const MEDIA_CHANNELS = ["books-talk", "novel-story"] as const;
+
+/** @deprecated Legacy channel — redirects to /media */
+export const LEGACY_MEDIA_CHANNEL = "watch-your-book";
 
 export type MediaChannel = (typeof MEDIA_CHANNELS)[number];
 

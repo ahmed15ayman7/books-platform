@@ -5,7 +5,7 @@ interface Props {
 }
 
 /** Legacy channel removed — send users to the media hub. */
-export default async function LegacyWatchYourBookArticlePage({ params }: Props) {
+export default async function LegacyWatchYourBookMediaPage({ params }: Props) {
   const { locale } = await params;
   redirect(`/${locale}/media`);
 }

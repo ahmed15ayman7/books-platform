@@ -44,12 +44,11 @@ interface MediaItem {
 }
 
 const mediaChannelLabel: Record<string, string> = {
-  "watch-your-book": "شاهد كتابك",
   "books-talk": "حديث الكتب",
   "novel-story": "رواية فحكاية",
 };
 
-const MEDIA_CHANNELS = ["watch-your-book", "books-talk", "novel-story"];
+const MEDIA_CHANNELS = ["books-talk", "novel-story"];
 
 export default function AdminMediaPage() {
   const params = useParams<{ locale?: string }>();

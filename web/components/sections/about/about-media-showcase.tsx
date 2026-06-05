@@ -38,10 +38,10 @@ export function AboutMediaShowcase({
         <FadeIn>
           <div className="rounded-xl border border-dashed border-[var(--brand-gray-300)] bg-white p-8 text-center">
             <p className="text-[var(--brand-gray-600)]">
-              {isAr ? "تابع أحدث الفيديوهات على قناة «شاهد كتابك»." : "Follow the latest videos on Watch Your Book."}
+              {isAr ? "تابع أحدث الفيديوهات على قنوات الميديا." : "Follow the latest videos on our media channels."}
             </p>
             <Button asChild className="mt-4" variant="outline">
-              <Link href={`/${locale}/media/watch-your-book`}>
+              <Link href={`/${locale}/media`}>
                 {isAr ? "تصفّح القناة" : "Browse channel"}
               </Link>
             </Button>

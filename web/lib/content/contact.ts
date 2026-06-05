@@ -57,8 +57,8 @@ const faqItems: FaqItem[] = [
     id: "media",
     question: { ar: "كيف أُعرض كتابي فيديو؟", en: "How can my book be featured in video?" },
     answer: {
-      ar: "عبر قناة «شاهد كتابك» — تواصل مع فريق الميديا.",
-      en: "Through the Watch Your Book channel — contact our media team.",
+      ar: "عبر قنوات الميديا — تواصل مع فريق الميديا.",
+      en: "Through our media channels — contact our media team.",
     },
   },
   {

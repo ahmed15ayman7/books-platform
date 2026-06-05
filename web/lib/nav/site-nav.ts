@@ -25,7 +25,6 @@ export const READING_CHANNELS = [
 ] as const;
 
 export const MEDIA_CHANNELS = [
-  { slug: "watch-your-book", labelAr: "شاهد كتابك", labelEn: "Watch Your Book" },
   { slug: "books-talk", labelAr: "حديث الكتب", labelEn: "Book Talk" },
   { slug: "novel-story", labelAr: "رواية فحكاية", labelEn: "Novel & Story" },
 ] as const;

@@ -33,18 +33,8 @@ export default async function MediaChannelRoutePage({ params, searchParams }: Pr
   if (!isMediaChannel(channel)) notFound();
 
   const navMeta = NAV_MEDIA_CHANNELS.find((c) => c.slug === channel);
-  const titleKey =
-    channel === "watch-your-book"
-      ? "watchYourBook"
-      : channel === "books-talk"
-        ? "booksTalk"
-        : "novelStory";
-  const subtitleKey =
-    channel === "watch-your-book"
-      ? "watchSubtitle"
-      : channel === "books-talk"
-        ? "booksTalkSubtitle"
-        : "novelSubtitle";
+  const titleKey = channel === "books-talk" ? "booksTalk" : "novelStory";
+  const subtitleKey = channel === "books-talk" ? "booksTalkSubtitle" : "novelSubtitle";
 
   const { articles, pagination } = await ArticleService.list({
     channel,
@@ -60,12 +50,12 @@ export default async function MediaChannelRoutePage({ params, searchParams }: Pr
   const title =
     locale === "ar" && navMeta
       ? navMeta.labelAr
-      : navMeta?.labelEn ?? t(titleKey as "watchYourBook");
+      : navMeta?.labelEn ?? t(titleKey as "booksTalk");
 
   return (
     <MediaChannelPage
       title={title}
-      subtitle={t(subtitleKey as "watchSubtitle")}
+      subtitle={t(subtitleKey as "booksTalkSubtitle")}
       items={articles}
       pagination={pagination}
       locale={locale}

@@ -38,8 +38,8 @@ test.describe("Navigation — desktop", () => {
       await page.goto("/ar");
       const banner = page.getByRole("banner");
       await banner.getByRole("link", { name: "إبداعات الميديا" }).first().hover();
-      await page.getByRole("menuitem", { name: "شاهد كتابك" }).click();
-      await expect(page).toHaveURL(/\/ar\/media\/watch-your-book/);
+      await page.getByRole("menuitem", { name: "حديث الكتب" }).click();
+      await expect(page).toHaveURL(/\/ar\/media\/books-talk/);
     } finally {
       guard.assertClean();
       guard.dispose();

@@ -68,7 +68,7 @@ async function main() {
     const existingMedia = await prisma.article.findFirst({
       where: {
         slug: `${E2E_FIXTURE_PREFIX}media`,
-        channel: "watch-your-book",
+        channel: "books-talk",
       },
       select: { id: true },
     });
@@ -80,7 +80,7 @@ async function main() {
           originalId: mediaOriginalId,
           title: "E2E Fixture Media Video",
           slug: `${E2E_FIXTURE_PREFIX}media`,
-          channel: "watch-your-book",
+          channel: "books-talk",
           status: "publish",
           excerpt: "Fixture media for E2E tests",
           videoId: "dQw4w9WgXcQ",

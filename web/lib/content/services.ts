@@ -65,8 +65,8 @@ const pillars: ServicePillar[] = [
     key: "av",
     title: { ar: "صوت ومرئي", en: "Audio & Video" },
     body: {
-      ar: "بودكast، فيديو YouTube، وقناة «شاهد كتابك» للكتب والمؤلفين.",
-      en: "Podcasts, YouTube video, and the Watch Your Book channel for books and authors.",
+      ar: "بودكast، فيديو YouTube، وقنوات الميديا للكتب والمؤلفين.",
+      en: "Podcasts, YouTube video, and media channels for books and authors.",
     },
   },
   {

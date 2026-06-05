@@ -51,7 +51,7 @@ test.describe("Admin media CRUD", () => {
         headers,
         data: {
           title,
-          channel: "watch-your-book",
+          channel: "books-talk",
           status: "publish",
           youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
           excerpt: "E2E test media excerpt",
@@ -130,7 +130,7 @@ test.describe("Admin media CRUD", () => {
         .filter({ hasText: "القناة" })
         .getByRole("combobox")
         .click();
-      await page.getByRole("option", { name: "شاهد كتابك" }).click();
+      await page.getByRole("option", { name: "حديث الكتب" }).click();
 
       await page
         .locator(".space-y-1")

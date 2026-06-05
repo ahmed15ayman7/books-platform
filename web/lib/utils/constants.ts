@@ -14,7 +14,6 @@ export const ARTICLE_CHANNELS = {
   IDEAS: "ideas",
   WORLD_READS: "world-reads",
   BOOKS_TALK: "books-talk",
-  WATCH_YOUR_BOOK: "watch-your-book",
   NOVEL_STORY: "novel-story",
 } as const;
 

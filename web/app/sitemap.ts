@@ -15,7 +15,6 @@ const STATIC_PATHS = [
   "/articles/ideas",
   "/articles/world-reads",
   "/media",
-  "/media/watch-your-book",
   "/media/books-talk",
   "/media/novel-story",
   "/publishers",

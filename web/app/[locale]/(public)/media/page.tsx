@@ -14,8 +14,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: locale === "ar" ? "إبداعات الميديا" : "Media Creations",
     description:
       locale === "ar"
-        ? "فيديوهات ومحتوى مرئي من فريق منصة الكتب — شاهد كتابك، حديث الكتب، رواية فحكاية"
-        : "Video content from Books Platform — Watch Your Book, Book Talk, Novel & Story",
+        ? "فيديوهات ومحتوى مرئي — حديث الكتب، رواية فحكاية"
+        : "Video content — Book Talk, Novel & Story",
     keywords: locale === "ar" ? ["فيديو", "ميديا", "كتب"] : ["video", "media", "books"],
   });
 }

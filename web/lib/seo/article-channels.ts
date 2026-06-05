@@ -31,12 +31,6 @@ const CHANNELS: Record<
     descAr: "ما يقرأه العالم الآن من كتب وثقافات",
     descEn: "What the world is reading now",
   },
-  "watch-your-book": {
-    titleAr: "شاهد كتابك",
-    titleEn: "Watch Your Book",
-    descAr: "محتوى مرئي عن الكتب والمؤلفين",
-    descEn: "Video content about books and authors",
-  },
   "novel-story": {
     titleAr: "رواية فحكاية",
     titleEn: "Novel & Story",

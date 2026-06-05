@@ -7,7 +7,6 @@ export const PUBLIC_ROUTES_AR = [
   "/ar/articles/ideas",
   "/ar/articles/world-reads",
   "/ar/media",
-  "/ar/media/watch-your-book",
   "/ar/media/books-talk",
   "/ar/media/novel-story",
   "/ar/publishers",
@@ -30,7 +29,11 @@ export const PUBLIC_ROUTES_EN = [
 export const LEGACY_REDIRECTS = [
   {
     from: "/ar/articles/watch-your-book",
-    to: /\/ar\/media\/watch-your-book/,
+    to: /\/ar\/media\/?$/,
+  },
+  {
+    from: "/ar/media/watch-your-book",
+    to: /\/ar\/media\/?$/,
   },
   {
     from: "/ar/articles/books-talk",

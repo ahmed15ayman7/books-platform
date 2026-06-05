@@ -41,7 +41,7 @@ const empty: MediaForm = {
   excerptEn: "",
   body: "",
   bodyEn: "",
-  channel: "watch-your-book",
+  channel: "books-talk",
   status: "draft",
   imageUrl: "",
   youtubeUrl: "",
@@ -49,7 +49,6 @@ const empty: MediaForm = {
 };
 
 const channelOptions = [
-  { value: "watch-your-book", label: "شاهد كتابك" },
   { value: "books-talk", label: "حديث الكتب" },
   { value: "novel-story", label: "رواية فحكاية" },
 ];
@@ -98,7 +97,7 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
           excerptEn: String(d.excerptEn ?? ""),
           body: String(d.body ?? d.content ?? ""),
           bodyEn: String(d.bodyEn ?? ""),
-          channel: String(d.channel ?? "watch-your-book"),
+          channel: String(d.channel ?? "books-talk"),
           status: String(d.status ?? "draft"),
           imageUrl: String(d.imageUrl ?? ""),
           youtubeUrl: String(d.youtubeUrl ?? ""),
