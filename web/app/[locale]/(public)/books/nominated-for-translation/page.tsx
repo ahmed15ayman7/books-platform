@@ -4,7 +4,7 @@ import Link from "next/link";
 import { BookService } from "@/server/services/book.service";
 import { CatalogCollageHero } from "@/components/sections/catalog-collage-hero";
 import { BookCard } from "@/components/sections/book-card";
-import { BooksFilters } from "@/components/sections/books-filters";
+import { BooksSortBar } from "@/components/sections/books-sort-bar";
 import { BooksPagination } from "@/components/sections/books-pagination";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Globe2 } from "lucide-react";
@@ -37,7 +37,7 @@ export default async function NominatedForTranslationPage({ searchParams }: Prop
   const page = Math.max(1, parseInt(sp.page ?? "1", 10));
   const sort = (sp.sort as "newest" | "oldest" | "title") ?? "newest";
 
-  const [{ books, pagination }, categories, heroResult] = await Promise.all([
+  const [{ books, pagination }, heroResult] = await Promise.all([
     BookService.list({
       page,
       limit: 16,
@@ -48,7 +48,6 @@ export default async function NominatedForTranslationPage({ searchParams }: Prop
       books: [],
       pagination: { page: 1, limit: 16, total: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false },
     })),
-    BookService.getCategories().catch(() => []),
     BookService.list({ page: 1, limit: 12, status: "NOMINATED", sort: "newest" }).catch(() => ({
       books: [],
       pagination: { page: 1, limit: 12, total: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false },
@@ -86,31 +85,23 @@ export default async function NominatedForTranslationPage({ searchParams }: Prop
       </CatalogCollageHero>
 
       <div className="container-platform py-8">
-        <div className="flex flex-col gap-6 lg:flex-row">
-          <aside className="w-full lg:w-64 lg:flex-shrink-0">
-            <BooksFilters
-              categories={categories}
-              locale={locale}
-              currentFilters={{ language: sp.language, sort: sp.sort, status: "NOMINATED" }}
-            />
-          </aside>
-          <main className="flex-1">
-            {books.length === 0 ? (
-              <EmptyState title={locale === "ar" ? "لا توجد كتب حالياً" : "No books found"} />
-            ) : (
-              <>
-                <div className="grid grid-cols-2 items-stretch gap-4 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
-                  {books.map((book) => (
-                    <BookCard key={book.id} {...book} locale={locale} />
-                  ))}
-                </div>
-                <div className="mt-8">
-                  <BooksPagination pagination={pagination} />
-                </div>
-              </>
-            )}
-          </main>
-        </div>
+        <BooksSortBar locale={locale} />
+        <main>
+          {books.length === 0 ? (
+            <EmptyState title={locale === "ar" ? "لا توجد كتب حالياً" : "No books found"} />
+          ) : (
+            <>
+              <div className="grid grid-cols-2 items-stretch gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                {books.map((book) => (
+                  <BookCard key={book.id} {...book} locale={locale} />
+                ))}
+              </div>
+              <div className="mt-8">
+                <BooksPagination pagination={pagination} />
+              </div>
+            </>
+          )}
+        </main>
 
         <div className="mt-12 rounded-xl bg-[var(--brand-red-soft)] p-6 text-center">
           <p className="mb-3 font-bold text-[var(--brand-gray-900)]">

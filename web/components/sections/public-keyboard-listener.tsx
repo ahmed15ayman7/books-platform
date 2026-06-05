@@ -1,26 +1,27 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePublicChrome } from "@/lib/public/public-chrome-context";
+import { useParams, useRouter } from "next/navigation";
 
 function isModKey(e: KeyboardEvent): boolean {
   return e.metaKey || e.ctrlKey;
 }
 
 export function PublicKeyboardListener() {
-  const { openSearch, closeSearch, searchOpen } = usePublicChrome();
+  const router = useRouter();
+  const params = useParams<{ locale?: string }>();
+  const locale = params.locale ?? "ar";
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (!isModKey(e) || e.key.toLowerCase() !== "k") return;
       e.preventDefault();
-      if (searchOpen) closeSearch();
-      else openSearch();
+      router.push(`/${locale}/search`);
     }
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [closeSearch, openSearch, searchOpen]);
+  }, [locale, router]);
 
   return null;
 }

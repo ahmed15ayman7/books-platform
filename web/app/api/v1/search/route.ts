@@ -1,132 +1,65 @@
 import { type NextRequest } from "next/server";
-import { db } from "@/lib/db";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
-import { notDeleted } from "@/lib/admin/audit-fields";
-import { MEDIA_CHANNELS } from "@/lib/media/youtube";
-
-const TAKE = 6;
+import { PAGINATION } from "@/lib/utils/constants";
+import { parseSearchSectionType } from "@/lib/search/search-types";
+import { GlobalSearchService } from "@/server/services/global-search.service";
 
 export async function GET(request: NextRequest) {
-  const q = request.nextUrl.searchParams.get("q")?.trim() ?? "";
+  const sp = request.nextUrl.searchParams;
+  const q = sp.get("q")?.trim() ?? "";
+  const type = parseSearchSectionType(sp.get("type"));
+  const page = Math.max(1, parseInt(sp.get("page") ?? "1", 10));
+  const limit = Math.min(
+    PAGINATION.MAX_PAGE_SIZE,
+    Math.max(1, parseInt(sp.get("limit") ?? String(PAGINATION.DEFAULT_PAGE_SIZE), 10)),
+  );
+
   if (q.length < 2) {
     return apiSuccess({
-      books: [],
-      articles: [],
-      media: [],
-      publishers: [],
-      authors: [],
+      mode: type === "all" ? "preview" : "section",
+      query: q,
+      books: type === "all" ? { items: [], total: 0 } : [],
+      articles: type === "all" ? { items: [], total: 0 } : [],
+      media: type === "all" ? { items: [], total: 0 } : [],
+      publishers: type === "all" ? { items: [], total: 0 } : [],
+      authors: type === "all" ? { items: [], total: 0 } : [],
+      pagination: type === "all" ? undefined : {
+        page: 1,
+        limit,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
     });
   }
 
   try {
-    const [books, articles, media, publishers, authors] = await Promise.all([
-      db.product.findMany({
-        where: {
-          published: true,
-          ...notDeleted,
-          OR: [
-            { nameEn: { contains: q, mode: "insensitive" } },
-            { nameAr: { contains: q, mode: "insensitive" } },
-            { slug: { contains: q, mode: "insensitive" } },
-          ],
-        },
-        take: TAKE,
-        orderBy: { updatedAt: "desc" },
-        select: {
-          id: true,
-          slug: true,
-          nameEn: true,
-          nameAr: true,
-          imageUrl: true,
-        },
-      }),
-      db.article.findMany({
-        where: {
-          status: "publish",
-          ...notDeleted,
-          channel: { notIn: [...MEDIA_CHANNELS] },
-          OR: [
-            { title: { contains: q, mode: "insensitive" } },
-            { titleEn: { contains: q, mode: "insensitive" } },
-            { slug: { contains: q, mode: "insensitive" } },
-          ],
-        },
-        take: TAKE,
-        orderBy: { updatedAt: "desc" },
-        select: {
-          id: true,
-          slug: true,
-          title: true,
-          titleEn: true,
-          channel: true,
-          imageUrl: true,
-        },
-      }),
-      db.article.findMany({
-        where: {
-          status: "publish",
-          ...notDeleted,
-          channel: { in: [...MEDIA_CHANNELS] },
-          OR: [
-            { title: { contains: q, mode: "insensitive" } },
-            { titleEn: { contains: q, mode: "insensitive" } },
-            { slug: { contains: q, mode: "insensitive" } },
-          ],
-        },
-        take: TAKE,
-        orderBy: { updatedAt: "desc" },
-        select: {
-          id: true,
-          slug: true,
-          title: true,
-          titleEn: true,
-          channel: true,
-          imageUrl: true,
-        },
-      }),
-      db.publisher.findMany({
-        where: {
-          status: "publish",
-          ...notDeleted,
-          OR: [
-            { title: { contains: q, mode: "insensitive" } },
-            { name: { contains: q, mode: "insensitive" } },
-            { nameAr: { contains: q, mode: "insensitive" } },
-            { slug: { contains: q, mode: "insensitive" } },
-          ],
-        },
-        take: TAKE,
-        orderBy: { updatedAt: "desc" },
-        select: {
-          id: true,
-          slug: true,
-          title: true,
-          name: true,
-          nameAr: true,
-          imageUrl: true,
-        },
-      }),
-      db.author.findMany({
-        where: {
-          spamFlag: null,
-          OR: [
-            { name: { contains: q, mode: "insensitive" } },
-            { nameAr: { contains: q, mode: "insensitive" } },
-            { slug: { contains: q, mode: "insensitive" } },
-          ],
-        },
-        take: TAKE,
-        orderBy: { updatedAt: "desc" },
-        select: {
-          id: true,
-          slug: true,
-          name: true,
-          nameAr: true,
-        },
-      }),
-    ]);
+    const result = await GlobalSearchService.search({
+      q,
+      type,
+      page,
+      limit,
+      category: sp.get("category") ?? undefined,
+      status: sp.get("status") ?? undefined,
+      sort: (sp.get("sort") as "newest" | "oldest" | "title") ?? "newest",
+      channel: sp.get("channel") ?? undefined,
+      country: sp.get("country") ?? undefined,
+    });
 
-    return apiSuccess({ books, articles, media, publishers, authors });
+    if (!result) {
+      return apiSuccess({
+        mode: type === "all" ? "preview" : "section",
+        query: q,
+        books: type === "all" ? { items: [], total: 0 } : [],
+        articles: type === "all" ? { items: [], total: 0 } : [],
+        media: type === "all" ? { items: [], total: 0 } : [],
+        publishers: type === "all" ? { items: [], total: 0 } : [],
+        authors: type === "all" ? { items: [], total: 0 } : [],
+      });
+    }
+
+    return apiSuccess(result);
   } catch (error) {
     console.error("[GET /api/v1/search]", error);
     return ApiErrors.internal();

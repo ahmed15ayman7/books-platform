@@ -1,24 +1,19 @@
 "use client";
 
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Search } from "lucide-react";
-import { usePublicChromeOptional } from "@/lib/public/public-chrome-context";
 import { modKeyLabel } from "@/lib/search/shortcut-labels";
 
 export function HeaderSearch() {
   const params = useParams<{ locale?: string }>();
   const locale = params.locale ?? "ar";
   const isAr = locale === "ar";
-  const chrome = usePublicChromeOptional();
-
-  function openSearch() {
-    chrome?.openSearch();
-  }
+  const href = `/${locale}/search`;
 
   return (
-    <button
-      type="button"
-      onClick={openSearch}
+    <Link
+      href={href}
       className="group relative w-full max-w-xl transition-all duration-[var(--motion-base)] rounded-2xl shadow-[var(--shadow-soft)] hover:shadow-[0_0_0_3px_rgba(177,30,46,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]/40"
       aria-label={isAr ? "بحث في المنصة" : "Search the platform"}
     >
@@ -47,6 +42,6 @@ export function HeaderSearch() {
           {isAr ? "بحث" : "Search"}
         </span>
       </div>
-    </button>
+    </Link>
   );
 }

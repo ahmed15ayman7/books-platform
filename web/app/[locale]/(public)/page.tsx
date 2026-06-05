@@ -29,7 +29,6 @@ import {
 import { getHomeEditorial } from "@/lib/content/home-editorial";
 import { ABOUT_IMAGES } from "@/lib/content/image-assets";
 import { HomeMissionStrip } from "@/components/sections/home/home-mission-strip";
-import { HomeReaderJourney } from "@/components/sections/home/home-reader-journey";
 import { HomeMediaSpotlight } from "@/components/sections/home/home-media-spotlight";
 import { HomeServicesPreview } from "@/components/sections/home/home-services-preview";
 
