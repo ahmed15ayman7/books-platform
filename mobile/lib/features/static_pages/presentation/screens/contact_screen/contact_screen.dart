@@ -81,6 +81,8 @@ class _ContactScreenState extends State<ContactScreen> {
             variant: AppBarVariant.title,
             title: 'contact_us_title'.tr(),
             showBack: true,
+            currentLocale: lang,
+            onLocaleChanged: (l) => context.setLocale(Locale(l)),
           ),
           Expanded(
             child: SafeArea(

@@ -11,6 +11,7 @@ class TeamScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = context.locale.languageCode;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Column(
@@ -19,12 +20,14 @@ class TeamScreen extends StatelessWidget {
             variant: AppBarVariant.title,
             title: 'team_title'.tr(),
             showBack: true,
+            currentLocale: lang,
+            onLocaleChanged: (l) => context.setLocale(Locale(l)),
           ),
           Expanded(
             child: SafeArea(
               top: false,
               child: SingleChildScrollView(
-                child: TeamBody(lang: context.locale.languageCode),
+                child: TeamBody(lang: lang),
               ),
             ),
           ),

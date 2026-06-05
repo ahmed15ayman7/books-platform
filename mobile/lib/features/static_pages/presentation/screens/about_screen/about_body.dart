@@ -7,10 +7,9 @@ import 'package:booksplatform/features/static_pages/presentation/widgets/belief_
 import 'package:booksplatform/features/static_pages/presentation/widgets/info_page_hero.dart';
 import 'package:booksplatform/features/static_pages/presentation/widgets/section_title.dart';
 
-// ignore_for_file: lines_longer_than_80_chars
+import '../../helpers/bilingual_helper.dart';
 
-typedef _B = ({String ar, String en});
-String _l(_B t, String lang) => lang == 'ar' ? t.ar : t.en;
+// ignore_for_file: lines_longer_than_80_chars
 
 // ── Content ────────────────────────────────────────────────────────────────
 
@@ -159,15 +158,15 @@ class AboutBody extends StatelessWidget {
       children: [
         InfoPageHero(
           icon: Icons.bookmark_rounded,
-          title: _l(_pageTitle, lang),
-          subtitle: _l(_heroSubtitle, lang),
+          title: localizedText(_pageTitle, lang),
+          subtitle: localizedText(_heroSubtitle, lang),
         ),
 
         // ── Introduction ──────────────────────────────────────────────────
         _Section(
           child: Column(
             children: [
-              SectionTitle(title: _l(_introTitle, lang)),
+              SectionTitle(title: localizedText(_introTitle, lang)),
               Container(
                 decoration: cardDecor,
                 padding: EdgeInsets.all(20.r),
@@ -175,7 +174,7 @@ class AboutBody extends StatelessWidget {
                   children: _intro
                       .map((p) => Padding(
                             padding: EdgeInsets.only(bottom: 16.h),
-                            child: Text(_l(p, lang), style: bodyStyle),
+                            child: Text(localizedText(p, lang), style: bodyStyle),
                           ))
                       .toList(),
                 ),
@@ -212,7 +211,7 @@ class AboutBody extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _l(_ideaTitle, lang),
+                        localizedText(_ideaTitle, lang),
                         style: GoogleFonts.cairo(
                           fontSize: 24.sp,
                           fontWeight: FontWeight.w800,
@@ -221,7 +220,7 @@ class AboutBody extends StatelessWidget {
                       ),
                       SizedBox(height: 14.h),
                       Text(
-                        _l(_idea, lang),
+                        localizedText(_idea, lang),
                         style: GoogleFonts.tajawal(
                           fontSize: 15.sp,
                           color: Colors.white.withValues(alpha: 0.8),
@@ -265,7 +264,7 @@ class AboutBody extends StatelessWidget {
                           ),
                           SizedBox(height: 10.h),
                           Text(
-                            _l(p.title, lang),
+                            localizedText(p.title, lang),
                             style: GoogleFonts.cairo(
                               fontSize: 16.5.sp,
                               fontWeight: FontWeight.w800,
@@ -275,7 +274,7 @@ class AboutBody extends StatelessWidget {
                           SizedBox(height: 6.h),
                           Expanded(
                             child: Text(
-                              _l(p.text, lang),
+                              localizedText(p.text, lang),
                               style: GoogleFonts.tajawal(
                                 fontSize: 12.sp,
                                 color: AppColors.textSecondary,
@@ -297,7 +296,7 @@ class AboutBody extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SectionTitle(
-                  title: _l(_distinctTitle, lang),
+                  title: localizedText(_distinctTitle, lang),
                   textAlign: TextAlign.start),
               Column(
                 children: _distinct
@@ -321,7 +320,7 @@ class AboutBody extends StatelessWidget {
                                       horizontal: 10.w),
                                   alignment: Alignment.center,
                                   child: Text(
-                                    _l(d.label, lang),
+                                    localizedText(d.label, lang),
                                     style: GoogleFonts.cairo(
                                       fontSize: 13.sp,
                                       fontWeight: FontWeight.w800,
@@ -332,7 +331,7 @@ class AboutBody extends StatelessWidget {
                                 SizedBox(width: 13.w),
                                 Expanded(
                                   child: Text(
-                                    _l((ar: d.ar, en: d.en), lang),
+                                    localizedText((ar: d.ar, en: d.en), lang),
                                     style: GoogleFonts.tajawal(
                                       fontSize: 14.sp,
                                       color: AppColors.textSecondary,
@@ -356,7 +355,7 @@ class AboutBody extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SectionTitle(
-                  title: _l(_effortsTitle, lang),
+                  title: localizedText(_effortsTitle, lang),
                   textAlign: TextAlign.start),
               Container(
                 decoration: cardDecor,
@@ -400,7 +399,7 @@ class AboutBody extends StatelessWidget {
                           SizedBox(width: 14.w),
                           Expanded(
                             child: Text(
-                              _l(e, lang),
+                              localizedText(e, lang),
                               style: GoogleFonts.tajawal(
                                 fontSize: 14.sp,
                                 color: AppColors.textSecondary,
@@ -418,7 +417,7 @@ class AboutBody extends StatelessWidget {
           ),
         ),
 
-        BeliefBand(text: _l(_belief, lang)),
+        BeliefBand(text: localizedText(_belief, lang)),
         SizedBox(height: 4.h),
       ],
     );

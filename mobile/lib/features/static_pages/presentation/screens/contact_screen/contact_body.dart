@@ -6,10 +6,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:booksplatform/core/theme/app_colors.dart';
 import 'package:booksplatform/features/static_pages/presentation/widgets/info_page_hero.dart';
 
-// ignore_for_file: lines_longer_than_80_chars
+import '../../helpers/bilingual_helper.dart';
 
-typedef _B = ({String ar, String en});
-String _l(_B t, String lang) => lang == 'ar' ? t.ar : t.en;
+// ignore_for_file: lines_longer_than_80_chars
 
 // ── Content ────────────────────────────────────────────────────────────────
 
@@ -82,7 +81,7 @@ class ContactBody extends StatelessWidget {
       children: [
         InfoPageHero(
           icon: Icons.mail_outline_rounded,
-          subtitle: _l(_heroSubtitle, lang),
+          subtitle: localizedText(_heroSubtitle, lang),
         ),
 
         // ── Contact details card ──────────────────────────────────────────
@@ -112,7 +111,7 @@ class ContactBody extends StatelessWidget {
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  _l(_hours, lang),
+                  localizedText(_hours, lang),
                   style: GoogleFonts.tajawal(
                     fontSize: 12.5.sp,
                     color: Colors.white.withValues(alpha: 0.6),
@@ -163,7 +162,7 @@ class ContactBody extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                _l(_followLabel, lang),
+                localizedText(_followLabel, lang),
                 style: GoogleFonts.cairo(
                   fontSize: 13.sp,
                   fontWeight: FontWeight.w700,
@@ -250,7 +249,7 @@ class _SuccessState extends StatelessWidget {
         ),
         SizedBox(height: 14.h),
         Text(
-          _l(_successMsg, lang),
+          localizedText(_successMsg, lang),
           textAlign: TextAlign.center,
           style: GoogleFonts.cairo(
             fontSize: 15.sp,
@@ -269,7 +268,7 @@ class _SuccessState extends StatelessWidget {
                 EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
           ),
           child: Text(
-            _l(_sendAnotherLabel, lang),
+            localizedText(_sendAnotherLabel, lang),
             style: GoogleFonts.cairo(
               fontSize: 14.sp,
               fontWeight: FontWeight.w700,
@@ -311,7 +310,7 @@ class _Form extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          _l(_formTitle, lang),
+          localizedText(_formTitle, lang),
           style: GoogleFonts.cairo(
             fontSize: 19.sp,
             fontWeight: FontWeight.w800,
@@ -320,12 +319,12 @@ class _Form extends StatelessWidget {
         ),
         SizedBox(height: 18.h),
         _Field(
-            label: _l(_fieldName, lang),
+            label: localizedText(_fieldName, lang),
             ctrl: nameCtrl,
             error: errors['name']),
         SizedBox(height: 15.h),
         _Field(
-          label: _l(_fieldEmail, lang),
+          label: localizedText(_fieldEmail, lang),
           ctrl: emailCtrl,
           error: errors['email'],
           keyboardType: TextInputType.emailAddress,
@@ -333,14 +332,14 @@ class _Form extends StatelessWidget {
         ),
         SizedBox(height: 15.h),
         _Field(
-          label: _l(_fieldPhone, lang),
+          label: localizedText(_fieldPhone, lang),
           ctrl: phoneCtrl,
           keyboardType: TextInputType.phone,
           textDirection: TextDirection.ltr,
         ),
         SizedBox(height: 15.h),
         _Field(
-          label: _l(_fieldMessage, lang),
+          label: localizedText(_fieldMessage, lang),
           ctrl: messageCtrl,
           error: errors['message'],
           maxLines: 4,
@@ -371,7 +370,7 @@ class _Form extends StatelessWidget {
                         ),
                       ),
                       SizedBox(width: 10.w),
-                      Text(_l(_sendingLabel, lang),
+                      Text(localizedText(_sendingLabel, lang),
                           style: GoogleFonts.cairo(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w700,
@@ -383,7 +382,7 @@ class _Form extends StatelessWidget {
                     children: [
                       Icon(Icons.send_rounded, size: 18.r),
                       SizedBox(width: 8.w),
-                      Text(_l(_sendLabel, lang),
+                      Text(localizedText(_sendLabel, lang),
                           style: GoogleFonts.cairo(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w700,

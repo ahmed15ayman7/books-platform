@@ -7,10 +7,9 @@ import 'package:booksplatform/features/static_pages/presentation/widgets/belief_
 import 'package:booksplatform/features/static_pages/presentation/widgets/info_page_hero.dart';
 import 'package:booksplatform/features/static_pages/presentation/widgets/section_title.dart';
 
-// ignore_for_file: lines_longer_than_80_chars
+import '../../helpers/bilingual_helper.dart';
 
-typedef _B = ({String ar, String en});
-String _l(_B t, String lang) => lang == 'ar' ? t.ar : t.en;
+// ignore_for_file: lines_longer_than_80_chars
 
 // ── Content ────────────────────────────────────────────────────────────────
 
@@ -143,8 +142,8 @@ class TeamBody extends StatelessWidget {
       children: [
         InfoPageHero(
           icon: Icons.people_outline_rounded,
-          title: _l(_pageTitle, lang),
-          subtitle: _l(_heroSubtitle, lang),
+          title: localizedText(_pageTitle, lang),
+          subtitle: localizedText(_heroSubtitle, lang),
         ),
 
         // ── Intro ─────────────────────────────────────────────────────────
@@ -152,9 +151,9 @@ class TeamBody extends StatelessWidget {
           padding: EdgeInsetsDirectional.fromSTEB(16.w, 26.h, 16.w, 0),
           child: Column(
             children: [
-              SectionTitle(title: _l(_introTitle, lang)),
+              SectionTitle(title: localizedText(_introTitle, lang)),
               Text(
-                _l(_intro, lang),
+                localizedText(_intro, lang),
                 textAlign: TextAlign.center,
                 style: GoogleFonts.tajawal(
                   fontSize: 15.sp,
@@ -229,7 +228,7 @@ class TeamBody extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _l(m.name, lang),
+                              localizedText(m.name, lang),
                               style: GoogleFonts.cairo(
                                 fontSize: 17.sp,
                                 fontWeight: FontWeight.w800,
@@ -238,7 +237,7 @@ class TeamBody extends StatelessWidget {
                             ),
                             SizedBox(height: 2.h),
                             Text(
-                              _l(m.role, lang),
+                              localizedText(m.role, lang),
                               style: GoogleFonts.cairo(
                                 fontSize: 12.5.sp,
                                 fontWeight: FontWeight.w700,
@@ -247,7 +246,7 @@ class TeamBody extends StatelessWidget {
                             ),
                             SizedBox(height: 8.h),
                             Text(
-                              _l(m.bio, lang),
+                              localizedText(m.bio, lang),
                               style: GoogleFonts.tajawal(
                                 fontSize: 13.5.sp,
                                 color: AppColors.textSecondary,
@@ -265,7 +264,7 @@ class TeamBody extends StatelessWidget {
           ),
         ),
 
-        BeliefBand(text: _l(_belief, lang)),
+        BeliefBand(text: localizedText(_belief, lang)),
         SizedBox(height: 4.h),
       ],
     );

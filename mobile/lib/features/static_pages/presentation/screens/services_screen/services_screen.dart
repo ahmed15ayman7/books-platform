@@ -11,6 +11,7 @@ class ServicesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = context.locale.languageCode;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Column(
@@ -19,12 +20,14 @@ class ServicesScreen extends StatelessWidget {
             variant: AppBarVariant.title,
             title: 'services_title'.tr(),
             showBack: true,
+            currentLocale: lang,
+            onLocaleChanged: (l) => context.setLocale(Locale(l)),
           ),
           Expanded(
             child: SafeArea(
               top: false,
               child: SingleChildScrollView(
-                child: ServicesBody(lang: context.locale.languageCode),
+                child: ServicesBody(lang: lang),
               ),
             ),
           ),

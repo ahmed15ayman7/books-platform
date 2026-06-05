@@ -7,10 +7,9 @@ import 'package:booksplatform/features/static_pages/presentation/widgets/belief_
 import 'package:booksplatform/features/static_pages/presentation/widgets/info_page_hero.dart';
 import 'package:booksplatform/features/static_pages/presentation/widgets/section_title.dart';
 
-// ignore_for_file: lines_longer_than_80_chars
+import '../../helpers/bilingual_helper.dart';
 
-typedef _B = ({String ar, String en});
-String _l(_B t, String lang) => lang == 'ar' ? t.ar : t.en;
+// ignore_for_file: lines_longer_than_80_chars
 
 // ── Content ────────────────────────────────────────────────────────────────
 
@@ -176,19 +175,19 @@ class ServicesBody extends StatelessWidget {
       children: [
         InfoPageHero(
           icon: Icons.work_outline_rounded,
-          title: _l(_pageTitle, lang),
-          subtitle: _l(_heroSubtitle, lang),
+          title: localizedText(_pageTitle, lang),
+          subtitle: localizedText(_heroSubtitle, lang),
         ),
 
         // ── Services list ─────────────────────────────────────────────────
         _Section(
           child: Column(
             children: [
-              SectionTitle(title: _l(_listTitle, lang)),
+              SectionTitle(title: localizedText(_listTitle, lang)),
               Padding(
                 padding: EdgeInsets.only(bottom: 16.h),
                 child: Text(
-                  _l(_listIntro, lang),
+                  localizedText(_listIntro, lang),
                   textAlign: TextAlign.center,
                   style: GoogleFonts.tajawal(
                     fontSize: 15.sp,
@@ -237,7 +236,7 @@ class ServicesBody extends StatelessWidget {
                           SizedBox(width: 14.w),
                           Expanded(
                             child: Text(
-                              _l(_servicesList[i], lang),
+                              localizedText(_servicesList[i], lang),
                               style: GoogleFonts.tajawal(
                                 fontSize: 14.sp,
                                 color: AppColors.textPrimary,
@@ -259,7 +258,7 @@ class ServicesBody extends StatelessWidget {
         _Section(
           child: Column(
             children: [
-              SectionTitle(title: _l(_mapTitle, lang)),
+              SectionTitle(title: localizedText(_mapTitle, lang)),
               Column(
                 children: _components.map((c) {
                   return Padding(
@@ -292,7 +291,7 @@ class ServicesBody extends StatelessWidget {
                                       CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      _l(c.title, lang),
+                                      localizedText(c.title, lang),
                                       style: GoogleFonts.cairo(
                                         fontSize: 16.5.sp,
                                         fontWeight: FontWeight.w800,
@@ -301,7 +300,7 @@ class ServicesBody extends StatelessWidget {
                                     ),
                                     SizedBox(height: 6.h),
                                     Text(
-                                      _l(c.desc, lang),
+                                      localizedText(c.desc, lang),
                                       style: GoogleFonts.tajawal(
                                         fontSize: 13.5.sp,
                                         color: AppColors.textSecondary,
@@ -391,7 +390,7 @@ class ServicesBody extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _l(_biblioTitle, lang),
+                        localizedText(_biblioTitle, lang),
                         style: GoogleFonts.cairo(
                           fontSize: 24.sp,
                           fontWeight: FontWeight.w800,
@@ -401,7 +400,7 @@ class ServicesBody extends StatelessWidget {
                       ),
                       SizedBox(height: 14.h),
                       Text(
-                        _l(_biblio, lang),
+                        localizedText(_biblio, lang),
                         style: GoogleFonts.tajawal(
                           fontSize: 14.5.sp,
                           color: Colors.white.withValues(alpha: 0.92),
@@ -420,7 +419,7 @@ class ServicesBody extends StatelessWidget {
         _Section(
           child: Column(
             children: [
-              SectionTitle(title: _l(_outputsTitle, lang)),
+              SectionTitle(title: localizedText(_outputsTitle, lang)),
               Column(
                 children: _outputs.map((o) {
                   return Padding(
@@ -450,7 +449,7 @@ class ServicesBody extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  _l(o.title, lang),
+                                  localizedText(o.title, lang),
                                   style: GoogleFonts.cairo(
                                     fontSize: 18.sp,
                                     fontWeight: FontWeight.w800,
@@ -459,7 +458,7 @@ class ServicesBody extends StatelessWidget {
                                 ),
                                 SizedBox(height: 7.h),
                                 Text(
-                                  _l(o.desc, lang),
+                                  localizedText(o.desc, lang),
                                   style: GoogleFonts.tajawal(
                                     fontSize: 14.sp,
                                     color: Colors.white
@@ -494,7 +493,7 @@ class ServicesBody extends StatelessWidget {
                                       ),
                                       SizedBox(height: 5.h),
                                       Text(
-                                        _l(o.who, lang),
+                                        localizedText(o.who, lang),
                                         style: GoogleFonts.tajawal(
                                           fontSize: 13.sp,
                                           color: Colors.white
@@ -518,7 +517,7 @@ class ServicesBody extends StatelessWidget {
           ),
         ),
 
-        BeliefBand(text: _l(_closing, lang)),
+        BeliefBand(text: localizedText(_closing, lang)),
         SizedBox(height: 4.h),
       ],
     );
