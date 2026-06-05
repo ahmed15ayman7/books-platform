@@ -61,7 +61,7 @@ export function buildMediaChannelLinks(locale: string): NavLink[] {
   const base = `/${locale}`;
   const isAr = locale === "ar";
   return [
-    { href: `${base}/media`, label: isAr ? "كل الفيديوهات" : "All Videos" },
+    // { href: `${base}/media`, label: isAr ? "كل الفيديوهات" : "All Videos" },
     ...MEDIA_CHANNELS.map((ch) => ({
       href: `${base}/media/${ch.slug}`,
       label: isAr ? ch.labelAr : ch.labelEn,
