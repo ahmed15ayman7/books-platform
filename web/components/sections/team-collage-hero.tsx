@@ -20,21 +20,42 @@ interface ScatterSlot {
   zIndex: number;
 }
 
-/** Hand-tuned positions for a natural scattered collage (supports up to 12 cards). */
-const SCATTER_SLOTS: ScatterSlot[] = [
-  { top: "2%", insetInlineStart: "0%", rotate: -14, scale: 0.86, zIndex: 2 },
-  { top: "0%", insetInlineStart: "26%", rotate: 9, scale: 1.02, zIndex: 6 },
-  { top: "5%", insetInlineEnd: "4%", rotate: -7, scale: 0.9, zIndex: 4 },
-  { top: "28%", insetInlineStart: "-2%", rotate: 11, scale: 0.92, zIndex: 3 },
-  { top: "24%", insetInlineStart: "22%", rotate: -6, scale: 1.08, zIndex: 7 },
-  { top: "32%", insetInlineStart: "48%", rotate: 5, scale: 0.88, zIndex: 5 },
-  { top: "26%", insetInlineEnd: "0%", rotate: -11, scale: 0.94, zIndex: 4 },
-  { top: "52%", insetInlineStart: "6%", rotate: 8, scale: 0.9, zIndex: 3 },
-  { top: "58%", insetInlineStart: "34%", rotate: -4, scale: 1, zIndex: 6 },
-  { top: "50%", insetInlineEnd: "16%", rotate: 12, scale: 0.87, zIndex: 2 },
-  { top: "48%", insetInlineEnd: "38%", rotate: -9, scale: 0.84, zIndex: 1 },
-  { top: "72%", insetInlineStart: "52%", rotate: 6, scale: 0.88, zIndex: 3 },
+/** Front row — leadership (featured), center stage, highest z-index. */
+const LEADERSHIP_SLOTS: ScatterSlot[] = [
+  { top: "14%", insetInlineStart: "30%", rotate: -3, scale: 1.14, zIndex: 30 },
+  { top: "4%", insetInlineStart: "6%", rotate: -11, scale: 1.06, zIndex: 28 },
+  { top: "6%", insetInlineEnd: "4%", rotate: 9, scale: 1.06, zIndex: 28 },
 ];
+
+/** Background — rest of team, pushed to edges/corners, smaller & lower z-index. */
+const TEAM_SLOTS: ScatterSlot[] = [
+  { top: "0%", insetInlineStart: "-5%", rotate: -15, scale: 0.8, zIndex: 2 },
+  { top: "1%", insetInlineEnd: "-4%", rotate: 12, scale: 0.78, zIndex: 1 },
+  { top: "32%", insetInlineStart: "-8%", rotate: 13, scale: 0.82, zIndex: 4 },
+  { top: "34%", insetInlineEnd: "-6%", rotate: -8, scale: 0.8, zIndex: 4 },
+  { top: "50%", insetInlineStart: "-5%", rotate: 9, scale: 0.81, zIndex: 5 },
+  { top: "52%", insetInlineEnd: "-4%", rotate: -6, scale: 0.79, zIndex: 5 },
+  { top: "68%", insetInlineStart: "2%", rotate: 7, scale: 0.84, zIndex: 7 },
+  { top: "70%", insetInlineEnd: "0%", rotate: -10, scale: 0.82, zIndex: 7 },
+];
+
+function buildCollageItems(members: TeamMemberData[]) {
+  const withPhoto = members.filter((m) => m.photoUrl || m.initials);
+  const leadership = withPhoto.filter((m) => m.featured);
+  const team = withPhoto.filter((m) => !m.featured);
+
+  const items: { member: TeamMemberData; slot: ScatterSlot; featured: boolean }[] = [];
+
+  team.slice(0, TEAM_SLOTS.length).forEach((member, i) => {
+    items.push({ member, slot: TEAM_SLOTS[i]!, featured: false });
+  });
+
+  leadership.slice(0, LEADERSHIP_SLOTS.length).forEach((member, i) => {
+    items.push({ member, slot: LEADERSHIP_SLOTS[i]!, featured: true });
+  });
+
+  return items;
+}
 
 interface TeamCollageHeroProps {
   locale: Locale;
@@ -48,10 +69,12 @@ function TeamPhotoCard({
   member,
   locale,
   slot,
+  featured,
 }: {
   member: TeamMemberData;
   locale: Locale;
   slot: ScatterSlot;
+  featured?: boolean;
 }) {
   const name = pickLocale(member.name, locale);
   const [failed, setFailed] = useState(false);
@@ -62,9 +85,11 @@ function TeamPhotoCard({
     <div
       className={cn(
         "group relative aspect-[2/3] overflow-hidden rounded-xl",
-        "bg-white/10 shadow-2xl ring-1 ring-white/25",
-        "transition-transform duration-500 ease-out",
-        "hover:z-20 hover:scale-110 hover:rotate-0 hover:shadow-[0_20px_40px_rgba(0,0,0,0.45)]",
+        "bg-white/10 shadow-2xl transition-transform duration-500 ease-out",
+        featured
+          ? "ring-2 ring-[var(--brand-red)]/60 shadow-[0_12px_32px_rgba(0,0,0,0.5)] hover:ring-[var(--brand-red)]"
+          : "ring-1 ring-white/20 opacity-90 hover:opacity-100",
+        "hover:z-[40] hover:scale-110 hover:rotate-0 hover:shadow-[0_20px_40px_rgba(0,0,0,0.45)]",
       )}
     >
           {showInitials ? (
@@ -97,7 +122,12 @@ function TeamPhotoCard({
   return (
     <StaggerItem>
       <div
-        className="absolute w-[72px] sm:w-[88px] md:w-[100px] lg:w-[112px]"
+        className={cn(
+          "absolute",
+          featured
+            ? "w-[84px] sm:w-[96px] md:w-[112px] lg:w-[128px]"
+            : "w-[64px] sm:w-[76px] md:w-[86px] lg:w-[92px]",
+        )}
         style={{
           top: slot.top,
           insetInlineStart: slot.insetInlineStart,
@@ -126,7 +156,11 @@ export function TeamCollageHero({
   const crumbs =
     breadcrumbs.length > 0 ? breadcrumbs : [{ label: homeLabel, href: `/${locale}` }];
 
-  const collageMembers = members.filter((m) => m.photoUrl || m.initials).slice(0, SCATTER_SLOTS.length);
+  const collageItems = buildCollageItems(members);
+  const mobileItems = [
+    ...collageItems.filter((item) => !item.featured),
+    ...collageItems.filter((item) => item.featured),
+  ].slice(0, 10);
 
   return (
     <section className="relative overflow-hidden bg-[var(--brand-black)] py-12 md:py-16 bg-gradient-to-br from-[var(--brand-red)]/25 via-[var(--brand-black)] to-[var(--brand-black)]">
@@ -188,15 +222,16 @@ export function TeamCollageHero({
 
           {/* Scattered collage — desktop & tablet */}
           <div
-            className="relative order-1 mx-auto hidden min-h-[340px] w-full max-w-[520px] sm:block lg:order-2 lg:min-h-[400px] lg:max-w-none"
+            className="relative order-1 mx-auto hidden min-h-[380px] w-full max-w-[540px] sm:block lg:order-2 lg:min-h-[440px] lg:max-w-none"
           >
-            <StaggerContainer className="relative h-full min-h-[340px] lg:min-h-[400px]">
-              {collageMembers.map((member, i) => (
+            <StaggerContainer className="relative h-full min-h-[380px] lg:min-h-[440px]">
+              {collageItems.map(({ member, slot, featured }) => (
                 <TeamPhotoCard
                   key={member.slug}
                   member={member}
                   locale={locale}
-                  slot={SCATTER_SLOTS[i]!}
+                  slot={slot}
+                  featured={featured}
                 />
               ))}
             </StaggerContainer>
@@ -208,18 +243,24 @@ export function TeamCollageHero({
           <div
             className="flex items-end justify-center gap-0 overflow-x-auto pb-4 pt-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            {collageMembers.slice(0, 8).map((member, i) => {
+            {mobileItems.map((item, i) => {
+              const { member, featured } = item;
               const name = pickLocale(member.name, locale);
-              const rotate = [-10, 6, -4, 8, -6, 5, -8, 3][i] ?? 0;
+              const rotate = [-10, 6, -4, 8, -6, 5, -8, 3, -5, 4][i] ?? 0;
               return (
                 <Link
                   key={member.slug}
                   href={`#member-${member.slug}`}
                   aria-label={name}
-                  className="relative -ms-3 first:ms-0 aspect-[2/3] w-[68px] shrink-0 overflow-hidden rounded-lg bg-white/10 shadow-lg ring-1 ring-white/20 transition-transform hover:scale-105"
+                  className={cn(
+                    "relative -ms-3 first:ms-0 aspect-[2/3] shrink-0 overflow-hidden rounded-lg bg-white/10 shadow-lg ring-1 transition-transform hover:scale-105",
+                    featured
+                      ? "w-[76px] ring-2 ring-[var(--brand-red)]/60"
+                      : "w-[60px] ring-white/20 opacity-90",
+                  )}
                   style={{
                     transform: `rotate(${rotate}deg) translateY(${i % 2 === 0 ? "0" : "8px"})`,
-                    zIndex: i,
+                    zIndex: featured ? 20 + i : i,
                   }}
                 >
                   {member.photoUrl ? (
