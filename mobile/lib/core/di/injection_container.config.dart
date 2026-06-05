@@ -56,10 +56,6 @@ import 'package:booksplatform/features/notifications/data/repositories/notificat
     as _i595;
 import 'package:booksplatform/features/notifications/domain/repositories/notifications_repository.dart'
     as _i693;
-import 'package:booksplatform/features/notifications/presentation/cubit/notification_settings_cubit.dart'
-    as _i377;
-import 'package:booksplatform/features/notifications/services/fcm_service.dart'
-    as _i438;
 import 'package:booksplatform/features/publish/data/datasources/publish_remote_data_source.dart'
     as _i1069;
 import 'package:booksplatform/features/publish/data/repositories/publish_repository_impl.dart'
@@ -151,24 +147,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i759.SecureStorageHelper>(
       () => _i759.SecureStorageHelper(gh<_i558.FlutterSecureStorage>()),
     );
-    gh.lazySingleton<_i438.FcmService>(
-      () => _i438.FcmService(
-        gh<_i759.SecureStorageHelper>(),
-        gh<_i409.GlobalKey<_i409.NavigatorState>>(),
-      ),
-    );
     gh.lazySingleton<_i498.CartStorage>(
       () => _i498.CartStorage(gh<_i460.SharedPreferences>()),
     );
     gh.lazySingleton<_i421.WishlistStorage>(
       () => _i421.WishlistStorage(gh<_i460.SharedPreferences>()),
-    );
-    gh.factory<_i377.NotificationSettingsCubit>(
-      () => _i377.NotificationSettingsCubit(
-        gh<_i460.SharedPreferences>(),
-        gh<_i438.FcmService>(),
-        gh<_i693.NotificationsRepository>(),
-      ),
     );
     gh.lazySingleton<_i502.DialogHelper>(
       () => _i502.DialogHelper(gh<_i409.GlobalKey<_i409.NavigatorState>>()),

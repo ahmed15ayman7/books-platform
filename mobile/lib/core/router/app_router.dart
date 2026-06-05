@@ -204,14 +204,14 @@ class AppRouter {
           ),
         );
 
-      case AppRoutes.notificationSettings:
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) => BlocProvider(
-            create: (_) => getIt<NotificationSettingsCubit>(),
-            child: const NotificationSettingsScreen(),
-          ),
-        );
+      // case AppRoutes.notificationSettings:
+      //   return MaterialPageRoute(
+      //     settings: settings,
+      //     builder: (_) => BlocProvider(
+      //       create: (_) => getIt<NotificationSettingsCubit>(),
+      //       child: const NotificationSettingsScreen(),
+      //     ),
+      //   );
 
       case AppRoutes.staticPage:
       case AppRoutes.aboutUs:
