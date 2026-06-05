@@ -40,6 +40,30 @@ function Icon({ name, size = 22, sw = 1.8, color = "currentColor", flip = false,
     religion:'<path d="M3 7h18M3 7l9-4 9 4M5 7v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7"/><path d="M9 21V12h6v9"/>',
     other:'<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>',
     pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="2.6"/>',
+    // ---- info-pages icon set ----
+    menu:'<path d="M3 6h18M3 12h18M3 18h18"/>',
+    target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+    languages:'<path d="M4 5h10M9 3v2M11 5c0 4-3 7-7 8M7 8c1 2 3 3.5 6 4"/><path d="m13 21 4-9 4 9M14.5 17h5"/>',
+    newspaper:'<path d="M19 20H5a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v13a2 2 0 0 0 2 2 2 2 0 0 0 2-2V8h-3"/><path d="M7 8h6M7 12h6M7 16h4"/>',
+    mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+    fileText:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/>',
+    mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+    phone:'<path d="M5 3h3.5l1.8 4.5-2.2 1.3a12 12 0 0 0 5.1 5.1l1.3-2.2L19 15.5V19a2 2 0 0 1-2.2 2A16 16 0 0 1 3 5.2 2 2 0 0 1 5 3z"/>',
+    users:'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.2a3.2 3.2 0 0 1 0 6M16.5 20a5.5 5.5 0 0 0-2-4.3"/>',
+    scale:'<path d="M12 3v18M7 21h10M12 5l-6 1m6-1 6 1"/><path d="M6 6 3 13a3 3 0 0 0 6 0zM18 6l-3 7a3 3 0 0 0 6 0z"/>',
+    shield:'<path d="M12 3 5 6v6c0 4 3 7 7 9 4-2 7-5 7-9V6z"/><path d="m9 12 2 2 4-4"/>',
+    send:'<path d="M22 2 11 13M22 2 15 22l-4-9-9-4z"/>',
+    briefcase:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+    bookMarked:'<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 2v8l3-2 3 2V2"/>',
+    // ---- social brand glyphs (stroke) ----
+    x:'<path d="M5 4l14 16M19 4 5 20"/>',
+    facebook:'<path d="M15 4h-2.5A3.5 3.5 0 0 0 9 7.5V10H6.5v3H9v7h3v-7h2.3l.7-3H12V7.7c0-.4.3-.7.7-.7H15z"/>',
+    instagram:'<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1"/>',
+    telegram:'<path d="M22 4 2 11.5l6.4 2.1M22 4 15.6 21l-3.8-7.4M22 4 8.4 13.6v4.6l3.4-4.2"/>',
+    youtube:'<rect x="2.5" y="6" width="19" height="12" rx="4"/><path d="m10.5 9.2 5 2.8-5 2.8z"/>',
+    linkedin:'<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7.5 10.5v6M7.5 7.5v.01M11.5 16.5v-3.2a2 2 0 0 1 4 0v3.2"/>',
   };
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill={name==='star'||name==='heart-fill'?color:'none'}
@@ -154,7 +178,7 @@ function LangToggle({ lang, setLang, th }) {
 
 // ---- app bar ----
 function AppBar({ th, lang, setLang, variant="home", title, subtitle, showBack, onBack,
-                 onSearch, onCart, cartCount = 0, trailing }) {
+                 onSearch, onCart, cartCount = 0, trailing, onMenu }) {
   return (
     <div style={{ position:"sticky", top:0, zIndex:30, background:th.surface,
       borderBottom:`1px solid ${th.line}`, paddingTop:52, paddingBottom:12, paddingInline:16,
@@ -188,6 +212,7 @@ function AppBar({ th, lang, setLang, variant="home", title, subtitle, showBack, 
         {/* trailing (left in RTL): lang + icons */}
         <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
           <LangToggle lang={lang} setLang={setLang} th={th} />
+          {onMenu && <button onClick={onMenu} aria-label="menu" style={iconBtn(th)}><Icon name="menu" size={20} /></button>}
           {trailing}
           {onSearch && <button onClick={onSearch} style={iconBtn(th)}><Icon name="search" size={20} /></button>}
           {onCart && <button onClick={onCart} style={{ ...iconBtn(th), position:"relative" }}>

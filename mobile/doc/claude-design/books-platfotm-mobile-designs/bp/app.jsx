@@ -21,6 +21,10 @@ const SCREENS = [
   { key:"cart",       ar:"السلة",            en:"Cart" },
   { key:"publish",    ar:"انشر كتابك",       en:"Publish" },
   { key:"search",     ar:"البحث",            en:"Search" },
+  { key:"about",      ar:"من نحن",          en:"About Us" },
+  { key:"services",   ar:"خدماتنا",         en:"Our Services" },
+  { key:"team",       ar:"فريق العمل",      en:"Our Team" },
+  { key:"contact",    ar:"تواصل معنا",       en:"Contact" },
 ];
 
 function App() {
@@ -33,6 +37,7 @@ function App() {
   const [articleId, setArticleId] = useS("a1");
   const [cart, setCart] = useS({ "justice":1, "burnout":2 });
   const [toastMsg, setToastMsg] = useS(null);
+  const [menuOpen, setMenuOpen] = useS(false);
 
   const screen = stack[stack.length-1];
   const go = (key) => setStack(s => s[s.length-1]===key ? s : [...s, key]);
@@ -57,6 +62,8 @@ function App() {
   const radius = t.cornerStyle==="sharp" ? 0.6 : 1;
 
   const common = { th, lang, setLang, go, goBack, openBook, openCart, cartCount, openArticle };
+  const onMenu = () => setMenuOpen(true);
+  const menuCommon = { ...common, onMenu };
   let content;
   switch (screen) {
     case "onboarding": content = <window.Onboarding th={th} lang={lang} setLang={setLang} dark={dark} finish={()=>setStack(["home"])} />; break;
@@ -68,7 +75,11 @@ function App() {
     case "cart":       content = <CartScreen {...common} cart={cart} updateQty={updateQty} removeItem={removeItem} />; break;
     case "publish":    content = <PublishScreen {...common} />; break;
     case "search":     content = <SearchScreen {...common} dark={dark} />; break;
-    default:           content = <HomeScreen {...common} />;
+    case "about":      content = <window.AboutScreen {...menuCommon} />; break;
+    case "services":   content = <window.ServicesScreen {...menuCommon} />; break;
+    case "team":       content = <window.TeamScreen {...menuCommon} />; break;
+    case "contact":    content = <window.ContactScreen {...menuCommon} />; break;
+    default:           content = <HomeScreen {...menuCommon} />;
   }
 
   return (
@@ -81,7 +92,7 @@ function App() {
         <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"#0B0B0B", color:"#fff",
           padding:"6px 14px", borderRadius:999, fontSize:12, fontWeight:700, marginBottom:12, letterSpacing:".02em" }}>
           <span style={{ width:8, height:8, borderRadius:999, background:t.primary }} />
-          Books Platform · Mobile · Onboarding + 9 screens
+          Books Platform · Mobile · Onboarding + 12 screens
         </div>
         <div style={{ fontFamily:"Cairo", fontWeight:800, fontSize:24, color: dark?"#fff":"#0B0B0B" }}>
           منصة الكتب العالمية — تطبيق الجوال</div>
@@ -117,6 +128,7 @@ function App() {
             display:"flex", flexDirection:"column", "--bp-radius": radius,
             fontFamily:"Tajawal, system-ui, sans-serif", position:"relative" }}>
             {content}
+            {menuOpen && <window.MenuSheet th={th} lang={lang} go={go} toast={toast} onClose={()=>setMenuOpen(false)} />}
             {toastMsg && (
               <div style={{ position:"absolute", bottom:108, left:"50%", transform:"translateX(-50%)", zIndex:80,
                 background:"#0B0B0B", color:"#fff", padding:"11px 20px", borderRadius:999, fontFamily:"Cairo",

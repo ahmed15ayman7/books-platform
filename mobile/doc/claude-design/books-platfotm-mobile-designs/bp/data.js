@@ -237,6 +237,48 @@
     relatedArticles:{ ar:"مقالات ذات صلة", en:"Related articles" },
     moderated:    { ar:"تخضع التعليقات للمراجعة قبل نشرها", en:"Comments are reviewed before publishing" },
     shareArticle: { ar:"مشاركة", en:"Share" },
+    menuTitle:    { ar:"القائمة", en:"Menu" },
+    backToTop:    { ar:"للأعلى", en:"Top" },
+    soon:         { ar:"قريباً", en:"Coming soon" },
+    contactCta:   { ar:"تواصل معنا", en:"Get in Touch" },
+    browseBtn:    { ar:"تصفّح الكتب", en:"Browse Books" },
+    publishBtn:   { ar:"انشر كتابك", en:"Publish Your Book" },
+    menu: {
+      wishlist:   { ar:"قائمة أمنياتي", en:"My Wishlist" },
+      nominated:  { ar:"الكتب المرشحة للترجمة", en:"Nominated for Translation" },
+      translated: { ar:"الكتب المترجمة", en:"Translated Books" },
+      notify:     { ar:"إعدادات الإشعارات", en:"Notification Settings" },
+      about:      { ar:"من نحن", en:"About Us" },
+      services:   { ar:"خدماتنا", en:"Our Services" },
+      team:       { ar:"فريق العمل", en:"Our Team" },
+      contact:    { ar:"تواصل معنا", en:"Contact Us" },
+    },
+  };
+
+  // ---- info pages content (verbatim from web codebase + live site) ----
+  const pages = {
+    contact: {
+      hero:{ title:{ar:"تواصل معنا",en:"Contact Us"},
+        subtitle:{ar:"نسعد باستفساراتك واقتراحاتك وشراكاتك",en:"We welcome your questions, suggestions, and partnerships"} },
+      phone:"(+2) 01005772608",
+      hours:{ar:"متاح من الساعة 10:00 صباحًا حتى 19:00 مساءً",en:"Available 10:00 AM – 7:00 PM"},
+      emails:["info@booksplatform.net","atefmazhar@yahoo.com"],
+      detailsTitle:{ar:"بيانات التواصل",en:"Contact Details"},
+      formTitle:{ar:"أرسل رسالة",en:"Send a Message"},
+      followLabel:{ar:"تابعنا",en:"Follow Us"},
+      fields:{ name:{ar:"الاسم بالكامل",en:"Full name"}, email:{ar:"البريد الإلكتروني",en:"Email"},
+        phone:{ar:"رقم الهاتف",en:"Phone"}, message:{ar:"الرسالة",en:"Message"} },
+      send:{ar:"إرسال الرسالة",en:"Send Message"},
+      sending:{ar:"جارٍ الإرسال…",en:"Sending…"},
+      success:{ar:"شكراً! سنرد عليك قريباً.",en:"Thank you! We will get back to you soon."},
+      errName:{ar:"يرجى إدخال الاسم",en:"Please enter your name"},
+      errEmail:{ar:"بريد إلكتروني غير صالح",en:"Invalid email address"},
+      errMsg:{ar:"يرجى كتابة رسالتك",en:"Please write your message"},
+    },
+    social:[
+      { key:"x", label:"X" }, { key:"facebook", label:"Facebook" }, { key:"instagram", label:"Instagram" },
+      { key:"telegram", label:"Telegram" }, { key:"youtube", label:"YouTube" }, { key:"linkedin", label:"LinkedIn" },
+    ],
   };
 
   // flat article lookup + editorial bodies (real prose, no lorem)
@@ -279,5 +321,5 @@
   ];
 
   window.BP = { tokens, theme, status, categories, catBy, books, bookBy,
-    publishers, countries, channels, articles, articleBy, articleBodies, sampleComments, strings };
+    publishers, countries, channels, articles, articleBy, articleBodies, sampleComments, strings, pages };
 })();

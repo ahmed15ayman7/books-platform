@@ -12,7 +12,7 @@ function HScroll({ children, pad = 16, gap = 12 }) {
 }
 
 // ---------- SCREEN 1 · HOME ----------
-function HomeScreen({ th, lang, setLang, go, openBook, openCart, cartCount }) {
+function HomeScreen({ th, lang, setLang, go, openBook, openCart, cartCount, onMenu }) {
   const BP = window.BP,S = BP.strings;
   const featured = BP.bookBy["liberty"];
   const fresh = BP.books.filter((b) => b.isNew || b.status === "NOMINATED").slice(0, 6);
@@ -20,7 +20,7 @@ function HomeScreen({ th, lang, setLang, go, openBook, openCart, cartCount }) {
   return (
     <PageCol>
       <AppBar th={th} lang={lang} setLang={setLang} variant="home"
-      onSearch={() => go("search")} onCart={openCart} cartCount={cartCount} />
+      onMenu={onMenu} onSearch={() => go("search")} onCart={openCart} cartCount={cartCount} />
       <div style={{ flex: 1, paddingBottom: 18 }}>
 
         {/* hero featured banner */}
