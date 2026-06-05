@@ -8,6 +8,7 @@ import { PublisherCard } from "@/components/sections/publisher-card";
 import { SectionBlock } from "@/components/sections/section-block";
 import { StaggerContainer, StaggerItem } from "@/components/motion";
 import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
+import { publicPublisherUrl } from "@/lib/admin/public-urls";
 import { Badge } from "@/components/ui/badge";
 import {
   CardMedia,
@@ -64,7 +65,7 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
     ...sponsored.filter((p) => p.imageUrl).map((p) => ({
       src: p.imageUrl!,
       alt: localizedPublisherName(p, locale),
-      slug: p.slug,
+      href: publicPublisherUrl(locale, p.slug),
     })),
     ...logoPublishers.publishers
       .filter((p) => p.imageUrl && !sponsored.some((s) => s.id === p.id))
@@ -72,7 +73,7 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
       .map((p) => ({
         src: p.imageUrl!,
         alt: localizedPublisherName(p, locale),
-        slug: p.slug,
+        href: publicPublisherUrl(locale, p.slug),
       })),
   ].slice(0, 8);
 

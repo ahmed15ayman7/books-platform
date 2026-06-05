@@ -152,7 +152,12 @@ export default function AdminArticlesPage() {
 
   const renderCard = (row: Article) => (
     <AdminGridCard>
-      <AdminGridCardMedia src={row.imageUrl} alt={row.title} fallback={<FileText className="h-10 w-10" />} />
+      <AdminGridCardMedia
+        src={row.imageUrl}
+        alt={row.title}
+        fallback={<FileText className="h-10 w-10" />}
+        href={adminArticleViewPath(locale, row.id, row.channel)}
+      />
       <AdminGridCardBody>
         <h3 className="line-clamp-2 font-semibold text-[var(--admin-text)]">{row.title}</h3>
         <p className="text-xs text-[var(--admin-text-subtle)]">

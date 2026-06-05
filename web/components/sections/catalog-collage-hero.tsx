@@ -11,6 +11,7 @@ import { FadeIn, RevealText, StaggerContainer, StaggerItem } from "@/components/
 export interface CoverItem {
   src: string;
   alt: string;
+  href?: string;
 }
 
 interface CatalogCollageHeroProps {
@@ -24,6 +25,56 @@ interface CatalogCollageHeroProps {
 }
 
 const ROTATIONS = [-8, 6, -4, 10, -6, 8, -10, 5, -5, 7, -7, 4];
+
+function CollageCover({
+  cover,
+  className,
+  style,
+  sizes,
+}: {
+  cover: CoverItem;
+  className?: string;
+  style?: React.CSSProperties;
+  sizes: string;
+}) {
+  const inner = (
+    <>
+      <Image
+        src={cover.src}
+        alt={cover.alt}
+        fill
+        unoptimized={cover.src.startsWith("http")}
+        className="object-contain p-1"
+        sizes={sizes}
+      />
+    </>
+  );
+
+  const shellClass = cn(
+    "relative overflow-hidden rounded-lg bg-white/10 shadow-lg ring-1 ring-white/20",
+    cover.href && "transition-transform duration-300 hover:scale-105 hover:shadow-xl hover:ring-white/40",
+    className,
+  );
+
+  if (cover.href) {
+    return (
+      <Link
+        href={cover.href}
+        className={shellClass}
+        style={style}
+        aria-label={cover.alt}
+      >
+        {inner}
+      </Link>
+    );
+  }
+
+  return (
+    <div className={shellClass} style={style}>
+      {inner}
+    </div>
+  );
+}
 
 export function CatalogCollageHero({
   locale,
@@ -93,44 +144,30 @@ export function CatalogCollageHero({
             {children && <FadeIn delay={0.3} className="mt-4">{children}</FadeIn>}
           </div>
 
-          <div className="relative hidden min-h-[280px] sm:block lg:min-h-[320px]" aria-hidden="true">
+          <div className="relative hidden min-h-[280px] sm:block lg:min-h-[320px]">
             <div className="grid grid-cols-4 gap-3 p-4">
               {covers.slice(0, 8).map((cover, i) => (
-                <div
-                  key={`${cover.src}-${i}`}
-                  className="relative aspect-[2/3] overflow-hidden rounded-lg bg-white/10 shadow-lg ring-1 ring-white/20"
+                <CollageCover
+                  key={`${cover.href ?? cover.src}-${i}`}
+                  cover={cover}
+                  className="aspect-[2/3]"
                   style={{ transform: `rotate(${ROTATIONS[i % ROTATIONS.length]}deg)` }}
-                >
-                  <Image
-                    src={cover.src}
-                    alt={cover.alt}
-                    fill
-                    unoptimized={cover.src.startsWith("http")}
-                    className="object-contain p-1"
-                    sizes="120px"
-                  />
-                </div>
+                  sizes="120px"
+                />
               ))}
             </div>
           </div>
         </div>
 
         {/* Mobile cover strip */}
-        <div className="mt-6 flex gap-3 overflow-x-auto pb-2 sm:hidden" aria-hidden="true">
+        <div className="mt-6 flex gap-3 overflow-x-auto pb-2 sm:hidden">
           {covers.slice(0, 6).map((cover, i) => (
-            <div
-              key={`m-${cover.src}-${i}`}
-              className="relative h-28 w-20 shrink-0 overflow-hidden rounded-md bg-white/10 ring-1 ring-white/20"
-            >
-              <Image
-                src={cover.src}
-                alt={cover.alt}
-                fill
-                unoptimized={cover.src.startsWith("http")}
-                className="object-contain p-1"
-                sizes="80px"
-              />
-            </div>
+            <CollageCover
+              key={`m-${cover.href ?? cover.src}-${i}`}
+              cover={cover}
+              className="h-28 w-20 shrink-0 rounded-md"
+              sizes="80px"
+            />
           ))}
         </div>
       </div>

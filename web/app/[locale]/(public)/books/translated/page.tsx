@@ -6,6 +6,7 @@ import { CatalogCollageHero } from "@/components/sections/catalog-collage-hero";
 import { BookCard } from "@/components/sections/book-card";
 import { BooksPagination } from "@/components/sections/books-pagination";
 import { localizedBookName } from "@/lib/i18n/book-locale";
+import { publicBookUrl } from "@/lib/admin/public-urls";
 import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -55,6 +56,7 @@ export default async function TranslatedBooksPage({ searchParams }: Props) {
     .map((b) => ({
       src: b.imageUrl!,
       alt: localizedBookName(b, locale),
+      href: publicBookUrl(locale, b.slug),
     }));
 
   return (

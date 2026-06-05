@@ -159,6 +159,7 @@ export default function AdminPublishersPage() {
         src={row.imageUrl}
         alt={row.name}
         fallback={<Building2 className="h-10 w-10" />}
+        href={adminPublisherViewPath(locale, row.id)}
       />
       <AdminGridCardBody>
         <div className="flex items-start gap-1">

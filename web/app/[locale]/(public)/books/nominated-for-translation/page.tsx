@@ -9,6 +9,7 @@ import { BooksPagination } from "@/components/sections/books-pagination";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Globe2 } from "lucide-react";
 import { localizedBookName } from "@/lib/i18n/book-locale";
+import { publicBookUrl } from "@/lib/admin/public-urls";
 import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -59,6 +60,7 @@ export default async function NominatedForTranslationPage({ searchParams }: Prop
     .map((b) => ({
       src: b.imageUrl!,
       alt: localizedBookName(b, locale),
+      href: publicBookUrl(locale, b.slug),
     }));
 
   return (

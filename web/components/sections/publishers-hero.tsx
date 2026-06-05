@@ -11,7 +11,7 @@ import { FadeIn, RevealText, StaggerContainer, StaggerItem } from "@/components/
 interface PublisherLogo {
   src: string;
   alt: string;
-  slug?: string;
+  href?: string;
 }
 
 interface PublishersHeroProps {
@@ -76,12 +76,11 @@ export function PublishersHero({
 
           {logos.length > 0 && (
             <FadeIn delay={0.25}>
-              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4" aria-hidden="true">
-                {logos.slice(0, 8).map((logo, i) => (
-                  <div
-                    key={`${logo.src}-${i}`}
-                    className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-xl bg-white p-3 shadow-md ring-1 ring-white/10"
-                  >
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+                {logos.slice(0, 8).map((logo, i) => {
+                  const shellClass =
+                    "relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-xl bg-white p-3 shadow-md ring-1 ring-white/10 transition-transform duration-300 hover:scale-105 hover:shadow-lg";
+                  const image = (
                     <Image
                       src={logo.src}
                       alt={logo.alt}
@@ -90,8 +89,23 @@ export function PublishersHero({
                       unoptimized={logo.src.startsWith("http")}
                       className="max-h-full max-w-full object-contain"
                     />
-                  </div>
-                ))}
+                  );
+
+                  return logo.href ? (
+                    <Link
+                      key={`${logo.href}-${i}`}
+                      href={logo.href}
+                      className={shellClass}
+                      aria-label={logo.alt}
+                    >
+                      {image}
+                    </Link>
+                  ) : (
+                    <div key={`${logo.src}-${i}`} className={shellClass}>
+                      {image}
+                    </div>
+                  );
+                })}
               </div>
             </FadeIn>
           )}

@@ -56,27 +56,17 @@ function TeamPhotoCard({
   const name = pickLocale(member.name, locale);
   const [failed, setFailed] = useState(false);
   const showInitials = !member.photoUrl || failed;
+  const memberHref = `#member-${member.slug}`;
 
-  return (
-    <StaggerItem>
-      <div
-        className="absolute w-[72px] sm:w-[88px] md:w-[100px] lg:w-[112px]"
-        style={{
-          top: slot.top,
-          insetInlineStart: slot.insetInlineStart,
-          insetInlineEnd: slot.insetInlineEnd,
-          zIndex: slot.zIndex,
-          transform: `rotate(${slot.rotate}deg) scale(${slot.scale})`,
-        }}
-      >
-        <div
-          className={cn(
-            "group relative aspect-[2/3] overflow-hidden rounded-xl",
-            "bg-white/10 shadow-2xl ring-1 ring-white/25",
-            "transition-transform duration-500 ease-out",
-            "hover:z-20 hover:scale-110 hover:rotate-0 hover:shadow-[0_20px_40px_rgba(0,0,0,0.45)]",
-          )}
-        >
+  const cardInner = (
+    <div
+      className={cn(
+        "group relative aspect-[2/3] overflow-hidden rounded-xl",
+        "bg-white/10 shadow-2xl ring-1 ring-white/25",
+        "transition-transform duration-500 ease-out",
+        "hover:z-20 hover:scale-110 hover:rotate-0 hover:shadow-[0_20px_40px_rgba(0,0,0,0.45)]",
+      )}
+    >
           {showInitials ? (
             <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-[var(--brand-red)]/40 to-[var(--brand-gray-800)] p-2">
               <span className="font-display text-lg font-bold text-white/90 sm:text-xl">
@@ -100,8 +90,25 @@ function TeamPhotoCard({
             )}
           >
             <p className="truncate text-[10px] font-semibold text-white sm:text-[11px]">{name}</p>
-          </div>
         </div>
+    </div>
+  );
+
+  return (
+    <StaggerItem>
+      <div
+        className="absolute w-[72px] sm:w-[88px] md:w-[100px] lg:w-[112px]"
+        style={{
+          top: slot.top,
+          insetInlineStart: slot.insetInlineStart,
+          insetInlineEnd: slot.insetInlineEnd,
+          zIndex: slot.zIndex,
+          transform: `rotate(${slot.rotate}deg) scale(${slot.scale})`,
+        }}
+      >
+        <Link href={memberHref} aria-label={name} className="block">
+          {cardInner}
+        </Link>
       </div>
     </StaggerItem>
   );
@@ -182,7 +189,6 @@ export function TeamCollageHero({
           {/* Scattered collage — desktop & tablet */}
           <div
             className="relative order-1 mx-auto hidden min-h-[340px] w-full max-w-[520px] sm:block lg:order-2 lg:min-h-[400px] lg:max-w-none"
-            aria-hidden="true"
           >
             <StaggerContainer className="relative h-full min-h-[340px] lg:min-h-[400px]">
               {collageMembers.map((member, i) => (
@@ -201,15 +207,16 @@ export function TeamCollageHero({
         <FadeIn delay={0.25} className="mt-2 sm:hidden">
           <div
             className="flex items-end justify-center gap-0 overflow-x-auto pb-4 pt-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            aria-hidden="true"
           >
             {collageMembers.slice(0, 8).map((member, i) => {
               const name = pickLocale(member.name, locale);
               const rotate = [-10, 6, -4, 8, -6, 5, -8, 3][i] ?? 0;
               return (
-                <div
+                <Link
                   key={member.slug}
-                  className="relative -ms-3 first:ms-0 aspect-[2/3] w-[68px] shrink-0 overflow-hidden rounded-lg bg-white/10 shadow-lg ring-1 ring-white/20"
+                  href={`#member-${member.slug}`}
+                  aria-label={name}
+                  className="relative -ms-3 first:ms-0 aspect-[2/3] w-[68px] shrink-0 overflow-hidden rounded-lg bg-white/10 shadow-lg ring-1 ring-white/20 transition-transform hover:scale-105"
                   style={{
                     transform: `rotate(${rotate}deg) translateY(${i % 2 === 0 ? "0" : "8px"})`,
                     zIndex: i,
@@ -228,7 +235,7 @@ export function TeamCollageHero({
                       {member.initials ?? name.slice(0, 2).toUpperCase()}
                     </div>
                   )}
-                </div>
+                </Link>
               );
             })}
           </div>

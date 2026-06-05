@@ -175,6 +175,7 @@ export default function AdminMediaPage() {
         src={row.imageUrl}
         alt={row.title}
         fallback={<Video className="h-10 w-10" />}
+        href={adminMediaViewPath(locale, row.id)}
       />
       <AdminGridCardBody>
         <h3 className="line-clamp-2 font-semibold text-[var(--admin-text)]">{row.title}</h3>

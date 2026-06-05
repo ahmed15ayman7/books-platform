@@ -77,8 +77,9 @@ function TeamMemberCard({
   return (
     <AnimatedCard>
       <article
+        id={`member-${member.slug}`}
         className={cn(
-          "rounded-2xl border border-[var(--brand-gray-200)] bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md h-full",
+          "scroll-mt-28 rounded-2xl border border-[var(--brand-gray-200)] bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md h-full",
           featured && "ring-1 ring-[var(--brand-red-soft)]",
         )}
       >
