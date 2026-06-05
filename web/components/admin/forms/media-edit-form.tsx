@@ -200,7 +200,7 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
         />
       )}
 
-      <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[1fr_360px]">
+      <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[1fr_360px]" data-admin-save-form>
         <div className="space-y-5">
           <AdminCard title="بيانات الفيديو">
             <div className="space-y-4">

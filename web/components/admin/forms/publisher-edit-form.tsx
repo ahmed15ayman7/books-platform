@@ -165,7 +165,7 @@ export function PublisherEditForm({ locale, id }: PublisherEditFormProps) {
         />
       )}
 
-      <form onSubmit={handleSubmit} className="max-w-3xl space-y-5">
+      <form onSubmit={handleSubmit} className="max-w-3xl space-y-5" data-admin-save-form>
         <FormDraftNotice
           showBanner={draft.showBanner}
           status={draft.status}

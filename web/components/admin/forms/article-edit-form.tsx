@@ -227,7 +227,7 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
         />
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5" data-admin-save-form>
         <FormDraftNotice
           showBanner={draft.showBanner}
           status={draft.status}

@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { carouselAutoplayReverse } from "@/lib/carousel/autoplay";
@@ -31,9 +30,11 @@ interface HomeHeroCarouselProps {
 function HeroSlideContent({
   slide,
   locale,
+  slideIndex = 0,
 }: {
   slide: HeroSlideData;
   locale: string;
+  slideIndex?: number;
 }) {
   const isAr = locale === "ar";
   const title = isAr ? slide.titleAr : (slide.titleEn ?? slide.titleAr);
@@ -41,14 +42,15 @@ function HeroSlideContent({
 
   return (
     <div className="relative h-[min(70vh,520px)] w-full overflow-hidden md:h-[min(72vh,560px)]">
-      <Image
+      {/* Native img — Next/Image lazy-load breaks on off-screen Embla slides */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={slide.imageUrl}
         alt=""
-        fill
-        className="object-cover object-center"
-        priority
-        sizes="100vw"
-        unoptimized={slide.imageUrl.startsWith("http")}
+        className="absolute inset-0 h-full w-full object-cover object-center"
+        loading="eager"
+        decoding="async"
+        fetchPriority={slideIndex === 0 ? "high" : "auto"}
       />
       <div
         className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/25"
@@ -80,13 +82,13 @@ function HeroSlideContent({
 
       {slide.foregroundImageUrl && (
         <div className="pointer-events-none absolute bottom-0 left-1/2 z-[5] h-[32%] w-[min(380px,75vw)] -translate-x-1/2 md:h-[40%]">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={slide.foregroundImageUrl}
             alt=""
-            fill
-            className="object-contain object-bottom drop-shadow-2xl"
-            sizes="(max-width: 768px) 75vw, 380px"
-            unoptimized={slide.foregroundImageUrl.startsWith("http")}
+            className="absolute inset-0 h-full w-full object-contain object-bottom drop-shadow-2xl"
+            loading="eager"
+            decoding="async"
           />
         </div>
       )}
@@ -115,8 +117,19 @@ export function HomeHeroCarousel({
   const scrollTo = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi]);
 
   useEffect(() => {
+    slides.forEach((slide, index) => {
+      if (index === 0) return;
+      const bg = new window.Image();
+      bg.src = slide.imageUrl;
+      if (slide.foregroundImageUrl) {
+        const fg = new window.Image();
+        fg.src = slide.foregroundImageUrl;
+      }
+    });
+  }, [slides]);
+
+  useEffect(() => {
     if (!emblaApi) return;
-    emblaApi.reInit();
     const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
     emblaApi.on("select", onSelect);
     onSelect();
@@ -157,14 +170,14 @@ export function HomeHeroCarousel({
     >
       <div ref={emblaRef} className="hero-embla__viewport w-full overflow-hidden">
         <div className="hero-embla__container flex">
-          {slides.map((slide) => (
+          {slides.map((slide, index) => (
             <div key={slide.id} className="hero-embla__slide min-w-0 shrink-0 grow-0 basis-full">
               {slide.linkUrl ? (
-                <Link href={slide.linkUrl} className="block w-full">
-                  <HeroSlideContent slide={slide} locale={locale} />
+                <Link href={slide.linkUrl} className="block h-full w-full">
+                  <HeroSlideContent slide={slide} locale={locale} slideIndex={index} />
                 </Link>
               ) : (
-                <HeroSlideContent slide={slide} locale={locale} />
+                <HeroSlideContent slide={slide} locale={locale} slideIndex={index} />
               )}
             </div>
           ))}

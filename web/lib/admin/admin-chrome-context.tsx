@@ -41,11 +41,25 @@ export function AdminChromeProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const triggerSave = useCallback(() => {
-    formActionsRef.current.onSave?.();
+    if (formActionsRef.current.onSave) {
+      formActionsRef.current.onSave();
+      return;
+    }
+    const form = document.querySelector<HTMLFormElement>(
+      "main form[data-admin-save-form]",
+    );
+    form?.requestSubmit();
   }, []);
 
   const triggerSaveDraft = useCallback(() => {
-    formActionsRef.current.onSaveDraft?.();
+    if (formActionsRef.current.onSaveDraft) {
+      formActionsRef.current.onSaveDraft();
+      return;
+    }
+    const draftBtn = document.querySelector<HTMLButtonElement>(
+      "main [data-admin-save-draft]",
+    );
+    draftBtn?.click();
   }, []);
 
   const value = useMemo(

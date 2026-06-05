@@ -281,7 +281,7 @@ export function BookEditForm({
   const publicSlug = savedPublicSlug ?? bookSlug ?? (form.slug.trim() || null);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6" dir="rtl">
+    <form onSubmit={handleSubmit} className="space-y-6" dir="rtl" data-admin-save-form>
       <FormDraftNotice
         showBanner={draft.showBanner}
         status={draft.status}

@@ -162,7 +162,7 @@ export default function AdminHomeSliderPage() {
           <h2 className="mb-4 font-semibold text-[var(--admin-text)]">
             {editingId ? "تعديل الشريحة" : "إضافة شريحة"}
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-3" data-admin-save-form>
             <FormDraftNotice
               showBanner={draft.showBanner}
               status={draft.status}
