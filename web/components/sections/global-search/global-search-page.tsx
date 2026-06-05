@@ -182,7 +182,7 @@ export function GlobalSearchPageClient({
                 : "Books, articles, videos, publishers, and authors — in one place"}
             </p>
 
-            <form onSubmit={handleSubmit} className="relative mt-8">
+            <form onSubmit={handleSubmit} className="relative mt-8 flex items-center">
               <div className="group relative overflow-hidden rounded-2xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.25)] ring-1 ring-white/20 transition-shadow focus-within:shadow-[0_0_0_4px_rgba(177,30,46,0.35)]">
                 <Search
                   className={`pointer-events-none absolute top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--brand-gray-400)] ${
@@ -192,7 +192,7 @@ export function GlobalSearchPageClient({
                 />
                 <input
                   ref={inputRef}
-                  type="search"
+                  type="text"
                   value={inputValue}
                   onChange={(e) => handleInputChange(e.target.value)}
                   placeholder={
@@ -227,15 +227,15 @@ export function GlobalSearchPageClient({
                     {modKeyLabel()}K
                   </kbd>
                 </div>
+              </div>
                 <button
                   type="submit"
-                  className={`absolute top-1/2 -translate-y-1/2 rounded-xl bg-[var(--brand-red)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-red-hover)] ${
-                    isAr ? "start-2" : "end-2"
+                  className={`rounded-xl bg-[var(--brand-red)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-red-hover)] ${
+                    isAr ? "ms-2" : "me-2"
                   }`}
                 >
                   {isAr ? "بحث" : "Search"}
                 </button>
-              </div>
             </form>
           </motion.div>
         </div>
