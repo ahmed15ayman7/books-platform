@@ -302,6 +302,47 @@ export default async function HomePage() {
           </div>
         </AnimatedSection>
       ))}
+      {/* ── كتب مترجمة ──────────────────────────────────────── */}
+      {translated.length > 0 && (
+        <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="translated-heading">
+          <div className="container-platform">
+            <FadeIn className="mb-8 flex items-end justify-between gap-4">
+              <SectionHeading
+                id="translated-heading"
+                title={locale === "ar" ? "كتب مترجمة" : "Translated Books"}
+                subtitle={locale === "ar" ? "من لغات العالم إلى العربية" : "From world languages to Arabic"}
+              />
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/${locale}/books/translated`}>
+                  {locale === "ar" ? "عرض الكل" : "See All"}
+                </Link>
+              </Button>
+            </FadeIn>
+            <BookCarousel books={translated} locale={locale} pageOrder={nextCarouselOrder()} />
+          </div>
+        </AnimatedSection>
+      )}
+
+      {/* ── كتب مرشحة للترجمة ───────────────────────────────── */}
+      {nominated.length > 0 && (
+        <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="nominated-heading">
+          <div className="container-platform">
+            <FadeIn className="mb-8 flex items-end justify-between gap-4">
+              <SectionHeading
+                id="nominated-heading"
+                title={locale === "ar" ? "كتب مرشحة للترجمة" : "Books for Translation"}
+                subtitle={locale === "ar" ? "كتب تستحق أن تصل للقارئ العربي" : "Books worth translating"}
+              />
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/${locale}/books/nominated-for-translation`}>
+                  {locale === "ar" ? "عرض الكل" : "See All"}
+                </Link>
+              </Button>
+            </FadeIn>
+            <BookCarousel books={nominated} locale={locale} pageOrder={nextCarouselOrder()} />
+          </div>
+        </AnimatedSection>
+      )}
 
       <HomeMediaSpotlight
         locale={locale}
@@ -391,47 +432,6 @@ export default async function HomePage() {
               </Button>
             </FadeIn>
             <CategoryGrid categories={categories} locale={locale} />
-          </div>
-        </AnimatedSection>
-      )}
-      {/* ── كتب مترجمة ──────────────────────────────────────── */}
-      {translated.length > 0 && (
-        <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="translated-heading">
-          <div className="container-platform">
-            <FadeIn className="mb-8 flex items-end justify-between gap-4">
-              <SectionHeading
-                id="translated-heading"
-                title={locale === "ar" ? "كتب مترجمة" : "Translated Books"}
-                subtitle={locale === "ar" ? "من لغات العالم إلى العربية" : "From world languages to Arabic"}
-              />
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/${locale}/books/translated`}>
-                  {locale === "ar" ? "عرض الكل" : "See All"}
-                </Link>
-              </Button>
-            </FadeIn>
-            <BookCarousel books={translated} locale={locale} pageOrder={nextCarouselOrder()} />
-          </div>
-        </AnimatedSection>
-      )}
-
-      {/* ── كتب مرشحة للترجمة ───────────────────────────────── */}
-      {nominated.length > 0 && (
-        <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="nominated-heading">
-          <div className="container-platform">
-            <FadeIn className="mb-8 flex items-end justify-between gap-4">
-              <SectionHeading
-                id="nominated-heading"
-                title={locale === "ar" ? "كتب مرشحة للترجمة" : "Books for Translation"}
-                subtitle={locale === "ar" ? "كتب تستحق أن تصل للقارئ العربي" : "Books worth translating"}
-              />
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/${locale}/books/nominated-for-translation`}>
-                  {locale === "ar" ? "عرض الكل" : "See All"}
-                </Link>
-              </Button>
-            </FadeIn>
-            <BookCarousel books={nominated} locale={locale} pageOrder={nextCarouselOrder()} />
           </div>
         </AnimatedSection>
       )}
