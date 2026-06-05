@@ -302,6 +302,26 @@ export default async function HomePage() {
           </div>
         </AnimatedSection>
       ))}
+        {/* ── كتب مرشحة للترجمة ───────────────────────────────── */}
+      {nominated.length > 0 && (
+        <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="nominated-heading">
+          <div className="container-platform">
+            <FadeIn className="mb-8 flex items-end justify-between gap-4">
+              <SectionHeading
+                id="nominated-heading"
+                title={locale === "ar" ? "كتب مرشحة للترجمة" : "Books for Translation"}
+                subtitle={locale === "ar" ? "كتب تستحق أن تصل للقارئ العربي" : "Books worth translating"}
+              />
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/${locale}/books/nominated-for-translation`}>
+                  {locale === "ar" ? "عرض الكل" : "See All"}
+                </Link>
+              </Button>
+            </FadeIn>
+            <BookCarousel books={nominated} locale={locale} pageOrder={nextCarouselOrder()} />
+          </div>
+        </AnimatedSection>
+      )}
       {/* ── كتب مترجمة ──────────────────────────────────────── */}
       {translated.length > 0 && (
         <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="translated-heading">
@@ -322,27 +342,40 @@ export default async function HomePage() {
           </div>
         </AnimatedSection>
       )}
-
-      {/* ── كتب مرشحة للترجمة ───────────────────────────────── */}
-      {nominated.length > 0 && (
-        <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="nominated-heading">
+      {/* ── تصنيفات المقالات ─────────────────────────────────── */}
+      {articleCategories.length > 0 && (
+        <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="article-cats-heading">
           <div className="container-platform">
             <FadeIn className="mb-8 flex items-end justify-between gap-4">
               <SectionHeading
-                id="nominated-heading"
-                title={locale === "ar" ? "كتب مرشحة للترجمة" : "Books for Translation"}
-                subtitle={locale === "ar" ? "كتب تستحق أن تصل للقارئ العربي" : "Books worth translating"}
+                id="article-cats-heading"
+                title={locale === "ar" ? "تصنيفات المقالات" : "Article Categories"}
+                subtitle={locale === "ar" ? "تصفّح المقالات حسب التصنيف" : "Browse articles by category"}
               />
               <Button asChild variant="outline" size="sm">
-                <Link href={`/${locale}/books/nominated-for-translation`}>
-                  {locale === "ar" ? "عرض الكل" : "See All"}
+                <Link href={`/${locale}/articles/harvest`}>
+                  {locale === "ar" ? "كل المقالات" : "All Articles"}
                 </Link>
               </Button>
             </FadeIn>
-            <BookCarousel books={nominated} locale={locale} pageOrder={nextCarouselOrder()} />
+            <StaggerContainer className="flex flex-wrap gap-3">
+              {articleCategories.slice(0, 14).map((cat) => (
+                <StaggerItem key={cat.id}>
+                  <Link
+                    href={`/${locale}/articles/category/${cat.slug}`}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[var(--brand-gray-200)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-gray-700)] transition-all hover:border-[var(--brand-red)] hover:bg-[var(--brand-red-soft)] hover:text-[var(--brand-red)]"
+                  >
+                    {locale === "ar" && cat.nameAr ? cat.nameAr : cat.name}
+                  </Link>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
           </div>
         </AnimatedSection>
       )}
+
+          {/* ── أقسام المقالات (زبدة الأفكار | حصاد الكتب | العالم يقرأ) ── */}
+          <HomeArticlesShowcase locale={locale} channels={readingArticleChannels} />
 
       <HomeMediaSpotlight
         locale={locale}
@@ -415,6 +448,18 @@ export default async function HomePage() {
           </div>
         </AnimatedSection>
       )}
+
+
+      {/* ── انشر كتابك + آخر الكتب المنشورة ─────────────────── */}
+      <HomePublishSection
+        locale={locale}
+        title={editorial.publishStrip.title}
+        description={editorial.publishStrip.description}
+        ctaLabel={editorial.publishStrip.cta}
+        booksTitle={editorial.publishStrip.booksTitle}
+        books={newlyReleased}
+        pageOrder={nextCarouselOrder()}
+      />
  {/* ── تصفّح حسب التصنيف ──────────────────────────────── */}
  {categories.length > 0 && (
         <AnimatedSection className={`section-spacing ${preBg()}`} aria-labelledby="categories-heading">
@@ -436,51 +481,6 @@ export default async function HomePage() {
         </AnimatedSection>
       )}
 
-      {/* ── تصنيفات المقالات ─────────────────────────────────── */}
-      {articleCategories.length > 0 && (
-        <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="article-cats-heading">
-          <div className="container-platform">
-            <FadeIn className="mb-8 flex items-end justify-between gap-4">
-              <SectionHeading
-                id="article-cats-heading"
-                title={locale === "ar" ? "تصنيفات المقالات" : "Article Categories"}
-                subtitle={locale === "ar" ? "تصفّح المقالات حسب التصنيف" : "Browse articles by category"}
-              />
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/${locale}/articles/harvest`}>
-                  {locale === "ar" ? "كل المقالات" : "All Articles"}
-                </Link>
-              </Button>
-            </FadeIn>
-            <StaggerContainer className="flex flex-wrap gap-3">
-              {articleCategories.slice(0, 14).map((cat) => (
-                <StaggerItem key={cat.id}>
-                  <Link
-                    href={`/${locale}/articles/category/${cat.slug}`}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-[var(--brand-gray-200)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-gray-700)] transition-all hover:border-[var(--brand-red)] hover:bg-[var(--brand-red-soft)] hover:text-[var(--brand-red)]"
-                  >
-                    {locale === "ar" && cat.nameAr ? cat.nameAr : cat.name}
-                  </Link>
-                </StaggerItem>
-              ))}
-            </StaggerContainer>
-          </div>
-        </AnimatedSection>
-      )}
-
-      {/* ── أقسام المقالات (زبدة الأفكار | حصاد الكتب | العالم يقرأ) ── */}
-      <HomeArticlesShowcase locale={locale} channels={readingArticleChannels} />
-
-      {/* ── انشر كتابك + آخر الكتب المنشورة ─────────────────── */}
-      <HomePublishSection
-        locale={locale}
-        title={editorial.publishStrip.title}
-        description={editorial.publishStrip.description}
-        ctaLabel={editorial.publishStrip.cta}
-        booksTitle={editorial.publishStrip.booksTitle}
-        books={newlyReleased}
-        pageOrder={nextCarouselOrder()}
-      />
 
       <HomeServicesPreview
         locale={locale}
