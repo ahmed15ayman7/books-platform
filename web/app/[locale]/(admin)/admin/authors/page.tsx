@@ -31,6 +31,7 @@ import {
 import {
   AuthorFormDialog,
 } from "@/components/admin/author-form-dialog";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface Author {
   id: string;
@@ -59,7 +60,6 @@ export default function AdminAuthorsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [listError, setListError] = useState("");
 
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -69,7 +69,6 @@ export default function AdminAuthorsPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    setListError("");
     try {
       const q = new URLSearchParams({
         page: String(page),
@@ -86,14 +85,14 @@ export default function AdminAuthorsPage() {
         error?: { message: string };
       };
       if (!res.ok || !data.success) {
-        setListError(data.error?.message ?? "فشل تحميل المؤلفين");
+        adminToast.error(data.error?.message ?? "فشل تحميل المؤلفين");
         return;
       }
       if (data.data) setAuthors(data.data);
       setTotalPages(data.pagination?.totalPages ?? 1);
       setTotal(data.pagination?.total ?? 0);
     } catch {
-      setListError("حدث خطأ في الاتصال");
+      adminToast.error("حدث خطأ في الاتصال");
     } finally {
       setLoading(false);
     }
@@ -114,7 +113,6 @@ export default function AdminAuthorsPage() {
         : `حذف المؤلف «${row.nameAr ?? row.name}»؟`;
     if (!confirm(msg)) return;
 
-    setListError("");
     try {
       const res = await fetch(`/api/v1/admin/authors/${row.id}`, {
         method: "DELETE",
@@ -122,16 +120,17 @@ export default function AdminAuthorsPage() {
       });
       const data = (await res.json()) as { success: boolean; error?: { message: string } };
       if (!res.ok || !data.success) {
-        setListError(data.error?.message ?? "فشل حذف المؤلف");
+        adminToast.error(data.error?.message ?? "فشل حذف المؤلف");
         return;
       }
+      adminToast.success("delete", row.nameAr ?? row.name);
       if (authors.length === 1 && page > 1) {
         setPage((p) => p - 1);
       } else {
         await load();
       }
     } catch {
-      setListError("حدث خطأ في الاتصال");
+      adminToast.error("حدث خطأ في الاتصال");
     }
   }
 
@@ -217,12 +216,6 @@ export default function AdminAuthorsPage() {
           </div>
         }
       />
-
-      {listError && (
-        <p className="form-error-banner mb-4 rounded-lg px-4 py-2 text-sm">
-          {listError}
-        </p>
-      )}
 
       <AdminListToolbar
         viewMode={viewMode}

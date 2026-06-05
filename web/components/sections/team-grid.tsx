@@ -26,7 +26,7 @@ export function TeamGrid({ members, locale, filter = "all" }: TeamGridProps) {
 
   if (filter !== "all") {
     return (
-      <StaggerContainer className="flex flex-wrap gap-6 justify-between items-center">
+      <StaggerContainer className="flex flex-wrap gap-6 justify-center items-center">
         {filtered.map((member) => (
           <StaggerItem key={member.slug} className="w-[30%]">
             <TeamMemberCard member={member} locale={locale} featured={filter === "featured"} />
@@ -39,7 +39,7 @@ export function TeamGrid({ members, locale, filter = "all" }: TeamGridProps) {
   return (
     <div className="space-y-10">
       {leadership.length > 0 && (
-        <StaggerContainer className="flex flex-wrap gap-6 justify-between items-center">
+        <StaggerContainer className="flex flex-wrap gap-6 justify-center items-center">
           {leadership.map((member) => (
             <StaggerItem key={member.slug} className="w-[30%]">
               <TeamMemberCard member={member} locale={locale} featured />
@@ -49,7 +49,7 @@ export function TeamGrid({ members, locale, filter = "all" }: TeamGridProps) {
       )}
 
       {rest.length > 0 && (
-        <StaggerContainer className="flex flex-wrap gap-6 justify-between items-center">
+        <StaggerContainer className="flex flex-wrap gap-6 justify-center items-center">
           {rest.map((member) => (
             <StaggerItem key={member.slug} className="w-[30%]">
               <TeamMemberCard member={member} locale={locale} />

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminInput } from "@/components/admin/admin-form-field";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 export interface BookPickerItem {
   id: string;
@@ -34,7 +35,6 @@ export function BookMultiPicker({
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<BookPickerItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const search = useCallback(async (term: string) => {
     if (!term.trim()) {
@@ -61,10 +61,9 @@ export function BookMultiPicker({
 
   function addBook(book: BookPickerItem) {
     if (value.length >= max) {
-      setError(`الحد الأقصى ${max} كتب`);
+      adminToast.error(`الحد الأقصى ${max} كتب`);
       return;
     }
-    setError("");
     onChange([...value, book.id], [...selectedBooks, book]);
     setQuery("");
     setResults([]);
@@ -86,7 +85,6 @@ export function BookMultiPicker({
         placeholder={placeholder}
       />
       {loading && <p className="text-xs text-[var(--admin-text-muted)]">جاري البحث...</p>}
-      {error && <p className="text-xs text-[var(--error)]">{error}</p>}
       {results.length > 0 && (
         <ul className="max-h-48 overflow-y-auto rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)]">
           {results.map((book) => (

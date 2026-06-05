@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Trash2, Loader2, AlertTriangle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface AdminEntityDeleteButtonProps {
   apiPath: string;
@@ -25,11 +26,9 @@ export function AdminEntityDeleteButton({
 }: AdminEntityDeleteButtonProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
 
   function executeDelete() {
-    setError("");
     startTransition(async () => {
       try {
         const res = await fetch(apiPath, {
@@ -41,13 +40,14 @@ export function AdminEntityDeleteButton({
           error?: { message?: string };
         };
         if (!res.ok || !data.success) {
-          setError(data.error?.message ?? "فشل الحذف");
+          adminToast.error(data.error?.message ?? "فشل الحذف");
           return;
         }
+        adminToast.success("delete", entityLabel);
         setOpen(false);
         router.push(redirectHref);
       } catch {
-        setError("حدث خطأ في الاتصال");
+        adminToast.error("حدث خطأ في الاتصال");
       }
     });
   }
@@ -62,10 +62,7 @@ export function AdminEntityDeleteButton({
             ? "h-9 w-9 border-[var(--admin-border-strong)] p-0 text-red-400 hover:border-red-800/60 hover:bg-red-950/30"
             : "gap-2 border-[var(--admin-border-strong)] text-red-400 hover:border-red-800/60 hover:bg-red-950/30"
         }
-        onClick={() => {
-          setError("");
-          setOpen(true);
-        }}
+        onClick={() => setOpen(true)}
       >
         <Trash2 className="h-4 w-4" />
         {variant === "text" ? "حذف" : null}
@@ -104,7 +101,6 @@ export function AdminEntityDeleteButton({
               <p className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-muted)] px-3 py-2 text-sm font-medium">
                 {entityTitle}
               </p>
-              {error && <p className="text-sm text-red-400">{error}</p>}
               <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                 <Button type="button" variant="outline" disabled={isPending} onClick={() => setOpen(false)}>
                   إلغاء

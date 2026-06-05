@@ -22,6 +22,7 @@ import { AdminCard } from "@/components/admin/admin-card";
 import { AdminInput, AdminTextarea } from "@/components/admin/admin-form-field";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface Subscriber {
   id: string;
@@ -41,7 +42,6 @@ export default function AdminNewsletterPage() {
   const [campaign, setCampaign] = useState({ subject: "", body: "" });
   const draft = useFormDraft(formDraftId.adminNewsletterCampaign(), campaign, setCampaign);
   const [sending, setSending] = useState(false);
-  const [sendStatus, setSendStatus] = useState("");
   const [sort, setSort] = useState("createdAt:desc");
   const [status, setStatus] = useState("all");
 
@@ -68,7 +68,6 @@ export default function AdminNewsletterPage() {
   async function sendCampaign(e: React.FormEvent) {
     e.preventDefault();
     setSending(true);
-    setSendStatus("");
     try {
       const res = await fetch("/api/v1/admin/newsletter/send", {
         method: "POST",
@@ -76,8 +75,12 @@ export default function AdminNewsletterPage() {
         body: JSON.stringify(campaign),
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
-      if (data.success) draft.clearDraft();
-      setSendStatus(data.success ? "تم إرسال الحملة بنجاح ✓" : (data.error?.message ?? "فشل الإرسال"));
+      if (data.success) {
+        draft.clearDraft();
+        adminToast.success("send", "الحملة البريدية");
+      } else {
+        adminToast.error(data.error?.message ?? "فشل الإرسال");
+      }
     } finally {
       setSending(false);
     }
@@ -160,11 +163,6 @@ export default function AdminNewsletterPage() {
               onChange={(e) => setCampaign((p) => ({ ...p, body: e.target.value }))}
               required
             />
-            {sendStatus && (
-              <p className={`text-xs ${sendStatus.includes("✓") ? "text-[var(--success)]" : "text-[var(--error)]"}`}>
-                {sendStatus}
-              </p>
-            )}
             <Button type="submit" disabled={sending} className="gap-1.5 w-full">
               <Send className="h-4 w-4" />
               {sending ? "جاري الإرسال..." : "إرسال للكل"}

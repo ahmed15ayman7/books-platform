@@ -23,6 +23,7 @@ import {
   AdminGridCardFooter,
 } from "@/components/admin/admin-data-grid";
 import { AdminListView } from "@/components/admin/admin-list-view";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface Comment {
   id: string;
@@ -69,12 +70,24 @@ export default function AdminCommentsPage() {
   async function action(id: string, act: "approve" | "hide" | "delete") {
     const method = act === "delete" ? "DELETE" : "PATCH";
     const body = act !== "delete" ? JSON.stringify({ status: act === "approve" ? "approved" : "hidden" }) : undefined;
-    await fetch(`/api/v1/admin/comments/${id}`, {
-      method,
-      headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
-      body,
-    });
-    await load();
+    try {
+      const res = await fetch(`/api/v1/admin/comments/${id}`, {
+        method,
+        headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
+        body,
+      });
+      const data = (await res.json()) as { success?: boolean; error?: { message?: string } };
+      if (!res.ok || !data.success) {
+        adminToast.error(data.error?.message ?? "فشل تنفيذ الإجراء");
+        return;
+      }
+      if (act === "approve") adminToast.message("تم قبول التعليق");
+      else if (act === "hide") adminToast.message("تم إخفاء التعليق");
+      else adminToast.success("delete", "التعليق");
+      await load();
+    } catch {
+      adminToast.error("حدث خطأ في الاتصال");
+    }
   }
 
   const rowActions = (row: Comment) => (

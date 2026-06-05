@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Loader2, CheckCircle2, AlertCircle, ExternalLink } from "lucide-react";
+import { Save, Loader2 } from "lucide-react";
 import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
+import { adminToast } from "@/lib/admin/admin-toast";
 import { createBook, updateBook, type BookEditData } from "./actions";
 import { adminFieldClass } from "@/components/admin/admin-form-field";
 import { AdminMarkdownHint } from "@/components/admin/admin-markdown-hint";
@@ -150,9 +151,6 @@ export function BookEditForm({
   const router = useRouter();
   const isCreate = !bookId;
   const [isPending, startTransition] = useTransition();
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const [errorMsg, setErrorMsg] = useState("");
-  const [savedPublicSlug, setSavedPublicSlug] = useState<string | null>(null);
 
   const [form, setForm] = useState<BookEditData>(initial);
   const draft = useFormDraft(formDraftId.adminBook(bookId), form, setForm);
@@ -209,22 +207,16 @@ export function BookEditForm({
   }
 
   function submitBook(asDraft = false) {
-    setStatus("idle");
-    setErrorMsg("");
-    setSavedPublicSlug(null);
-
     const nameEn = form.nameEn.trim();
     const nameAr = form.nameAr.trim();
     const slug = form.slug.trim() || slugify(form.nameEn) || slugify(form.nameAr);
 
     if (!nameEn && !nameAr) {
-      setStatus("error");
-      setErrorMsg("الاسم بالعربية أو الإنجليزية مطلوب");
+      adminToast.error("الاسم بالعربية أو الإنجليزية مطلوب");
       return;
     }
     if (!slug) {
-      setStatus("error");
-      setErrorMsg("الرابط المختصر (Slug) مطلوب");
+      adminToast.error("الرابط المختصر (Slug) مطلوب");
       return;
     }
 
@@ -239,27 +231,34 @@ export function BookEditForm({
       if (bookId) {
         const result = await updateBook(bookId, payload);
         if (!result.ok) {
-          setStatus("error");
-          setErrorMsg(result.error);
+          adminToast.error(result.error);
           return;
         }
         draft.clearDraft();
-        setSavedPublicSlug(slug);
-        setStatus("success");
-        setTimeout(() => setStatus("idle"), 8000);
+        if (asDraft) {
+          adminToast.success("draft", "الكتاب");
+        } else {
+          adminToast.success(isCreate ? "create" : "update", "الكتاب", {
+            description: `/${locale}/books/${slug}`,
+            action: {
+              label: "عرض",
+              onClick: () => window.open(`/${locale}/books/${slug}`, "_blank"),
+            },
+          });
+        }
         return;
       }
 
       const result = await createBook(payload);
       if (!result.ok) {
-        setStatus("error");
-        setErrorMsg(result.error);
+        adminToast.error(result.error);
         return;
       }
       if (result.id) {
         draft.clearDraft();
-        setSavedPublicSlug(result.slug ?? slug);
-        setStatus("success");
+        adminToast.success("create", "الكتاب", {
+          description: `/${locale}/books/${result.slug ?? slug}`,
+        });
         setTimeout(() => {
           router.push(`/${locale}/admin/books/${result.id}`);
         }, 4000);
@@ -276,9 +275,6 @@ export function BookEditForm({
     onSave: () => submitBook(false),
     onSaveDraft: () => submitBook(true),
   });
-
-  const successMessage = isCreate ? "تم إنشاء الكتاب بنجاح" : "تم حفظ التغييرات بنجاح";
-  const publicSlug = savedPublicSlug ?? bookSlug ?? (form.slug.trim() || null);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6" dir="rtl" data-admin-save-form>
@@ -603,34 +599,6 @@ export function BookEditForm({
           </Field>
         </div>
       </div>
-
-      {/* ── Status (أسفل النموذج) ─────────────────────────────────── */}
-      {status === "success" && (
-        <div role="status" className="form-success-banner flex flex-col gap-2 rounded-xl px-4 py-3 text-sm">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 shrink-0" />
-            {successMessage}
-          </div>
-          {publicSlug && (
-            <a
-              href={`/${locale}/books/${publicSlug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 hover:underline"
-              dir="ltr"
-            >
-              <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-              /{locale}/books/{publicSlug}
-            </a>
-          )}
-        </div>
-      )}
-      {status === "error" && (
-        <div role="alert" className="form-error-banner flex items-center gap-2 rounded-xl px-4 py-3 text-sm">
-          <AlertCircle className="h-4 w-4 shrink-0" />
-          {errorMsg}
-        </div>
-      )}
 
       {/* ── Save bar ─────────────────────────────────────────────── */}
       <div className="sticky bottom-0 flex items-center justify-between gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-5 py-3 shadow-lg">

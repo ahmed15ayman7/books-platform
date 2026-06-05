@@ -15,6 +15,7 @@ import { AdminSlugInput } from "@/components/admin/admin-form-field";
 import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 export interface AuthorFormValues {
   id?: string;
@@ -64,7 +65,6 @@ export function AuthorFormDialog({
   const [form, setForm] = useState<AuthorFormValues>(emptyForm);
   const draft = useFormDraft(formDraftId.adminAuthor(author?.id), form, setForm, { enabled: open });
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!open) return;
@@ -87,7 +87,6 @@ export function AuthorFormDialog({
         bioAr: "",
       });
     }
-    setError("");
   }, [open, author, initialName]);
 
   const set = (key: keyof AuthorFormValues) => (value: string) =>
@@ -96,16 +95,15 @@ export function AuthorFormDialog({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    setError("");
 
     const finalSlug = form.slug.trim() || slugify(form.name);
     if (!form.name.trim() && !form.nameAr.trim()) {
-      setError("أدخل اسم المؤلف بالعربية أو الإنجليزية");
+      adminToast.error("أدخل اسم المؤلف بالعربية أو الإنجليزية");
       setSaving(false);
       return;
     }
     if (!finalSlug) {
-      setError("الرابط المختصر (Slug) مطلوب");
+      adminToast.error("الرابط المختصر (Slug) مطلوب");
       setSaving(false);
       return;
     }
@@ -129,15 +127,16 @@ export function AuthorFormDialog({
         error?: { message: string };
       };
       if (!res.ok || !data.success || !data.data) {
-        setError(data.error?.message ?? "فشل الحفظ");
+        adminToast.error(data.error?.message ?? "فشل الحفظ");
         return;
       }
+      adminToast.success(isEdit ? "update" : "create", "المؤلف");
       onSaved?.(data.data);
       draft.clearDraft();
       onOpenChange(false);
       setForm(emptyForm);
     } catch {
-      setError("حدث خطأ في الاتصال");
+      adminToast.error("حدث خطأ في الاتصال");
     } finally {
       setSaving(false);
     }
@@ -193,7 +192,6 @@ export function AuthorFormDialog({
             />
           </div>
 
-          {error && <p className="text-xs text-[var(--error)]">{error}</p>}
           <DialogFooter className="gap-2 sm:gap-0">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               إلغاء

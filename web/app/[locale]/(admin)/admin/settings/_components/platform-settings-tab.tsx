@@ -12,6 +12,7 @@ import { can } from "@/lib/admin/permissions-client";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface Settings {
   platformNameAr: string;
@@ -50,8 +51,7 @@ export function PlatformSettingsTab() {
   const [loaded, setLoaded] = useState(false);
   const draft = useFormDraft(formDraftId.adminPlatformSettings(), settings, setSettings, { ready: loaded });
   const [saving, setSaving] = useState(false);
-  const [status, setStatus] = useState("");
-  const { runWithPasskey, error: passkeyError } = usePasskeyGate();
+  const { runWithPasskey } = usePasskeyGate();
   const canUpdate = can(PERMISSIONS.settings.update);
 
   useEffect(() => {
@@ -68,7 +68,6 @@ export function PlatformSettingsTab() {
     e.preventDefault();
     if (!canUpdate) return;
     setSaving(true);
-    setStatus("");
     await runWithPasskey(async () => {
       try {
         const res = await fetch("/api/v1/admin/settings", {
@@ -77,15 +76,18 @@ export function PlatformSettingsTab() {
           body: JSON.stringify(settings),
         });
         const data = (await res.json()) as { success: boolean };
-        if (data.success) draft.clearDraft();
-        setStatus(data.success ? "تم الحفظ بنجاح ✓" : "فشل الحفظ");
+        if (data.success) {
+          draft.clearDraft();
+          adminToast.success("save", "إعدادات المنصة");
+        } else {
+          adminToast.error("فشل الحفظ");
+        }
       } catch {
-        setStatus("حدث خطأ");
+        adminToast.error("حدث خطأ");
       } finally {
         setSaving(false);
       }
     });
-    setSaving(false);
   }
 
   const set =
@@ -183,14 +185,6 @@ export function PlatformSettingsTab() {
           }
         />
       </AdminCard>
-
-      {(status || passkeyError) && (
-        <p
-          className={`text-sm ${status.includes("✓") ? "text-[var(--success)]" : "text-[var(--error)]"}`}
-        >
-          {passkeyError || status}
-        </p>
-      )}
 
       {canUpdate && (
         <Button type="submit" disabled={saving} className="gap-1.5">

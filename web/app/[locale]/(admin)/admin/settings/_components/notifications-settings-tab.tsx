@@ -15,6 +15,7 @@ import { can } from "@/lib/admin/permissions-client";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface LogRow {
   id: string;
@@ -32,8 +33,7 @@ export function NotificationsSettingsTab() {
   const [loaded, setLoaded] = useState(false);
   const draft = useFormDraft(formDraftId.adminNotificationSettings(), settings, setSettings, { ready: loaded });
   const [logs, setLogs] = useState<LogRow[]>([]);
-  const [status, setStatus] = useState("");
-  const { runWithPasskey, error: passkeyError } = usePasskeyGate();
+  const { runWithPasskey } = usePasskeyGate();
   const canUpdate = can(PERMISSIONS.settings.update);
 
   useEffect(() => {
@@ -65,8 +65,12 @@ export function NotificationsSettingsTab() {
         body: JSON.stringify(settings),
       });
       const data = (await res.json()) as { success: boolean };
-      if (data.success) draft.clearDraft();
-      setStatus(data.success ? "تم الحفظ ✓" : "فشل الحفظ");
+      if (data.success) {
+        draft.clearDraft();
+        adminToast.success("save", "إعدادات الإشعارات");
+      } else {
+        adminToast.error("فشل الحفظ");
+      }
     });
   }
 
@@ -164,14 +168,6 @@ export function NotificationsSettingsTab() {
           )}
         </div>
       </AdminCard>
-
-      {(status || passkeyError) && (
-        <p
-          className={`text-sm ${status.includes("✓") ? "text-[var(--success)]" : "text-[var(--error)]"}`}
-        >
-          {passkeyError || status}
-        </p>
-      )}
 
       {canUpdate && (
         <Button type="submit" className="gap-1.5">

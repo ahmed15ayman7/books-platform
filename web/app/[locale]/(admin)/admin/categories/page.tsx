@@ -25,6 +25,7 @@ import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { autoSlugFromEnglish } from "@/lib/admin/slugify";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface Category {
   id: string;
@@ -56,7 +57,6 @@ export default function AdminCategoriesPage() {
   const [form, setForm] = useState<CatForm>(emptyForm);
   const draft = useFormDraft(formDraftId.adminCategory(editingId), form, setForm);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -92,13 +92,11 @@ export default function AdminCategoriesPage() {
   function openEdit(cat: Category) {
     setEditingId(cat.id);
     setForm({ name: cat.name, nameAr: cat.nameAr ?? "", slug: cat.slug, active: cat.active });
-    setError("");
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    setError("");
     try {
       const url = editingId ? `/api/v1/admin/categories/${editingId}` : "/api/v1/admin/categories";
       const res = await fetch(url, {
@@ -107,19 +105,39 @@ export default function AdminCategoriesPage() {
         body: JSON.stringify(form),
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
-      if (!res.ok || !data.success) { setError(data.error?.message ?? "فشل الحفظ"); return; }
+      if (!res.ok || !data.success) {
+        adminToast.error(data.error?.message ?? "فشل الحفظ");
+        return;
+      }
+      adminToast.success(editingId ? "update" : "create", "التصنيف");
       draft.clearDraft();
       setForm(emptyForm);
       setEditingId(null);
       await load();
-    } catch { setError("حدث خطأ في الاتصال"); }
-    finally { setSaving(false); }
+    } catch {
+      adminToast.error("حدث خطأ في الاتصال");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function handleDelete(id: string) {
     if (!confirm("حذف هذا التصنيف؟")) return;
-    await fetch(`/api/v1/admin/categories/${id}`, { method: "DELETE", headers: adminAuthHeaders() });
-    await load();
+    try {
+      const res = await fetch(`/api/v1/admin/categories/${id}`, {
+        method: "DELETE",
+        headers: adminAuthHeaders(),
+      });
+      const data = await res.json() as { success: boolean; error?: { message: string } };
+      if (!res.ok || !data.success) {
+        adminToast.error(data.error?.message ?? "فشل الحذف");
+        return;
+      }
+      adminToast.success("delete", "التصنيف");
+      await load();
+    } catch {
+      adminToast.error("حدث خطأ في الاتصال");
+    }
   }
 
   const set = (k: keyof CatForm) => (v: string | boolean) =>
@@ -251,7 +269,6 @@ export default function AdminCategoriesPage() {
               checked={form.active}
               onChange={(e) => set("active")(e.target.checked)}
             />
-            {error && <p className="text-xs text-[var(--error)]">{error}</p>}
             <div className="flex gap-2 pt-1">
               <Button type="submit" size="sm" disabled={saving}>
                 {saving ? "..." : editingId ? "تحديث" : "إضافة"}

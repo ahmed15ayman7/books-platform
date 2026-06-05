@@ -18,6 +18,7 @@ import { loadAdminSession } from "@/lib/admin/permissions-client";
 import { getAccessibleTrashTypes } from "@/lib/admin/content-hub-permissions";
 import { TRASH_RETENTION_DAYS } from "@/lib/admin/trash-config";
 import { formatAdminDateTime } from "@/lib/admin/format-dates";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface TrashItem {
   id: string;
@@ -72,7 +73,6 @@ export default function AdminTrashPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
-  const [error, setError] = useState("");
   const [actionTarget, setActionTarget] = useState<TrashItem | null>(null);
   const [purgeOpen, setPurgeOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -85,7 +85,6 @@ export default function AdminTrashPage() {
   const load = useCallback(async () => {
     if (accessibleTypes.length === 0) return;
     setLoading(true);
-    setError("");
     try {
       const q = new URLSearchParams({
         type: activeType,
@@ -102,7 +101,7 @@ export default function AdminTrashPage() {
         setTotal(data.pagination?.total ?? 0);
       } else {
         setItems([]);
-        setError("تعذّر تحميل سلة المحذوفات");
+        adminToast.error("تعذّر تحميل سلة المحذوفات");
       }
     } finally {
       setLoading(false);
@@ -126,7 +125,6 @@ export default function AdminTrashPage() {
   function handleRestore(item: TrashItem) {
     setActionTarget(item);
     startTransition(async () => {
-      setError("");
       try {
         const res = await fetch("/api/v1/admin/trash/restore", {
           method: "POST",
@@ -135,13 +133,14 @@ export default function AdminTrashPage() {
         });
         const data = (await res.json()) as { success?: boolean; error?: { message?: string } };
         if (!res.ok || !data.success) {
-          setError(data.error?.message ?? "فشل الاستعادة");
+          adminToast.error(data.error?.message ?? "فشل الاستعادة");
           return;
         }
+        adminToast.success("restore", item.title);
         setActionTarget(null);
         await load();
       } catch {
-        setError("حدث خطأ في الاتصال");
+        adminToast.error("حدث خطأ في الاتصال");
       }
     });
   }
@@ -153,7 +152,6 @@ export default function AdminTrashPage() {
 
   function executePurge() {
     if (!actionTarget) return;
-    setError("");
     startTransition(async () => {
       try {
         const res = await fetch("/api/v1/admin/trash/purge", {
@@ -166,14 +164,15 @@ export default function AdminTrashPage() {
           error?: { message?: string };
         };
         if (!res.ok || !data.success) {
-          setError(data.error?.message ?? "فشل الحذف النهائي");
+          adminToast.error(data.error?.message ?? "فشل الحذف النهائي");
           return;
         }
+        adminToast.success("delete", actionTarget.title);
         setPurgeOpen(false);
         setActionTarget(null);
         await load();
       } catch {
-        setError("حدث خطأ في الاتصال");
+        adminToast.error("حدث خطأ في الاتصال");
       }
     });
   }
@@ -204,12 +203,6 @@ export default function AdminTrashPage() {
           }}
         />
       </div>
-
-      {error && (
-        <p className="mb-4 text-sm text-red-400" role="alert">
-          {error}
-        </p>
-      )}
 
       <div className="overflow-hidden rounded-xl border border-[var(--admin-border)]">
         <table className="w-full text-sm">

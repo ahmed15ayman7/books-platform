@@ -9,6 +9,7 @@ import { AdminCard } from "@/components/admin/admin-card";
 import { AdminInput, AdminTextarea } from "@/components/admin/admin-form-field";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface BroadcastForm {
   channel: string;
@@ -23,12 +24,10 @@ export default function AdminNotificationsPage() {
   const [form, setForm] = useState<BroadcastForm>(empty);
   const draft = useFormDraft(formDraftId.adminNotificationBroadcast(), form, setForm);
   const [sending, setSending] = useState(false);
-  const [status, setStatus] = useState("");
 
   async function handleSend(e: React.FormEvent) {
     e.preventDefault();
     setSending(true);
-    setStatus("");
     try {
       const res = await fetch("/api/v1/admin/notifications/broadcast", {
         method: "POST",
@@ -36,13 +35,15 @@ export default function AdminNotificationsPage() {
         body: JSON.stringify(form),
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
-      setStatus(data.success ? "تم الإرسال بنجاح ✓" : (data.error?.message ?? "فشل الإرسال"));
-      if (data.success) {
-        draft.clearDraft();
-        setForm(empty);
+      if (!data.success) {
+        adminToast.error(data.error?.message ?? "فشل الإرسال");
+        return;
       }
+      adminToast.success("send", "الإشعار");
+      draft.clearDraft();
+      setForm(empty);
     } catch {
-      setStatus("حدث خطأ في الاتصال");
+      adminToast.error("حدث خطأ في الاتصال");
     } finally {
       setSending(false);
     }
@@ -99,12 +100,6 @@ export default function AdminNotificationsPage() {
             <AdminInput label="عنوان الإشعار *" value={form.title} onChange={set("title")} required />
             <AdminTextarea label="نص الإشعار *" rows={4} value={form.body} onChange={set("body")} required />
             <AdminInput label="رابط الإشعار (اختياري)" value={form.url} onChange={set("url")} placeholder="https://..." />
-
-            {status && (
-              <p className={`text-sm ${status.includes("✓") ? "text-[var(--success)]" : "text-[var(--error)]"}`}>
-                {status}
-              </p>
-            )}
 
             <Button type="submit" disabled={sending} className="gap-1.5 w-full">
               <Send className="h-4 w-4" />

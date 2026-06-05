@@ -13,6 +13,7 @@ import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { formatAdminDateTime } from "@/lib/admin/format-dates";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface HeroSlide {
   id: string;
@@ -50,7 +51,6 @@ export default function AdminHomeSliderPage() {
   const [form, setForm] = useState(emptyForm);
   const draft = useFormDraft(formDraftId.adminHomeSlide(editingId), form, setForm);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
 
   const loadSlides = useCallback(async () => {
     setLoading(true);
@@ -72,7 +72,6 @@ export default function AdminHomeSliderPage() {
   function openCreate() {
     setEditingId(null);
     setForm(emptyForm);
-    setError("");
   }
 
   function openEdit(slide: HeroSlide) {
@@ -88,13 +87,11 @@ export default function AdminHomeSliderPage() {
       position: slide.position,
       isActive: slide.isActive,
     });
-    setError("");
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    setError("");
     const payload = {
       titleAr: form.titleAr,
       titleEn: form.titleEn || null,
@@ -118,15 +115,16 @@ export default function AdminHomeSliderPage() {
       });
       const data = (await res.json()) as { success: boolean; error?: { message: string } };
       if (!res.ok || !data.success) {
-        setError(data.error?.message ?? "فشل الحفظ");
+        adminToast.error(data.error?.message ?? "فشل الحفظ");
         return;
       }
+      adminToast.success(editingId ? "update" : "create", "الشريحة");
       setForm(emptyForm);
       setEditingId(null);
       draft.clearDraft();
       await loadSlides();
     } catch {
-      setError("حدث خطأ في الاتصال");
+      adminToast.error("حدث خطأ في الاتصال");
     } finally {
       setSaving(false);
     }
@@ -134,11 +132,21 @@ export default function AdminHomeSliderPage() {
 
   async function handleDelete(id: string) {
     if (!confirm(locale === "ar" ? "حذف هذه الشريحة؟" : "Delete this slide?")) return;
-    await fetch(`/api/v1/admin/hero-slides/${id}`, {
-      method: "DELETE",
-      headers: adminAuthHeaders(),
-    });
-    await loadSlides();
+    try {
+      const res = await fetch(`/api/v1/admin/hero-slides/${id}`, {
+        method: "DELETE",
+        headers: adminAuthHeaders(),
+      });
+      const data = (await res.json()) as { success: boolean; error?: { message: string } };
+      if (!res.ok || !data.success) {
+        adminToast.error(data.error?.message ?? "فشل الحذف");
+        return;
+      }
+      adminToast.success("delete", "الشريحة");
+      await loadSlides();
+    } catch {
+      adminToast.error("حدث خطأ في الاتصال");
+    }
   }
 
   return (
@@ -215,7 +223,6 @@ export default function AdminHomeSliderPage() {
                 </Label>
               </div>
             </div>
-            {error && <p className="text-sm text-red-400">{error}</p>}
             <div className="flex gap-2 pt-2">
               <Button type="submit" disabled={saving}>
                 {saving ? "جاري الحفظ..." : editingId ? "تحديث" : "إضافة"}

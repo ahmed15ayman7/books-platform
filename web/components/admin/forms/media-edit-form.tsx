@@ -19,6 +19,7 @@ import { adminMediaViewPath } from "@/lib/admin/public-urls";
 import { ArticleLivePreview } from "@/components/admin/article-live-preview";
 import { ArticleMarkdownHint } from "@/components/admin/article-markdown-hint";
 import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface MediaForm {
   title: string;
@@ -73,8 +74,6 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
   const [selectedBooks, setSelectedBooks] = useState<BookPickerItem[]>([]);
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [timestamps, setTimestamps] = useState<{ createdAt?: string; updatedAt?: string }>({});
 
   const previewVideoId = useMemo(() => parseYoutubeUrl(form.youtubeUrl).videoId, [form.youtubeUrl]);
@@ -122,12 +121,10 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
 
   async function submitMedia(asDraft = false) {
     if (!previewVideoId) {
-      setError("رابط YouTube غير صالح");
+      adminToast.error("رابط YouTube غير صالح");
       return;
     }
     setSaving(true);
-    setError("");
-    setSuccess(false);
     try {
       const payload = {
         ...form,
@@ -146,16 +143,16 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
       });
       const data = await res.json() as { success: boolean; error?: { message: string }; data?: { id: string } };
       if (!res.ok || !data.success) {
-        setError(data.error?.message ?? "فشل الحفظ");
+        adminToast.error(data.error?.message ?? "فشل الحفظ");
         return;
       }
-      setSuccess(true);
+      adminToast.success(asDraft ? "draft" : isNew ? "create" : "update", "الفيديو");
       const savedId = isNew ? data.data?.id : id;
       if (savedId && isNew) {
         router.push(adminMediaViewPath(locale, savedId));
       }
     } catch {
-      setError("حدث خطأ في الاتصال");
+      adminToast.error("حدث خطأ في الاتصال");
     } finally {
       setSaving(false);
     }
@@ -263,17 +260,6 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
               />
             </div>
           </AdminCard>
-
-          {error && (
-            <p className="form-error-banner rounded-lg px-4 py-2 text-sm">
-              {error}
-            </p>
-          )}
-          {success && (
-            <p className="rounded-lg border border-[var(--success)]/30 bg-[var(--success-soft)] px-4 py-2 text-sm text-[var(--success)]">
-              تم الحفظ بنجاح
-            </p>
-          )}
 
           <div className="flex gap-3">
             <Button type="submit" disabled={saving || !previewVideoId}>

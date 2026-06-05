@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
-import { ContentPageShell } from "@/components/sections/content-page-shell";
 import { SectionBlock } from "@/components/sections/section-block";
 import { TeamGrid } from "@/components/sections/team-grid";
+import { TeamCollageHero } from "@/components/sections/team-collage-hero";
 import { TeamQuoteBlock } from "@/components/sections/team-quote-block";
 import { TeamDepartments } from "@/components/sections/team-departments";
 import { CtaBand } from "@/components/sections/cta-band";
+import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
 import { getTeamContent } from "@/lib/content/team";
 import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -35,48 +36,51 @@ export default async function TeamPage() {
   const isAr = locale === "ar";
 
   return (
-    <ContentPageShell
-      locale={locale}
-      hero={{
-        title: content.hero.title,
-        subtitle: content.hero.subtitle,
-        variant: "dark",
-        size: "lg",
-        breadcrumbs: [
+    <div className="min-h-screen bg-[var(--brand-gray-50)]">
+      <TeamCollageHero
+        locale={locale}
+        title={content.hero.title}
+        subtitle={content.hero.subtitle}
+        members={content.members}
+        breadcrumbs={[
           { label: isAr ? "الرئيسية" : "Home", href: `/${locale}` },
           { label: content.hero.title },
-        ],
-      }}
-    >
-      <SectionBlock lead={content.intro} />
-
-      <SectionBlock id="leadership" title={content.leadershipSection.title}>
-        <TeamGrid members={content.members} locale={locale} filter="featured" />
-      </SectionBlock>
-
-      <SectionBlock id="team" title={content.teamSection.title}>
-        <TeamGrid members={content.members} locale={locale} filter="non-featured" />
-      </SectionBlock>
-
-      <TeamDepartments
-        locale={locale}
-        eyebrow={content.departments.eyebrow}
-        title={content.departments.title}
-        items={content.departments.items}
+        ]}
       />
 
-      <TeamQuoteBlock
-        quote={content.quote}
-        ctaHref={`/${locale}/contact`}
-        ctaLabel={content.cta}
-      />
+      <div className="container-platform py-14 md:py-16">
+        <AnimatedContentSections>
+          <SectionBlock lead={content.intro} />
 
-      <CtaBand
-        primaryHref={`/${locale}/contact`}
-        primaryLabel={content.cta}
-        secondaryHref={`/${locale}/about`}
-        secondaryLabel={isAr ? "من نحن" : "About Us"}
-      />
-    </ContentPageShell>
+          <SectionBlock id="leadership" title={content.leadershipSection.title}>
+            <TeamGrid members={content.members} locale={locale} filter="featured" />
+          </SectionBlock>
+
+          <SectionBlock id="team" title={content.teamSection.title}>
+            <TeamGrid members={content.members} locale={locale} filter="non-featured" />
+          </SectionBlock>
+
+          <TeamDepartments
+            locale={locale}
+            eyebrow={content.departments.eyebrow}
+            title={content.departments.title}
+            items={content.departments.items}
+          />
+
+          <TeamQuoteBlock
+            quote={content.quote}
+            ctaHref={`/${locale}/contact`}
+            ctaLabel={content.cta}
+          />
+
+          <CtaBand
+            primaryHref={`/${locale}/contact`}
+            primaryLabel={content.cta}
+            secondaryHref={`/${locale}/about`}
+            secondaryLabel={isAr ? "من نحن" : "About Us"}
+          />
+        </AnimatedContentSections>
+      </div>
+    </div>
   );
 }

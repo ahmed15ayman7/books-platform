@@ -7,6 +7,7 @@ import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminInput } from "@/components/admin/admin-form-field";
 import { usePasskeyGate } from "@/lib/admin/use-passkey-gate";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface PasskeyRow {
   id: string;
@@ -18,7 +19,7 @@ interface PasskeyRow {
 export function PasskeyManager() {
   const [passkeys, setPasskeys] = useState<PasskeyRow[]>([]);
   const [deviceName, setDeviceName] = useState("");
-  const { busy, error, registerPasskey } = usePasskeyGate();
+  const { busy, registerPasskey } = usePasskeyGate();
 
   const load = useCallback(async () => {
     const res = await fetch("/api/v1/admin/passkey", { headers: adminAuthHeaders() });
@@ -42,10 +43,16 @@ export function PasskeyManager() {
   }
 
   async function handleDelete(id: string) {
-    await fetch(`/api/v1/admin/passkey/${id}`, {
+    const res = await fetch(`/api/v1/admin/passkey/${id}`, {
       method: "DELETE",
       headers: adminAuthHeaders(),
     });
+    const data = (await res.json()) as { success?: boolean; error?: { message?: string } };
+    if (!res.ok || !data.success) {
+      adminToast.error(data.error?.message ?? "فشل حذف Passkey");
+      return;
+    }
+    adminToast.success("delete", "Passkey");
     void load();
   }
 
@@ -72,8 +79,6 @@ export function PasskeyManager() {
             {busy ? "جاري..." : "إضافة Passkey"}
           </Button>
         </div>
-
-        {error && <p className="text-sm text-[var(--error)]">{error}</p>}
 
         <ul className="divide-y divide-[var(--admin-border)] rounded-lg border border-[var(--admin-border)]">
           {passkeys.length === 0 ? (

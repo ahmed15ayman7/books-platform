@@ -15,6 +15,7 @@ import { autoSlugFromEnglish } from "@/lib/admin/slugify";
 import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { adminAuthorViewPath } from "@/lib/admin/public-urls";
 import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface AuthorForm {
   name: string;
@@ -45,8 +46,6 @@ export function AuthorEditForm({ locale, id }: AuthorEditFormProps) {
   const [loading, setLoading] = useState(!isNew);
   const draft = useFormDraft(formDraftId.adminAuthor(id), form, setForm, { ready: !loading });
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [timestamps, setTimestamps] = useState<{ createdAt?: string; updatedAt?: string }>({});
 
   const load = useCallback(async () => {
@@ -80,12 +79,10 @@ export function AuthorEditForm({ locale, id }: AuthorEditFormProps) {
 
   async function submitAuthor() {
     if (!form.name.trim()) {
-      setError("الاسم الإنجليزي مطلوب");
+      adminToast.error("الاسم الإنجليزي مطلوب");
       return;
     }
     setSaving(true);
-    setError("");
-    setSuccess(false);
     try {
       const url = isNew ? "/api/v1/admin/authors" : `/api/v1/admin/authors/${id}`;
       const res = await fetch(url, {
@@ -95,17 +92,17 @@ export function AuthorEditForm({ locale, id }: AuthorEditFormProps) {
       });
       const data = await res.json() as { success: boolean; error?: { message: string }; data?: { id: string } };
       if (!res.ok || !data.success) {
-        setError(data.error?.message ?? "فشل الحفظ");
+        adminToast.error(data.error?.message ?? "فشل الحفظ");
         return;
       }
-      setSuccess(true);
       draft.clearDraft();
+      adminToast.success(isNew ? "create" : "update", "المؤلف");
       const savedId = isNew ? data.data?.id : id;
       if (savedId && isNew) {
         router.push(adminAuthorViewPath(locale, savedId));
       }
     } catch {
-      setError("حدث خطأ في الاتصال");
+      adminToast.error("حدث خطأ في الاتصال");
     } finally {
       setSaving(false);
     }
@@ -186,17 +183,6 @@ export function AuthorEditForm({ locale, id }: AuthorEditFormProps) {
             />
           </div>
         </AdminCard>
-
-        {error && (
-          <p className="form-error-banner rounded-lg px-4 py-2 text-sm">
-            {error}
-          </p>
-        )}
-        {success && (
-          <p className="rounded-lg bg-[var(--success-soft)] border border-[var(--success)]/30 px-4 py-2 text-sm text-[var(--success)]">
-            تم الحفظ بنجاح
-          </p>
-        )}
 
         <div className="flex gap-3">
           <Button type="submit" disabled={saving}>
