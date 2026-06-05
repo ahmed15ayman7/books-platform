@@ -64,7 +64,7 @@ export function getHomeEditorial(locale: Locale) {
       })),
     },
     mediaSpotlight: {
-      title: isAr ? "أحدث الفيديوهات" : "Latest Videos",
+      title: isAr ? "إبداعات الميديا" : "Media Creations",
       subtitle: isAr ? "من قنوات الميديا" : "From our media channels",
       cta: isAr ? "كل الفيديوهات" : "All Videos",
     },

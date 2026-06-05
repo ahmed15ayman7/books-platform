@@ -10,7 +10,6 @@ import { JsonLd, websiteJsonLd, organizationJsonLd } from "@/components/seo/json
 import { BookCarousel } from "@/components/sections/book-carousel";
 import { BookCard } from "@/components/sections/book-card";
 import { CategoryGrid } from "@/components/sections/category-grid";
-import { ArticleCard } from "@/components/sections/article-card";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { NewsletterStrip } from "@/components/sections/newsletter-strip";
 import { PublishersMarquee } from "@/components/sections/publishers-marquee";
@@ -19,7 +18,6 @@ import { Button } from "@/components/ui/button";
 import { PenTool, Library, PenLine, Building2 } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
 import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
-import { articleLinkedBookDisplay } from "@/lib/i18n/article-linked-book";
 import {
   AnimatedSection,
   FadeIn,
@@ -30,7 +28,9 @@ import { getHomeEditorial } from "@/lib/content/home-editorial";
 import { ABOUT_IMAGES } from "@/lib/content/image-assets";
 import { HomeMissionStrip } from "@/components/sections/home/home-mission-strip";
 import { HomeMediaSpotlight } from "@/components/sections/home/home-media-spotlight";
+import { HomeArticlesShowcase } from "@/components/sections/home/home-articles-showcase";
 import { HomeServicesPreview } from "@/components/sections/home/home-services-preview";
+import { shuffleArray } from "@/lib/utils/shuffle";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as Locale;
@@ -50,12 +50,15 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-const ARTICLE_CHANNELS = [
-  { key: "ideas",           ar: "زبدة الأفكار",  en: "Essence of Ideas", path: "articles/ideas" },
-  { key: "harvest",         ar: "حصاد الكتب",     en: "Book Harvest",     path: "articles/harvest" },
-  { key: "world-reads",     ar: "العالم يقرأ",    en: "World Reads",      path: "articles/world-reads" },
-  { key: "books-talk",      ar: "حديث الكتب",     en: "Books Talk",       path: "media/books-talk" },
-  { key: "novel-story",     ar: "رواية فحكاية",   en: "Novel & Story",    path: "media/novel-story" },
+const READING_ARTICLE_CHANNELS = [
+  { key: "ideas",       ar: "زبدة الأفكار",  en: "Essence of Ideas", path: "articles/ideas" },
+  { key: "harvest",     ar: "حصاد الكتب",     en: "Book Harvest",     path: "articles/harvest" },
+  { key: "world-reads", ar: "العالم يقرأ",    en: "World Reads",      path: "articles/world-reads" },
+] as const;
+
+const MEDIA_HOME_CHANNELS = [
+  { key: "novel-story", ar: "رواية فحكاية", en: "Novel & Story", path: "media/novel-story" },
+  { key: "books-talk", ar: "حديث الكتب", en: "Books Talk", path: "media/books-talk" },
 ] as const;
 
 // Alternates bg-white / bg-[#fff7f6] for each section rendered
@@ -69,7 +72,8 @@ export default async function HomePage() {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("home");
 
-  const [homeBooks, articlesMap, dbSlides, categories, articleCategories, latestMedia] = await Promise.all([
+  const [homeBooks, articlesMap, dbSlides, categories, articleCategories, mediaNovel, mediaBooksTalk] =
+    await Promise.all([
     BookService.getHomeData().catch(() => ({
       newlyReleased: [],
       translated: [],
@@ -82,10 +86,30 @@ export default async function HomePage() {
     HeroSlideService.listActive().catch(() => []),
     BookService.getCategories().catch(() => []),
     ArticleService.getCategories().catch(() => []),
-    ArticleService.getLatestMedia(4).catch(() => []),
+    ArticleService.list({ page: 1, limit: 5, mediaOnly: true, channel: "novel-story", sort: "newest" }).catch(
+      () => ({ articles: [] }),
+    ),
+    ArticleService.list({ page: 1, limit: 5, mediaOnly: true, channel: "books-talk", sort: "newest" }).catch(
+      () => ({ articles: [] }),
+    ),
   ]);
 
   const editorial = getHomeEditorial(locale);
+
+  const mediaChannelResults = [mediaNovel, mediaBooksTalk];
+  const mediaChannels = MEDIA_HOME_CHANNELS.map((ch, index) => ({
+    key: ch.key,
+    title: locale === "ar" ? ch.ar : ch.en,
+    href: `/${locale}/${ch.path}`,
+    videos: (mediaChannelResults[index]?.articles ?? [])
+      .filter((a) => a.videoId)
+      .map((a) => ({
+        slug: a.slug,
+        title: a.title,
+        videoId: a.videoId as string,
+        imageUrl: a.imageUrl,
+      })),
+  }));
 
   const heroSlides =
     dbSlides.length > 0
@@ -135,6 +159,24 @@ export default async function HomePage() {
   };
   const articles = articlesMap as Record<string, ArticleSnippet[]>;
 
+  const stripExcerpt = (html: string | null) =>
+    html?.replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").trim() ?? null;
+
+  const readingArticleChannels = READING_ARTICLE_CHANNELS.map((ch) => ({
+    key: ch.key,
+    title: locale === "ar" ? ch.ar : ch.en,
+    href: `/${locale}/${ch.path}`,
+    articles: shuffleArray(articles[ch.key] ?? [])
+      .filter((a) => a.slug && a.title)
+      .slice(0, 4)
+      .map((a) => ({
+        slug: a.slug,
+        title: a.title ?? "",
+        excerpt: stripExcerpt(a.excerpt),
+        imageUrl: a.imageUrl,
+      })),
+  }));
+
   // Split category sections: first 3, then interleave "آخر الكتب المنشورة", rest
   const catsBefore = categorySections.slice(0, 3);
   const catsAfter  = categorySections.slice(3);
@@ -146,7 +188,7 @@ export default async function HomePage() {
 
   // After dark publishers section backgrounds reset to 0
   const postDarkBgs = buildBgList(
-    4 + ARTICLE_CHANNELS.length, // publishers grid + translated + nominated + article categories + media/reading channels
+    4, // publishers grid + translated + nominated + article categories
   );
 
   let preIdx  = 0;
@@ -285,9 +327,7 @@ export default async function HomePage() {
       <HomeMediaSpotlight
         locale={locale}
         title={editorial.mediaSpotlight.title}
-        subtitle={editorial.mediaSpotlight.subtitle}
-        cta={editorial.mediaSpotlight.cta}
-        videos={latestMedia}
+        channels={mediaChannels}
       />
 
       {/* ── دور النشر — dark ────────────────────────────────── */}
@@ -449,79 +489,8 @@ export default async function HomePage() {
         </AnimatedSection>
       )}
 
-      {/* ── Article channel sections ──────────────────────────── */}
-      {ARTICLE_CHANNELS.map((ch) => {
-        const channelArticles = articles[ch.key] ?? [];
-        if (!channelArticles.length) return null;
-        const bg = postBg();
-        const [featuredRaw, ...restRaw] = channelArticles;
-        if (!featuredRaw?.slug) return null;
-        const featuredLinked = articleLinkedBookDisplay(featuredRaw.products?.[0], locale);
-        const featured = {
-          ...featuredRaw,
-          linkedBook: featuredLinked,
-        };
-        const rest = restRaw
-          .filter((a) => !!a.slug)
-          .map((a) => ({
-            ...a,
-            linkedBook: articleLinkedBookDisplay(a.products?.[0], locale),
-          }));
-        return (
-          <AnimatedSection
-            key={ch.key}
-            className={`section-spacing ${bg}`}
-            aria-labelledby={`ch-${ch.key}-heading`}
-          >
-            <div className="container-platform">
-              <FadeIn className="mb-8 flex items-end justify-between gap-4">
-                <SectionHeading
-                  id={`ch-${ch.key}-heading`}
-                  title={locale === "ar" ? ch.ar : ch.en}
-                />
-                <Button asChild variant="outline" size="sm">
-                  <Link href={`/${locale}/${ch.path}`}>
-                    {locale === "ar" ? "عرض الكل" : "See All"}
-                  </Link>
-                </Button>
-              </FadeIn>
-              <StaggerContainer
-                className={rest.length > 0 ? "grid grid-cols-1 items-stretch gap-6 md:grid-cols-3" : "max-w-2xl"}
-              >
-                <StaggerItem className={rest.length > 0 ? "md:col-span-2" : ""}>
-                  <ArticleCard
-                    slug={featured.slug}
-                    title={featured.title ?? ""}
-                    excerpt={featured.excerpt}
-                    imageUrl={featured.imageUrl}
-                    videoId={featured.videoId}
-                    linkedBook={featured.linkedBook}
-                    date={featured.date ?? undefined}
-                    channel={featured.channel ?? undefined}
-                    locale={locale}
-                    featured={rest.length > 0}
-                  />
-                </StaggerItem>
-                {rest.map((a) => (
-                  <StaggerItem key={a.id}>
-                    <ArticleCard
-                      slug={a.slug!}
-                      title={a.title ?? ""}
-                      excerpt={a.excerpt}
-                      imageUrl={a.imageUrl}
-                      videoId={a.videoId}
-                      linkedBook={a.linkedBook}
-                      date={a.date ?? undefined}
-                      channel={a.channel ?? undefined}
-                      locale={locale}
-                    />
-                  </StaggerItem>
-                ))}
-              </StaggerContainer>
-            </div>
-          </AnimatedSection>
-        );
-      })}
+      {/* ── أقسام المقالات (زبدة الأفكار | حصاد الكتب | العالم يقرأ) ── */}
+      <HomeArticlesShowcase locale={locale} channels={readingArticleChannels} />
 
       {/* ── انشر كتابك CTA ───────────────────────────────────── */}
       <AnimatedSection className="bg-[var(--brand-red)] py-16" aria-labelledby="publish-cta-heading">
