@@ -50,7 +50,7 @@ function HeroSlideContent({
         className="absolute inset-0 h-full w-full object-cover object-center"
         loading="eager"
         decoding="async"
-        fetchPriority={slideIndex === 0 ? "high" : "auto"}
+        fetchPriority={slideIndex === 0 ? "high" : "high"}
       />
       <div
         className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/25"
