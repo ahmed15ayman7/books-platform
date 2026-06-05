@@ -78,5 +78,13 @@ export function getHomeEditorial(locale: Locale) {
       })),
       cta: isAr ? "كل الخدمات" : "All Services",
     },
+    publishStrip: {
+      title: isAr ? "انشر كتابك" : "Publish Your Book",
+      description: isAr
+        ? "يتيح هذا القسم من منصة الكتب العالمية مساحة خاصة لإبداعات المؤلفين والباحثين العرب الذين يعولون على طباعة ونشر أعمالهم الأولى غير المنشورة، لعرضها أمام القرّاء والناشرين والمهتمين بالثقافة والمعرفة."
+        : "Books Platform dedicates this space to Arab authors and researchers preparing to print and publish their first unpublished works — giving them visibility among readers, publishers, and the wider knowledge community.",
+      cta: isAr ? "امنح كتابك فرصته الأولى للانتشار" : "Give your book its first chance to reach readers",
+      booksTitle: isAr ? "آخر الكتب المنشورة" : "Latest Published Books",
+    },
   };
 }

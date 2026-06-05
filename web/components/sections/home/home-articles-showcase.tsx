@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Bookmark, ChevronDown } from "lucide-react";
@@ -33,12 +33,14 @@ function ArticleAccordionItem({
   isOpen,
   onToggle,
   compact,
+  onImageError,
 }: {
   article: HomeArticleItem;
   locale: Locale;
   isOpen: boolean;
   onToggle: () => void;
   compact?: boolean;
+  onImageError: () => void;
 }) {
   const articleHref = `/${locale}/articles/${article.slug}`;
   const toggleLabel =
@@ -91,6 +93,7 @@ function ArticleAccordionItem({
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
               sizes="(max-width: 768px) 100vw, 33vw"
+              onError={onImageError}
             />
           </Link>
           {article.excerpt && (
@@ -113,8 +116,30 @@ function ArticleColumn({
 }) {
   const articles = channel.articles.filter((a) => a.slug && a.title && a.imageUrl);
   const [openSlug, setOpenSlug] = useState(articles[0]?.slug ?? "");
+  const [brokenSlugs, setBrokenSlugs] = useState<Set<string>>(() => new Set());
 
-  if (articles.length === 0) return null;
+  const visibleArticles = useMemo(
+    () => articles.filter((a) => !brokenSlugs.has(a.slug)),
+    [articles, brokenSlugs],
+  );
+
+  useEffect(() => {
+    if (visibleArticles.length === 0) return;
+    if (!openSlug || brokenSlugs.has(openSlug)) {
+      setOpenSlug(visibleArticles[0]!.slug);
+    }
+  }, [brokenSlugs, openSlug, visibleArticles]);
+
+  if (visibleArticles.length === 0) return null;
+
+  const markBroken = (slug: string) => {
+    setBrokenSlugs((prev) => {
+      if (prev.has(slug)) return prev;
+      const next = new Set(prev);
+      next.add(slug);
+      return next;
+    });
+  };
 
   return (
     <div className="flex min-w-0 flex-col">
@@ -134,7 +159,7 @@ function ArticleColumn({
       </Link>
 
       <div className="flex flex-col gap-2" role="presentation">
-        {articles.map((article) => (
+        {visibleArticles.map((article) => (
           <ArticleAccordionItem
             key={article.slug}
             article={article}
@@ -142,6 +167,7 @@ function ArticleColumn({
             isOpen={openSlug === article.slug}
             compact={openSlug !== article.slug}
             onToggle={() => setOpenSlug(article.slug)}
+            onImageError={() => markBroken(article.slug)}
           />
         ))}
       </div>

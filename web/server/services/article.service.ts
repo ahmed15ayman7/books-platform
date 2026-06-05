@@ -296,7 +296,7 @@ export const ArticleService = {
           db.article.findMany({
             where: { status: "publish", channel, ...notDeleted },
             orderBy: { date: "desc" },
-            take: 8,
+            take: 24,
             select: {
               id: true,
               slug: true,

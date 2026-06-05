@@ -8,14 +8,13 @@ import { HeroSlideService } from "@/server/services/hero-slide.service";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { JsonLd, websiteJsonLd, organizationJsonLd } from "@/components/seo/json-ld";
 import { BookCarousel } from "@/components/sections/book-carousel";
-import { BookCard } from "@/components/sections/book-card";
 import { CategoryGrid } from "@/components/sections/category-grid";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { NewsletterStrip } from "@/components/sections/newsletter-strip";
 import { PublishersMarquee } from "@/components/sections/publishers-marquee";
 import { PublisherCard } from "@/components/sections/publisher-card";
 import { Button } from "@/components/ui/button";
-import { PenTool, Library, PenLine, Building2 } from "lucide-react";
+import { Library, PenLine, Building2 } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
 import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
 import {
@@ -29,6 +28,7 @@ import { ABOUT_IMAGES } from "@/lib/content/image-assets";
 import { HomeMissionStrip } from "@/components/sections/home/home-mission-strip";
 import { HomeMediaSpotlight } from "@/components/sections/home/home-media-spotlight";
 import { HomeArticlesShowcase } from "@/components/sections/home/home-articles-showcase";
+import { HomePublishSection } from "@/components/sections/home/home-publish-section";
 import { HomeServicesPreview } from "@/components/sections/home/home-services-preview";
 import { shuffleArray } from "@/lib/utils/shuffle";
 import { resolveArticleDisplayImage } from "@/lib/articles/resolve-display-image";
@@ -173,7 +173,7 @@ export default async function HomePage() {
       .map((a) => {
         const imageUrl = resolveArticleDisplayImage({
           imageUrl: a.imageUrl,
-          bookImageUrl: a.products?.[0]?.imageUrl,
+          bookImageUrls: (a.products ?? []).map((p) => p.imageUrl),
           excerpt: a.excerpt,
           content: a.content,
         });
@@ -195,7 +195,7 @@ export default async function HomePage() {
 
   // Pre-compute backgrounds for every section in render order:
   // 0: categories  1: صدر حديثًا  2-4: catsBefore  5: آخر الكتب المنشورة  6+: catsAfter
-  const preDarkCount = 2 + catsBefore.length + 1 + catsAfter.length; // sections before dark publishers
+  const preDarkCount = 2 + catsBefore.length + catsAfter.length; // newly released + category batches before dark publishers
   const preDarkBgs   = buildBgList(preDarkCount);
 
   // After dark publishers section backgrounds reset to 0
@@ -278,39 +278,6 @@ export default async function HomePage() {
         </AnimatedSection>
       ))}
 
-      {/* ── آخر الكتب المنشورة ─────────────────────────────── */}
-      {newlyReleased.length > 0 && (
-        <AnimatedSection className={`section-spacing ${preBg()}`} aria-labelledby="latest-heading">
-          <div className="container-platform">
-            <FadeIn className="mb-8 flex items-end justify-between gap-4">
-              <SectionHeading
-                id="latest-heading"
-                title={locale === "ar" ? "آخر الكتب المنشورة" : "Latest Published Books"}
-              />
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/${locale}/books`}>
-                  {locale === "ar" ? "عرض الكل" : "See All"}
-                </Link>
-              </Button>
-            </FadeIn>
-            <div className="grid grid-cols-2 items-stretch gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-              {newlyReleased.map((book) => (
-                <BookCard
-                  key={book.id}
-                  slug={book.slug}
-                  nameEn={book.nameEn}
-                  nameAr={book.nameAr}
-                  imageUrl={book.imageUrl}
-                  translationStatus={book.translationStatus ?? undefined}
-                  primaryCategory={book.primaryCategory}
-                  locale={locale}
-                  compact
-                />
-              ))}
-            </div>
-          </div>
-        </AnimatedSection>
-      )}
 
       {/* ── Category sections — second batch ────────────────── */}
       {catsAfter.map(({ category, books }) => (
@@ -504,29 +471,16 @@ export default async function HomePage() {
       {/* ── أقسام المقالات (زبدة الأفكار | حصاد الكتب | العالم يقرأ) ── */}
       <HomeArticlesShowcase locale={locale} channels={readingArticleChannels} />
 
-      {/* ── انشر كتابك CTA ───────────────────────────────────── */}
-      <AnimatedSection className="bg-[var(--brand-red)] py-16" aria-labelledby="publish-cta-heading">
-        <div className="container-platform text-center text-white">
-          <div className="mx-auto max-w-xl">
-            <FadeIn direction="none" delay={0.1}>
-              <PenTool className="mx-auto mb-4 h-12 w-12 text-[var(--brand-red-soft)]" aria-hidden="true" />
-              <h2 id="publish-cta-heading" className="font-display text-display-md font-bold">
-                {t("publishBanner")}
-              </h2>
-              <p className="mt-2 text-[var(--brand-red-soft)]">{t("publishBannerDesc")}</p>
-              <Button
-                asChild
-                size="xl"
-                className="mt-6 bg-white text-[var(--brand-red)] hover:bg-[var(--brand-gray-100)]"
-              >
-                <Link href={`/${locale}/publish`}>
-                  {locale === "ar" ? "انشر كتابك الآن" : "Publish Your Book Now"}
-                </Link>
-              </Button>
-            </FadeIn>
-          </div>
-        </div>
-      </AnimatedSection>
+      {/* ── انشر كتابك + آخر الكتب المنشورة ─────────────────── */}
+      <HomePublishSection
+        locale={locale}
+        title={editorial.publishStrip.title}
+        description={editorial.publishStrip.description}
+        ctaLabel={editorial.publishStrip.cta}
+        booksTitle={editorial.publishStrip.booksTitle}
+        books={newlyReleased}
+        pageOrder={nextCarouselOrder()}
+      />
 
       <HomeServicesPreview
         locale={locale}
