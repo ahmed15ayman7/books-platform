@@ -5,22 +5,29 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../core/enums/translation_status.dart';
 import '../../../../../core/theme/app_colors.dart';
+import '../../../domain/entities/category.dart';
 
 class CatalogFilterRow extends StatelessWidget {
   const CatalogFilterRow({
     super.key,
     required this.locale,
     required this.activeStatus,
+    required this.activeCategory,
     required this.newest,
+    required this.categories,
     required this.onStatusTap,
     required this.onSortTap,
+    required this.onCategoryTap,
   });
 
   final String locale;
   final TranslationStatus? activeStatus;
+  final String? activeCategory;
   final bool newest;
+  final List<Category> categories;
   final ValueChanged<TranslationStatus?> onStatusTap;
   final ValueChanged<bool> onSortTap;
+  final ValueChanged<String> onCategoryTap;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +39,6 @@ class CatalogFilterRow extends StatelessWidget {
           CatalogFilterChip(
             label: 'books.status.all'.tr(),
             active: activeStatus == null,
-            // $mobile-debug-skill | Problem: onTap was () {} so tapping "All" never cleared an active status filter. Fix: calls onStatusTap(null) which resets _status in the screen.
             onTap: () => onStatusTap(null),
           ),
           SizedBox(width: 8.w),
@@ -61,6 +67,21 @@ class CatalogFilterRow extends StatelessWidget {
             active: !newest,
             onTap: () => onSortTap(false),
           ),
+          if (categories.isNotEmpty) ...[
+            SizedBox(width: 8.w),
+            Container(width: 1, height: 24.h, color: AppColors.divider),
+            SizedBox(width: 8.w),
+            ...categories.map(
+              (cat) => Padding(
+                padding: EdgeInsetsDirectional.only(end: 8.w),
+                child: CatalogFilterChip(
+                  label: locale == 'ar' ? cat.nameAr : cat.nameEn,
+                  active: activeCategory == cat.slug,
+                  onTap: () => onCategoryTap(cat.slug),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

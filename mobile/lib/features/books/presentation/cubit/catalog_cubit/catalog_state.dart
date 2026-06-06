@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../domain/entities/book.dart';
+import '../../../domain/entities/category.dart';
 
 sealed class CatalogState extends Equatable {
   const CatalogState();
@@ -17,11 +18,16 @@ final class CatalogLoading extends CatalogState {
 }
 
 final class CatalogSuccess extends CatalogState {
-  const CatalogSuccess({required this.books, this.hasMore = false});
+  const CatalogSuccess({
+    required this.books,
+    this.categories = const [],
+    this.hasMore = false,
+  });
   final List<Book> books;
+  final List<Category> categories;
   final bool hasMore;
   @override
-  List<Object?> get props => [books, hasMore];
+  List<Object?> get props => [books, categories, hasMore];
 }
 
 final class CatalogError extends CatalogState {

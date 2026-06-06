@@ -4,6 +4,7 @@ import 'package:injectable/injectable.dart';
 import '../../../../../core/enums/translation_status.dart';
 import '../../../../../core/network/failure_messages.dart' as core;
 import '../../../domain/entities/book.dart';
+import '../../../domain/entities/category.dart';
 import '../../../domain/entities/sort_order.dart';
 import '../../../domain/repositories/base_books_repository.dart';
 import 'catalog_state.dart';
@@ -19,6 +20,7 @@ class CatalogCubit extends Cubit<CatalogState> {
   SortOrder _sort = SortOrder.newest;
   int _page = 1;
   bool _isLoadingMore = false;
+  List<Category> _categories = [];
 
   Future<void> load() {
     _page = 1;
@@ -64,6 +66,7 @@ class CatalogCubit extends Cubit<CatalogState> {
         final incoming = _clientFilter(paginated.data);
         emit(CatalogSuccess(
           books: [...current.books, ...incoming],
+          categories: _categories,
           hasMore: paginated.pagination.hasNextPage && incoming.isNotEmpty,
         ));
       },
@@ -72,16 +75,29 @@ class CatalogCubit extends Cubit<CatalogState> {
 
   Future<void> _fetch() async {
     emit(const CatalogLoading());
-    final result = await _repo.getBooks(
+
+    final booksFuture = _repo.getBooks(
       categorySlug: _activeCategory,
       status: _activeStatus,
       sort: _sort,
     );
-    result.fold(
+    // Load categories once on first fetch — fired in parallel, non-blocking on failure.
+    final catFuture = _categories.isEmpty ? _repo.getCategorySections() : null;
+
+    final booksResult = await booksFuture;
+    if (catFuture != null) {
+      final catResult = await catFuture;
+      catResult.fold(
+        (_) {},
+        (sections) => _categories = sections.map((s) => s.category).toList(),
+      );
+    }
+
+    booksResult.fold(
       (f) => emit(CatalogError(core.failureToMessage(f))),
-      // $mobile-debug-skill | Problem: backend ignores translationStatus param and returns all books. Fix: client-side filter mirrors home screen approach (home_content_cubit.dart:51) so empty status filter correctly shows EmptyStateWidget.
       (paginated) => emit(CatalogSuccess(
         books: _clientFilter(paginated.data),
+        categories: _categories,
         hasMore: paginated.pagination.hasNextPage,
       )),
     );

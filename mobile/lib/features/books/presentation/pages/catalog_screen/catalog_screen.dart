@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/enums/translation_status.dart';
 import '../../../../../core/router/app_routes.dart';
+import '../../../domain/entities/category.dart';
 import '../../../domain/entities/sort_order.dart';
 import '../../../../../core/router/args/book_detail_args.dart';
 import '../../../../../core/theme/app_colors.dart';
@@ -28,6 +29,8 @@ class CatalogScreen extends StatefulWidget {
 
 class _CatalogScreenState extends State<CatalogScreen> {
   TranslationStatus? _status;
+  String? _activeCategory;
+  List<Category> _categories = [];
   bool _newest = true;
   late final ScrollController _scrollController;
 
@@ -51,29 +54,50 @@ class _CatalogScreenState extends State<CatalogScreen> {
     }
   }
 
-  // $mobile-debug-skill | Problem: single _applyFilter never forwarded sort to the cubit (sort param omitted), so "Oldest" toggled the UI chip but the API always received sort=newest. Fix: split into two focused methods — each passes exactly what it owns to applyFilter.
   void _onStatusChanged(TranslationStatus? status) {
     setState(() {
       _status = (status != null && status == _status) ? null : status;
     });
-    context.read<CatalogCubit>().applyFilter(status: _status);
+    context.read<CatalogCubit>().applyFilter(
+      categorySlug: _activeCategory,
+      status: _status,
+    );
   }
 
   void _onSortChanged(bool newest) {
     setState(() => _newest = newest);
     context.read<CatalogCubit>().applyFilter(
+      categorySlug: _activeCategory,
       status: _status,
       sort: newest ? SortOrder.newest : SortOrder.oldest,
+    );
+  }
+
+  void _onCategoryChanged(String slug) {
+    final newSlug = slug == _activeCategory ? null : slug;
+    setState(() => _activeCategory = newSlug);
+    context.read<CatalogCubit>().applyFilter(
+      categorySlug: newSlug,
+      status: _status,
+      sort: _newest ? SortOrder.newest : SortOrder.oldest,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final locale = context.locale.languageCode;
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Column(
-        children: [
+    return BlocListener<CatalogCubit, CatalogState>(
+      listener: (context, state) {
+        if (state is CatalogSuccess &&
+            state.categories.isNotEmpty &&
+            _categories.isEmpty) {
+          setState(() => _categories = state.categories);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: Column(
+          children: [
           AppBarWidget(
             variant: AppBarVariant.title,
             title: 'books.title'.tr(),
@@ -103,9 +127,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
           CatalogFilterRow(
             locale: locale,
             activeStatus: _status,
+            activeCategory: _activeCategory,
+            categories: _categories,
             newest: _newest,
             onStatusTap: _onStatusChanged,
             onSortTap: _onSortChanged,
+            onCategoryTap: _onCategoryChanged,
           ),
           Expanded(
             child: BlocBuilder<CatalogCubit, CatalogState>(
@@ -182,6 +209,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
             currentLocale: locale,
           ),
         ],
+      ),
       ),
     );
   }
