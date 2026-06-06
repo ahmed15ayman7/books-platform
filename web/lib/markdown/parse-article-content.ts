@@ -1,4 +1,5 @@
 import { isImageUrl } from "./is-image-url";
+import { normalizeImageSrc } from "./normalize-image-url";
 
 export type ArticleContentBlock =
   | { type: "heading"; level: 1 | 2 | 3 | 4 | 5 | 6; text: string }
@@ -74,13 +75,29 @@ function stripInnerHtml(html: string): string {
   return html.replace(/<[^>]+>/g, "").trim();
 }
 
+function isHorizontalRule(line: string): boolean {
+  const t = line.trim();
+  return /^(\*\s*){3,}$|^(-\s*){3,}$|^_{3,}$|^\*{3,}$|^-{3,}$/.test(t.replace(/\s/g, ""));
+}
+
+function toImageBlock(src: string, alt: string, caption?: string): ArticleContentBlock {
+  return {
+    type: "image",
+    src: normalizeImageSrc(src) ?? src.trim(),
+    alt: alt || "صورة",
+    caption,
+  };
+}
+
 function parseLineBlock(line: string): ArticleContentBlock | null {
   const trimmed = line.trim();
   if (!trimmed) return null;
 
+  if (isHorizontalRule(trimmed)) return null;
+
   const mdImage = MD_IMAGE.exec(trimmed);
   if (mdImage) {
-    return { type: "image", src: mdImage[2]!.trim(), alt: mdImage[1]!.trim() || "صورة" };
+    return toImageBlock(mdImage[2]!, mdImage[1]!.trim());
   }
 
   const mdLink = MD_LINK.exec(trimmed);
@@ -88,13 +105,17 @@ function parseLineBlock(line: string): ArticleContentBlock | null {
     const label = mdLink[1]!.trim();
     const href = mdLink[2]!.trim();
     if (isImageUrl(href)) {
-      return { type: "image", src: href, alt: label || "صورة", caption: label || undefined };
+      return toImageBlock(href, label, label || undefined);
     }
     return { type: "paragraph", text: `[${label || href}](${href})` };
   }
 
+  if (/!\[[^\]]*\]\([^)]+\)/.test(trimmed)) {
+    return { type: "paragraph", text: trimmed };
+  }
+
   if (isImageUrl(trimmed)) {
-    return { type: "image", src: trimmed, alt: "صورة" };
+    return toImageBlock(trimmed, "صورة");
   }
 
   const heading = MD_HEADING.exec(trimmed);
@@ -103,7 +124,7 @@ function parseLineBlock(line: string): ArticleContentBlock | null {
     return { type: "heading", level, text: heading[2]!.trim() };
   }
 
-  if (/^[-*]\s+/.test(trimmed)) {
+  if (/^[-*]\s+/.test(trimmed) && !isHorizontalRule(trimmed)) {
     return { type: "list", items: [trimmed.replace(/^[-*]\s+/, "")] };
   }
 
@@ -128,7 +149,9 @@ export function parseArticleContent(raw: string): ArticleContentBlock[] {
     const lines = chunk.split("\n").map((l) => l.trim()).filter(Boolean);
     if (lines.length === 0) continue;
 
-    const allList = lines.every((l) => /^[-*]\s+/.test(l) || /^\d+\.\s+/.test(l));
+    const allList = lines.every(
+      (l) => !isHorizontalRule(l) && (/^[-*]\s+/.test(l) || /^\d+\.\s+/.test(l)),
+    );
     if (allList) {
       blocks.push({
         type: "list",

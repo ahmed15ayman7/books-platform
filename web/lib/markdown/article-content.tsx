@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { isImageUrl } from "./is-image-url";
+import { normalizeImageSrc } from "./normalize-image-url";
 import { parseArticleContent } from "./parse-article-content";
 
 const INLINE_TOKEN =
@@ -18,12 +19,13 @@ function inlineFormat(text: string): ReactNode[] {
     if (m.index > last) parts.push(text.slice(last, m.index));
 
     if (m[1] !== undefined && m[2] !== undefined) {
+      const src = normalizeImageSrc(m[2].trim()) ?? m[2].trim();
       parts.push(
-        <InlineArticleImage key={key++} src={m[2].trim()} alt={m[1].trim() || "صورة"} compact />,
+        <InlineArticleImage key={key++} src={src} alt={m[1].trim() || "صورة"} compact />,
       );
     } else if (m[3] !== undefined && m[4] !== undefined) {
       const label = m[3].trim();
-      const href = m[4].trim();
+      const href = normalizeImageSrc(m[4].trim()) ?? m[4].trim();
       if (isImageUrl(href)) {
         parts.push(
           <InlineArticleImage key={key++} src={href} alt={label || "صورة"} compact />,
@@ -71,6 +73,7 @@ function InlineArticleImage({
   compact?: boolean;
 }) {
   const [failed, setFailed] = useState(false);
+  const resolvedSrc = normalizeImageSrc(src) ?? src;
 
   return (
     <figure className={cn("my-6 w-full text-center", compact && "my-4")}>
@@ -84,11 +87,10 @@ function InlineArticleImage({
           // Native img — article URLs are external/dynamic (gstatic, wp, etc.)
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={src}
+            src={resolvedSrc}
             alt={alt}
             loading="lazy"
             decoding="async"
-            referrerPolicy="no-referrer"
             className="h-auto w-full object-contain"
             onError={() => setFailed(true)}
           />

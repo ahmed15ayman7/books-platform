@@ -73,4 +73,37 @@ describe("parseArticleContent", () => {
     const blocks = parseArticleContent("## Section title\n\nBody text");
     expect(blocks[0]).toMatchObject({ type: "heading", level: 2, text: "Section title" });
   });
+
+  it("parses h4 headings", () => {
+    const blocks = parseArticleContent("#### Section title\n\nBody text");
+    expect(blocks[0]).toMatchObject({ type: "heading", level: 4, text: "Section title" });
+  });
+
+  it("keeps prose with inline markdown images as paragraphs", () => {
+    const line =
+      "الشغب الأبيض ![](https://booksplatform.net/wp-content/uploads/Gord-Hil-1-300x240.jpg) نبدأ من قلب فانكوفر";
+    const blocks = parseArticleContent(`${line}\n\n### خاتمة`);
+    expect(blocks[0]).toMatchObject({ type: "paragraph", text: line });
+  });
+
+  it("normalizes relative wp upload paths in image blocks", () => {
+    const blocks = parseArticleContent("/wp-content/uploads/cover-11-224x300.jpg");
+    expect(blocks[0]).toMatchObject({
+      type: "image",
+      src: "https://booksplatform.net/wp-content/uploads/cover-11-224x300.jpg",
+    });
+  });
+
+  it("skips markdown horizontal rules", () => {
+    const blocks = parseArticleContent("Intro\n\n* * *\n\nOutro");
+    expect(blocks.map((b) => b.type)).toEqual(["paragraph", "paragraph"]);
+  });
+
+  it("does not treat prose containing wp-content as a bare image URL", () => {
+    expect(
+      isImageUrl(
+        "الشغب الأبيض ![](https://booksplatform.net/wp-content/uploads/Gord-Hil-1-300x240.jpg) نبدأ",
+      ),
+    ).toBe(false);
+  });
 });
