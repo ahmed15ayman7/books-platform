@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 
 import 'package:booksplatform/core/network/failure_messages.dart' as core;
 
+import '../../../domain/entities/article.dart';
 import '../../../domain/entities/article_category.dart';
 import '../../../domain/repositories/base_articles_repository.dart';
 import 'articles_list_state.dart';
@@ -22,6 +23,11 @@ class ArticlesListCubit extends Cubit<ArticlesListState> {
     ArticleCategory(id: 'ideas', name: 'Essence of Ideas', nameAr: 'زبدة الأفكار', slug: 'ideas', linkedCount: 0),
   ];
 
+  // The API returns articles from all channels (including video-only channels
+  // like books-talk and novel-story) when no channel filter is applied.
+  // Only these three channels publish text-content articles.
+  static const Set<String> _contentChannels = {'world-reads', 'harvest', 'ideas'};
+
   static List<ArticleCategory> get channels => _channels;
 
   Future<void> refresh() => _loadArticles(slug: _activeSlug);
@@ -33,7 +39,7 @@ class ArticlesListCubit extends Cubit<ArticlesListState> {
     result.fold(
       (failure) => emit(ArticlesListError(core.failureToMessage(failure))),
       (paginated) => emit(ArticlesListSuccess(
-        articles: paginated.data,
+        articles: _filterContentOnly(paginated.data),
         activeSlug: '',
         hasNextPage: paginated.pagination.hasNextPage,
         page: 1,
@@ -53,7 +59,9 @@ class ArticlesListCubit extends Cubit<ArticlesListState> {
     result.fold(
       (failure) => emit(ArticlesListError(core.failureToMessage(failure))),
       (paginated) => emit(ArticlesListSuccess(
-        articles: paginated.data,
+        articles: slug.isEmpty
+            ? _filterContentOnly(paginated.data)
+            : paginated.data,
         activeSlug: slug,
         hasNextPage: paginated.pagination.hasNextPage,
         page: 1,
@@ -72,11 +80,19 @@ class ArticlesListCubit extends Cubit<ArticlesListState> {
     result.fold(
       (failure) => emit(ArticlesListError(core.failureToMessage(failure))),
       (paginated) => emit(ArticlesListSuccess(
-        articles: [...current.articles, ...paginated.data],
+        articles: [
+          ...current.articles,
+          ..._activeSlug.isEmpty
+              ? _filterContentOnly(paginated.data)
+              : paginated.data,
+        ],
         activeSlug: _activeSlug,
         hasNextPage: paginated.pagination.hasNextPage,
         page: nextPage,
       )),
     );
   }
+
+  List<Article> _filterContentOnly(List<Article> articles) =>
+      articles.where((a) => _contentChannels.contains(a.channel)).toList();
 }
