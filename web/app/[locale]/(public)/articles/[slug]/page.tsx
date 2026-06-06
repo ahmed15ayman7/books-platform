@@ -61,7 +61,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   if (!article) notFound();
 
   const linkedBook = articleLinkedBookDisplay(article.products?.[0], locale);
-  const heroImageUrl = linkedBook?.imageUrl ?? article.imageUrl;
+  const heroImageUrl = linkedBook?.imageUrl ?? article.imageUrl?.split(',')[0] ?? article.imageUrl;
   const relatedArticles = related.map((art) => mapArticleForCard(art, locale));
 
   const channelInfo = article.channel ? channelNames[article.channel] : null;
@@ -79,7 +79,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
       "@context": "https://schema.org",
       "@type": "Article",
       headline: article.title,
-      image: article.imageUrl,
+      image: article.imageUrl?.split(',')[0] ?? article.imageUrl,
       datePublished: article.date?.toISOString(),
       description: article.excerpt,
     },

@@ -88,7 +88,7 @@ function ArticleAccordionItem({
             className="group relative block aspect-video overflow-hidden bg-[var(--brand-gray-200)]"
           >
             <Image
-              src={article.imageUrl}
+              src={article.imageUrl.split(',')[0] ?? article.imageUrl}
               alt=""
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
