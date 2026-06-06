@@ -127,6 +127,8 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
         Navigator.of(context).pushReplacementNamed(AppRoutes.media);
       case BottomNavTab.publishers:
         Navigator.of(context).pushReplacementNamed(AppRoutes.publishers);
+      case BottomNavTab.wishlist:
+        Navigator.of(context).pushReplacementNamed(AppRoutes.wishlist);
     }
   }
 }

@@ -242,6 +242,8 @@ class _PublishScreenState extends State<PublishScreen> {
         Navigator.of(context).pushReplacementNamed(AppRoutes.media);
       case BottomNavTab.publishers:
         Navigator.of(context).pushReplacementNamed(AppRoutes.publishers);
+      case BottomNavTab.wishlist:
+        Navigator.of(context).pushReplacementNamed(AppRoutes.wishlist);
     }
   }
 }

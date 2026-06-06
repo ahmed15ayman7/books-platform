@@ -125,6 +125,8 @@ class _PublishersScreenState extends State<PublishersScreen> {
         Navigator.of(context).pushReplacementNamed(AppRoutes.media);
       case BottomNavTab.publishers:
         break;
+      case BottomNavTab.wishlist:
+        Navigator.of(context).pushReplacementNamed(AppRoutes.wishlist);
     }
   }
 }

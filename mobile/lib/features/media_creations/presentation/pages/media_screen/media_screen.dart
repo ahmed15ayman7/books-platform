@@ -127,6 +127,8 @@ class _MediaScreenState extends State<MediaScreen> {
         break;
       case BottomNavTab.publishers:
         Navigator.of(context).pushReplacementNamed(AppRoutes.publishers);
+      case BottomNavTab.wishlist:
+        Navigator.of(context).pushReplacementNamed(AppRoutes.wishlist);
     }
   }
 }

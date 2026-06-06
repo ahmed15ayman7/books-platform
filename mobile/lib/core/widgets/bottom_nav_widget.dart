@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_shadows.dart';
 
-enum BottomNavTab { home, books, articles, media, publishers }
+enum BottomNavTab { home, books, articles, media, publishers, wishlist }
 
 class BottomNavWidget extends StatelessWidget {
   const BottomNavWidget({
@@ -46,6 +46,12 @@ class BottomNavWidget extends StatelessWidget {
         label: ar ? 'المقالات' : 'Articles',
       ),
       null, // FAB slot
+      _TabItem(
+        tab: BottomNavTab.wishlist,
+        icon: Icons.favorite_border_rounded,
+        activeIcon: Icons.favorite_rounded,
+        label: ar ? 'المفضلة' : 'Wishlist',
+      ),
       _TabItem(
         tab: BottomNavTab.media,
         icon: Icons.play_circle_outline_rounded,

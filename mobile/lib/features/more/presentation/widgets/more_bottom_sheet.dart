@@ -16,11 +16,6 @@ class MoreBottomSheet extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _MoreTile(
-          icon: Icons.favorite_border_rounded,
-          titleKey: 'wishlist_title',
-          onTap: () => _navigate(context, AppRoutes.wishlist),
-        ),
-        _MoreTile(
           icon: Icons.translate_rounded,
           titleKey: 'recommended_for_translation_title',
           onTap: () => _navigate(context, AppRoutes.recommendedBooks),
