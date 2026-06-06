@@ -45,15 +45,22 @@ class ArticleModel {
       channel: json['channel'] as String? ?? '',
       categoryLabel: category?['name'] as String? ?? json['channel'] as String? ?? '',
       categoryLabelAr: category?['nameAr'] as String? ?? '',
-      date: json['createdAt'] as String? ?? json['date'] as String? ?? '',
+      date: json['date'] as String? ?? json['createdAt'] as String? ?? '',
       readingTime: (json['readingTimeMinutes'] as num?)?.toInt() ??
-          (json['readingTime'] as num?)?.toInt() ?? 5,
+          (json['readingTime'] as num?)?.toInt() ?? 0,
       authorFirstName: author?['firstName'] as String? ?? json['authorFirstName'] as String? ?? '',
       authorLastName: author?['lastName'] as String? ?? json['authorLastName'] as String? ?? '',
-      // $mobile-debug-skill | Problem: imageUrl paths contain Arabic characters (e.g. /uploads/اللغة.jpg) which are invalid in HTTP requests without percent-encoding. Fix: Uri.encodeFull preserves scheme/host but encodes non-ASCII path characters.
-      imageUrl: _encodeUrl(json['imageUrl'] as String? ?? json['coverImageUrl'] as String?),
-      hasVideo: json['hasVideo'] as bool? ?? false,
+      imageUrl: _encodeUrl(_parseFirstImageUrl(json['imageUrl'] as String? ?? json['coverImageUrl'] as String?)),
+      // videoId presence determines whether this article has embeddable video
+      hasVideo: ((json['videoId'] as String?) ?? '').isNotEmpty,
     );
+  }
+
+  // Takes the first URL from a pipe-separated list (API sends multiple images as "url1|url2|...")
+  static String? _parseFirstImageUrl(String? raw) {
+    if (raw == null || raw.isEmpty) return null;
+    final first = raw.split('|').first.trim();
+    return first.isEmpty ? null : first;
   }
 
   static String? _encodeUrl(String? url) {

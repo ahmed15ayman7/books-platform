@@ -1,0 +1,462 @@
+https://booksplatform.ahmed15ayman7.com/api/v1/articles?page=1&limit=20
+{
+"success": true,
+"data": [
+{
+"id": "cmpkgv8ba0gzmu70de8vjxcwz",
+"slug": "articles-53524",
+"title": "نقد العقل المحض | العمل الذي تجاوز حدود الزمن لإيمانويل كانط",
+"excerpt": null,
+"imageUrl": null,
+"channel": "ideas",
+"date": null,
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The Essence of Ideas",
+"nameAr": "زبدة الافكار",
+"slug": "zbda-alafkar"
+},
+"products": [],
+"readingTimeMinutes": 16
+},
+{
+"id": "cmpkguff40gvwu70d17egz01z",
+"slug": "articles-49678",
+"title": ""البؤساء" لفيكتور هوغو.. ملحمة الإنسانية بين سَندان القانون ومطرقة الرحمة",
+"excerpt": null,
+"imageUrl": null,
+"channel": "ideas",
+"date": null,
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The Essence of Ideas",
+"nameAr": "زبدة الافكار",
+"slug": "zbda-alafkar"
+},
+"products": [],
+"readingTimeMinutes": 16
+},
+{
+"id": "cmpkguesg0gvsu70d5b8g9dtl",
+"slug": "articles-49470",
+"title": "دكتور زيفاغو لبوريس باسترناك .. رحلة عبر الثورة والحب وصمود الروح البشرية",
+"excerpt": null,
+"imageUrl": null,
+"channel": "ideas",
+"date": null,
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The Essence of Ideas",
+"nameAr": "زبدة الافكار",
+"slug": "zbda-alafkar"
+},
+"products": [],
+"readingTimeMinutes": 16
+},
+{
+"id": "cmq1aqrew000a07ppovq1r19r",
+"slug": "--54463",
+"title": "عرب لا نراهم | حكايات العرب المنسيين في قلب إسرائيل",
+"excerpt": "",
+"imageUrl": "https://img.youtube.com/vi/-oeGWH9mxZ8/hqdefault.jpg",
+"channel": "books-talk",
+"date": "2026-06-05T00:00:00.000Z",
+"videoId": "-oeGWH9mxZ8",
+"youtubeUrl": "https://youtu.be/-oeGWH9mxZ8",
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "Book Talk",
+"nameAr": "حديث الكتب",
+"slug": "book-talk"
+},
+"products": [],
+"readingTimeMinutes": null
+},
+{
+"id": "cmq1ap3zt000807pp1suruq1u",
+"slug": "--54462",
+"title": "أكذوبة إعادة التدوير.. ما لا يخبرك به أصحاب المصانع! (كتاب حروب النفايات)",
+"excerpt": "",
+"imageUrl": "https://img.youtube.com/vi/EpYfgfSAvwk/hqdefault.jpg",
+"channel": "books-talk",
+"date": "2026-06-05T00:00:00.000Z",
+"videoId": "EpYfgfSAvwk",
+"youtubeUrl": "https://youtu.be/EpYfgfSAvwk",
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "Book Talk",
+"nameAr": "حديث الكتب",
+"slug": "book-talk"
+},
+"products": [
+{
+"id": "cmpye0rdj00b2u7zk8wdy74ep",
+"slug": "product-46165",
+"nameEn": "حروب النفايات: الحياة البرية لما بعد النفايات",
+"nameAr": "حروب النفايات: الحياة البرية لما بعد النفايات",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Wild-Afterlife-of-Your-Trash.jpg"
+}
+],
+"readingTimeMinutes": null
+},
+{
+"id": "cmq1amkfg000607pp7838eahl",
+"slug": "--54461",
+"title": "كيف يسرق النظام العالمي أموالك وأنت تبتسم؟ (كتاب السرقة الكبري)",
+"excerpt": "",
+"imageUrl": "https://img.youtube.com/vi/GN57_zpgYY8/hqdefault.jpg",
+"channel": "books-talk",
+"date": "2026-06-05T00:00:00.000Z",
+"videoId": "GN57_zpgYY8",
+"youtubeUrl": "https://youtu.be/GN57_zpgYY8",
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "Book Talk",
+"nameAr": "حديث الكتب",
+"slug": "book-talk"
+},
+"products": [
+{
+"id": "cmpkhkw0m00wxu7hw7sz5jeql",
+"slug": "the-great-heist-chinas-epic-campaign-to-steal-americas-secrets",
+"nameEn": "The Great Heist: China's Epic Campaign to Steal America's Secrets",
+"nameAr": "السرقة الكبرى: حملة الصين الملحمية لسرقة أسرار أمريكا",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/The-Great-Heist.jpg"
+}
+],
+"readingTimeMinutes": null
+},
+{
+"id": "cmq1agam2000207pp1hafgk1t",
+"slug": "-10--54460",
+"title": "مبادرة مصرية تطرق ابواب موسوعة جينيس فكرة ريادية 10 الاف شخص يشتركون في تأليف كتاب واحد",
+"excerpt": "",
+"imageUrl": "https://img.youtube.com/vi/RmzXJ_aaM0A/hqdefault.jpg",
+"channel": "novel-story",
+"date": "2026-06-05T00:00:00.000Z",
+"videoId": "RmzXJ_aaM0A",
+"youtubeUrl": "https://youtu.be/RmzXJ_aaM0A",
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": null,
+"products": [],
+"readingTimeMinutes": null
+},
+{
+"id": "cmq13qyci000007npwwx9efqn",
+"slug": "--54459",
+"title": "أين سيولد المليارديرات القادمون؟ (كتاب الجغرافيا الجديدة للابتكار)",
+"excerpt": "",
+"imageUrl": "https://img.youtube.com/vi/sJg30wvMaqA/hqdefault.jpg",
+"channel": "books-talk",
+"date": "2026-06-05T00:00:00.000Z",
+"videoId": "sJg30wvMaqA",
+"youtubeUrl": "https://youtu.be/sJg30wvMaqA",
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "Book Talk",
+"nameAr": "حديث الكتب",
+"slug": "book-talk"
+},
+"products": [],
+"readingTimeMinutes": null
+},
+{
+"id": "cmpzmuq8y000107mspi9cjd9g",
+"slug": "--54457",
+"title": "الديمقراطية في مفترق طرق: بين خيبة الأمل في التجديد والصعود العالمي للاستبداد",
+"excerpt": "طوال معظم أواخر القرن العشرين، لم تُقدَّم الديمقراطية كنظام سياسي فحسب، بل كغاية حتمية للحضارة الحديثة. بعد انهيار الاتحاد السوفيتي، بدت الديمقراطية الليبرالية منتصرة، ",
+"imageUrl": "https://alawset.net/wp-content/uploads/2019/01/%D8%A7%D9%84%D8%AF%D9%88%D9%84%D8%A9-%D9%83%D8%B4%D8%B1%D8%B7-%D9%85%D8%B3%D8%A8%D9%82-%D9%84%D9%84%D8%AF%D9%8A%D9%85%D9%82%D8%B1%D8%A7%D8%B7%D9%8A%D8%A9-%D9%81%D9%8A-%D8%A7%D9%84%D9%88%D8%B7%D9%86-%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%D9%8A.jpg",
+"channel": "harvest",
+"date": "2026-06-04T00:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "Book Harvest",
+"nameAr": "حصاد الكتب",
+"slug": "hasade"
+},
+"products": [],
+"readingTimeMinutes": 9
+},
+{
+"id": "cmpkgvo4m0h2ou70dqhk2knuq",
+"slug": "articles-54456",
+"title": "المستقبل المفتوح وأعداؤه: حين تُحوّل السيادة الرقمية والذكاء الاصطناعي التكنولوجيا إلى معركةٍ على الحرية",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/77b4eec6-1cb2-40a6-b6c3-61747eb29831-1080x675-1.webp",
+"channel": "ideas",
+"date": "2026-05-18T21:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The Essence of Ideas",
+"nameAr": "زبدة الافكار",
+"slug": "zbda-alafkar"
+},
+"products": [
+{
+"id": "cmpkhmq51038su7hwjrsrkmid",
+"slug": "the-open-future-and-its-enemies",
+"nameEn": "The Open Future and Its Enemies",
+"nameAr": "المستقبل المفتوح وأعداؤه",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/15603111.jpg"
+}
+],
+"readingTimeMinutes": 9
+},
+{
+"id": "cmpkgvn9q0h2gu70ditsdbn5c",
+"slug": "articles-54408",
+"title": "سيكولوجية الخجل: لماذا نرتعب من تقييم الآخرين لنا؟",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/الخجل.jpg",
+"channel": "ideas",
+"date": "2026-05-18T21:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The Essence of Ideas",
+"nameAr": "زبدة الافكار",
+"slug": "zbda-alafkar"
+},
+"products": [],
+"readingTimeMinutes": 2
+},
+{
+"id": "cmpkgvngv0h2iu70dz0b7upat",
+"slug": "articles-54411",
+"title": "حياتي.. حكاية رجل من الريف",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/702591317_26513188498380851_1392546707636287980_n.jpg",
+"channel": "ideas",
+"date": "2026-05-18T21:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The Essence of Ideas",
+"nameAr": "زبدة الافكار",
+"slug": "zbda-alafkar"
+},
+"products": [],
+"readingTimeMinutes": 4
+},
+{
+"id": "cmpkgvnn50h2ku70df8w2au95",
+"slug": "articles-54415",
+"title": "الرواية التي تسألك السؤال الذي تهرب منه كل يوم.. الرجل الذي رأى ثقل الحياة وكتب عن خفتها "كائن لا تحتمل خفته" لميلان كونديرا",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/700554610_122181796784944138_3170432756653155585_n.jpg",
+"channel": "ideas",
+"date": "2026-05-18T21:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The Essence of Ideas",
+"nameAr": "زبدة الافكار",
+"slug": "zbda-alafkar"
+},
+"products": [],
+"readingTimeMinutes": 9
+},
+{
+"id": "cmpkgvnur0h2mu70d63jhglic",
+"slug": "articles-54418",
+"title": "كتاب "الصين الإسلامية: إعادة اكتشاف تاريخ مسلمي الصين"",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/94449610005.png|https://booksplatform.net/wp-content/uploads/59825629910.png",
+"channel": "ideas",
+"date": "2026-05-18T21:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The Essence of Ideas",
+"nameAr": "زبدة الافكار",
+"slug": "zbda-alafkar"
+},
+"products": [
+{
+"id": "cmpkhky0n00yuu7hwitppot3l",
+"slug": "islamic-china",
+"nameEn": "Islamic China",
+"nameAr": "الصين الإسلامية",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/الصين-الإسلامية2.png"
+}
+],
+"readingTimeMinutes": 6
+},
+{
+"id": "cmpkgvmjb0h2cu70dg1o6iiee",
+"slug": "articles-54356",
+"title": "سيكولوجيا الشعور بالذنب: الجذور الفلسفية لتأنيب الضمير",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/الشعور-بالذنب.jpg",
+"channel": "ideas",
+"date": "2026-05-17T21:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The Essence of Ideas",
+"nameAr": "زبدة الافكار",
+"slug": "zbda-alafkar"
+},
+"products": [],
+"readingTimeMinutes": 2
+},
+{
+"id": "cmpkgvn4u0h2eu70dq83gv160",
+"slug": "articles-54359",
+"title": "أمريكا الإسرائيلية وفلسطين الهندية الحمراء .. تاريخ السوابق الأمريكية للجرائم الإسرائيلية",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/669884911_26108190055547366_2454459393380928120_n.jpg",
+"channel": "ideas",
+"date": "2026-05-17T21:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The Essence of Ideas",
+"nameAr": "زبدة الافكار",
+"slug": "zbda-alafkar"
+},
+"products": [],
+"readingTimeMinutes": 4
+},
+{
+"id": "cmpkgvm9y0h2au70db7ncey0s",
+"slug": "articles-54353",
+"title": "الرواية التي تعلّمك أن الأحلام الكبيرة قد تكون أقفاصاً صنعناها بأيدينا.. الرجل الذي عمل في مصنع أحذية وكتب عن أوهام الثروة. "آمال عظيمة" لتشارلز ديكنز",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/701777255_122181634892944138_7740839534310648943_n.jpg",
+"channel": "ideas",
+"date": "2026-05-17T21:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The Essence of Ideas",
+"nameAr": "زبدة الافكار",
+"slug": "zbda-alafkar"
+},
+"products": [],
+"readingTimeMinutes": 10
+},
+{
+"id": "cmpkgvlzi0h28u70d1l8ph6br",
+"slug": "articles-54277",
+"title": "حين تصبح مخطوطة قديمة أكثر حياةً من الجريدة الصباحية.. الرجل الذي كتب رواية ونسيها القراء ليعيشوها "عزازيل" ليوسف زيدان",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/عزازيل.jpg|https://booksplatform.net/wp-content/uploads/عزازيل-1.jpg",
+"channel": "ideas",
+"date": "2026-05-16T21:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The Essence of Ideas",
+"nameAr": "زبدة الافكار",
+"slug": "zbda-alafkar"
+},
+"products": [],
+"readingTimeMinutes": 9
+},
+{
+"id": "cmpkgvl730h22u70du8e9r3ax",
+"slug": "2026-2049",
+"title": "صراع العمالقة بين مطرقة الحرب وسندان السلام: قراءة في مستقبل العلاقات الأمريكية الصينية 2026 - 2049",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/820a763b-dba5-4c7e-bde9-b3d30034e3e6__86433.jpg|https://booksplatform.net/wp-content/uploads/USA-China.jpg|https://booksplatform.net/wp-content/uploads/TimHamesSquare.jpg",
+"channel": "ideas",
+"date": "2026-05-16T21:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The Essence of Ideas",
+"nameAr": "زبدة الافكار",
+"slug": "zbda-alafkar"
+},
+"products": [],
+"readingTimeMinutes": 10
+},
+{
+"id": "cmpkgvlo60h26u70dq3q4rl8q",
+"slug": "articles-54274",
+"title": "تسعة تصورات عن الزمن: السَّفَر عَبْر الزمن بين الحقيقة والخيال",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/تسعة-تصورات-عن-الزمن-السَّفَر-عَبْر-الزمن-بين-الحقيقة-والخيال.jpg",
+"channel": "ideas",
+"date": "2026-05-16T21:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The Essence of Ideas",
+"nameAr": "زبدة الافكار",
+"slug": "zbda-alafkar"
+},
+"products": [],
+"readingTimeMinutes": 4
+}
+],
+"pagination": {
+"page": 1,
+"limit": 20,
+"total": 173,
+"totalPages": 9,
+"hasNextPage": true,
+"hasPrevPage": false
+}
+}

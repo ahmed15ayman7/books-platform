@@ -75,14 +75,13 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                         ),
                       ),
                     ArticlesListSuccess(
-                      :final categories,
                       :final articles,
                       :final activeSlug,
                       :final hasNextPage,
                     ) =>
                       ArticlesBody(
                         key: const ValueKey('success'),
-                        categories: categories,
+                        categories: ArticlesListCubit.channels,
                         articles: articles,
                         activeSlug: activeSlug,
                         hasNextPage: hasNextPage,

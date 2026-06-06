@@ -15,61 +15,44 @@ class ArticlesListCubit extends Cubit<ArticlesListState> {
 
   String _activeSlug = '';
 
-  static const ArticleCategory _allCategory = ArticleCategory(
-    id: '',
-    name: 'All',
-    nameAr: 'الكل',
-    slug: '',
-    linkedCount: 0,
-  );
+  static const List<ArticleCategory> _channels = [
+    ArticleCategory(id: '', name: 'All', nameAr: 'الكل', slug: '', linkedCount: 0),
+    ArticleCategory(id: 'world-reads', name: 'World Reads', nameAr: 'العالم يقرأ', slug: 'world-reads', linkedCount: 0),
+    ArticleCategory(id: 'harvest', name: 'Book Harvest', nameAr: 'حصاد الكتب', slug: 'harvest', linkedCount: 0),
+    ArticleCategory(id: 'ideas', name: 'Essence of Ideas', nameAr: 'زبدة الأفكار', slug: 'ideas', linkedCount: 0),
+  ];
+
+  static List<ArticleCategory> get channels => _channels;
 
   Future<void> refresh() => _loadArticles(slug: _activeSlug);
 
   Future<void> load() async {
     _activeSlug = '';
     emit(const ArticlesListLoading());
-
-    final categoriesFuture = _repository.getCategories();
-    final articlesFuture = _repository.getArticles(page: 1);
-
-    final categoriesResult = await categoriesFuture;
-    final articlesResult = await articlesFuture;
-
-    categoriesResult.fold(
+    final result = await _repository.getArticles(page: 1);
+    result.fold(
       (failure) => emit(ArticlesListError(core.failureToMessage(failure))),
-      (fetchedCategories) {
-        final categories = [_allCategory, ...fetchedCategories];
-        articlesResult.fold(
-          (failure) => emit(ArticlesListError(core.failureToMessage(failure))),
-          (paginated) => emit(ArticlesListSuccess(
-            categories: categories,
-            articles: paginated.data,
-            activeSlug: '',
-            hasNextPage: paginated.pagination.hasNextPage,
-            page: 1,
-          )),
-        );
-      },
+      (paginated) => emit(ArticlesListSuccess(
+        articles: paginated.data,
+        activeSlug: '',
+        hasNextPage: paginated.pagination.hasNextPage,
+        page: 1,
+      )),
     );
   }
 
   Future<void> switchCategory(String slug) => _loadArticles(slug: slug);
 
   Future<void> _loadArticles({required String slug}) async {
-    final current = state;
     _activeSlug = slug;
-
-    final categories = current is ArticlesListSuccess ? current.categories : [_allCategory];
     emit(const ArticlesListLoading());
-
     final result = await _repository.getArticles(
-      categorySlug: slug.isEmpty ? null : slug,
+      channel: slug.isEmpty ? null : slug,
       page: 1,
     );
     result.fold(
       (failure) => emit(ArticlesListError(core.failureToMessage(failure))),
       (paginated) => emit(ArticlesListSuccess(
-        categories: categories,
         articles: paginated.data,
         activeSlug: slug,
         hasNextPage: paginated.pagination.hasNextPage,
@@ -83,13 +66,12 @@ class ArticlesListCubit extends Cubit<ArticlesListState> {
     if (current is! ArticlesListSuccess || !current.hasNextPage) return;
     final nextPage = current.page + 1;
     final result = await _repository.getArticles(
-      categorySlug: _activeSlug.isEmpty ? null : _activeSlug,
+      channel: _activeSlug.isEmpty ? null : _activeSlug,
       page: nextPage,
     );
     result.fold(
       (failure) => emit(ArticlesListError(core.failureToMessage(failure))),
       (paginated) => emit(ArticlesListSuccess(
-        categories: current.categories,
         articles: [...current.articles, ...paginated.data],
         activeSlug: _activeSlug,
         hasNextPage: paginated.pagination.hasNextPage,

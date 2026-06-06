@@ -39,6 +39,12 @@ class ArticleDetailModel {
   final String? videoUrl;
   final String? imageUrl;
 
+  static String? _parseFirstImageUrl(String? raw) {
+    if (raw == null || raw.isEmpty) return null;
+    final first = raw.split('|').first.trim();
+    return first.isEmpty ? null : first;
+  }
+
   static String? _encodeUrl(String? url) {
     if (url == null) return null;
     try {
@@ -58,9 +64,9 @@ class ArticleDetailModel {
       title: json['title'] as String? ?? '',
       authorFirstName: author?['firstName'] as String? ?? json['authorFirstName'] as String? ?? '',
       authorLastName: author?['lastName'] as String? ?? json['authorLastName'] as String? ?? '',
-      date: json['createdAt'] as String? ?? json['date'] as String? ?? '',
+      date: json['date'] as String? ?? json['createdAt'] as String? ?? '',
       readingTime: (json['readingTimeMinutes'] as num?)?.toInt() ??
-          (json['readingTime'] as num?)?.toInt() ?? 5,
+          (json['readingTime'] as num?)?.toInt() ?? 0,
       channel: json['channel'] as String? ?? '',
       categoryLabel: json['categoryLabel'] as String? ?? json['channel'] as String? ?? '',
       bodyParagraphs: bodyRaw.map((e) => e.toString()).toList(),
@@ -68,10 +74,10 @@ class ArticleDetailModel {
           .map((e) => ArticleModel.fromJson(e as Map<String, dynamic>))
           .toList(),
       pullQuote: json['pullQuote'] as String?,
-      hasVideo: json['hasVideo'] as bool? ?? false,
-      videoUrl: json['videoUrl'] as String?,
-      // $mobile-debug-skill | Problem: article detail had no imageUrl field so the hero only showed a solid gradient. Fix: read imageUrl from API and percent-encode Arabic chars in the path.
-      imageUrl: _encodeUrl(json['imageUrl'] as String? ?? json['coverImageUrl'] as String?),
+      // videoId presence determines whether this article has embeddable video
+      hasVideo: ((json['videoId'] as String?) ?? '').isNotEmpty,
+      videoUrl: json['youtubeUrl'] as String? ?? json['videoUrl'] as String?,
+      imageUrl: _encodeUrl(_parseFirstImageUrl(json['imageUrl'] as String? ?? json['coverImageUrl'] as String?)),
     );
   }
 

@@ -7,7 +7,6 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/section_header_widget.dart';
 import '../../../domain/entities/article.dart';
 import '../../../domain/entities/article_detail.dart';
-import 'article_detail_audio_player.dart';
 import 'article_detail_body_content.dart';
 import 'article_detail_byline.dart';
 import 'article_detail_comment_section.dart';
@@ -66,27 +65,14 @@ class ArticleDetailBody extends StatelessWidget {
               child: ArticleDetailVideoBadge(locale: locale),
             ),
           ),
-        // YouTube player for watch-your-book and novel-story channels
-        if ((article.channel == Article.kChannelWatchYourBook ||
-                article.channel == Article.kChannelNovelStory) &&
-            article.videoUrl != null)
+        if (article.hasVideo && article.videoUrl != null)
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsetsDirectional.fromSTEB(0, 14.h, 0, 0),
               child: ArticleDetailVideoPlayer(
                 videoUrl: article.videoUrl!,
-                showAiDisclosure:
-                    article.channel == Article.kChannelNovelStory,
+                showAiDisclosure: article.channel == Article.kChannelNovelStory,
               ),
-            ),
-          ),
-        // Audio player for books-talk channel
-        if (article.channel == Article.kChannelBooksTalk &&
-            article.videoUrl != null)
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(16.w, 14.h, 16.w, 0),
-              child: ArticleDetailAudioPlayer(audioUrl: article.videoUrl!),
             ),
           ),
         SliverToBoxAdapter(

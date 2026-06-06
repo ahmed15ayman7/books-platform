@@ -5,9 +5,7 @@ import '../../../../core/network/api_envelope.dart';
 import '../../../../core/network/api_manager.dart';
 import '../../../../core/network/failure.dart';
 import '../../domain/entities/article.dart';
-import '../../domain/entities/article_category.dart';
 import '../../domain/entities/article_detail.dart';
-import '../models/article_category_model.dart';
 import '../models/article_detail_model.dart';
 import '../models/article_model.dart';
 
@@ -17,33 +15,17 @@ class ArticlesRemoteDataSourceImpl {
 
   final ApiManager _api;
 
-  Future<Either<Failure, List<ArticleCategory>>> getCategories() =>
-      _api.get(
-        path: '/articles/categories',
-        fromJson: (json) {
-          final map = json as Map<String, dynamic>;
-          final list = map['data'] as List<dynamic>;
-          return list
-              .map((e) => ArticleCategoryModel.fromJson(e as Map<String, dynamic>).toEntity())
-              .toList();
-        },
-      );
-
   Future<Either<Failure, PaginatedResponse<Article>>> getArticles({
-    String? categorySlug,
+    String? channel,
     int page = 1,
     int limit = 20,
-    String? sort,
-    String? locale,
   }) =>
       _api.get<PaginatedResponse<Article>>(
         path: '/articles',
         queryParameters: {
           'page': page,
           'limit': limit,
-          'sort': ?sort,
-          'locale': ?locale,
-          'categorySlug': ?categorySlug,
+          'channel': ?channel,
         },
         fromJson: (json) => PaginatedResponse<Article>.fromJson(
           json,

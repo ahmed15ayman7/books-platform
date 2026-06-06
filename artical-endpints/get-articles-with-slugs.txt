@@ -1,0 +1,1228 @@
+- ARTICLE_SLUG_CHANNELS = [
+  { slug: "world-reads", labelAr: "العالم يقرأ", labelEn: "World Reads" },
+  { slug: "harvest", labelAr: "حصاد الكتب", labelEn: "Book Harvest" },
+  { slug: "ideas", labelAr: "زبدة الأفكار", labelEn: "Essence of Ideas" },
+]
+
+- https://booksplatform.ahmed15ayman7.com/api/v1/articles?channel={ARTICLE_SLUG_CHANNELS}&page=1&limit=20
+
+for example https://booksplatform.ahmed15ayman7.com/api/v1/articles?channel=world-reads&page=1&limit=20
+{
+"success": true,
+"data": [
+{
+"id": "cmpkgv0ic0gyou70daiwsxri1",
+"slug": "articles-52223",
+"title": "من الوحشية الأمريكية إلى منطق الصهيونية.. رحلة فكرية عبر كتب تشكل الوعي السياسي والتاريخي",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Gemini_Generated_Image_pnj4v9pnj4v9pnj4.png|https://booksplatform.net/wp-content/uploads/The_Man_Who_Gave_Me_A_Biscuit_CVR_3D__11374-6-1.jpg|https://booksplatform.net/wp-content/uploads/1758715421-1024x944-1.jpg|https://booksplatform.net/wp-content/uploads/كيف-تفكر-كخبير-اقتصادي-1.jpg|https://booksplatform.net/wp-content/uploads/Gaza-2-1.jpg",
+"channel": "world-reads",
+"date": "2026-04-08T22:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [
+{
+"id": "cmpkhmdqf02lru7hwd4wpt2bo",
+"slug": "american-monstrosity-donald-trump-how-we-got-him-how-we-stop-him",
+"nameEn": "AMERICAN MONSTROSITY Donald Trump: How We Got Him — How We Stop Him",
+"nameAr": "الوحشية الأمريكية دونالد ترامب: كيف وصلنا إليه – وكيف نوقفه",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/71hhtYOExLL._SY342_-1-3.jpg"
+},
+{
+"id": "cmpkhmdqa02kwu7hwvmnnlszk",
+"slug": "meet-mayor-mamdani",
+"nameEn": "MEET MAYOR MAMDANI",
+"nameAr": "تعرف على العمدة مامداني",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/The_Man_Who_Gave_Me_A_Biscuit_CVR_3D__11374-6.jpg"
+},
+{
+"id": "cmpkhmdqj02meu7hwjmvfbwjv",
+"slug": "no-neutrals-there-us-labor-zionism-and-the-struggle-for-palestine",
+"nameEn": "No Neutrals There US Labor, Zionism, and the Struggle for Palestine",
+"nameAr": "لا يوجد محايدون هناك: حزب العمل الأمريكي، والصهيونية، والنضال من أجل فلسطين",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/لا-حياد-هناك-الحركة-النقابية-الأميركية،-الصهيونية-وصراع-فلسطين.png"
+},
+{
+"id": "cmpkhm3oz028yu7hw8wh78bt9",
+"slug": "how-to-think-like-an-economist-great-economists-who-shaped-the-world-and-what-they-can-teach-us",
+"nameEn": "How to Think Like an Economist Great Economists Who Shaped the World and What They Can Teach Us",
+"nameAr": "كيف تفكر كخبير اقتصادي: الاقتصاديون العظماء الذين شكلوا العالم وما يمكنهم أن يعلمونا إياه",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/كيف-تفكر-كخبير-اقتصادي.jpg"
+},
+{
+"id": "cmpkhltlb0205u7hwshok3mmi",
+"slug": "the-logic-of-zionism-from-nationalist-myth-to-the-gaza-genocide-second-edition",
+"nameEn": "The Logic of Zionism: From Nationalist Myth to the Gaza Genocide — Second Edition",
+"nameAr": "منطق الصهيونية: من الأسطورة القومية إلى الإبادة الجماعية في غزة – الطبعة الثانية",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Gaza-2.jpg"
+}
+],
+"readingTimeMinutes": 4
+},
+{
+"id": "cmpkgv0du0gymu70d1zh0jqxg",
+"slug": "articles-52182",
+"title": "إصدارات جديدة تشرّح الراهن.. من مآسي غزة وصراعات الشرق الأوسط إلى مخاطر الذكاء الاصطناعي",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/ترتيب-غلاف-الكتب-المثير.png|https://booksplatform.net/wp-content/uploads/دور-بريطانيا-القذر-في-تدمير-غزة.jpg|https://booksplatform.net/wp-content/uploads/War-in-the-Age-of-Trump.webp|https://booksplatform.net/wp-content/uploads/81DhdnBVuoL._SY425_.jpg|https://booksplatform.net/wp-content/uploads/Complicit_3D_with_Sunday_Times_bestseller__05913-1-1.jpg|https://booksplatform.net/wp-content/uploads/Obsolete_CVF__26281.jpg",
+"channel": "world-reads",
+"date": "2026-04-07T22:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [],
+"readingTimeMinutes": 2
+},
+{
+"id": "cmpkguvi00gxou70d1jr1d71y",
+"slug": "2026-4",
+"title": "زلزال 2026.. كيف يتشكل العالم الجديد؟",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/boersenmedien-6.webp",
+"channel": "world-reads",
+"date": "2026-03-18T22:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [
+{
+"id": "cmpkhm5ha02btu7hw3zlhognw",
+"slug": "the-trump-administration-how-an-extremist-network-seized-power-in-america",
+"nameEn": "The Trump Administration: How an Extremist Network Seized Power in America",
+"nameAr": "إدارة ترامب: كيف استولت شبكة متطرفة على السلطة في أمريكا",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/epub-.jpeg"
+},
+{
+"id": "cmpkhm5ha02bru7hwdh35xmh9",
+"slug": "the-decline-of-power",
+"nameEn": "The Decline of Power",
+"nameAr": "تراجع السلطة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/ausgabe.jpeg"
+},
+{
+"id": "cmpkhm5h902bnu7hw3i2tl3w9",
+"slug": "the-last-chance",
+"nameEn": "The Last Chance",
+"nameAr": "الفرصة الأخيرة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/alexander.jpeg"
+},
+{
+"id": "cmpkhm5hb02bvu7hwiyjl7d1s",
+"slug": "false-facts-12-beliefs-that-lead-to-misguidance",
+"nameEn": "False Facts: 12 Beliefs That Lead to Misguidance",
+"nameAr": "حقائق كاذبة: 12 معتقدات تؤدي إلى الضلال",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Facts.jpeg"
+},
+{
+"id": "cmpkhm5ha02bpu7hwgpne1jdf",
+"slug": "the-vulnerable-society",
+"nameEn": "The Vulnerable Society",
+"nameAr": "المجتمع الضعيف",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/ausgaبيbe.jpeg"
+},
+{
+"id": "cmpkhm3pb02b1u7hwnnjyiyvz",
+"slug": "welcome-to-the-wrong-movie",
+"nameEn": "Welcome to the Wrong Movie",
+"nameAr": "مرحبًا بكم في الفيلم الخطأ",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/boersenmedien-6.webp"
+},
+{
+"id": "cmpkhm3pc02b5u7hw5u2neodc",
+"slug": "super-agency-when-ai-becomes-part-of-everyday-life",
+"nameEn": "Super-Agency: When AI Becomes Part of Everyday Life",
+"nameAr": "الوكالة الفائقة: عندما يصبح الذكاء الاصطناعي جزءًا من الحياة اليومية",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/boersenmedien-8.webp"
+},
+{
+"id": "cmpkhm3pc02b3u7hw0xoa0q0x",
+"slug": "apple-in-china",
+"nameEn": "Apple in China",
+"nameAr": "أبل في الصين",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/boersenmedien-7.webp"
+},
+{
+"id": "cmpkhm3pc02b7u7hw1s5i7min",
+"slug": "ukraine-2030-a-nations-vision",
+"nameEn": "Ukraine 2030: A Nation's Vision",
+"nameAr": "أوكرانيا 2030: رؤية الأمة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/boersenmedien-9.webp"
+},
+{
+"id": "cmpkhm5h902blu7hwqkkm1m4l",
+"slug": "the-kangaroos-revolt",
+"nameEn": "The Kangaroo's Revolt",
+"nameAr": "ثورة الكنغر",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/ausgfddsabe.jpeg"
+}
+],
+"readingTimeMinutes": 3
+},
+{
+"id": "cmpkguu6b0gxcu70dq242eeb2",
+"slug": "articles-51040",
+"title": "زلازل السياسة وترانيم الغبار: جولة في أحدث الإصدارات",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/remote-9.jpg|https://booksplatform.net/wp-content/uploads/بيس.jpg",
+"channel": "world-reads",
+"date": "2026-03-15T22:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [
+{
+"id": "cmpkhm3p4029ru7hwr0jrao9o",
+"slug": "a-new-world-order",
+"nameEn": "A New World Order",
+"nameAr": "نظام عالمي جديد",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/remote-10.jpg"
+},
+{
+"id": "cmpkhm3ox028ou7hwr9wbjgmk",
+"slug": "at-home-ahmed-aboutalebs-extraordinary-life-from-his-youth-in-morocco-to-mayor-of-rotterdam-2",
+"nameEn": "At Home: Ahmed Aboutaleb's Extraordinary Life, from His Youth in Morocco to Mayor of Rotterdam",
+"nameAr": "دول الخليج العربية وإيران .. جذور التنافس في النظام الإقليمي الخليجي وتجلياته",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/دول-الخليج-العربية-وإيران.jpg"
+},
+{
+"id": "cmpkhm3p3029pu7hw3gbiysla",
+"slug": "dust-god-created-most-people-to-live-in-hell",
+"nameEn": "Dust... God created most people to live in hell.",
+"nameAr": "الغبار... خلق الله معظم الناس ليعيشوا في الجحيم.",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/remote-9.jpg"
+},
+{
+"id": "cmpkhm3p2029hu7hw7se2jmcx",
+"slug": "even-if-the-sky-falls",
+"nameEn": "Even If the Sky Falls",
+"nameAr": "حتى لو سقطت السماء",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/remote-5.jpg"
+},
+{
+"id": "cmpkhm3p3029lu7hwapjr0a2i",
+"slug": "in-my-cozy-den-a-thrilling-tale-of-exploitation-and-power",
+"nameEn": "In My Cozy Den: A Thrilling Tale of Exploitation and Power",
+"nameAr": "في عريني المريح: قصة مثيرة عن الاستغلال والسلطة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/remote-7.jpg"
+},
+{
+"id": "cmpkhm3ox028pu7hwv4yidkrs",
+"slug": "how-islam-rules-in-iran-theology-and-theocracy-in-the-islamic-republic-2",
+"nameEn": "How Islam Rules in Iran Theology and Theocracy in the Islamic Republic",
+"nameAr": "كيف يحكم الإسلام في إيران : الدين والحكم الديني في الجمهورية الإسلامية",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/how-islam-rules-in-iran-theology-and-theocracy-in-the-islamic-republic.jpg"
+},
+{
+"id": "cmpkhm3oy028uu7hwhs3u5b97",
+"slug": "apocalypse-in-media-literature-and-linguistics",
+"nameEn": "Apocalypse in Media, Literature, and Linguistics",
+"nameAr": "نهاية العالم في وسائل الإعلام والأدب واللغويات",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/نهاية-العالم-في-الإعلام-والأدب-واللغويات.jpg"
+}
+],
+"readingTimeMinutes": 3
+},
+{
+"id": "cmpkguu010gxau70d96eddcta",
+"slug": "articles-50974",
+"title": "عناويننا اليوم .. دليل البقاء والنجاح في عالم مضطرب",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Finding-3.jpg",
+"channel": "world-reads",
+"date": "2026-03-14T22:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [
+{
+"id": "cmpkhm3ox028nu7hwlbddpapn",
+"slug": "at-home-ahmed-aboutalebs-extraordinary-life-from-his-youth-in-morocco-to-mayor-of-rotterdam",
+"nameEn": "At Home: Ahmed Aboutaleb's Extraordinary Life, from His Youth in Morocco to Mayor of Rotterdam",
+"nameAr": "في المنزل: حياة أحمد أبو طالب الاستثنائية، من شبابه في المغرب إلى عمدة روتردام",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Finding-6.jpg"
+},
+{
+"id": "cmpkhm0af0282u7hwnj3ndz26",
+"slug": "whats-stopping-you-11-cheatcodes-to-unlock-the-life-you-want",
+"nameEn": "What's Stopping You?: 11 Cheatcodes to Unlock the Life You Want",
+"nameAr": "ما الذي يمنعك؟: 11 رمز غش لفتح الحياة التي تريدها",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/ما-الذي-يمنعك.jpg"
+},
+{
+"id": "cmpkhm0ah028fu7hw1mu9t5ow",
+"slug": "the-spy-and-the-traitor",
+"nameEn": "The Spy and the Traitor",
+"nameAr": "الجاسوس والخائن",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Finding-2.jpg"
+},
+{
+"id": "cmpkhm0ag0286u7hw9nxoq5um",
+"slug": "products-50915",
+"nameEn": "أردوغان من الكلمات إلى النفوذ.. أبعاد خطاباته السياسة ودورها في نهضة تركيا",
+"nameAr": "أردوغان من الكلمات إلى النفوذ.. أبعاد خطاباته السياسة ودورها في نهضة تركيا",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/أردوغان-من-الكلمات-إلى-النفوذ-أبعاد-خطاباته-السياسة-ودورها-في-نهضة-تركيا.webp"
+},
+{
+"id": "cmpkhm0af027xu7hwck7xbycm",
+"slug": "aan-het-einde-van-de-wereld-2",
+"nameEn": "Aan het einde van de wereld",
+"nameAr": "في نهاية العالم | رواية مؤثرة عن الفقدان، والروابط الأسرية، وقوة الحب",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/في-نهاية-العالم.jpg"
+},
+{
+"id": "cmpkhm0ai028hu7hwfh1a1b31",
+"slug": "the-seven-special-forces-of-todays-leader",
+"nameEn": "The Seven Special Forces of Today's Leader",
+"nameAr": "القوات الخاصة السبعة لزعيم اليوم",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Finding-3.jpg"
+},
+{
+"id": "cmpkhm0ai028ju7hwhhowkqzs",
+"slug": "between-leading-and-letting-go-tips-for-raising-teenagers",
+"nameEn": "Between Leading and Letting Go: Tips for Raising Teenagers",
+"nameAr": "بين القيادة والتخلي: نصائح لتربية المراهقين",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Finding-4.jpg"
+}
+],
+"readingTimeMinutes": 3
+},
+{
+"id": "cmpkgutt20gx8u70d4piv7j3h",
+"slug": "10-2",
+"title": "مرافئ الوعي: 10 كتب كفيلة بأن تمنحكم رؤية أعمق لما يدور حولنا",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/ضد-المنطق.jpg",
+"channel": "world-reads",
+"date": "2026-03-12T22:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [
+{
+"id": "cmpkhm0ae027uu7hw6xzwip5h",
+"slug": "dont-burn-anyone-at-the-stake-today-2",
+"nameEn": "Don't Burn Anyone at the Stake Today",
+"nameAr": "لا تحرق أي شخص على المحك اليوم",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Greg-Mills-6.jpg"
+},
+{
+"id": "cmpkhm0ae027su7hwt7pilxvn",
+"slug": "the-next-renaissance-ai-and-the-expansion-of-human-potential",
+"nameEn": "The Next Renaissance: AI and the Expansion of Human Potential",
+"nameAr": "النهضة القادمة: الذكاء الاصطناعي وتوسيع الإمكانات البشرية",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Greg-Mills-5.jpg"
+},
+{
+"id": "cmpkhm0ad027pu7hwibabj0zg",
+"slug": "a-historian-in-gaza",
+"nameEn": "A Historian in Gaza",
+"nameAr": "مؤرخ في غزة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Greg-Mills-4.jpg"
+},
+{
+"id": "cmpkhm0ad027nu7hwmp03f9z8",
+"slug": "world-of-war-crimes",
+"nameEn": "World of War Crimes",
+"nameAr": "عالم جرائم الحرب",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Greg-Mills-3.jpg"
+},
+{
+"id": "cmpkhm0ad027lu7hw66xlalo1",
+"slug": "the-book-of-memory-or-how-to-live-forever",
+"nameEn": "The Book of Memory: Or, How to Live Forever",
+"nameAr": "كتاب الذاكرة: أو كيف نعيش إلى الأبد",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Greg-Mills-2.jpg"
+},
+{
+"id": "cmpkhm0ac027hu7hwpyf7i8n2",
+"slug": "the-art-of-war-and-peace-the-changing-face-of-21st-century-warfare",
+"nameEn": "The Art of War and Peace: The Changing Face of 21st Century Warfare",
+"nameAr": "فن الحرب والسلام: الوجه المتغير لحرب القرن الحادي والعشرين",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Greg-Mills.jpg"
+},
+{
+"id": "cmpkhm0a6026fu7hw0epwd4vo",
+"slug": "ghosts-and-things-the-material-culture-of-nineteenth-century-spiritualism",
+"nameEn": "Ghosts and Things .. The Material Culture of Nineteenth-Century Spiritualism",
+"nameAr": "الأشباح والأشياء.. الثقافة المادية للروحانية في القرن التاسع عشر",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/الأشباح-والأشياء.avif"
+},
+{
+"id": "cmpkhm0a6026hu7hwz5jscrm3",
+"slug": "postal-intelligence-the-tassis-family-and-communications-revolution-in-early-modern-europe",
+"nameEn": "Postal Intelligence .. The Tassis Family and Communications Revolution in Early Modern Europe",
+"nameAr": "الاستخبارات البريدية.. عائلة تاسيس وثورة الاتصالات في أوائل أوروبا الحديثة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/الاستخبارات-البريدية.avif"
+},
+{
+"id": "cmpkhm0a5026bu7hw8clrtuwf",
+"slug": "purges-how-dictators-fight-to-survive",
+"nameEn": "Purges How Dictators Fight to Survive",
+"nameAr": "التطهير: كيف يقاتل الدكتاتوريون من أجل البقاء",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/عمليات-التطهير.avif"
+},
+{
+"id": "cmpkhm0a8026vu7hwqhv9fyxq",
+"slug": "products-50807",
+"nameEn": "ضد المنطق",
+"nameAr": "ضد المنطق",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/ضد-المنطق.jpg"
+}
+],
+"readingTimeMinutes": 5
+},
+{
+"id": "cmpkgut810gx2u70dqyhjout6",
+"slug": "articles-50843",
+"title": "شيفرة العالم الجديد: من مهد الطفولة إلى عصر الذكاء الاصطناعي",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Steven-Vago-1.webp",
+"channel": "world-reads",
+"date": "2026-03-10T22:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [
+{
+"id": "cmpkhm0aa0271u7hw6l34bbww",
+"slug": "law-and-society",
+"nameEn": "Law and Society",
+"nameAr": "القانون والمجتمع",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Steven-Vago.webp"
+},
+{
+"id": "cmpkhm0ab0277u7hwvu016uid",
+"slug": "perspectives-on-early-parenthood-and-infancy",
+"nameEn": "Perspectives on Early Parenthood and Infancy",
+"nameAr": "وجهات نظر حول الأبوة المبكرة والطفولة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/orders.jpg"
+},
+{
+"id": "cmpkhm0aa0275u7hwkltb6tv5",
+"slug": "intelligence-led-policing",
+"nameEn": "Intelligence-Led Policing",
+"nameAr": "الشرطة التي تقودها الاستخبارات",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Jerry-H.-Ratcliffe.webp"
+},
+{
+"id": "cmpkhm0a9026zu7hwegvzikgg",
+"slug": "humanitarian-myths-and-hubris",
+"nameEn": "Humanitarian Myths and Hubris",
+"nameAr": "الخرافات الإنسانية والغطرسة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/order.webp"
+},
+{
+"id": "cmpkhm0ab027du7hw8jc108yv",
+"slug": "becoming-ai-native-charting-the-next-ai-frontier",
+"nameEn": "Becoming AI Native Charting the Next AI Frontier",
+"nameAr": "أن تصبح مواطنًا أصليًا في مجال الذكاء الاصطناعي، ورسم حدود الذكاء الاصطناعي التالية",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Steven-Vago-2.webp"
+},
+{
+"id": "cmpkhm0aa0273u7hwad880tw3",
+"slug": "commercial-real-estate-analysis-for-investment-finance-and-development",
+"nameEn": "Commercial Real Estate Analysis for Investment, Finance, and Development",
+"nameAr": "التحليل العقاري التجاري للاستثمار والتمويل والتنمية",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/outledge.jpg"
+},
+{
+"id": "cmpkhm0a9026xu7hwid15q94p",
+"slug": "demystifying-adaptive-teaching-how-to-teach-to-the-top",
+"nameEn": "Demystifying Adaptive Teaching How to Teach to the Top",
+"nameAr": "إزالة الغموض عن التدريس التكيفي كيفية التدريس إلى القمة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Routledge.webp"
+}
+],
+"readingTimeMinutes": 4
+},
+{
+"id": "cmpkgut1w0gx0u70dcyh3n8r5",
+"slug": "articles-50754",
+"title": "عشر محطات فكرية: من دهاليز السياسة إلى أسرار الذاكرة",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/9780571374175-1.jpg|https://booksplatform.net/wp-content/uploads/انحطاط-وسقوط-الإمبراطورية-البشرية-2.webp|https://booksplatform.net/wp-content/uploads/بناء-أنظمة-ذكية-للمستقبل-إتقان-ثورة-الحوسبة-الإدراكية-1.jpg|https://booksplatform.net/wp-content/uploads/حرب-نيكسون-في-الداخل-1.avif|https://booksplatform.net/wp-content/uploads/هراء-عصري.-سوء-استخدام-مفكري-ما-بعد-الحداثة-للعلم-1.jpg",
+"channel": "world-reads",
+"date": "2026-03-09T22:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [
+{
+"id": "cmpkhm0a40267u7hwbi7j32lh",
+"slug": "democratic-backsliding-in-post-mubarak-egypt",
+"nameEn": "Democratic Backsliding in Post-Mubarak Egypt",
+"nameAr": "تراجع الديمقراطية في مصر ما بعد مبارك",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Democratic.jpg"
+},
+{
+"id": "cmpkhm0a40265u7hwiwt9vyup",
+"slug": "making-muslimness-race-religion-and-performance-in-contemporary-manchester",
+"nameEn": "Making Muslimness Race, Religion, and Performance in Contemporary Manchester",
+"nameAr": "جعل العرق الإسلامي والدين والأداء في مانشستر المعاصرة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Asif-Majid-PhD.webp"
+},
+{
+"id": "cmpkhm0a30263u7hwy3flt7fh",
+"slug": "assessment-of-failed-federalism-in-iraq-federal-in-name-only",
+"nameEn": "Assessment of Failed Federalism in Iraq Federal in Name Only",
+"nameAr": "تقييم الفيدرالية الفاشلة في العراق الفيدرالية بالاسم فقط",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Atomic-1.jpg"
+},
+{
+"id": "cmpkhm0a30261u7hwnvxzyrsz",
+"slug": "athens-or-jerusalem-a-study-in-christian-comprehension",
+"nameEn": "Athens or Jerusalem? A Study in Christian Comprehension",
+"nameAr": "أثينا أم القدس؟ دراسة في الفهم المسيحي",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Athens.webp"
+},
+{
+"id": "cmpkhm0a1025tu7hw3catxws5",
+"slug": "how-the-taliban-regained-power-in-afghanistan",
+"nameEn": "How the Taliban Regained Power in Afghanistan",
+"nameAr": "كيف استعادت طالبان السلطة في أفغانستان",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Taliban.jpg"
+},
+{
+"id": "cmpkhlftd01i6u7hwc8s6l9bo",
+"slug": "nixons-war-at-home",
+"nameEn": "Nixon's War at Home",
+"nameAr": "حرب نيكسون في المنزل",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/حرب-نيكسون-في-الداخل.avif"
+},
+{
+"id": "cmpkhkuup00syu7hwga2oemkm",
+"slug": "why-we-remember-revealing-the-hidden-power-of-memory",
+"nameEn": "Why We Remember .. Revealing the Hidden Power of Memory",
+"nameAr": "لماذا نتذكر.. الكشف عن القوة الخفية للذاكرة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/9780571374175.jpg"
+},
+{
+"id": "cmpkhly05024pu7hwzjg2k2nj",
+"slug": "fashionable-nonsense-postmodern-intellectuals-abuse-of-science-2",
+"nameEn": "Fashionable Nonsense Postmodern Intellectuals' Abuse of Science",
+"nameAr": "هراء عصري: سوء استخدام مفكري ما بعد الحداثة للعلم",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/هراء-عصري.-سوء-استخدام-مفكري-ما-بعد-الحداثة-للعلم.jpg"
+}
+],
+"readingTimeMinutes": 3
+},
+{
+"id": "cmpkgus0v0gwuu70dsv837n0q",
+"slug": "articles-50643",
+"title": "رحلة بين الرفوف.. من صراعات السياسة إلى عمق الروح البشرية",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Ideas.webp",
+"channel": "world-reads",
+"date": "2026-03-08T22:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [
+{
+"id": "cmpkhly020245u7hwdwrmssoh",
+"slug": "patria-lost-countries-of-south-america",
+"nameEn": "Patria | Lost Countries of South America",
+"nameAr": "باتريا | الدول المفقودة في أمريكا الجنوبية",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/باتريا.png"
+},
+{
+"id": "cmpkhly02023zu7hwmdka7egk",
+"slug": "is-free-speech-under-threat",
+"nameEn": "Is Free Speech Under Threat?",
+"nameAr": "هل حرية التعبير مهددة؟",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/حرية-التعبير.png"
+},
+{
+"id": "cmpkhly01023xu7hwlnqsf3qw",
+"slug": "the-ai-con-how-to-fight-big-techs-hype-and-create-the-future-we-want",
+"nameEn": "The AI Con | How to Fight Big Tech's Hype and Create the Future We Want",
+"nameAr": "منظمة العفو الدولية كون | كيفية محاربة ضجيج شركات التكنولوجيا الكبرى وصنع المستقبل الذي نريده",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/خدعة-الذكاء-الاصطناعي.webp"
+},
+{
+"id": "cmpkhkuum00sfu7hw0kilxv6d",
+"slug": "get-in-the-inside-story-of-labour-under-starmer",
+"nameEn": "Get In: The Inside Story of Labour Under Starmer",
+"nameAr": "ادخل: القصة الداخلية للعمل تحت قيادة ستارمر",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/41aziRSLrVL._SY445_SX342_FMwebp_.webp"
+},
+{
+"id": "cmpkhly020241u7hwtkool8wn",
+"slug": "the-roads-to-rome-a-journey-into-europes-past",
+"nameEn": "The Roads To Rome | A Journey Into Europe's Past",
+"nameAr": "الطرق إلى روما | رحلة إلى ماضي أوروبا",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/الطريق-الى-روما.png"
+},
+{
+"id": "cmpkhly060250u7hwfqu6046f",
+"slug": "is-american-democracy-in-crisis-the-munk-debates",
+"nameEn": "Is American Democracy in Crisis? The Munk Debates",
+"nameAr": "هل الديمقراطية الأميركية في أزمة؟ مناقشات مونك",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/ANDREW-SULLIVAN.webp"
+},
+{
+"id": "cmpkhly05024vu7hwcjubdfs1",
+"slug": "on-wholeness-anishinaabe-pathways-to-embodiment",
+"nameEn": "On Wholeness.. Anishinaabe Pathways to Embodiment",
+"nameAr": "على الكمال.. مسارات أنيشينابي للتجسيد",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/عن-الكمال.webp"
+},
+{
+"id": "cmpkhly05024uu7hw14kkndai",
+"slug": "ideas-to-postpone-the-end-of-the-world",
+"nameEn": "Ideas to Postpone the End of the World",
+"nameAr": "أفكار لتأجيل نهاية العالم",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Ideas.webp"
+},
+{
+"id": "cmpkhly05024su7hwd6bixut2",
+"slug": "in-search-of-a-better-world-a-human-rights-odyssey",
+"nameEn": "In Search of A Better World A Human Rights Odyssey",
+"nameAr": "بحثاً عن عالم أفضل: ملحمة حقوق الإنسان",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Search.webp"
+}
+],
+"readingTimeMinutes": 5
+},
+{
+"id": "cmpkguopf0gwou70d607rvcj6",
+"slug": "articles-50603",
+"title": "إصدارات قلبت الموازين.. هذه الكتب العشرة تكشف حقائق العالم",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Putting.png|https://booksplatform.net/wp-content/uploads/sss-1.png",
+"channel": "world-reads",
+"date": "2026-03-07T22:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [
+{
+"id": "cmpkhly04024hu7hwxw8eyhpy",
+"slug": "french-colonial-oradour-the-memory-of-crimes-committed-in-the-name",
+"nameEn": "French Colonial Oradour.. the memory of crimes committed in the name",
+"nameAr": "المستعمر الفرنسي أورادور.. ذكرى الجرائم التي ارتكبت باسمه",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Oradour.png"
+},
+{
+"id": "cmpkhly030247u7hwd23yxt32",
+"slug": "the-age-of-resilience-the-earth-is-reverting-to-its-wild-state-we-must-reinvent-ourselves",
+"nameEn": "The Age of Resilience.. The Earth is reverting to its wild state; we must reinvent ourselves.",
+"nameAr": "عصر الصمود.. الأرض تعود إلى حالتها البرية؛ يجب علينا إعادة اختراع أنفسنا.",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Age.png"
+},
+{
+"id": "cmpkhly03024bu7hw9cbkxbjr",
+"slug": "betrayal-for-loyalty-a-true-story-of-rebellion-against-the-apocalypse",
+"nameEn": "Betrayal for Loyalty: A True Story of Rebellion Against the Apocalypse",
+"nameAr": "الخيانة من أجل الولاء: قصة حقيقية للتمرد ضد نهاية العالم",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Aurelien.png"
+},
+{
+"id": "cmpkhly03024du7hw53dbukdn",
+"slug": "hello-laziness-the-art-and-benefits-of-doing-less-in-business",
+"nameEn": "Hello Laziness.. The Art and Benefits of Doing Less in Business",
+"nameAr": "أهلاً بالكسل.. فن وفوائد العمل الأقل في الأعمال",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/livre.png"
+},
+{
+"id": "cmpkhly04024nu7hwjilrjh3f",
+"slug": "inspirations-from-egypt-a-poetic-philosophical-and-spiritual-journey-along-the-banks-of-the-nile",
+"nameEn": "Inspirations from Egypt: A Poetic, Philosophical, and Spiritual Journey Along the Banks of the Nile",
+"nameAr": "إلهام من مصر: رحلة شعرية وفلسفية وروحية على ضفاف النيل",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Inspirations.png"
+},
+{
+"id": "cmpkhly04024lu7hwq0bl74ye",
+"slug": "unemployment-the-human-condition-in-the-post",
+"nameEn": "Unemployment: The Human Condition in the Post",
+"nameAr": "البطالة: حالة الإنسان في البريد",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Unemployment.png"
+},
+{
+"id": "cmpkhly04024ju7hw88yrpa19",
+"slug": "success-manufacturing-lies",
+"nameEn": "Success.. Manufacturing Lies",
+"nameAr": "النجاح.. تصنيع الأكاذيب",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Raphael.png"
+},
+{
+"id": "cmpkhly03024fu7hwunj6kx00",
+"slug": "putting-an-end-to-the-capitalist-city",
+"nameEn": "Putting an End to the Capitalist City",
+"nameAr": "وضع حد للمدينة الرأسمالية",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Putting.png"
+}
+],
+"readingTimeMinutes": 3
+},
+{
+"id": "cmpkguojw0gwmu70dammztdsi",
+"slug": "articles-50514",
+"title": "كتبخانة وجولة في عقل العالم",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Good.jpg|https://booksplatform.net/wp-content/uploads/Healthy-5.webp",
+"channel": "world-reads",
+"date": "2026-03-06T22:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [
+{
+"id": "cmpkhlxzz023bu7hwu6dm83pd",
+"slug": "genesis-artificial-intelligence-hope-and-the-human-spirit",
+"nameEn": "Genesis Artificial Intelligence, Hope, and the Human Spirit",
+"nameAr": "سفر التكوين الذكاء الاصطناعي والأمل والروح الإنسانية",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Healthy-4.webp"
+},
+{
+"id": "cmpkhlxzz0239u7hwlc3eyza7",
+"slug": "how-the-other-half-eats-the-untold-story-of-food-and-inequality-in-america",
+"nameEn": "How the Other Half Eats The Untold Story of Food and Inequality in America",
+"nameAr": "كيف يأكل النصف الآخر: القصة غير المروية عن الغذاء وعدم المساواة في أمريكا",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Healthy-3.webp"
+},
+{
+"id": "cmpkhlxzy0237u7hwp02qqe7f",
+"slug": "feed-the-people-why-industrial-food-is-good-and-how-to-make-it-even-better",
+"nameEn": "Feed the People! Why Industrial Food Is Good and How to Make It Even Better",
+"nameAr": "إطعام الناس! لماذا يعتبر الغذاء الصناعي جيدًا وكيفية جعله أفضل",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Healthy-2.webp"
+},
+{
+"id": "cmpkhlxzy0235u7hwg3pqch2t",
+"slug": "the-craft-how-the-freemasons-made-the-modern-world",
+"nameEn": "The Craft How the Freemasons Made the Modern World",
+"nameAr": "الحرفة كيف صنع الماسونيون العالم الحديث",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Healthy-1.webp"
+},
+{
+"id": "cmpkhlxzy0231u7hwlsgzictn",
+"slug": "good-people",
+"nameEn": "Good People",
+"nameAr": "الناس الطيبين",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Good.jpg"
+},
+{
+"id": "cmpkhlv7j022zu7hwub8jihtx",
+"slug": "a-walking-life-reclaiming-our-health-and-our-freedom-one-step-at-a-time",
+"nameEn": "A Walking Life Reclaiming Our Health and Our Freedom One Step at a Time",
+"nameAr": "حياة مشي تستعيد صحتنا وحريتنا خطوة بخطوة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Antonia.webp"
+},
+{
+"id": "cmpkhlv7i022xu7hwg8ffsm7n",
+"slug": "you-didnt-hear-this-from-me-mostly-true-notes-on-gossip",
+"nameEn": "You Didn't Hear This From Me (Mostly) True Notes on Gossip",
+"nameAr": "لم تسمع هذا مني (في الغالب) ملاحظات حقيقية عن القيل والقال",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/infio.webp"
+}
+],
+"readingTimeMinutes": 4
+},
+{
+"id": "cmpkguoan0gwku70duw8cig7b",
+"slug": "articles-50481",
+"title": "من أنفاق بكين إلى شغب فانكوفر.. حكايات لا ترويها الكتب التقليدية",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/FUTURE-1.jpg",
+"channel": "world-reads",
+"date": "2026-03-05T22:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [
+{
+"id": "cmpkhlv7i022uu7hwi5m7fwqi",
+"slug": "white-riot-the-anti-asian-riots",
+"nameEn": "WHITE RIOT.. The Anti-Asian Riots",
+"nameAr": "الشغب الأبيض.. الشغب المناهض لآسيا",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Gord-Hil-1.jpg"
+},
+{
+"id": "cmpkhlv7i022su7hwxozmtu12",
+"slug": "the-500-years-of-indigenous-resistance-comic",
+"nameEn": "THE 500 YEARS OF INDIGENOUS RESISTANCE COMIC",
+"nameAr": "500 عام من المقاومة الهزلية للسكان الأصليين",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/cover-11.jpg"
+},
+{
+"id": "cmpkhlv7h022ou7hwwss75ymd",
+"slug": "the-antifa-comic-book-100-years-of-fascism-and-antifa-movements",
+"nameEn": "THE ANTIFA COMIC BOOK 100 Years of Fascism and Antifa Movements",
+"nameAr": "كتاب أنتيفا الهزلي 100 عام من الفاشية وحركات أنتيفا",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/cover-10.jpg"
+},
+{
+"id": "cmpkhlv7g022eu7hwv9y5st2p",
+"slug": "decolonize-your-diet",
+"nameEn": "DECOLONIZE YOUR DIET",
+"nameAr": "قم بإنهاء نظامك الغذائي",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/info.jpg"
+},
+{
+"id": "cmpkhlv7h022mu7hwu7qgew4o",
+"slug": "the-cure-for-hate",
+"nameEn": "THE CURE FOR HATE",
+"nameAr": "علاج الكراهية",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/fullcover.jpg"
+},
+{
+"id": "cmpkhlv7g022gu7hwynne9vpa",
+"slug": "the-rat-people-a-journey-through-beijings-forbidden",
+"nameEn": "THE RAT PEOPLE A Journey through Beijing's Forbidden",
+"nameAr": "شعب الفئران: رحلة عبر المحرمات في بكين",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Paperbac.jpg"
+},
+{
+"id": "cmpkhlv7f022au7hwuhosuz8d",
+"slug": "the-future-is-disabled-prophecies-love-notes-and-mourning-songs",
+"nameEn": "THE FUTURE IS DISABLED.. Prophecies, Love Notes and Mourning Songs",
+"nameAr": "المستقبل معطل.. نبوءات ورسائل حب وأغاني حداد",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/FUTURE-1.jpg"
+},
+{
+"id": "cmpkhlv7g022iu7hwe0v2x3g5",
+"slug": "the-home-stretch-a-father-a-son-and-all-the-things-they-never-talk-about",
+"nameEn": "THE HOME STRETCH A Father, a Son, and All the Things They Never Talk About",
+"nameAr": "امتداد المنزل: أب، وابن، وكل الأشياء التي لا يتحدثون عنها أبدًا",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/HOME-2.jpg"
+}
+],
+"readingTimeMinutes": 4
+},
+{
+"id": "cmpkgului0gw8u70djt9i4k5l",
+"slug": "articles-50318",
+"title": "عشرة كتب كندية.. ترسم وجها آخر لبطاقتها البريدية",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Fernwood.jpg",
+"channel": "world-reads",
+"date": "2026-03-02T22:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [
+{
+"id": "cmpkhlv76020vu7hwm5flzcvy",
+"slug": "advocating-for-palestine-in-canada-histories-movements-action",
+"nameEn": "Advocating for Palestine in Canada Histories, Movements, Action",
+"nameAr": "الدفاع عن فلسطين في كندا: التاريخ والحركات والعمل",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Palestin.jpg"
+},
+{
+"id": "cmpkhlv73020hu7hwwffubh6n",
+"slug": "the-genocide-continues-population-control-and-the-sterilization-of-indigenous-women",
+"nameEn": "The Genocide Continues.. Population Control and the Sterilization of Indigenous Women",
+"nameAr": "الإبادة الجماعية مستمرة.. السيطرة على السكان وتعقيم نساء السكان الأصليين",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Genocide.jpg"
+},
+{
+"id": "cmpkhlv75020pu7hw9kjz3bqu",
+"slug": "fight-to-win-inside-poor-peoples-organizing",
+"nameEn": "Fight to Win Inside Poor People's Organizing",
+"nameAr": "الكفاح من أجل الفوز داخل منظمة الفقراء",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Fight.jpg"
+},
+{
+"id": "cmpkhlv75020ru7hwjshpjbxe",
+"slug": "poor-housing-a-silent-crisis",
+"nameEn": "Poor Housing A Silent Crisis",
+"nameAr": "سوء الإسكان أزمة صامتة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Poor.jpg"
+},
+{
+"id": "cmpkhlv73020du7hwfy1536l2",
+"slug": "the-letters-institutional-lives-and-edi",
+"nameEn": "The Letters Institutional Lives and EDI",
+"nameAr": "رسائل الحياة المؤسسية و EDI",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/circulation.jpg"
+},
+{
+"id": "cmpkhlv75020nu7hws5t7cv4e",
+"slug": "revolutionary-science",
+"nameEn": "Revolutionary Science",
+"nameAr": "العلوم الثورية",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Science.jpg"
+},
+{
+"id": "cmpkhlv74020lu7hw1gwob8jd",
+"slug": "hot-mess-mothering-through-a-code-red-climate-emergency",
+"nameEn": "Hot Mess Mothering Through a Code Red Climate Emergency",
+"nameAr": "فوضى عارمة في الأمومة من خلال رمز الطوارئ المناخية الأحمر",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Hot.jpg"
+},
+{
+"id": "cmpkhlv72020bu7hw52yurpcr",
+"slug": "a-new-global-geometry",
+"nameEn": "A New Global Geometry?",
+"nameAr": "هندسة عالمية جديدة؟",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Fernwood.jpg"
+},
+{
+"id": "cmpkhlv74020ju7hw5eouczee",
+"slug": "ill-get-right-on-it",
+"nameEn": "I'll Get Right On It",
+"nameAr": "سأقوم بالأمر على الفور",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Get.jpg"
+}
+],
+"readingTimeMinutes": 4
+},
+{
+"id": "cmpkguc4j0gvau70d8les9o5c",
+"slug": "10",
+"title": "10 كتب تربط الخيوط بين السياسة، والتاريخ، والمال، والخيال",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/ف-9.png|https://booksplatform.net/wp-content/uploads/ف.png|https://booksplatform.net/wp-content/uploads/ف-1.png|https://booksplatform.net/wp-content/uploads/ف-2.png|https://booksplatform.net/wp-content/uploads/ف-3.png|https://booksplatform.net/wp-content/uploads/ف-4.png|https://booksplatform.net/wp-content/uploads/ف-5.png|https://booksplatform.net/wp-content/uploads/ف-6.png|https://booksplatform.net/wp-content/uploads/ف-7.png|https://booksplatform.net/wp-content/uploads/ف-8.png",
+"channel": "world-reads",
+"date": "2026-02-10T00:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [],
+"readingTimeMinutes": 3
+},
+{
+"id": "cmpkgubgu0gv4u70dkkls8hi8",
+"slug": "articles-48538",
+"title": "رحلة في عقل العالم: عشرة كتب تشكل وعينا المعاصر",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/4053850c-58a1-4151-8bb1-ef467073228d-669-1.webp|https://booksplatform.net/wp-content/uploads/Gypsies-in-Contemporary-Egypt-1.jpg|https://booksplatform.net/wp-content/uploads/Victor-Hugo-and-Islam-1.png|https://booksplatform.net/wp-content/uploads/Omar-Alsoumi-1.jpg|https://booksplatform.net/wp-content/uploads/The-Protocols-of-the-Elders-of-1.jpg|https://booksplatform.net/wp-content/uploads/Zorg-A-Tale-of-Greed-and-Murder-1.webp|https://booksplatform.net/wp-content/uploads/nahwa-maskan-ameen-1.jpg|https://booksplatform.net/wp-content/uploads/718XmxqRSyL._SY342_-1.jpg",
+"channel": "world-reads",
+"date": "2026-02-09T00:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [
+{
+"id": "cmpkhkw0i00wbu7hw8w5vizfo",
+"slug": "products-45940",
+"nameEn": ""الهناجرة".. غجر مصر المنبوذون يعودون للضوء",
+"nameAr": "الهناجرة".. غجر مصر المنبوذون يعودون للضوء",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Gypsies-in-Contemporary-Egypt.jpg"
+},
+{
+"id": "cmpkhlarq01cfu7hwwo1kbqms",
+"slug": "the-protocols-of-the-elders-of-zion-unmasking-the-worlds-deepest-conspiracy",
+"nameEn": "the Protocols of the Elders of Zion: Unmasking the World's Deepest Conspiracy",
+"nameAr": "بروتوكولات حكماء صهيون: كشف أعمق مؤامرة في العالم",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/The-Protocols-of-the-Elders-of.jpg"
+},
+{
+"id": "cmpkhkw0m00wvu7hw1nqgprch",
+"slug": "zorg-a-tale-of-greed-and-murder-that-inspired-the-abolition-of-slavery",
+"nameEn": "Zorg: A Tale of Greed and Murder That Inspired the Abolition of Slavery",
+"nameAr": "زورج: قصة الجشع والقتل التي ألهمت إلغاء العبودية",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Zorg-A-Tale-of-Greed-and-Murder.webp"
+},
+{
+"id": "cmpkhl4bd016uu7hwfg8vivj0",
+"slug": "towards-a-safe-home",
+"nameEn": "Towards A Safe Home",
+"nameAr": "نحو منزل آمن",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/nahwa-maskan-ameen.jpg"
+},
+{
+"id": "cmpkhkuuj00rxu7hwkc3si8lr",
+"slug": "chokepoints-american-power-in-the-age-of-economic-warfare-2",
+"nameEn": "Chokepoints American Power in the Age of Economic Warfare",
+"nameAr": "المرح: كيف يغير اللعب تفكيرنا ويلهم التواصل ويشعل الإبداع",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/718XmxqRSyL._SY342_.jpg"
+},
+{
+"id": "cmpkhktql00pau7hwtwvj0dq0",
+"slug": "products-44953",
+"nameEn": "قبل أن تبرد القهوة",
+"nameAr": "قبل أن تبرد القهوة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/4053850c-58a1-4151-8bb1-ef467073228d-669.webp"
+}
+],
+"readingTimeMinutes": 3
+},
+{
+"id": "cmpkgubos0gv6u70dvy8380ex",
+"slug": "2026-2",
+"title": "المواجهة الكبرى: كيف يُعاد تشكيل العالم في 2026؟"",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/lamartine-passeur-dislam-1.jpg|https://booksplatform.net/wp-content/uploads/Make-America-Great-Again-1.avif|https://booksplatform.net/wp-content/uploads/fb3a8e1d2271f06613a6-1.jpg|https://booksplatform.net/wp-content/uploads/Great-Boom-Ahead-Your-Guide-1.jpg|https://booksplatform.net/wp-content/uploads/718K16OJaoL._SY342_-1.jpg|https://booksplatform.net/wp-content/uploads/598809921_25888485794077703_1835381683119286597_n-1.jpg|https://booksplatform.net/wp-content/uploads/الوصايا-العشر-1.jpg|https://booksplatform.net/wp-content/uploads/العوالم-الأربعة-للوجود-1.png",
+"channel": "world-reads",
+"date": "2026-02-09T00:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [
+{
+"id": "cmpkhl6tc018ou7hwh33hih8o",
+"slug": "time-to-get-tough-make-america-great-again",
+"nameEn": "Time to Get Tough .. Make America Great Again",
+"nameAr": "حان وقت التشدد.. لنجعل أمريكا عظيمة مرة أخرى",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Make-America-Great-Again.avif"
+},
+{
+"id": "cmpkhkw0a00uzu7hw4aimgndc",
+"slug": "the-defeat-of-the-west",
+"nameEn": "The Defeat of the West",
+"nameAr": "هزيمة الغرب",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/fb3a8e1d2271f06613a6.jpg, https://booksplatform.net/wp-content/uploads/535264-scaled.jpeg"
+},
+{
+"id": "cmpkhlarz01dyu7hwck0dzegj",
+"slug": "products-47653",
+"nameEn": "الطفرة العظيمة المقبلة: دليلك للربح الشخصي والتجاري في عصر الرخاء",
+"nameAr": "الطفرة العظيمة المقبلة: دليلك للربح الشخصي والتجاري في عصر الرخاء",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Great-Boom-Ahead-Your-Guide.jpg"
+},
+{
+"id": "cmpkhkuul00sau7hw6950vsoc",
+"slug": "products-45360",
+"nameEn": "كفانا دموعا!! خبايا شركة جونسون آند جونسون",
+"nameAr": "كفانا دموعا!! خبايا شركة جونسون آند جونسون",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/718K16OJaoL._SY342_.jpg"
+},
+{
+"id": "cmpkhlarl01bou7hwbgh0ijut",
+"slug": "lamartine-conveyor-of-islam",
+"nameEn": "Lamartine, conveyor of Islam",
+"nameAr": "لامارتين، ناقل الإسلام",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/lamartine-passeur-dislam.jpg"
+},
+{
+"id": "cmpkhkuup00svu7hwwt8xjt78",
+"slug": "twilight-of-the-saints-the-history-and-politics-of-salafism-in-contemporary-egypt",
+"nameEn": "Twilight of the Saints.. The History and Politics of Salafism in Contemporary Egypt",
+"nameAr": "شفق القديسين.. تاريخ السلفية وسياستها في مصر المعاصرة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/598809921_25888485794077703_1835381683119286597_n.jpg, https://booksplatform.net/wp-content/uploads/9780231215213.avif"
+},
+{
+"id": "cmpkhktqk00p7u7hw78uizqy5",
+"slug": "products-44399",
+"nameEn": "الوصايا العشر للإنسان الآلي .. كيف تصبح شريرا مثاليا كالآخرين",
+"nameAr": "الوصايا العشر للإنسان الآلي .. كيف تصبح شريرا مثاليا كالآخرين",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/الوصايا-العشر.jpg"
+},
+{
+"id": "cmpkhky0o00ywu7hw5etbg1ix",
+"slug": "the-four-realms-of-existence",
+"nameEn": "The Four Realms of Existence",
+"nameAr": "عوالم الوجود الأربعة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/العوالم-الأربعة-للوجود.png"
+}
+],
+"readingTimeMinutes": 3
+},
+{
+"id": "cmpkguaz10gv0u70d8i42masx",
+"slug": "articles-48476",
+"title": "على حافة الهاوية.. كتب اليوم تشرح عالمنا المربك",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/81F6MawJ4VL._SY342_-1.jpg|https://booksplatform.net/wp-content/uploads/أزمة-الغذاء-القادمة-1.avif|https://booksplatform.net/wp-content/uploads/خط-أحمر-في-الرمال.jpg|https://booksplatform.net/wp-content/uploads/The-Plot-The-Secret-Story-of-1.jpg|https://booksplatform.net/wp-content/uploads/81F6MawJ4VL._SY342_-2.jpg|https://booksplatform.net/wp-content/uploads/Time-Shelter-1.jpg|https://booksplatform.net/wp-content/uploads/أوراق-أفغانستان-1.jpg|https://booksplatform.net/wp-content/uploads/The-Plot-The-Secret-Story-of-2.jpg|https://booksplatform.net/wp-content/uploads/rtinE-ssentials-1.jpg|https://booksplatform.net/wp-content/uploads/استبدال-الولاية-1.avif|https://booksplatform.net/wp-content/uploads/عشيرة-برهوت-65399-250x375-webp-1.webp|https://booksplatform.net/wp-content/uploads/Dr.-Rina-Bliss-1.jpg",
+"channel": "world-reads",
+"date": "2026-02-09T00:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [
+{
+"id": "cmpkhlarw01diu7hwp76xjj58",
+"slug": "whats-real-about-race-untangling-science-genetics-and-society",
+"nameEn": "What's Real about Race? Untangling Science, Genetics, and Society",
+"nameAr": "ما هو الحقيقي حول العرق؟ فك تشابك العلوم وعلم الوراثة والمجتمع",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Dr.-Rina-Bliss.jpg"
+},
+{
+"id": "cmpkhlarj01bdu7hwqa7aehgh",
+"slug": "the-coming-food-crisis",
+"nameEn": "The Coming Food Crisis",
+"nameAr": "أزمة الغذاء القادمة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/أزمة-الغذاء-القادمة.avif"
+},
+{
+"id": "cmpkhldn001exu7hw64gjmuhe",
+"slug": "replace-the-state",
+"nameEn": "Replace the State",
+"nameAr": "استبدال الدولة",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/استبدال-الولاية.avif"
+},
+{
+"id": "cmpkhlfra01gxu7hwx3w1gqzk",
+"slug": "the-daily-artists-way-366-meditations-for-creative-living",
+"nameEn": "The Daily Artist's Way: 366 Meditations for Creative Living",
+"nameAr": "طريقة الفنان اليومية: 366 تأملات للحياة الإبداعية",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/rtinE-ssentials.jpg"
+},
+{
+"id": "cmpkhl6tc018mu7hwmz3ey4np",
+"slug": "time-to-get-tough-make-america-great-again-2",
+"nameEn": "Time to Get Tough .. Make America Great Again",
+"nameAr": "عشيرة برهوت",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/عشيرة-برهوت-65399-250x375-webp.webp"
+}
+],
+"readingTimeMinutes": 3
+},
+{
+"id": "cmpkgubbk0gv2u70dfdmvjh4o",
+"slug": "articles-48502",
+"title": "جواسيس الظل وانهيار العمالقة (الاختراق والسقوط)",
+"excerpt": null,
+"imageUrl": "https://booksplatform.net/wp-content/uploads/100-Rules-for-Living-to-100.jpg|https://booksplatform.net/wp-content/uploads/Picture1.png|https://booksplatform.net/wp-content/uploads/Picture4.png|https://booksplatform.net/wp-content/uploads/Picture5.png|https://booksplatform.net/wp-content/uploads/Picture6.png|https://booksplatform.net/wp-content/uploads/Picture7.png|https://booksplatform.net/wp-content/uploads/Picture2.png|https://booksplatform.net/wp-content/uploads/images-36.jpg|https://booksplatform.net/wp-content/uploads/الجغرافيا-السياسية-لكوكب-مختلّ-صدمة-الأنثروبوسين-1.jpg|https://booksplatform.net/wp-content/uploads/Climate-Change-Deception-1.avif",
+"channel": "world-reads",
+"date": "2026-02-09T00:00:00.000Z",
+"videoId": null,
+"youtubeUrl": null,
+"authorFirstName": null,
+"authorLastName": null,
+"isFeatured": false,
+"articleCategory": {
+"name": "The World Reads",
+"nameAr": "العالم يقرأ",
+"slug": "the-world-reads"
+},
+"products": [
+{
+"id": "cmpkhlaro01c4u7hw3vvjswdw",
+"slug": "climate-change-deception",
+"nameEn": "Climate Change Deception",
+"nameAr": "خداع تغير المناخ",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/Climate-Change-Deception.avif"
+},
+{
+"id": "cmpkhkw0a00v4u7hw0gvsebqt",
+"slug": "goliaths-curse-the-history-and-future-of-societal-collapse",
+"nameEn": "Goliath's Curse : The History and Future of Societal Collapse",
+"nameAr": "لعنة جالوت: تاريخ ومستقبل الانهيار المجتمعي",
+"imageUrl": "https://booksplatform.net/wp-content/uploads/710PNUspUyL._SY342_.jpg"
+}
+],
+"readingTimeMinutes": 4
+}
+],
+"pagination": {
+"page": 1,
+"limit": 20,
+"total": 18,
+"totalPages": 1,
+"hasNextPage": false,
+"hasPrevPage": false
+}
+}

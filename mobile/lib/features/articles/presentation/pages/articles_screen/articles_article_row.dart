@@ -64,6 +64,19 @@ class ArticlesArticleRow extends StatelessWidget {
                         errorWidget: (_, _, _) => const SizedBox.shrink(),
                       ),
                     ),
+                  if (article.hasVideo)
+                    Positioned.fill(
+                      child: Container(
+                        color: Colors.black26,
+                        child: Center(
+                          child: Icon(
+                            Icons.play_circle_outline_rounded,
+                            color: Colors.white,
+                            size: 28.r,
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -93,9 +106,10 @@ class ArticlesArticleRow extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 5.h),
-                  // $mobile-debug-skill | Problem: Arabic "د" at end of string triggered BiDi RTL rendering, scrambling the date. Fix: force LTR so factual date metadata always reads left-to-right.
                   Text(
-                    '${article.date} · ${article.readMinutes} ${'articles.min'.tr()}',
+                    article.hasVideo
+                        ? article.date
+                        : '${article.date} · ${article.readMinutes} ${'articles.min'.tr()}',
                     textDirection: TextDirection.ltr,
                     style: GoogleFonts.inter(
                       fontSize: 11.sp,
