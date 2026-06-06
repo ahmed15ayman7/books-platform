@@ -18,14 +18,12 @@ class HomeContentCubit extends Cubit<HomeContentState> {
 
     // Fire all requests concurrently before first await.
     final featuredFuture = _repo.getFeaturedBooks();
-    final categoriesFuture = _repo.getCategories();
     final newlyReleasedFuture = _repo.getNewlyReleasedBooks();
     final translatedFuture = _repo.getTranslatedBooks();
     final categorySectionsFuture = _repo.getCategorySections();
     final publishersFuture = _repo.getTopPublishers();
 
     final featuredResult = await featuredFuture;
-    final categoriesResult = await categoriesFuture;
     final newlyReleasedResult = await newlyReleasedFuture;
     final translatedResult = await translatedFuture;
     final categorySectionsResult = await categorySectionsFuture;
@@ -33,7 +31,6 @@ class HomeContentCubit extends Cubit<HomeContentState> {
 
     for (final r in [
       featuredResult,
-      categoriesResult,
       newlyReleasedResult,
       translatedResult,
       categorySectionsResult,
@@ -45,12 +42,14 @@ class HomeContentCubit extends Cubit<HomeContentState> {
       }
     }
 
+    final categorySections = categorySectionsResult.getOrElse(() => []);
+
     emit(HomeContentSuccess(
       featured: featuredResult.getOrElse(() => []),
-      categories: categoriesResult.getOrElse(() => []),
+      categories: categorySections.map((s) => s.category).toList(),
       freshBooks: newlyReleasedResult.getOrElse(() => []),
       translatedBooks: translatedResult.fold((_) => [], (p) => p.data),
-      categorySections: categorySectionsResult.getOrElse(() => []),
+      categorySections: categorySections,
       topPublishers: publishersResult.getOrElse(() => []).take(5).toList(),
     ));
   }
