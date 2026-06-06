@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import 'package:booksplatform/features/books/domain/entities/category_section.dart';
+
 import '../../../domain/entities/book.dart';
 import '../../../domain/entities/category.dart';
 import '../../../domain/entities/publisher_summary.dart';
@@ -25,6 +27,7 @@ final class HomeContentSuccess extends HomeContentState {
     required this.freshBooks,
     required this.translatedBooks,
     required this.topPublishers,
+    required this.categorySections,
   });
 
   final List<Book> featured;
@@ -32,10 +35,11 @@ final class HomeContentSuccess extends HomeContentState {
   final List<Book> freshBooks;
   final List<Book> translatedBooks;
   final List<PublisherSummary> topPublishers;
+  final List<CategorySection> categorySections;
 
   @override
   List<Object?> get props =>
-      [featured, categories, freshBooks, translatedBooks, topPublishers];
+      [featured, categories, freshBooks, translatedBooks, topPublishers, categorySections];
 }
 
 final class HomeContentError extends HomeContentState {

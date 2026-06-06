@@ -74,6 +74,14 @@ class HomeBody extends StatelessWidget {
             emptyTitle: 'home.no_translated_books'.tr(),
             emptySubtitle: 'home.no_translated_books_subtitle'.tr(),
           ),
+          for (final cs in state.categorySections)
+            HomeBooksCarouselSection(
+              title: locale == 'ar' ? cs.category.nameAr : cs.category.nameEn,
+              books: cs.books,
+              locale: locale,
+              onSeeAll: onBrowse,
+              onBookTap: onBookTap,
+            ),
           if (state.topPublishers.isNotEmpty)
             HomePublishersSection(
               publishers: state.topPublishers,

@@ -1,9 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../../../../core/enums/translation_status.dart';
 import '../../../../../core/network/failure_messages.dart' as core;
-import '../../../domain/entities/book.dart';
 import '../../../domain/repositories/base_books_repository.dart';
 import 'home_content_state.dart';
 
@@ -18,46 +16,42 @@ class HomeContentCubit extends Cubit<HomeContentState> {
   Future<void> load() async {
     emit(const HomeContentLoading());
 
-    final featuredResult = await _repo.getFeaturedBooks();
-    if (featuredResult.isLeft()) {
-      final f = featuredResult.fold((f) => f, (_) => null)!;
-      emit(HomeContentError(core.failureToMessage(f)));
-      return;
-    }
+    // Fire all requests concurrently before first await.
+    final featuredFuture = _repo.getFeaturedBooks();
+    final categoriesFuture = _repo.getCategories();
+    final newlyReleasedFuture = _repo.getNewlyReleasedBooks();
+    final translatedFuture = _repo.getTranslatedBooks();
+    final categorySectionsFuture = _repo.getCategorySections();
+    final publishersFuture = _repo.getTopPublishers();
 
-    final catResult = await _repo.getCategories();
-    if (catResult.isLeft()) {
-      final f = catResult.fold((f) => f, (_) => null)!;
-      emit(HomeContentError(core.failureToMessage(f)));
-      return;
-    }
+    final featuredResult = await featuredFuture;
+    final categoriesResult = await categoriesFuture;
+    final newlyReleasedResult = await newlyReleasedFuture;
+    final translatedResult = await translatedFuture;
+    final categorySectionsResult = await categorySectionsFuture;
+    final publishersResult = await publishersFuture;
 
-    final allResult = await _repo.getBooks();
-    if (allResult.isLeft()) {
-      final f = allResult.fold((f) => f, (_) => null)!;
-      emit(HomeContentError(core.failureToMessage(f)));
-      return;
+    for (final r in [
+      featuredResult,
+      categoriesResult,
+      newlyReleasedResult,
+      translatedResult,
+      categorySectionsResult,
+      publishersResult,
+    ]) {
+      if (r.isLeft()) {
+        emit(HomeContentError(core.failureToMessage(r.fold((f) => f, (_) => throw StateError('')))));
+        return;
+      }
     }
-
-    final pubResult = await _repo.getTopPublishers();
-    if (pubResult.isLeft()) {
-      final f = pubResult.fold((f) => f, (_) => null)!;
-      emit(HomeContentError(core.failureToMessage(f)));
-      return;
-    }
-
-    final freshBooks = allResult.fold((_) => <Book>[], (p) => p.data.take(10).toList());
-    final featured = featuredResult.getOrElse(() => []);
-    final translatedBooks = featured
-        .where((b) => b.status == TranslationStatus.translated)
-        .toList();
 
     emit(HomeContentSuccess(
-      featured: featured,
-      categories: catResult.getOrElse(() => []),
-      freshBooks: freshBooks,
-      translatedBooks: translatedBooks,
-      topPublishers: pubResult.getOrElse(() => []).take(5).toList(),
+      featured: featuredResult.getOrElse(() => []),
+      categories: categoriesResult.getOrElse(() => []),
+      freshBooks: newlyReleasedResult.getOrElse(() => []),
+      translatedBooks: translatedResult.fold((_) => [], (p) => p.data),
+      categorySections: categorySectionsResult.getOrElse(() => []),
+      topPublishers: publishersResult.getOrElse(() => []).take(5).toList(),
     ));
   }
 }

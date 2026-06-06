@@ -7,6 +7,7 @@ import '../../../../core/network/failure.dart';
 import '../../domain/entities/book.dart';
 import '../../domain/entities/book_stats.dart';
 import '../../domain/entities/category.dart';
+import '../../domain/entities/category_section.dart';
 import '../../domain/entities/publisher_summary.dart';
 import '../../domain/entities/sort_order.dart';
 import '../../domain/repositories/base_books_repository.dart';
@@ -77,4 +78,12 @@ class BooksRepositoryImpl implements BooksRepository {
     int limit = 20,
   }) =>
       _remote.getRecommendedForTranslation(page: page, limit: limit);
+
+  @override
+  Future<Either<Failure, List<Book>>> getNewlyReleasedBooks({int limit = 20}) =>
+      _remote.getNewlyReleasedBooks(limit: limit);
+
+  @override
+  Future<Either<Failure, List<CategorySection>>> getCategorySections() =>
+      _remote.getCategorySections();
 }

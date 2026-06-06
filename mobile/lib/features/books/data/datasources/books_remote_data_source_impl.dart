@@ -8,11 +8,13 @@ import '../../../../core/network/failure.dart';
 import '../../domain/entities/book.dart';
 import '../../domain/entities/book_stats.dart';
 import '../../domain/entities/category.dart';
+import '../../domain/entities/category_section.dart';
 import '../../domain/entities/publisher_summary.dart';
 import '../../domain/entities/sort_order.dart';
 import '../models/book_model.dart';
 import '../models/book_stats_model.dart';
 import '../models/category_model.dart';
+import '../models/category_section_model.dart';
 
 @lazySingleton
 class BooksRemoteDataSourceImpl {
@@ -114,13 +116,41 @@ class BooksRemoteDataSourceImpl {
         ).data!.toEntity(),
       );
 
+  Future<Either<Failure, List<Book>>> getNewlyReleasedBooks({int limit = 20}) =>
+      _api.get(
+        path: '/books',
+        queryParameters: {'sort': 'newest', 'limit': limit},
+        fromJson: (json) => PaginatedResponse<BookModel>.fromJson(
+          json,
+          fromJsonT: BookModel.fromJson,
+        ).data.map((m) => m.toEntity()).toList(),
+      );
+
+  Future<Either<Failure, List<CategorySection>>> getCategorySections() =>
+      _api.get(
+        path: '/books/category-sections',
+        fromJson: (json) {
+          final list = (json as Map<String, dynamic>)['data'] as List<dynamic>;
+          return list
+              .map((e) => CategorySectionModel.fromJson(
+                    e as Map<String, dynamic>,
+                  ).toEntity())
+              .toList();
+        },
+      );
+
   Future<Either<Failure, PaginatedResponse<Book>>> getTranslatedBooks({
     int page = 1,
     int limit = 20,
   }) =>
       _api.get<PaginatedResponse<Book>>(
         path: '/books',
-        queryParameters: {'translationStatus': 'TRANSLATED', 'page': page, 'limit': limit},
+        queryParameters: {
+          'translationStatus': 'TRANSLATED',
+          'sort': 'newest',
+          'page': page,
+          'limit': limit,
+        },
         fromJson: (json) => PaginatedResponse<Book>.fromJson(
           json,
           fromJsonT: (item) => BookModel.fromJson(item).toEntity(),

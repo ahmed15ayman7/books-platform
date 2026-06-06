@@ -6,6 +6,7 @@ import '../../../../core/network/failure.dart';
 import '../entities/book.dart';
 import '../entities/book_stats.dart';
 import '../entities/category.dart';
+import '../entities/category_section.dart';
 import '../entities/publisher_summary.dart';
 import '../entities/sort_order.dart';
 
@@ -44,4 +45,8 @@ abstract class BooksRepository {
     int page = 1,
     int limit = 20,
   });
+
+  Future<Either<Failure, List<Book>>> getNewlyReleasedBooks({int limit = 20});
+
+  Future<Either<Failure, List<CategorySection>>> getCategorySections();
 }
