@@ -39,13 +39,13 @@ class BottomNavWidget extends StatelessWidget {
         activeIcon: Icons.menu_book_rounded,
         label: ar ? 'الكتب' : 'Books',
       ),
-      null, // FAB slot
       _TabItem(
         tab: BottomNavTab.articles,
         icon: Icons.article_outlined,
         activeIcon: Icons.article_rounded,
         label: ar ? 'المقالات' : 'Articles',
       ),
+      null, // FAB slot
       _TabItem(
         tab: BottomNavTab.media,
         icon: Icons.play_circle_outline_rounded,
@@ -87,7 +87,7 @@ class BottomNavWidget extends StatelessWidget {
               child: Row(
                 children: tabs.map((item) {
                   if (item == null) {
-                    return Expanded(child: SizedBox(height: 56.h));
+                    return Expanded(flex: 2, child: SizedBox(height: 56.h));
                   }
                   final isActive = activeTab == item.tab;
                   return Expanded(
