@@ -142,4 +142,22 @@ describe("parseArticleContent", () => {
     expect(text).toContain(`[${linkLabelFromUrl(url)}](${url})`);
     expect(linkLabelFromUrl(url)).toBe("إيمانويل كانط");
   });
+
+  it("linkifies Wikipedia URLs without a closing parenthesis", () => {
+    const url =
+      "https://ar.wikipedia.org/wiki/%D8%A5%D9%8A%D9%85%D8%A7%D9%86%D9%88%D9%8A%D9%84_%D9%83%D8%A7%D9%86%D8%B7";
+    const blocks = parseArticleContent(`اقرأ (${url} عن الفيلسوف.`);
+    const text = (blocks[0] as { text: string }).text;
+    expect(text).toContain(`[${linkLabelFromUrl(url)}](${url})`);
+  });
+
+  it("turns markdown-image syntax with external URLs into text links", () => {
+    const url =
+      "https://ar.wikipedia.org/wiki/%D8%A5%D9%8A%D9%85%D8%A7%D9%86%D9%88%D9%8A%D9%84_%D9%83%D8%A7%D9%86%D8%B7";
+    const blocks = parseArticleContent(`![فيلسوف](${url})`);
+    expect(blocks[0]).toMatchObject({
+      type: "paragraph",
+      text: `[فيلسوف](${url})`,
+    });
+  });
 });

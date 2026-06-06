@@ -2,12 +2,26 @@
 
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { isImageUrl } from "./is-image-url";
 import { normalizeImageSrc } from "./normalize-image-url";
+import { resolveArticleImageSrc } from "./article-media-url";
+import { linkLabelFromUrl } from "./normalize-article-source";
 import { parseArticleContent } from "./parse-article-content";
 
 const INLINE_TOKEN =
   /!\[([^\]]*)\]\(([^)]+)\)|\[([^\]]+)\]\(([^)]+)\)|(\*\*[^*]+\*\*|__[^_]+__|\*[^*]+\*|_[^_]+_)/g;
+
+function ExternalLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      className="font-medium text-[var(--brand-red)] underline underline-offset-2 hover:text-[var(--brand-red-hover)]"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      {label}
+    </a>
+  );
+}
 
 function inlineFormat(text: string): ReactNode[] {
   const parts: ReactNode[] = [];
@@ -19,28 +33,27 @@ function inlineFormat(text: string): ReactNode[] {
     if (m.index > last) parts.push(text.slice(last, m.index));
 
     if (m[1] !== undefined && m[2] !== undefined) {
-      const src = normalizeImageSrc(m[2].trim()) ?? m[2].trim();
-      parts.push(
-        <InlineArticleImage key={key++} src={src} alt={m[1].trim() || "صورة"} compact />,
-      );
+      const raw = m[2].trim();
+      const imageSrc = resolveArticleImageSrc(raw);
+      if (imageSrc) {
+        parts.push(
+          <InlineArticleImage key={key++} src={imageSrc} alt={m[1].trim() || "صورة"} compact />,
+        );
+      } else {
+        const label = m[1].trim() || linkLabelFromUrl(raw);
+        parts.push(<ExternalLink key={key++} href={raw} label={label} />);
+      }
     } else if (m[3] !== undefined && m[4] !== undefined) {
       const label = m[3].trim();
-      const href = normalizeImageSrc(m[4].trim()) ?? m[4].trim();
-      if (isImageUrl(href)) {
+      const href = m[4].trim();
+      const imageSrc = resolveArticleImageSrc(href);
+      if (imageSrc) {
         parts.push(
-          <InlineArticleImage key={key++} src={href} alt={label || "صورة"} compact />,
+          <InlineArticleImage key={key++} src={imageSrc} alt={label || "صورة"} compact />,
         );
       } else {
         parts.push(
-          <a
-            key={key++}
-            href={href}
-            className="font-medium text-[var(--brand-red)] underline underline-offset-2 hover:text-[var(--brand-red-hover)]"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            {label || href}
-          </a>,
+          <ExternalLink key={key++} href={href} label={label || linkLabelFromUrl(href)} />,
         );
       }
     } else if (m[5]) {
@@ -75,7 +88,7 @@ function InlineArticleImage({
   compact?: boolean;
 }) {
   const [failed, setFailed] = useState(false);
-  const resolvedSrc = normalizeImageSrc(src) ?? src;
+  const resolvedSrc = resolveArticleImageSrc(src) ?? normalizeImageSrc(src) ?? src;
   const figcaption = caption ?? (alt !== "صورة" && alt !== "image" ? alt : null);
 
   return (

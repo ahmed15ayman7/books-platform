@@ -1,4 +1,6 @@
 /** Decode a readable link label from a URL (e.g. Wikipedia slug → Arabic title). */
+import { isArticleImageUrl } from "./article-media-url";
+
 export function linkLabelFromUrl(url: string): string {
   try {
     const parsed = new URL(url);
@@ -57,9 +59,19 @@ export function replaceCaptionShortcodes(text: string): string {
 
 /** Turn bare (https://...) URLs into markdown links with decoded labels. Skips markdown image/link syntax. */
 export function linkifyParenthesizedUrls(text: string): string {
-  return text.replace(/(?<!\])\(https?:\/\/[^\s)]+\)/g, (match) => {
-    const url = match.slice(1, -1);
+  return text.replace(/(?<!\])\(https?:\/\/[^\s)\]]+\)?/g, (match) => {
+    let url = match.slice(1);
+    if (url.endsWith(")")) url = url.slice(0, -1);
     const label = linkLabelFromUrl(url);
+    return `[${label}](${url})`;
+  });
+}
+
+/** Convert markdown-image syntax that points at a non-image URL into a text link. */
+export function demoteNonImageMarkdownImages(text: string): string {
+  return text.replace(/!\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g, (full, alt: string, url: string) => {
+    if (isArticleImageUrl(url)) return full;
+    const label = alt.trim() || linkLabelFromUrl(url);
     return `[${label}](${url})`;
   });
 }
@@ -68,6 +80,7 @@ export function linkifyParenthesizedUrls(text: string): string {
 export function normalizeArticleSource(raw: string): string {
   let out = unescapeWordPressEscapes(raw);
   out = replaceCaptionShortcodes(out);
+  out = demoteNonImageMarkdownImages(out);
   out = linkifyParenthesizedUrls(out);
   return out;
 }

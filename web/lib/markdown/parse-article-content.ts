@@ -1,6 +1,7 @@
 import { isImageUrl } from "./is-image-url";
 import { normalizeImageSrc } from "./normalize-image-url";
-import { normalizeArticleSource } from "./normalize-article-source";
+import { normalizeArticleSource, linkLabelFromUrl } from "./normalize-article-source";
+import { isArticleImageUrl } from "./article-media-url";
 
 export type ArticleContentBlock =
   | { type: "heading"; level: 1 | 2 | 3 | 4 | 5 | 6; text: string }
@@ -99,24 +100,29 @@ function parseLineBlock(line: string): ArticleContentBlock | null {
   const mdImage = MD_IMAGE.exec(trimmed);
   if (mdImage) {
     const alt = mdImage[1]!.trim();
-    return toImageBlock(mdImage[2]!, alt, alt || undefined);
+    const raw = mdImage[2]!.trim();
+    if (isArticleImageUrl(raw)) {
+      return toImageBlock(raw, alt, alt || undefined);
+    }
+    const label = alt || linkLabelFromUrl(raw);
+    return { type: "paragraph", text: `[${label}](${raw})` };
   }
 
   const mdLink = MD_LINK.exec(trimmed);
   if (mdLink) {
     const label = mdLink[1]!.trim();
     const href = mdLink[2]!.trim();
-    if (isImageUrl(href)) {
+    if (isArticleImageUrl(href)) {
       return toImageBlock(href, label, label || undefined);
     }
-    return { type: "paragraph", text: `[${label || href}](${href})` };
+    return { type: "paragraph", text: `[${label || linkLabelFromUrl(href)}](${href})` };
   }
 
   if (/!\[[^\]]*\]\([^)]+\)/.test(trimmed)) {
     return { type: "paragraph", text: trimmed };
   }
 
-  if (isImageUrl(trimmed)) {
+  if (isArticleImageUrl(trimmed)) {
     return toImageBlock(trimmed, "صورة");
   }
 
