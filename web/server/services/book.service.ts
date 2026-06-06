@@ -1,5 +1,7 @@
 import { db } from "@/lib/db";
 import { notDeleted } from "@/lib/admin/audit-fields";
+import { normalizeArabic } from "@/lib/i18n/normalize-arabic";
+import { BOOK_CATEGORY_LABELS_AR } from "@/lib/nav/book-categories";
 import { PAGINATION } from "@/lib/utils/constants";
 
 export interface BookFilters {
@@ -274,6 +276,24 @@ export const BookService = {
     });
   },
 
+  async getNavCategories() {
+    const all = await db.productCategory.findMany({
+      select: {
+        id: true,
+        name: true,
+        nameAr: true,
+        slug: true,
+        linkedCount: true,
+      },
+    });
+
+    const byNorm = new Map(all.map((c) => [normalizeArabic(c.nameAr ?? c.name), c]));
+
+    return BOOK_CATEGORY_LABELS_AR.map((label) => byNorm.get(normalizeArabic(label))).filter(
+      (c): c is NonNullable<typeof c> => c != null,
+    );
+  },
+
   async getStats() {
     const [totalBooks, totalPublishers, totalTranslated, totalCountries] =
       await Promise.all([
@@ -284,6 +304,46 @@ export const BookService = {
       ]);
 
     return { totalBooks, totalPublishers, totalTranslatedBooks: totalTranslated, totalCountries };
+  },
+
+  async getCategorySections() {
+    const bookSelect = {
+      id: true,
+      slug: true,
+      nameEn: true,
+      nameAr: true,
+      imageUrl: true,
+      translationStatus: true,
+      primaryCategory: {
+        select: { nameAr: true, name: true, slug: true },
+      },
+    } as const;
+
+    const categories = await this.getNavCategories();
+
+    const categoryBooks = await Promise.all(
+      categories.map((cat) =>
+        db.product.findMany({
+          where: { published: true, primaryCategoryId: cat.id },
+          orderBy: { position: "desc" },
+          take: 10,
+          select: bookSelect,
+        }),
+      ),
+    );
+
+    return categories
+      .map((cat, i) => ({ category: cat, books: categoryBooks[i] ?? [] }))
+      .filter((s) => s.books.length > 0)
+      .sort((a, b) => {
+        const ai = BOOK_CATEGORY_LABELS_AR.findIndex(
+          (label) => normalizeArabic(label) === normalizeArabic(a.category.nameAr ?? ""),
+        );
+        const bi = BOOK_CATEGORY_LABELS_AR.findIndex(
+          (label) => normalizeArabic(label) === normalizeArabic(b.category.nameAr ?? ""),
+        );
+        return ai - bi;
+      });
   },
 
   async getFeaturedForHome() {
@@ -332,16 +392,6 @@ export const BookService = {
   },
 
   async getHomeData() {
-    const TARGET_CATEGORIES = [
-      "تقنيات وعلوم",
-      "دراسات اجتماعية",
-      "لغات وآداب",
-      "فلسفات وثقافات",
-      "أديان وعقائد",
-      "اقتصاد وتنمية",
-      "أفكار وسياسات",
-    ];
-
     const bookSelect = {
       id: true,
       slug: true,
@@ -354,11 +404,9 @@ export const BookService = {
       },
     } as const;
 
-    const [categories, newlyReleased, translated, nominated, sponsoredPublishers, topPublishers] = await Promise.all([
-      db.productCategory.findMany({
-        where: { nameAr: { in: TARGET_CATEGORIES } },
-        select: { id: true, name: true, nameAr: true, slug: true },
-      }),
+    const [categorySections, newlyReleased, translated, nominated, sponsoredPublishers, topPublishers] =
+      await Promise.all([
+        this.getCategorySections(),
       db.product.findMany({
         where: { published: true },
         orderBy: { position: "desc" },
@@ -405,26 +453,6 @@ export const BookService = {
         },
       }),
     ]);
-
-    const categoryBooks = await Promise.all(
-      categories.map((cat) =>
-        db.product.findMany({
-          where: { published: true, primaryCategoryId: cat.id },
-          orderBy: { position: "desc" },
-          take: 10,
-          select: bookSelect,
-        })
-      )
-    );
-
-    const categorySections = categories
-      .map((cat, i) => ({ category: cat, books: categoryBooks[i] ?? [] }))
-      .filter((s) => s.books.length > 0)
-      .sort((a, b) => {
-        const ai = TARGET_CATEGORIES.indexOf(a.category.nameAr ?? "");
-        const bi = TARGET_CATEGORIES.indexOf(b.category.nameAr ?? "");
-        return ai - bi;
-      });
 
     return {
       newlyReleased,

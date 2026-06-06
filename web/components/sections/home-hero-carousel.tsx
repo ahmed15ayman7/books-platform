@@ -1,10 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import useEmblaCarousel from "embla-carousel-react";
-import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { carouselAutoplayReverse } from "@/lib/carousel/autoplay";
 import { cn } from "@/lib/utils";
 
 export interface HeroSlideData {
@@ -21,14 +20,19 @@ export interface HeroSlideData {
 interface HomeHeroCarouselProps {
   slides: HeroSlideData[];
   locale: string;
+  pageOrder?: number;
+  autoplayMs?: number;
+  autoplayReverse?: boolean;
 }
 
 function HeroSlideContent({
   slide,
   locale,
+  isActive,
 }: {
   slide: HeroSlideData;
   locale: string;
+  isActive: boolean;
 }) {
   const isAr = locale === "ar";
   const title = isAr ? slide.titleAr : (slide.titleEn ?? slide.titleAr);
@@ -36,14 +40,15 @@ function HeroSlideContent({
 
   return (
     <div className="relative h-[min(70vh,520px)] w-full overflow-hidden md:h-[min(72vh,560px)]">
-      <Image
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={slide.imageUrl}
         alt=""
-        fill
-        className="object-cover object-center"
-        priority
-        sizes="100vw"
-        unoptimized={slide.imageUrl.startsWith("http")}
+        className="absolute inset-0 h-full w-full object-cover object-center"
+        loading="eager"
+        decoding="async"
+        fetchPriority={isActive ? "high" : "auto"}
+        referrerPolicy="no-referrer"
       />
       <div
         className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/25"
@@ -75,13 +80,14 @@ function HeroSlideContent({
 
       {slide.foregroundImageUrl && (
         <div className="pointer-events-none absolute bottom-0 left-1/2 z-[5] h-[32%] w-[min(380px,75vw)] -translate-x-1/2 md:h-[40%]">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={slide.foregroundImageUrl}
             alt=""
-            fill
-            className="object-contain object-bottom drop-shadow-2xl"
-            sizes="(max-width: 768px) 75vw, 380px"
-            unoptimized={slide.foregroundImageUrl.startsWith("http")}
+            className="absolute inset-0 h-full w-full object-contain object-bottom drop-shadow-2xl"
+            loading="eager"
+            decoding="async"
+            referrerPolicy="no-referrer"
           />
         </div>
       )}
@@ -89,41 +95,85 @@ function HeroSlideContent({
   );
 }
 
-export function HomeHeroCarousel({ slides, locale }: HomeHeroCarouselProps) {
+export function HomeHeroCarousel({
+  slides,
+  locale,
+  pageOrder = 0,
+  autoplayMs = 7000,
+  autoplayReverse: autoplayReverseProp,
+}: HomeHeroCarouselProps) {
   const isAr = locale === "ar";
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: slides.length > 1,
-    align: "start",
-    duration: 28,
-  });
+  const autoplayReverse = autoplayReverseProp ?? carouselAutoplayReverse(pageOrder);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const pausedRef = useRef(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
-  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
-  const scrollTo = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi]);
+  const scrollPrev = useCallback(() => {
+    setSelectedIndex((i) => (i - 1 + slides.length) % slides.length);
+  }, [slides.length]);
+
+  const scrollNext = useCallback(() => {
+    setSelectedIndex((i) => (i + 1) % slides.length);
+  }, [slides.length]);
+
+  const scrollTo = useCallback((index: number) => {
+    setSelectedIndex(index);
+  }, []);
 
   useEffect(() => {
-    if (!emblaApi) return;
-    emblaApi.reInit();
-    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
-    emblaApi.on("select", onSelect);
-    onSelect();
-    return () => {
-      emblaApi.off("select", onSelect);
+    slides.forEach((slide) => {
+      if (!slide.imageUrl) return;
+      const bg = new window.Image();
+      bg.referrerPolicy = "no-referrer";
+      bg.src = slide.imageUrl;
+      if (slide.foregroundImageUrl) {
+        const fg = new window.Image();
+        fg.referrerPolicy = "no-referrer";
+        fg.src = slide.foregroundImageUrl;
+      }
+    });
+  }, [slides]);
+
+  useEffect(() => {
+    if (slides.length <= 1 || autoplayMs <= 0) return;
+
+    const root = sectionRef.current;
+    if (!root) return;
+
+    const pause = () => {
+      pausedRef.current = true;
     };
-  }, [emblaApi, slides.length]);
+    const resume = () => {
+      pausedRef.current = false;
+    };
 
-  useEffect(() => {
-    if (!emblaApi || slides.length <= 1) return;
-    const timer = setInterval(() => emblaApi.scrollNext(), 7000);
-    return () => clearInterval(timer);
-  }, [emblaApi, slides.length]);
+    root.addEventListener("mouseenter", pause);
+    root.addEventListener("mouseleave", resume);
+    root.addEventListener("pointerdown", pause);
+    root.addEventListener("pointerup", resume);
+
+    const timer = setInterval(() => {
+      if (pausedRef.current) return;
+      setSelectedIndex((i) => {
+        if (autoplayReverse) return (i - 1 + slides.length) % slides.length;
+        return (i + 1) % slides.length;
+      });
+    }, autoplayMs);
+
+    return () => {
+      clearInterval(timer);
+      root.removeEventListener("mouseenter", pause);
+      root.removeEventListener("mouseleave", resume);
+      root.removeEventListener("pointerdown", pause);
+      root.removeEventListener("pointerup", resume);
+    };
+  }, [slides.length, autoplayMs, autoplayReverse]);
 
   if (slides.length === 0) return null;
 
   if (slides.length === 1) {
     const slide = slides[0]!;
-    const inner = <HeroSlideContent slide={slide} locale={locale} />;
+    const inner = <HeroSlideContent slide={slide} locale={locale} isActive />;
     return (
       <section className="relative w-full bg-[var(--brand-black)]" aria-label={isAr ? "البانر الرئيسي" : "Hero banner"}>
         {slide.linkUrl ? (
@@ -139,24 +189,40 @@ export function HomeHeroCarousel({ slides, locale }: HomeHeroCarouselProps) {
 
   return (
     <section
-      className="hero-embla relative w-full bg-[var(--brand-black)]"
+      ref={sectionRef}
+      className="relative w-full bg-[var(--brand-black)]"
       aria-roledescription="carousel"
       aria-label={isAr ? "شرائح الرئيسية" : "Homepage slides"}
     >
-      <div ref={emblaRef} className="hero-embla__viewport w-full overflow-hidden">
-        <div className="hero-embla__container flex">
-          {slides.map((slide) => (
-            <div key={slide.id} className="hero-embla__slide min-w-0 shrink-0 grow-0 basis-full">
-              {slide.linkUrl ? (
-                <Link href={slide.linkUrl} className="block w-full">
-                  <HeroSlideContent slide={slide} locale={locale} />
+      {/* Crossfade stack — avoids Embla translate3d repaint bugs on off-screen slides */}
+      <div className="relative w-full">
+        {slides.map((slide, index) => {
+          const isActive = index === selectedIndex;
+          const content = (
+            <HeroSlideContent slide={slide} locale={locale} isActive={isActive} />
+          );
+
+          return (
+            <div
+              key={slide.id}
+              className={cn(
+                "transition-opacity duration-700 ease-in-out",
+                isActive
+                  ? "relative z-10 opacity-100"
+                  : "pointer-events-none absolute inset-0 z-0 opacity-0",
+              )}
+              aria-hidden={!isActive}
+            >
+              {slide.linkUrl && isActive ? (
+                <Link href={slide.linkUrl} className="block h-full w-full">
+                  {content}
                 </Link>
               ) : (
-                <HeroSlideContent slide={slide} locale={locale} />
+                content
               )}
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
 
       <button
@@ -184,7 +250,7 @@ export function HomeHeroCarousel({ slides, locale }: HomeHeroCarouselProps) {
             onClick={() => scrollTo(i)}
             className={cn(
               "h-2 rounded-full transition-all",
-              i === selectedIndex ? "w-8 bg-[var(--brand-red)]" : "w-2 bg-white/45 hover:bg-white/70"
+              i === selectedIndex ? "w-8 bg-[var(--brand-red)]" : "w-2 bg-white/45 hover:bg-white/70",
             )}
             aria-label={`${isAr ? "شريحة" : "Slide"} ${i + 1}`}
             aria-current={i === selectedIndex ? "true" : undefined}

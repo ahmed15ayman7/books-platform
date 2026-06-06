@@ -69,11 +69,11 @@ export function CategoryGrid({
   categories,
   locale,
   className,
-  showSpecialLinks = true,
+  showSpecialLinks = false,
 }: CategoryGridProps) {
   const isAr = locale === "ar";
   const base = `/${locale}/books`;
-  const displayCategories = categories.slice(0, 7);
+  const displayCategories = categories.slice(0, 10);
 
   const allItems = [
     ...displayCategories.map((cat) => ({
@@ -81,7 +81,6 @@ export function CategoryGrid({
       href: `${base}/category/${cat.slug}`,
       Icon: iconForCategorySlug(cat.slug),
       label: isAr && cat.nameAr ? cat.nameAr : cat.name,
-      count: `${cat.linkedCount} ${isAr ? "كتاب" : "books"}`,
     })),
     ...(showSpecialLinks
       ? [
@@ -90,14 +89,12 @@ export function CategoryGrid({
             href: `${base}/translated`,
             Icon: Languages,
             label: isAr ? "كتب مترجمة" : "Translated",
-            count: "",
           },
           {
             key: "nominated",
             href: `${base}/nominated-for-translation`,
             Icon: Globe2,
             label: isAr ? "مرشحة للترجمة" : "For Translation",
-            count: "",
           },
         ]
       : []),
@@ -114,7 +111,7 @@ export function CategoryGrid({
       whileInView="visible"
       viewport={{ once: true, margin: "-60px 0px" }}
     >
-      {allItems.map(({ key, href, Icon, label, count }) => (
+      {allItems.map(({ key, href, Icon, label }) => (
         <motion.div key={key} variants={itemVariants}>
           <Link
             href={href}
@@ -130,9 +127,6 @@ export function CategoryGrid({
             <span className="text-sm font-semibold text-[var(--brand-gray-900)] group-hover:text-[var(--brand-red)] transition-colors">
               {label}
             </span>
-            {count && (
-              <span className="text-xs text-[var(--brand-gray-500)]">{count}</span>
-            )}
           </Link>
         </motion.div>
       ))}

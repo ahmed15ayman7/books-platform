@@ -5,22 +5,25 @@ import { usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useRef } from "react";
-
-interface ArticleCategory {
-  id: string;
-  name: string;
-  nameAr: string | null;
-  slug: string;
-}
+import {
+  buildBookCategoryLinks,
+  buildReadingChannelLinks,
+  buildMediaChannelLinks,
+  bookCategoriesNavLabel,
+  mediaNavLabel,
+  readingsNavLabel,
+  mediaHubHref,
+  type NavCategory,
+} from "@/lib/nav/site-nav";
 
 interface DesktopNavClientProps {
   locale: string;
-  articleCategories?: ArticleCategory[];
+  bookCategories?: NavCategory[];
 }
 
-export function DesktopNavClient({ locale, articleCategories = [] }: DesktopNavClientProps) {
+export function DesktopNavClient({ locale, bookCategories = [] }: DesktopNavClientProps) {
   const pathname = usePathname();
-  const t = locale === "ar";
+  const isAr = locale === "ar";
   const base = `/${locale}`;
 
   const [openMenu, setOpenMenu] = useState<string | null>(null);
@@ -39,19 +42,13 @@ export function DesktopNavClient({ locale, articleCategories = [] }: DesktopNavC
     if (closeTimer.current) clearTimeout(closeTimer.current);
   }
 
-  const booksDropdown = [
-    { href: `${base}/books`, label: t ? "كل الكتب" : "All Books" },
-    { href: `${base}/books/nominated-for-translation`, label: t ? "مرشحة للترجمة" : "For Translation" },
-    { href: `${base}/books/translated`, label: t ? "كتب مترجمة" : "Translated Books" },
-  ];
+  const booksDropdown = buildBookCategoryLinks(locale, bookCategories);
+  const readingChannels = buildReadingChannelLinks(locale);
+  const mediaChannels = buildMediaChannelLinks(locale);
 
-  const articlesChannels = [
-    { href: `${base}/articles/world-reads`, label: t ? "العالم يقرأ" : "World Reads" },
-    { href: `${base}/articles/harvest`, label: t ? "حصاد الكتب" : "Book Harvest" },
-    { href: `${base}/articles/ideas`, label: t ? "زبدة الأفكار" : "Essence of Ideas" },
-    { href: `${base}/articles/books-talk`, label: t ? "حديث الكتب" : "Book Talk" },
-    { href: `${base}/articles/watch-your-book`, label: t ? "شاهد كتابك" : "Watch Your Book" },
-    { href: `${base}/articles/novel-story`, label: t ? "رواية فحكاية" : "Novel & Story" },
+  const mediaPaths = [
+    mediaHubHref(locale),
+    ...mediaChannels.map((c) => c.href),
   ];
 
   function isActive(href: string) {
@@ -59,14 +56,22 @@ export function DesktopNavClient({ locale, articleCategories = [] }: DesktopNavC
     return pathname.startsWith(href);
   }
 
+  const readingsActive =
+    pathname.includes("/articles") &&
+    !mediaPaths.some((p) => pathname.startsWith(p));
+
+  const mediaActive =
+    pathname.includes("/media") ||
+    mediaPaths.some((p) => pathname.startsWith(p));
+
   return (
     <nav
       className="flex flex-wrap items-center justify-center gap-0.5"
       role="navigation"
-      aria-label={t ? "التنقل الرئيسي" : "Main navigation"}
+      aria-label={isAr ? "التنقل الرئيسي" : "Main navigation"}
     >
       <NavLink href={base} active={isActive(base)}>
-        {t ? "الرئيسية" : "Home"}
+        {isAr ? "الرئيسية" : "Home"}
       </NavLink>
 
       <div
@@ -76,8 +81,13 @@ export function DesktopNavClient({ locale, articleCategories = [] }: DesktopNavC
         onFocusCapture={() => openDropdown("books")}
         onBlurCapture={scheduleClose}
       >
-        <NavLink href={`${base}/books`} hasDropdown active={pathname.includes("/books")} isOpen={openMenu === "books"}>
-          {t ? "تصنيفات الكتب" : "Books"}
+        <NavLink
+          href={`${base}/books`}
+          hasDropdown
+          active={pathname.includes("/books/category")}
+          isOpen={openMenu === "books"}
+        >
+          {bookCategoriesNavLabel(locale)}
         </NavLink>
         {openMenu === "books" && (
           <DropdownMenu
@@ -92,33 +102,55 @@ export function DesktopNavClient({ locale, articleCategories = [] }: DesktopNavC
         href={`${base}/books/nominated-for-translation`}
         active={pathname.includes("nominated-for-translation")}
       >
-        {t ? "كتب مرشحة للترجمة" : "For Translation"}
+        {isAr ? "كتب مرشحة للترجمة" : "For Translation"}
       </NavLink>
 
       <NavLink href={`${base}/books/translated`} active={pathname.includes("/books/translated")}>
-        {t ? "كتب مترجمة" : "Translated"}
+        {isAr ? "كتب مترجمة" : "Translated"}
       </NavLink>
 
       <div
         className="relative"
-        onMouseEnter={() => openDropdown("articles")}
+        onMouseEnter={() => openDropdown("readings")}
         onMouseLeave={scheduleClose}
-        onFocusCapture={() => openDropdown("articles")}
+        onFocusCapture={() => openDropdown("readings")}
         onBlurCapture={scheduleClose}
       >
         <NavLink
-          href={`${base}/articles/harvest`}
+          href={readingChannels[0]?.href ?? `${base}/articles/world-reads`}
           hasDropdown
-          active={pathname.includes("/articles")}
-          isOpen={openMenu === "articles"}
+          active={readingsActive}
+          isOpen={openMenu === "readings"}
         >
-          {t ? "قراءات وعروض" : "Readings"}
+          {readingsNavLabel(locale)}
         </NavLink>
-        {openMenu === "articles" && (
-          <ArticlesDropdown
-            channels={articlesChannels}
-            categories={articleCategories}
-            locale={locale}
+        {openMenu === "readings" && (
+          <DropdownMenu
+            items={readingChannels}
+            onMouseEnter={cancelClose}
+            onMouseLeave={scheduleClose}
+          />
+        )}
+      </div>
+
+      <div
+        className="relative"
+        onMouseEnter={() => openDropdown("media")}
+        onMouseLeave={scheduleClose}
+        onFocusCapture={() => openDropdown("media")}
+        onBlurCapture={scheduleClose}
+      >
+        <NavLink
+          href={mediaHubHref(locale)}
+          hasDropdown
+          active={mediaActive}
+          isOpen={openMenu === "media"}
+        >
+          {mediaNavLabel(locale)}
+        </NavLink>
+        {openMenu === "media" && (
+          <DropdownMenu
+            items={mediaChannels}
             onMouseEnter={cancelClose}
             onMouseLeave={scheduleClose}
           />
@@ -126,7 +158,7 @@ export function DesktopNavClient({ locale, articleCategories = [] }: DesktopNavC
       </div>
 
       <NavLink href={`${base}/publishers`} active={pathname.includes("/publishers")}>
-        {t ? "ناشرون" : "Publishers"}
+        {isAr ? "ناشرون" : "Publishers"}
       </NavLink>
 
       <NavLink
@@ -135,7 +167,7 @@ export function DesktopNavClient({ locale, articleCategories = [] }: DesktopNavC
         accent
         className="nav-publish-pill"
       >
-        {t ? "انشر كتابك" : "Publish"}
+        {isAr ? "انشر كتابك" : "Publish"}
       </NavLink>
     </nav>
   );
@@ -173,12 +205,10 @@ function NavLink({
         accent &&
           active &&
           "ring-2 ring-[var(--brand-red)] ring-offset-2 ring-offset-[var(--brand-black)]",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--brand-black)]"
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--brand-black)]",
       )}
       style={
-        accent
-          ? undefined
-          : { color: active ? "#ffffff" : "rgba(255,255,255,0.95)" }
+        accent ? undefined : { color: active ? "#ffffff" : "rgba(255,255,255,0.95)" }
       }
       aria-current={active ? "page" : undefined}
     >
@@ -187,7 +217,7 @@ function NavLink({
         <ChevronDown
           className={cn(
             "h-3.5 w-3.5 shrink-0 opacity-80 transition-transform duration-[var(--motion-base)]",
-            isOpen && "rotate-180"
+            isOpen && "rotate-180",
           )}
           aria-hidden="true"
         />
@@ -223,67 +253,6 @@ function DropdownMenu({
           {item.label}
         </Link>
       ))}
-    </div>
-  );
-}
-
-function ArticlesDropdown({
-  channels: _channels,
-  categories,
-  locale,
-  onMouseEnter,
-  onMouseLeave,
-}: {
-  channels: { href: string; label: string }[];
-  categories: ArticleCategory[];
-  locale: string;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
-}) {
-  const isAr = locale === "ar";
-  const base = `/${locale}`;
-
-  return (
-    <div
-      className="absolute top-full start-0 z-50 mt-1 min-w-[280px] max-h-[70vh] overflow-y-auto animate-scale-in rounded-2xl border border-[var(--brand-gray-700)] bg-[#141414] py-2 shadow-2xl"
-      role="menu"
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-    >
-      <p className="px-4 pb-1 pt-1 text-[10px] font-bold uppercase tracking-widest text-white/30">
-        {isAr ? "القنوات" : "Channels"}
-      </p>
-      {/* {channels.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          role="menuitem"
-          className="mx-1 block rounded-xl px-4 py-2.5 text-sm transition-all duration-[var(--motion-base)] hover:bg-[var(--brand-red)] hover:text-white"
-          style={{ color: "rgba(255,255,255,0.92)" }}
-        >
-          {item.label}
-        </Link>
-      ))} */}
-
-      {categories.length > 0 && (
-        <>
-          <div className="my-2 mx-2 border-t border-white/10" />
-          <p className="px-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-white/30">
-            {isAr ? "التصنيفات" : "Categories"}
-          </p>
-          {categories.slice(0, 10).map((cat) => (
-            <Link
-              key={cat.id}
-              href={`${base}/articles/category/${cat.slug}`}
-              role="menuitem"
-              className="mx-1 block rounded-xl px-4 py-2 text-sm transition-all duration-[var(--motion-base)] hover:bg-[var(--brand-red)] hover:text-white"
-              style={{ color: "rgba(255,255,255,0.82)" }}
-            >
-              {isAr && cat.nameAr ? cat.nameAr : cat.name}
-            </Link>
-          ))}
-        </>
-      )}
     </div>
   );
 }

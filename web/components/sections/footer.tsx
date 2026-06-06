@@ -1,29 +1,42 @@
 import { getLocale } from "next-intl/server";
 import { FooterAnimatedGrid } from "@/components/sections/footer-animated.client";
+import { BookService } from "@/server/services/book.service";
+import {
+  buildBookCategoryLinks,
+  buildMediaChannelLinks,
+  buildReadingChannelLinks,
+} from "@/lib/nav/site-nav";
 
 export async function Footer() {
   const locale = await getLocale();
   const isAr = locale === "ar";
   const base = `/${locale}`;
 
+  const bookCategories = await BookService.getNavCategories().catch(() => []);
+  const categoryLinks = buildBookCategoryLinks(locale, bookCategories);
+  const readingLinks = buildReadingChannelLinks(locale);
+  const mediaLinks = buildMediaChannelLinks(locale);
+
   const columns = [
     {
-      title: isAr ? "الكتب" : "Books",
+      title: isAr ? "تصنيفات الكتب" : "Book Categories",
       links: [
-        { href: `${base}/books`, label: isAr ? "كل الكتب" : "All Books" },
-        { href: `${base}/books/nominated-for-translation`, label: isAr ? "مرشحة للترجمة" : "For Translation" },
+        ...categoryLinks,
+        {
+          href: `${base}/books/nominated-for-translation`,
+          label: isAr ? "مرشحة للترجمة" : "For Translation",
+        },
         { href: `${base}/books/translated`, label: isAr ? "كتب مترجمة" : "Translated Books" },
         { href: `${base}/publish`, label: isAr ? "انشر كتابك" : "Publish Your Book" },
       ],
     },
     {
-      title: isAr ? "المقالات" : "Articles",
-      links: [
-        { href: `${base}/articles/harvest`, label: isAr ? "حصاد الكتب" : "Book Harvest" },
-        { href: `${base}/articles/ideas`, label: isAr ? "زبدة الأفكار" : "Essence of Ideas" },
-        { href: `${base}/articles/world-reads`, label: isAr ? "العالم يقرأ" : "World Reads" },
-        { href: `${base}/articles/books-talk`, label: isAr ? "حديث الكتب" : "Book Talk" },
-      ],
+      title: isAr ? "قراءات وعروض" : "Readings",
+      links: readingLinks,
+    },
+    {
+      title: isAr ? "إبداعات الميديا" : "Media",
+      links: mediaLinks,
     },
     {
       title: isAr ? "المنصة" : "Platform",

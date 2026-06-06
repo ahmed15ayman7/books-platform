@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
-import { cn } from "@/lib/utils";
+import { FilterButton, FilterPanel, FilterSection } from "@/components/ui/filter-panel";
 
 interface Category {
   id: string;
@@ -57,12 +57,7 @@ export function BooksFilters({ categories, locale, currentFilters }: BooksFilter
   const isAr = locale === "ar";
 
   return (
-    <div className="space-y-5 rounded-2xl border border-[var(--brand-gray-200)] bg-white p-4 shadow-[var(--shadow-soft)]">
-      <h2 className="font-bold text-[var(--brand-gray-900)]">
-        {isAr ? "تصفية" : "Filter"}
-      </h2>
-
-      {/* Sort */}
+    <FilterPanel title={isAr ? "تصفية" : "Filter"}>
       <FilterSection title={isAr ? "الترتيب" : "Sort By"}>
         <div className="flex flex-col gap-1">
           {sortOptions.map((opt) => (
@@ -116,41 +111,6 @@ export function BooksFilters({ categories, locale, currentFilters }: BooksFilter
           </div>
         </FilterSection>
       )}
-    </div>
-  );
-}
-
-function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--brand-gray-500)]">
-        {title}
-      </p>
-      {children}
-    </div>
-  );
-}
-
-function FilterButton({
-  children,
-  active,
-  onClick,
-}: {
-  children: React.ReactNode;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "rounded-xl px-3 py-2 text-sm text-start transition-all duration-[var(--motion-base)]",
-        active
-          ? "bg-[var(--brand-red-soft)] text-[var(--brand-red)] font-medium shadow-sm"
-          : "text-[var(--brand-gray-700)] hover:bg-[var(--brand-gray-100)] hover:scale-[1.01]"
-      )}
-    >
-      {children}
-    </button>
+    </FilterPanel>
   );
 }

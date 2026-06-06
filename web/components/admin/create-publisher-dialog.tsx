@@ -18,6 +18,7 @@ import {
 import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 export interface PublisherOption {
   id: string;
@@ -67,12 +68,10 @@ export function CreatePublisherDialog({
   const [form, setForm] = useState<PublisherFormState>(emptyForm);
   const draft = useFormDraft(formDraftId.adminPublisherDialog(), form, setForm, { enabled: open });
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     if (open) {
       setForm({ ...emptyForm, nameAr: initialName.trim() });
-      setError("");
     }
   }, [open, initialName]);
 
@@ -82,11 +81,10 @@ export function CreatePublisherDialog({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.nameAr.trim() && !form.name.trim()) {
-      setError("اسم دار النشر (عربي أو إنجليزي) مطلوب");
+      adminToast.error("اسم دار النشر (عربي أو إنجليزي) مطلوب");
       return;
     }
     setSaving(true);
-    setError("");
     try {
       const res = await fetch("/api/v1/admin/publishers", {
         method: "POST",
@@ -99,9 +97,10 @@ export function CreatePublisherDialog({
         error?: { message: string };
       };
       if (!res.ok || !data.success || !data.data) {
-        setError(data.error?.message ?? "فشل إنشاء دار النشر");
+        adminToast.error(data.error?.message ?? "فشل إنشاء دار النشر");
         return;
       }
+      adminToast.success("create", "دار النشر");
       onCreated({
         id: data.data.id,
         title: data.data.title ?? data.data.nameAr ?? data.data.name ?? form.nameAr.trim(),
@@ -111,7 +110,7 @@ export function CreatePublisherDialog({
       onOpenChange(false);
       setForm(emptyForm);
     } catch {
-      setError("حدث خطأ في الاتصال");
+      adminToast.error("حدث خطأ في الاتصال");
     } finally {
       setSaving(false);
     }
@@ -220,7 +219,6 @@ export function CreatePublisherDialog({
             </div>
           </div>
 
-          {error && <p className="text-xs text-[var(--error)]">{error}</p>}
           <DialogFooter className="gap-2 sm:gap-0">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               إلغاء

@@ -152,10 +152,20 @@ export function BookDetailHero({
           </Button>
         )}
         <div className="flex gap-2">
-          <Button variant="outline" size="icon" className="flex-1" aria-label={addToWishlistLabel}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="flex-1 border border-[var(--brand-gray-200)] text-[var(--brand-gray-600)] hover:border-[var(--brand-red)] hover:bg-[var(--brand-red-soft)] hover:text-[var(--brand-red)]"
+            aria-label={addToWishlistLabel}
+          >
             <Heart className="h-4 w-4" aria-hidden="true" />
           </Button>
-          <Button variant="outline" size="icon" className="flex-1" aria-label={shareLabel}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="flex-1 border border-[var(--brand-gray-200)] text-[var(--brand-gray-600)] hover:border-[var(--brand-red)] hover:bg-[var(--brand-red-soft)] hover:text-[var(--brand-red)]"
+            aria-label={shareLabel}
+          >
             <Share2 className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>

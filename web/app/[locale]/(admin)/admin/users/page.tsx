@@ -33,6 +33,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface AdminUserRow {
   id: string;
@@ -80,7 +81,6 @@ export default function AdminUsersPage() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const draft = useFormDraft(formDraftId.adminUser(editingId), form, setForm, { enabled: showForm });
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -123,7 +123,6 @@ export default function AdminUsersPage() {
   function openCreate() {
     setEditingId(null);
     setForm(emptyForm);
-    setError("");
     setShowForm(true);
   }
 
@@ -139,7 +138,6 @@ export default function AdminUsersPage() {
         ? (row.permissions as Permission[])
         : [],
     });
-    setError("");
     setShowForm(true);
   }
 
@@ -168,7 +166,6 @@ export default function AdminUsersPage() {
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
     runSensitive(async () => {
     setSaving(true);
     try {
@@ -188,9 +185,10 @@ export default function AdminUsersPage() {
         });
         const data = (await res.json()) as { success: boolean; error?: { message: string } };
         if (!res.ok || !data.success) {
-          setError(data.error?.message ?? "فشل التحديث");
+          adminToast.error(data.error?.message ?? "فشل التحديث");
           return;
         }
+        adminToast.success("update", "المستخدم");
       } else {
         const res = await fetch("/api/v1/admin/users", {
           method: "POST",
@@ -205,15 +203,16 @@ export default function AdminUsersPage() {
         });
         const data = (await res.json()) as { success: boolean; error?: { message: string } };
         if (!res.ok || !data.success) {
-          setError(data.error?.message ?? "فشل الإنشاء");
+          adminToast.error(data.error?.message ?? "فشل الإنشاء");
           return;
         }
+        adminToast.success("create", "المستخدم");
       }
       draft.clearDraft();
       setShowForm(false);
       void loadUsers();
     } catch {
-      setError("حدث خطأ في الاتصال");
+      adminToast.error("حدث خطأ في الاتصال");
     } finally {
       setSaving(false);
     }
@@ -227,8 +226,13 @@ export default function AdminUsersPage() {
         method: "DELETE",
         headers: adminAuthHeaders(),
       });
-      const data = (await res.json()) as { success: boolean };
-      if (data.success) void loadUsers();
+      const data = (await res.json()) as { success: boolean; error?: { message: string } };
+      if (!res.ok || !data.success) {
+        adminToast.error(data.error?.message ?? "فشل التعطيل");
+        return;
+      }
+      adminToast.success("update", "حالة المستخدم");
+      void loadUsers();
     });
   }
 
@@ -466,8 +470,6 @@ export default function AdminUsersPage() {
                 })}
               </div>
             )}
-
-            {error && <p className="text-sm text-red-400">{error}</p>}
 
             <div className="flex gap-2">
               <Button type="submit" loading={saving}>

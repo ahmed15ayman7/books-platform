@@ -18,6 +18,7 @@ import {
 import { loadAdminSession, can } from "@/lib/admin/permissions-client";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { formatAdminDateTime } from "@/lib/admin/format-dates";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface DraftItem {
   id: string;
@@ -74,7 +75,6 @@ export default function AdminDraftsPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
-  const [error, setError] = useState("");
   const [publishingId, setPublishingId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -86,7 +86,6 @@ export default function AdminDraftsPage() {
   const load = useCallback(async () => {
     if (accessibleTypes.length === 0) return;
     setLoading(true);
-    setError("");
     try {
       const q = new URLSearchParams({
         type: activeType,
@@ -103,7 +102,7 @@ export default function AdminDraftsPage() {
         setTotal(data.pagination?.total ?? 0);
       } else {
         setItems([]);
-        setError("تعذّر تحميل المسودات");
+        adminToast.error("تعذّر تحميل المسودات");
       }
     } finally {
       setLoading(false);
@@ -128,7 +127,6 @@ export default function AdminDraftsPage() {
     if (item.type === "submissions") return;
     setPublishingId(item.id);
     startTransition(async () => {
-      setError("");
       try {
         const res = await fetch("/api/v1/admin/drafts/publish", {
           method: "POST",
@@ -137,12 +135,13 @@ export default function AdminDraftsPage() {
         });
         const data = (await res.json()) as { success?: boolean; error?: { message?: string } };
         if (!res.ok || !data.success) {
-          setError(data.error?.message ?? "فشل النشر");
+          adminToast.error(data.error?.message ?? "فشل النشر");
           return;
         }
+        adminToast.success("publish", item.title);
         await load();
       } catch {
-        setError("حدث خطأ في الاتصال");
+        adminToast.error("حدث خطأ في الاتصال");
       } finally {
         setPublishingId(null);
       }
@@ -175,12 +174,6 @@ export default function AdminDraftsPage() {
           }}
         />
       </div>
-
-      {error && (
-        <p className="mb-4 text-sm text-red-400" role="alert">
-          {error}
-        </p>
-      )}
 
       <div className="overflow-hidden rounded-xl border border-[var(--admin-border)]">
         <table className="w-full text-sm">

@@ -133,7 +133,7 @@ model Article {
   languageTag      String?          @map("language_tag")
   postTranslations String?          @map("post_translations")
   status           String           @default("publish")
-  channel          String?          // harvest | ideas | world-reads | books-talk | watch-your-book | novel-story
+  channel          String?          // harvest | ideas | world-reads | books-talk | novel-story
   authorId         Int?             @map("author_id")
   authorUsername   String?          @map("author_username")
   authorEmail      String?          @map("author_email")

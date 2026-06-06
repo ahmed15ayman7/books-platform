@@ -102,6 +102,22 @@
     --container-max: 1440px;
     --section-py: 4rem;
     --section-py-lg: 6rem;
+
+    /* Admin tokens on :root so Radix portals (select, dialog, toast) resolve colors */
+    --admin-bg: var(--brand-gray-50);
+    --admin-surface: var(--brand-white);
+    --admin-surface-muted: var(--brand-gray-100);
+    --admin-text: var(--brand-black);
+    --admin-text-muted: var(--brand-gray-600);
+    --admin-text-subtle: var(--brand-gray-500);
+    --admin-border: var(--brand-gray-200);
+    --admin-border-strong: var(--brand-gray-300);
+    --admin-accent: var(--brand-red);
+    --admin-accent-soft: var(--brand-red-soft);
+    --admin-hover: var(--brand-gray-100);
+    --admin-input-bg: var(--brand-white);
+    --admin-input-border: var(--brand-gray-300);
+    --admin-error-text: #991b1b;
   }
 
   .dark {
@@ -234,20 +250,7 @@
   }
 
   .admin-shell {
-    --admin-bg: var(--brand-gray-50);
-    --admin-surface: var(--brand-white);
-    --admin-surface-muted: var(--brand-gray-100);
-    --admin-text: var(--brand-black);
-    --admin-text-muted: var(--brand-gray-600);
-    --admin-text-subtle: var(--brand-gray-500);
-    --admin-border: var(--brand-gray-200);
-    --admin-border-strong: var(--brand-gray-300);
-    --admin-accent: var(--brand-red);
-    --admin-accent-soft: var(--brand-red-soft);
-    --admin-hover: var(--brand-gray-100);
-    --admin-input-bg: var(--brand-white);
-    --admin-input-border: var(--brand-gray-300);
-    --admin-error-text: #991b1b;
+    color-scheme: light;
   }
 }
 
@@ -469,5 +472,21 @@
 
   .form-error-text {
     color: var(--error);
+  }
+
+  .form-success-banner {
+    border: 1px solid color-mix(in srgb, var(--success) 35%, transparent);
+    background-color: var(--success-soft, #ecfdf5);
+    color: #166534;
+  }
+
+  .admin-shell .form-success-banner {
+    background-color: #ffffff;
+    border-color: color-mix(in srgb, var(--success) 40%, var(--admin-border));
+  }
+
+  .form-success-banner a {
+    color: var(--brand-red);
+    font-weight: 600;
   }
 }

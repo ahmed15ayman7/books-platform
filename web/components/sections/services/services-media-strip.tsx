@@ -35,16 +35,16 @@ export function ServicesMediaStrip({
         <SlideIn from="start">
           <div className="space-y-3">
             <Link
-              href={`/${locale}/articles/watch-your-book`}
-              className="block text-sm font-medium text-[var(--brand-red)] hover:underline"
-            >
-              {isAr ? "شاهد كتابك" : "Watch Your Book"} →
-            </Link>
-            <Link
-              href={`/${locale}/articles/books-talk`}
+              href={`/${locale}/media/books-talk`}
               className="block text-sm font-medium text-[var(--brand-red)] hover:underline"
             >
               {isAr ? "حديث الكتب" : "Books Talk"} →
+            </Link>
+            <Link
+              href={`/${locale}/media/novel-story`}
+              className="block text-sm font-medium text-[var(--brand-red)] hover:underline"
+            >
+              {isAr ? "رواية فحكاية" : "Novel & Story"} →
             </Link>
           </div>
         </SlideIn>

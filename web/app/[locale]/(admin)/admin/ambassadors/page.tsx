@@ -27,6 +27,7 @@ import { AdminCard } from "@/components/admin/admin-card";
 import { AdminInput, AdminSelect } from "@/components/admin/admin-form-field";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface Ambassador {
   id: string;
@@ -60,7 +61,6 @@ export default function AdminAmbassadorsPage() {
   const [form, setForm] = useState(emptyForm);
   const draft = useFormDraft(formDraftId.adminAmbassador(editingId), form, setForm);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
   const [sort, setSort] = useState("createdAt:desc");
   const [status, setStatus] = useState("all");
 
@@ -87,7 +87,6 @@ export default function AdminAmbassadorsPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    setError("");
     try {
       const url = editingId ? `/api/v1/admin/ambassadors/${editingId}` : "/api/v1/admin/ambassadors";
       const res = await fetch(url, {
@@ -96,12 +95,18 @@ export default function AdminAmbassadorsPage() {
         body: JSON.stringify({ ...form, commissionRate: parseFloat(form.commissionRate) }),
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
-      if (!res.ok || !data.success) { setError(data.error?.message ?? "فشل الحفظ"); return; }
+      if (!res.ok || !data.success) {
+        adminToast.error(data.error?.message ?? "فشل الحفظ");
+        return;
+      }
+      adminToast.success(editingId ? "update" : "create", "السفير");
       draft.clearDraft();
       setForm(emptyForm);
       setEditingId(null);
       await load();
-    } catch { setError("حدث خطأ"); }
+    } catch {
+      adminToast.error("حدث خطأ");
+    }
     finally { setSaving(false); }
   }
 
@@ -230,7 +235,6 @@ export default function AdminAmbassadorsPage() {
                 { value: "pending", label: "قيد المراجعة" },
               ]}
             />
-            {error && <p className="text-xs text-[var(--error)]">{error}</p>}
             <div className="flex gap-2">
               <Button type="submit" size="sm" disabled={saving} className="gap-1.5">
                 <Plus className="h-3.5 w-3.5" />

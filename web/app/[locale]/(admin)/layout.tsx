@@ -1,3 +1,4 @@
+import { AdminChromeShell } from "@/components/admin/admin-chrome-shell";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
 
@@ -10,12 +11,14 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
-    <div className="admin-shell flex min-h-screen bg-[var(--admin-bg)] text-[var(--admin-text)]">
-      <AdminSidebar />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <AdminTopbar />
-        <main className="flex-1 overflow-auto p-6">{children}</main>
+    <AdminChromeShell>
+      <div className="flex min-h-screen flex-1">
+        <AdminSidebar />
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <AdminTopbar />
+          <main className="flex-1 overflow-auto p-6">{children}</main>
+        </div>
       </div>
-    </div>
+    </AdminChromeShell>
   );
 }

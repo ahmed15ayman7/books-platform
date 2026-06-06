@@ -25,6 +25,7 @@ import {
   AdminGridCardFooter,
 } from "@/components/admin/admin-data-grid";
 import { AdminListView } from "@/components/admin/admin-list-view";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface Submission {
   id: string;
@@ -78,26 +79,51 @@ export default function AdminSubmissionsPage() {
 
   async function handleApprove(id: string) {
     setActioning(true);
-    await fetch(`/api/v1/admin/submissions/${id}/approve`, {
-      method: "POST",
-      headers: adminAuthHeaders(),
-    });
-    setModal({ open: false, item: null, rejectReason: "" });
-    await load();
-    setActioning(false);
+    try {
+      const res = await fetch(`/api/v1/admin/submissions/${id}/approve`, {
+        method: "POST",
+        headers: adminAuthHeaders(),
+      });
+      const data = (await res.json()) as { success?: boolean; error?: { message?: string } };
+      if (!res.ok || !data.success) {
+        adminToast.error(data.error?.message ?? "فشل الموافقة على الطلب");
+        return;
+      }
+      adminToast.success("update", "طلب النشر");
+      setModal({ open: false, item: null, rejectReason: "" });
+      await load();
+    } catch {
+      adminToast.error("حدث خطأ في الاتصال");
+    } finally {
+      setActioning(false);
+    }
   }
 
   async function handleReject(id: string, reason: string) {
-    if (!reason.trim()) { alert("يجب إدخال سبب الرفض"); return; }
+    if (!reason.trim()) {
+      adminToast.error("يجب إدخال سبب الرفض");
+      return;
+    }
     setActioning(true);
-    await fetch(`/api/v1/admin/submissions/${id}/reject`, {
-      method: "POST",
-      headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
-      body: JSON.stringify({ reason }),
-    });
-    setModal({ open: false, item: null, rejectReason: "" });
-    await load();
-    setActioning(false);
+    try {
+      const res = await fetch(`/api/v1/admin/submissions/${id}/reject`, {
+        method: "POST",
+        headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ reason }),
+      });
+      const data = (await res.json()) as { success?: boolean; error?: { message?: string } };
+      if (!res.ok || !data.success) {
+        adminToast.error(data.error?.message ?? "فشل رفض الطلب");
+        return;
+      }
+      adminToast.message("تم رفض الطلب");
+      setModal({ open: false, item: null, rejectReason: "" });
+      await load();
+    } catch {
+      adminToast.error("حدث خطأ في الاتصال");
+    } finally {
+      setActioning(false);
+    }
   }
 
   const workTypeLabel: Record<string, string> = {

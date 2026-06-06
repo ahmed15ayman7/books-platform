@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { carouselAutoplayReverse } from "@/lib/carousel/autoplay";
+import { useEmblaAutoplay } from "@/hooks/use-embla-autoplay";
 import { cn } from "@/lib/utils";
 
 interface EmblaShowcaseProps {
@@ -11,6 +13,9 @@ interface EmblaShowcaseProps {
   className?: string;
   slideClassName?: string;
   autoplayMs?: number;
+  /** Position on the page — enables autoplay with alternating direction (even = forward, odd = reverse). */
+  pageOrder?: number;
+  autoplayReverse?: boolean;
   ariaLabel: string;
   showArrows?: boolean;
   showDots?: boolean;
@@ -23,12 +28,17 @@ export function EmblaShowcase({
   className,
   slideClassName = "min-w-0 shrink-0 grow-0 basis-full",
   autoplayMs = 0,
+  pageOrder,
+  autoplayReverse: autoplayReverseProp,
   ariaLabel,
   showArrows = true,
   showDots = true,
 }: EmblaShowcaseProps) {
   const isAr = locale === "ar";
   const count = children.length;
+  const resolvedAutoplayMs = pageOrder !== undefined ? (autoplayMs > 0 ? autoplayMs : 6000) : autoplayMs;
+  const autoplayReverse =
+    autoplayReverseProp ?? (pageOrder !== undefined ? carouselAutoplayReverse(pageOrder) : false);
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: count > 1,
     align: "start",
@@ -51,11 +61,11 @@ export function EmblaShowcase({
     };
   }, [emblaApi, count]);
 
-  useEffect(() => {
-    if (!emblaApi || count <= 1 || autoplayMs <= 0) return;
-    const timer = setInterval(() => emblaApi.scrollNext(), autoplayMs);
-    return () => clearInterval(timer);
-  }, [emblaApi, count, autoplayMs]);
+  useEmblaAutoplay(emblaApi, count, {
+    intervalMs: resolvedAutoplayMs,
+    reverse: autoplayReverse,
+    enabled: resolvedAutoplayMs > 0,
+  });
 
   if (count === 0) return null;
 

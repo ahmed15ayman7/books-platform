@@ -14,7 +14,6 @@ interface PublisherCardProps {
   imageUrl?: string | null;
   websiteUrl?: string | null;
   country?: string | null;
-  bookCount?: number;
   locale: string;
   className?: string;
 }
@@ -24,12 +23,9 @@ export function PublisherCard({
   slug,
   imageUrl,
   country,
-  bookCount,
   locale,
   className,
 }: PublisherCardProps) {
-  const isAr = locale === "ar";
-
   return (
     <Link
       href={`/${locale}/publishers/${slug}`}
@@ -58,12 +54,8 @@ export function PublisherCard({
         <p className="line-clamp-2 text-sm font-semibold text-[var(--brand-gray-900)] group-hover:text-[var(--brand-red)] transition-colors">
           {title}
         </p>
-        {(country || bookCount !== undefined) && (
-          <p className="mt-1 text-xs text-[var(--brand-gray-500)]">
-            {[country, bookCount ? `${bookCount} ${isAr ? "كتاب" : "books"}` : null]
-              .filter(Boolean)
-              .join(" · ")}
-          </p>
+        {country && (
+          <p className="mt-1 text-xs text-[var(--brand-gray-500)]">{country}</p>
         )}
       </div>
     </Link>

@@ -16,6 +16,8 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "test:e2e:cleanup": "tsx --env-file=.env scripts/e2e-cleanup.ts",
+    "test:e2e:setup": "tsx --env-file=.env scripts/e2e-seed-fixtures.ts",
     "db:migrate": "prisma migrate dev",
     "db:migrate:prod": "prisma migrate deploy",
     "db:generate": "prisma generate",
@@ -25,7 +27,10 @@
     "analyze": "ANALYZE=true next build",
     "prepare": "husky",
     "verify:images": "tsx scripts/verify-public-images.ts",
-    "assets:about": "tsx scripts/download-about-images.ts"
+    "assets:about": "tsx scripts/download-about-images.ts",
+    "backfill:translation": "tsx --env-file=.env scripts/backfill-translation-status.ts",
+    "backfill:translation:apply": "tsx --env-file=.env scripts/backfill-translation-status.ts --apply",
+    "purge:watch-your-book": "tsx --env-file=.env scripts/purge-watch-your-book.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
@@ -85,6 +90,7 @@
     "reading-time": "^1.5.0",
     "recharts": "^3.8.1",
     "resend": "^6.12.4",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",
     "three": "^0.184.0",
     "use-debounce": "^10.1.1",

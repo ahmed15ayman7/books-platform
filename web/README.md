@@ -72,7 +72,9 @@ Open [http://localhost:3000](http://localhost:3000) — redirects to `/ar`.
 | `npm run type-check` | TypeScript check |
 | `npm run test` | Vitest unit tests |
 | `npm run test:coverage` | Tests with coverage report |
-| `npm run test:e2e` | Playwright E2E tests |
+| `npm run test:e2e` | Playwright E2E tests (requires Postgres + seed) |
+| `npm run test:e2e:cleanup` | Remove tagged E2E data from local DB (`e2e-*` slugs) |
+| `npm run test:e2e:setup` | Seed reusable E2E fixtures (`e2e-fixture-*`) |
 | `npm run db:migrate` | Run Prisma migrations |
 | `npm run db:seed` | Seed database |
 | `npm run db:studio` | Open Prisma Studio |

@@ -65,8 +65,8 @@ const pillars: ServicePillar[] = [
     key: "av",
     title: { ar: "صوت ومرئي", en: "Audio & Video" },
     body: {
-      ar: "بودكast، فيديو YouTube، وقناة «شاهد كتابك» للكتب والمؤلفين.",
-      en: "Podcasts, YouTube video, and the Watch Your Book channel for books and authors.",
+      ar: "بودكast، فيديو YouTube، وقنوات الميديا للكتب والمؤلفين.",
+      en: "Podcasts, YouTube video, and media channels for books and authors.",
     },
   },
   {
@@ -179,15 +179,15 @@ export function getServicesContent(locale: Locale): ServicesContent {
     hero: {
       title: isAr ? "خدماتنا" : "Our Services",
       subtitle: isAr
-        ? "من الفهرسة الببليوغرافية إلى المحتوى المرئي — حلول متكاملة للنشر والمعرفة"
-        : "From bibliographic indexing to visual content — integrated publishing and knowledge solutions",
+        ? "خدمات جديدة ومميزة وغير مسبوقة تقدّمها منصة الكتب للقارئ والمؤلف والناشر والمترجم"
+        : "New, distinctive and unprecedented services offered by Books Platform to the reader, author, publisher and translator",
     },
     intro: {
-      eyebrow: isAr ? "مقدمة" : "Introduction",
+      eyebrow: isAr ? "خدمات المنصة" : "Platform Services",
       title: isAr ? "ماذا نقدّم؟" : "What We Offer",
       lead: isAr
-        ? "منظومة خدمات تغطي دورة حياة الكتاب — من اكتشاف الإصدارات العالمية إلى إنتاج محتوى إعلامي يصل للقارئ العربي."
-        : "A service ecosystem covering the book lifecycle — from discovering global releases to producing media content that reaches Arabic readers.",
+        ? "تقدّم منصة الكتب مجموعة من الخدمات الجديدة والمميزة والحصرية للقرّاء والمؤلفين والناشرين والمترجمين."
+        : "Books Platform offers a range of new, distinctive, and exclusive services to readers, authors, publishers, and translators.",
     },
     pillars: pillars.map((p) => ({
       ...p,

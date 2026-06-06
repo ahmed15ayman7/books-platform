@@ -33,7 +33,7 @@ export function CardMedia({
 export function CardMediaImage({
   src,
   alt,
-  objectFit = "cover",
+  objectFit = "contain",
   sizes = "(max-width: 640px) 50vw, 25vw",
   priority,
 }: {
@@ -52,7 +52,7 @@ export function CardMediaImage({
       priority={priority}
       className={cn(
         "transition-transform duration-500 group-hover:scale-105",
-        objectFit === "cover" ? "object-cover" : "object-contain p-4",
+        objectFit === "cover" ? "object-cover" : "object-contain p-2",
       )}
     />
   );

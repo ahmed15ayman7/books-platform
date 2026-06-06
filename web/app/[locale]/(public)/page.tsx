@@ -8,19 +8,15 @@ import { HeroSlideService } from "@/server/services/hero-slide.service";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { JsonLd, websiteJsonLd, organizationJsonLd } from "@/components/seo/json-ld";
 import { BookCarousel } from "@/components/sections/book-carousel";
-import { BookCard } from "@/components/sections/book-card";
 import { CategoryGrid } from "@/components/sections/category-grid";
-import { ArticleCard } from "@/components/sections/article-card";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { StatsCounter } from "@/components/sections/stats-counter";
 import { NewsletterStrip } from "@/components/sections/newsletter-strip";
 import { PublishersMarquee } from "@/components/sections/publishers-marquee";
 import { PublisherCard } from "@/components/sections/publisher-card";
 import { Button } from "@/components/ui/button";
-import { PenTool, Library, PenLine, Building2 } from "lucide-react";
+import { Library, PenLine, Building2 } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
 import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
-import { articleLinkedBookDisplay } from "@/lib/i18n/article-linked-book";
 import {
   AnimatedSection,
   FadeIn,
@@ -30,9 +26,12 @@ import {
 import { getHomeEditorial } from "@/lib/content/home-editorial";
 import { ABOUT_IMAGES } from "@/lib/content/image-assets";
 import { HomeMissionStrip } from "@/components/sections/home/home-mission-strip";
-import { HomeReaderJourney } from "@/components/sections/home/home-reader-journey";
 import { HomeMediaSpotlight } from "@/components/sections/home/home-media-spotlight";
+import { HomeArticlesShowcase } from "@/components/sections/home/home-articles-showcase";
+import { HomePublishSection } from "@/components/sections/home/home-publish-section";
 import { HomeServicesPreview } from "@/components/sections/home/home-services-preview";
+import { shuffleArray } from "@/lib/utils/shuffle";
+import { resolveArticleDisplayImage } from "@/lib/articles/resolve-display-image";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as Locale;
@@ -52,13 +51,15 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-const ARTICLE_CHANNELS = [
-  { key: "ideas",           ar: "زبدة الأفكار",  en: "Essence of Ideas", path: "ideas" },
-  { key: "harvest",         ar: "حصاد الكتب",     en: "Book Harvest",     path: "harvest" },
-  { key: "world-reads",     ar: "العالم يقرأ",    en: "World Reads",      path: "world-reads" },
-  { key: "watch-your-book", ar: "شاهد كتابك",     en: "Watch Your Book",  path: "watch-your-book" },
-  { key: "books-talk",      ar: "حديث الكتب",     en: "Books Talk",       path: "books-talk" },
-  { key: "novel-story",     ar: "رواية فحكاية",   en: "Novel & Story",    path: "novel-story" },
+const READING_ARTICLE_CHANNELS = [
+  { key: "ideas",       ar: "زبدة الأفكار",  en: "Essence of Ideas", path: "articles/ideas" },
+  { key: "harvest",     ar: "حصاد الكتب",     en: "Book Harvest",     path: "articles/harvest" },
+  { key: "world-reads", ar: "العالم يقرأ",    en: "World Reads",      path: "articles/world-reads" },
+] as const;
+
+const MEDIA_HOME_CHANNELS = [
+  { key: "novel-story", ar: "رواية فحكاية", en: "Novel & Story", path: "media/novel-story" },
+  { key: "books-talk", ar: "حديث الكتب", en: "Books Talk", path: "media/books-talk" },
 ] as const;
 
 // Alternates bg-white / bg-[#fff7f6] for each section rendered
@@ -72,7 +73,8 @@ export default async function HomePage() {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("home");
 
-  const [homeBooks, stats, articlesMap, dbSlides, categories, articleCategories, latestMedia] = await Promise.all([
+  const [homeBooks, articlesMap, dbSlides, categories, mediaNovel, mediaBooksTalk] =
+    await Promise.all([
     BookService.getHomeData().catch(() => ({
       newlyReleased: [],
       translated: [],
@@ -81,20 +83,33 @@ export default async function HomePage() {
       publisherGrid: [],
       categorySections: [],
     })),
-    BookService.getStats().catch(() => ({
-      totalBooks: 0,
-      totalPublishers: 0,
-      totalTranslatedBooks: 0,
-      totalCountries: 0,
-    })),
     ArticleService.getFeaturedForHome().catch(() => ({})),
     HeroSlideService.listActive().catch(() => []),
     BookService.getCategories().catch(() => []),
-    ArticleService.getCategories().catch(() => []),
-    ArticleService.getLatestMedia(4).catch(() => []),
+    ArticleService.list({ page: 1, limit: 5, mediaOnly: true, channel: "novel-story", sort: "newest" }).catch(
+      () => ({ articles: [] }),
+    ),
+    ArticleService.list({ page: 1, limit: 5, mediaOnly: true, channel: "books-talk", sort: "newest" }).catch(
+      () => ({ articles: [] }),
+    ),
   ]);
 
   const editorial = getHomeEditorial(locale);
+
+  const mediaChannelResults = [mediaNovel, mediaBooksTalk];
+  const mediaChannels = MEDIA_HOME_CHANNELS.map((ch, index) => ({
+    key: ch.key,
+    title: locale === "ar" ? ch.ar : ch.en,
+    href: `/${locale}/${ch.path}`,
+    videos: (mediaChannelResults[index]?.articles ?? [])
+      .filter((a) => a.videoId)
+      .map((a) => ({
+        slug: a.slug,
+        title: a.title,
+        videoId: a.videoId as string,
+        imageUrl: a.imageUrl,
+      })),
+  }));
 
   const heroSlides =
     dbSlides.length > 0
@@ -131,6 +146,7 @@ export default async function HomePage() {
     slug: string;
     title: string;
     excerpt: string | null;
+    content?: string | null;
     imageUrl: string | null;
     date: Date | null;
     channel: string | null;
@@ -144,18 +160,46 @@ export default async function HomePage() {
   };
   const articles = articlesMap as Record<string, ArticleSnippet[]>;
 
+  const stripExcerpt = (html: string | null) =>
+    html?.replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").trim() ?? null;
+
+  const readingArticleChannels = READING_ARTICLE_CHANNELS.map((ch) => ({
+    key: ch.key,
+    title: locale === "ar" ? ch.ar : ch.en,
+    href: `/${locale}/${ch.path}`,
+    articles: shuffleArray(articles[ch.key] ?? [])
+      .filter((a) => a.slug && a.title)
+      .map((a) => {
+        const imageUrl = resolveArticleDisplayImage({
+          imageUrl: a.imageUrl,
+          bookImageUrls: (a.products ?? []).map((p) => p.imageUrl),
+          excerpt: a.excerpt,
+          content: a.content,
+        });
+        if (!imageUrl) return null;
+        return {
+          slug: a.slug,
+          title: a.title ?? "",
+          excerpt: stripExcerpt(a.excerpt),
+          imageUrl,
+        };
+      })
+      .filter((a): a is NonNullable<typeof a> => a !== null)
+      .slice(0, 4),
+  }));
+
   // Split category sections: first 3, then interleave "آخر الكتب المنشورة", rest
   const catsBefore = categorySections.slice(0, 3);
   const catsAfter  = categorySections.slice(3);
 
   // Pre-compute backgrounds for every section in render order:
   // 0: categories  1: صدر حديثًا  2-4: catsBefore  5: آخر الكتب المنشورة  6+: catsAfter
-  const preDarkCount = 2 + catsBefore.length + 1 + catsAfter.length; // sections before dark publishers
+  const preDarkCount = 2 + catsBefore.length + catsAfter.length; // newly released + category batches before dark publishers
   const preDarkBgs   = buildBgList(preDarkCount);
 
   // After dark publishers section backgrounds reset to 0
   const postDarkBgs = buildBgList(
-    4 + ARTICLE_CHANNELS.length, // publishers grid + translated + nominated + article categories + 6 channels
+    4, // publishers grid + translated + nominated + article categories
   );
 
   let preIdx  = 0;
@@ -163,13 +207,16 @@ export default async function HomePage() {
   const preBg  = () => preDarkBgs[preIdx++]  ?? "bg-white";
   const postBg = () => postDarkBgs[postIdx++] ?? "bg-white";
 
+  let carouselOrder = 0;
+  const nextCarouselOrder = () => carouselOrder++;
+
   return (
     <div>
       <JsonLd data={websiteJsonLd(locale)} />
       <JsonLd data={organizationJsonLd(locale)} />
 
       {/* ── Hero ─────────────────────────────────────────────── */}
-      <HomeHeroCarousel slides={heroSlides} locale={locale} />
+      <HomeHeroCarousel slides={heroSlides} locale={locale} pageOrder={nextCarouselOrder()} />
 
       <HomeMissionStrip
         locale={locale}
@@ -178,26 +225,7 @@ export default async function HomePage() {
         secondaryLabel={editorial.mission.secondary}
       />
 
-      {/* ── تصفّح حسب التصنيف ──────────────────────────────── */}
-      {categories.length > 0 && (
-        <AnimatedSection className={`section-spacing ${preBg()}`} aria-labelledby="categories-heading">
-          <div className="container-platform">
-            <FadeIn className="mb-8 flex items-end justify-between gap-4">
-              <SectionHeading
-                id="categories-heading"
-                title={locale === "ar" ? "تصفّح حسب التصنيف" : "Browse by Category"}
-                subtitle={locale === "ar" ? "مجالات المعرفة والترجمات" : "Knowledge domains"}
-              />
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/${locale}/books`}>
-                  {locale === "ar" ? "كل الكتب" : "All Books"}
-                </Link>
-              </Button>
-            </FadeIn>
-            <CategoryGrid categories={categories} locale={locale} />
-          </div>
-        </AnimatedSection>
-      )}
+     
 
       {/* ── صدر حديثًا ─────────────────────────────────────── */}
       {newlyReleased.length > 0 && (
@@ -214,16 +242,16 @@ export default async function HomePage() {
                 </Link>
               </Button>
             </FadeIn>
-            <BookCarousel books={newlyReleased} locale={locale} />
+            <BookCarousel books={newlyReleased} locale={locale} pageOrder={nextCarouselOrder()} />
           </div>
         </AnimatedSection>
       )}
 
-      <HomeReaderJourney
+      {/* <HomeReaderJourney
         locale={locale}
         title={editorial.readerJourney.title}
         steps={editorial.readerJourney.steps}
-      />
+      /> */}
 
       {/* ── Category sections — first batch ─────────────────── */}
       {catsBefore.map(({ category, books }) => (
@@ -244,44 +272,11 @@ export default async function HomePage() {
                 </Link>
               </Button>
             </FadeIn>
-            <BookCarousel books={books} locale={locale} />
+            <BookCarousel books={books} locale={locale} pageOrder={nextCarouselOrder()} />
           </div>
         </AnimatedSection>
       ))}
 
-      {/* ── آخر الكتب المنشورة ─────────────────────────────── */}
-      {newlyReleased.length > 0 && (
-        <AnimatedSection className={`section-spacing ${preBg()}`} aria-labelledby="latest-heading">
-          <div className="container-platform">
-            <FadeIn className="mb-8 flex items-end justify-between gap-4">
-              <SectionHeading
-                id="latest-heading"
-                title={locale === "ar" ? "آخر الكتب المنشورة" : "Latest Published Books"}
-              />
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/${locale}/books`}>
-                  {locale === "ar" ? "عرض الكل" : "See All"}
-                </Link>
-              </Button>
-            </FadeIn>
-            <div className="grid grid-cols-2 items-stretch gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-              {newlyReleased.map((book) => (
-                <BookCard
-                  key={book.id}
-                  slug={book.slug}
-                  nameEn={book.nameEn}
-                  nameAr={book.nameAr}
-                  imageUrl={book.imageUrl}
-                  translationStatus={book.translationStatus ?? undefined}
-                  primaryCategory={book.primaryCategory}
-                  locale={locale}
-                  compact
-                />
-              ))}
-            </div>
-          </div>
-        </AnimatedSection>
-      )}
 
       {/* ── Category sections — second batch ────────────────── */}
       {catsAfter.map(({ category, books }) => (
@@ -302,18 +297,122 @@ export default async function HomePage() {
                 </Link>
               </Button>
             </FadeIn>
-            <BookCarousel books={books} locale={locale} />
+            <BookCarousel books={books} locale={locale} pageOrder={nextCarouselOrder()} />
           </div>
         </AnimatedSection>
       ))}
+        {/* ── كتب مرشحة للترجمة ───────────────────────────────── */}
+      {nominated.length > 0 && (
+        <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="nominated-heading">
+          <div className="container-platform">
+            <FadeIn className="mb-8 flex items-end justify-between gap-4">
+              <SectionHeading
+                id="nominated-heading"
+                title={locale === "ar" ? "كتب مرشحة للترجمة" : "Books for Translation"}
+                subtitle={locale === "ar" ? "كتب تستحق أن تصل للقارئ العربي" : "Books worth translating"}
+              />
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/${locale}/books/nominated-for-translation`}>
+                  {locale === "ar" ? "عرض الكل" : "See All"}
+                </Link>
+              </Button>
+            </FadeIn>
+            <BookCarousel books={nominated} locale={locale} pageOrder={nextCarouselOrder()} />
+          </div>
+        </AnimatedSection>
+      )}
+      {/* ── كتب مترجمة ──────────────────────────────────────── */}
+      {translated.length > 0 && (
+        <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="translated-heading">
+          <div className="container-platform">
+            <FadeIn className="mb-8 flex items-end justify-between gap-4">
+              <SectionHeading
+                id="translated-heading"
+                title={locale === "ar" ? "كتب مترجمة" : "Translated Books"}
+                subtitle={locale === "ar" ? "من لغات العالم إلى العربية" : "From world languages to Arabic"}
+              />
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/${locale}/books/translated`}>
+                  {locale === "ar" ? "عرض الكل" : "See All"}
+                </Link>
+              </Button>
+            </FadeIn>
+            <BookCarousel books={translated} locale={locale} pageOrder={nextCarouselOrder()} />
+          </div>
+        </AnimatedSection>
+      )}
+            {/* ── انشر كتابك + آخر الكتب المنشورة ─────────────────── */}
+            <HomePublishSection
+        locale={locale}
+        title={editorial.publishStrip.title}
+        description={editorial.publishStrip.description}
+        ctaLabel={editorial.publishStrip.cta}
+        booksTitle={editorial.publishStrip.booksTitle}
+        books={newlyReleased}
+        pageOrder={nextCarouselOrder()}
+      />
+
+      {/* ── تصنيفات المقالات ───────────────────────────────────
+      {articleCategories.length > 0 && (
+        <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="article-cats-heading">
+          <div className="container-platform">
+            <FadeIn className="mb-8 flex items-end justify-between gap-4">
+              <SectionHeading
+                id="article-cats-heading"
+                title={locale === "ar" ? "تصنيفات المقالات" : "Article Categories"}
+                subtitle={locale === "ar" ? "تصفّح المقالات حسب التصنيف" : "Browse articles by category"}
+              />
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/${locale}/articles/harvest`}>
+                  {locale === "ar" ? "كل المقالات" : "All Articles"}
+                </Link>
+              </Button>
+            </FadeIn>
+            <StaggerContainer className="flex flex-wrap gap-3">
+              {articleCategories.slice(0, 14).map((cat) => (
+                <StaggerItem key={cat.id}>
+                  <Link
+                    href={`/${locale}/articles/category/${cat.slug}`}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[var(--brand-gray-200)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-gray-700)] transition-all hover:border-[var(--brand-red)] hover:bg-[var(--brand-red-soft)] hover:text-[var(--brand-red)]"
+                  >
+                    {locale === "ar" && cat.nameAr ? cat.nameAr : cat.name}
+                  </Link>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
+          </div>
+        </AnimatedSection>
+      )} */}
+
+          {/* ── أقسام المقالات (زبدة الأفكار | حصاد الكتب | العالم يقرأ) ── */}
+          <HomeArticlesShowcase locale={locale} channels={readingArticleChannels} />
 
       <HomeMediaSpotlight
         locale={locale}
         title={editorial.mediaSpotlight.title}
-        subtitle={editorial.mediaSpotlight.subtitle}
-        cta={editorial.mediaSpotlight.cta}
-        videos={latestMedia}
+        channels={mediaChannels}
       />
+ {/* ── تصفّح حسب التصنيف ──────────────────────────────── */}
+ {categories.length > 0 && (
+        <AnimatedSection className={`section-spacing ${preBg()}`} aria-labelledby="categories-heading">
+          <div className="container-platform">
+            <FadeIn className="mb-8 flex items-end justify-between gap-4">
+              <SectionHeading
+                id="categories-heading"
+                title={locale === "ar" ? "تصفّح حسب التصنيف" : "Browse by Category"}
+                subtitle={locale === "ar" ? "مجالات المعرفة والترجمات" : "Knowledge domains"}
+              />
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/${locale}/books`}>
+                  {locale === "ar" ? "كل الكتب" : "All Books"}
+                </Link>
+              </Button>
+            </FadeIn>
+            <CategoryGrid categories={categories} locale={locale} />
+          </div>
+        </AnimatedSection>
+      )}
+
 
       {/* ── دور النشر — dark ────────────────────────────────── */}
       {publishers.length > 0 && (
@@ -341,7 +440,7 @@ export default async function HomePage() {
                 </Link>
               </Button>
             </FadeIn>
-            <PublishersMarquee publishers={publishers} locale={locale} />
+            <PublishersMarquee publishers={publishers} locale={locale} pageOrder={nextCarouselOrder()} />
           </div>
         </AnimatedSection>
       )}
@@ -372,7 +471,6 @@ export default async function HomePage() {
                     imageUrl={pub.imageUrl}
                     websiteUrl={pub.websiteUrl}
                     country={pub.country}
-                    bookCount={pub.bookCount}
                     locale={locale}
                   />
                 </StaggerItem>
@@ -382,191 +480,7 @@ export default async function HomePage() {
         </AnimatedSection>
       )}
 
-      {/* ── كتب مترجمة ──────────────────────────────────────── */}
-      {translated.length > 0 && (
-        <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="translated-heading">
-          <div className="container-platform">
-            <FadeIn className="mb-8 flex items-end justify-between gap-4">
-              <SectionHeading
-                id="translated-heading"
-                title={locale === "ar" ? "كتب مترجمة" : "Translated Books"}
-                subtitle={locale === "ar" ? "من لغات العالم إلى العربية" : "From world languages to Arabic"}
-              />
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/${locale}/books/translated`}>
-                  {locale === "ar" ? "عرض الكل" : "See All"}
-                </Link>
-              </Button>
-            </FadeIn>
-            <BookCarousel books={translated} locale={locale} />
-          </div>
-        </AnimatedSection>
-      )}
 
-      {/* ── كتب مرشحة للترجمة ───────────────────────────────── */}
-      {nominated.length > 0 && (
-        <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="nominated-heading">
-          <div className="container-platform">
-            <FadeIn className="mb-8 flex items-end justify-between gap-4">
-              <SectionHeading
-                id="nominated-heading"
-                title={locale === "ar" ? "كتب مرشحة للترجمة" : "Books for Translation"}
-                subtitle={locale === "ar" ? "كتب تستحق أن تصل للقارئ العربي" : "Books worth translating"}
-              />
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/${locale}/books/nominated-for-translation`}>
-                  {locale === "ar" ? "عرض الكل" : "See All"}
-                </Link>
-              </Button>
-            </FadeIn>
-            <BookCarousel books={nominated} locale={locale} />
-          </div>
-        </AnimatedSection>
-      )}
-
-      {/* ── تصنيفات المقالات ─────────────────────────────────── */}
-      {articleCategories.length > 0 && (
-        <AnimatedSection className={`section-spacing ${postBg()}`} aria-labelledby="article-cats-heading">
-          <div className="container-platform">
-            <FadeIn className="mb-8 flex items-end justify-between gap-4">
-              <SectionHeading
-                id="article-cats-heading"
-                title={locale === "ar" ? "تصنيفات المقالات" : "Article Categories"}
-                subtitle={locale === "ar" ? "تصفّح المقالات حسب التصنيف" : "Browse articles by category"}
-              />
-              <Button asChild variant="outline" size="sm">
-                <Link href={`/${locale}/articles/harvest`}>
-                  {locale === "ar" ? "كل المقالات" : "All Articles"}
-                </Link>
-              </Button>
-            </FadeIn>
-            <StaggerContainer className="flex flex-wrap gap-3">
-              {articleCategories.slice(0, 14).map((cat) => (
-                <StaggerItem key={cat.id}>
-                  <Link
-                    href={`/${locale}/articles/category/${cat.slug}`}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-[var(--brand-gray-200)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-gray-700)] transition-all hover:border-[var(--brand-red)] hover:bg-[var(--brand-red-soft)] hover:text-[var(--brand-red)]"
-                  >
-                    {locale === "ar" && cat.nameAr ? cat.nameAr : cat.name}
-                    {cat.linkedCount > 0 && (
-                      <span className="rounded-full bg-[var(--brand-gray-100)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--brand-gray-500)]">
-                        {cat.linkedCount}
-                      </span>
-                    )}
-                  </Link>
-                </StaggerItem>
-              ))}
-            </StaggerContainer>
-          </div>
-        </AnimatedSection>
-      )}
-
-      {/* ── Article channel sections ──────────────────────────── */}
-      {ARTICLE_CHANNELS.map((ch) => {
-        const channelArticles = articles[ch.key] ?? [];
-        if (!channelArticles.length) return null;
-        const bg = postBg();
-        const [featuredRaw, ...restRaw] = channelArticles;
-        if (!featuredRaw?.slug) return null;
-        const featuredLinked = articleLinkedBookDisplay(featuredRaw.products?.[0], locale);
-        const featured = {
-          ...featuredRaw,
-          linkedBook: featuredLinked,
-        };
-        const rest = restRaw
-          .filter((a) => !!a.slug)
-          .map((a) => ({
-            ...a,
-            linkedBook: articleLinkedBookDisplay(a.products?.[0], locale),
-          }));
-        return (
-          <AnimatedSection
-            key={ch.key}
-            className={`section-spacing ${bg}`}
-            aria-labelledby={`ch-${ch.key}-heading`}
-          >
-            <div className="container-platform">
-              <FadeIn className="mb-8 flex items-end justify-between gap-4">
-                <SectionHeading
-                  id={`ch-${ch.key}-heading`}
-                  title={locale === "ar" ? ch.ar : ch.en}
-                />
-                <Button asChild variant="outline" size="sm">
-                  <Link href={`/${locale}/articles/${ch.path}`}>
-                    {locale === "ar" ? "عرض الكل" : "See All"}
-                  </Link>
-                </Button>
-              </FadeIn>
-              <StaggerContainer
-                className={rest.length > 0 ? "grid grid-cols-1 items-stretch gap-6 md:grid-cols-3" : "max-w-2xl"}
-              >
-                <StaggerItem className={rest.length > 0 ? "md:col-span-2" : ""}>
-                  <ArticleCard
-                    slug={featured.slug}
-                    title={featured.title ?? ""}
-                    excerpt={featured.excerpt}
-                    imageUrl={featured.imageUrl}
-                    videoId={featured.videoId}
-                    linkedBook={featured.linkedBook}
-                    date={featured.date ?? undefined}
-                    channel={featured.channel ?? undefined}
-                    locale={locale}
-                    featured={rest.length > 0}
-                  />
-                </StaggerItem>
-                {rest.map((a) => (
-                  <StaggerItem key={a.id}>
-                    <ArticleCard
-                      slug={a.slug!}
-                      title={a.title ?? ""}
-                      excerpt={a.excerpt}
-                      imageUrl={a.imageUrl}
-                      videoId={a.videoId}
-                      linkedBook={a.linkedBook}
-                      date={a.date ?? undefined}
-                      channel={a.channel ?? undefined}
-                      locale={locale}
-                    />
-                  </StaggerItem>
-                ))}
-              </StaggerContainer>
-            </div>
-          </AnimatedSection>
-        );
-      })}
-
-      {/* ── انشر كتابك CTA ───────────────────────────────────── */}
-      <AnimatedSection className="bg-[var(--brand-red)] py-16" aria-labelledby="publish-cta-heading">
-        <div className="container-platform text-center text-white">
-          <div className="mx-auto max-w-xl">
-            <FadeIn direction="none" delay={0.1}>
-              <PenTool className="mx-auto mb-4 h-12 w-12 text-[var(--brand-red-soft)]" aria-hidden="true" />
-              <h2 id="publish-cta-heading" className="font-display text-display-md font-bold">
-                {t("publishBanner")}
-              </h2>
-              <p className="mt-2 text-[var(--brand-red-soft)]">{t("publishBannerDesc")}</p>
-              <Button
-                asChild
-                size="xl"
-                className="mt-6 bg-white text-[var(--brand-red)] hover:bg-[var(--brand-gray-100)]"
-              >
-                <Link href={`/${locale}/publish`}>
-                  {locale === "ar" ? "انشر كتابك الآن" : "Publish Your Book Now"}
-                </Link>
-              </Button>
-            </FadeIn>
-          </div>
-        </div>
-      </AnimatedSection>
-
-      {/* ── Stats ─────────────────────────────────────────────── */}
-      <StatsCounter
-        totalBooks={stats.totalBooks}
-        totalPublishers={stats.totalPublishers}
-        totalTranslatedBooks={stats.totalTranslatedBooks}
-        totalCountries={stats.totalCountries}
-        locale={locale}
-      />
 
       <HomeServicesPreview
         locale={locale}

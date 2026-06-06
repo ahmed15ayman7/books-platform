@@ -18,6 +18,7 @@ import { articleSeoMetadata } from "@/lib/seo/metadata";
 import { youtubeEmbedUrl, youtubeThumbnail } from "@/lib/media/youtube";
 import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-shell";
 import { isMediaChannel } from "@/lib/media/youtube";
+import { mediaHubHref, mediaNavLabel } from "@/lib/nav/site-nav";
 import { adminArticleEditPath, adminArticleViewPath } from "@/lib/admin/public-urls";
 import { ArticleContent } from "@/lib/markdown/article-content";
 import { ArticleCommentsSection } from "@/components/sections/article-comments-section";
@@ -45,7 +46,6 @@ const channelNames: Record<string, { ar: string; en: string; path: string }> = {
   ideas: { ar: "زبدة الأفكار", en: "Essence of Ideas", path: "ideas" },
   "world-reads": { ar: "العالم يقرأ", en: "World Reads", path: "world-reads" },
   "books-talk": { ar: "حديث الكتب", en: "Book Talk", path: "books-talk" },
-  "watch-your-book": { ar: "شاهد كتابك", en: "Watch Your Book", path: "watch-your-book" },
   "novel-story": { ar: "رواية فحكاية", en: "Novel & Story", path: "novel-story" },
 };
 
@@ -61,7 +61,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   if (!article) notFound();
 
   const linkedBook = articleLinkedBookDisplay(article.products?.[0], locale);
-  const heroImageUrl = linkedBook?.imageUrl ?? article.imageUrl;
+  const heroImageUrl = linkedBook?.imageUrl ?? article.imageUrl?.split(',')[0] ?? article.imageUrl;
   const relatedArticles = related.map((art) => mapArticleForCard(art, locale));
 
   const channelInfo = article.channel ? channelNames[article.channel] : null;
@@ -79,7 +79,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
       "@context": "https://schema.org",
       "@type": "Article",
       headline: article.title,
-      image: article.imageUrl,
+      image: article.imageUrl?.split(',')[0] ?? article.imageUrl,
       datePublished: article.date?.toISOString(),
       description: article.excerpt,
     },
@@ -138,12 +138,30 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
               {channelInfo && (
                 <>
                   <span>/</span>
-                  <Link
-                    href={`/${locale}/articles/${channelInfo.path}`}
-                    className="hover:text-[var(--brand-red)]"
-                  >
-                    {channelLabel}
-                  </Link>
+                  {isMedia ? (
+                    <>
+                      <Link
+                        href={mediaHubHref(locale)}
+                        className="hover:text-[var(--brand-red)]"
+                      >
+                        {mediaNavLabel(locale)}
+                      </Link>
+                      <span>/</span>
+                      <Link
+                        href={`/${locale}/media/${channelInfo.path}`}
+                        className="hover:text-[var(--brand-red)]"
+                      >
+                        {channelLabel}
+                      </Link>
+                    </>
+                  ) : (
+                    <Link
+                      href={`/${locale}/articles/${channelInfo.path}`}
+                      className="hover:text-[var(--brand-red)]"
+                    >
+                      {channelLabel}
+                    </Link>
+                  )}
                 </>
               )}
               <span>/</span>

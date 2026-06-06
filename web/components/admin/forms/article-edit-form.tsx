@@ -21,6 +21,8 @@ import {
 } from "@/lib/admin/public-urls";
 import { ArticleLivePreview } from "@/components/admin/article-live-preview";
 import { ArticleMarkdownHint } from "@/components/admin/article-markdown-hint";
+import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface ArticleForm {
   title: string;
@@ -54,7 +56,6 @@ const channelOptions = [
   { value: "harvest", label: "حصاد الكتب" },
   { value: "ideas", label: "زبدة الأفكار" },
   { value: "world-reads", label: "العالم يقرأ" },
-  { value: "watch-your-book", label: "شاهد كتابك" },
   { value: "books-talk", label: "حديث الكتب" },
   { value: "novel-story", label: "رواية فحكاية" },
 ];
@@ -81,8 +82,6 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
   const [loading, setLoading] = useState(!isNew || Boolean(initialBookId));
   const draft = useFormDraft(formDraftId.adminArticle(id), form, setForm, { ready: !loading });
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [timestamps, setTimestamps] = useState<{ createdAt?: string; updatedAt?: string }>({});
 
   const load = useCallback(async () => {
@@ -147,11 +146,8 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
     void load();
   }, [load]);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submitArticle(asDraft = false) {
     setSaving(true);
-    setError("");
-    setSuccess(false);
     try {
       const url = isNew ? "/api/v1/admin/articles" : `/api/v1/admin/articles/${id}`;
       const res = await fetch(url, {
@@ -159,6 +155,7 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
         headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          status: asDraft ? "draft" : form.status,
           productIds,
           date: form.date ? new Date(form.date) : null,
         }),
@@ -169,24 +166,32 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
         data?: { id: string; channel?: string | null };
       };
       if (!res.ok || !data.success) {
-        setError(data.error?.message ?? "فشل الحفظ");
+        adminToast.error(data.error?.message ?? "فشل الحفظ");
         return;
       }
       draft.clearDraft();
-      setSuccess(true);
+      adminToast.success(asDraft ? "draft" : isNew ? "create" : "update", "المقال");
       const savedId = isNew ? data.data?.id : id;
       const channel = data.data?.channel ?? form.channel;
-      if (savedId) {
-        if (isNew) {
-          router.push(adminArticleViewPath(locale, savedId, channel));
-        }
+      if (savedId && isNew) {
+        router.push(adminArticleViewPath(locale, savedId, channel));
       }
     } catch {
-      setError("حدث خطأ في الاتصال");
+      adminToast.error("حدث خطأ في الاتصال");
     } finally {
       setSaving(false);
     }
   }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await submitArticle(false);
+  }
+
+  useAdminFormShortcuts({
+    onSave: () => void submitArticle(false),
+    onSaveDraft: () => void submitArticle(true),
+  });
 
   const set =
     (k: keyof ArticleForm) =>
@@ -217,7 +222,7 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
         />
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5" data-admin-save-form>
         <FormDraftNotice
           showBanner={draft.showBanner}
           status={draft.status}
@@ -290,17 +295,6 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
             />
           </div>
         </AdminCard>
-
-        {error && (
-          <p className="form-error-banner rounded-lg px-4 py-2 text-sm">
-            {error}
-          </p>
-        )}
-        {success && (
-          <p className="rounded-lg bg-[var(--success-soft)] border border-[var(--success)]/30 px-4 py-2 text-sm text-[var(--success)]">
-            تم الحفظ بنجاح
-          </p>
-        )}
 
         <div className="flex gap-3">
           <Button type="submit" disabled={saving}>

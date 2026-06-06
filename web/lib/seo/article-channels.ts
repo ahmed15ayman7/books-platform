@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/lib/i18n/config";
+import { isMediaChannel } from "@/lib/media/youtube";
 import { buildPageMetadata } from "./metadata";
 
 const CHANNELS: Record<
@@ -30,12 +31,6 @@ const CHANNELS: Record<
     descAr: "ما يقرأه العالم الآن من كتب وثقافات",
     descEn: "What the world is reading now",
   },
-  "watch-your-book": {
-    titleAr: "شاهد كتابك",
-    titleEn: "Watch Your Book",
-    descAr: "محتوى مرئي عن الكتب والمؤلفين",
-    descEn: "Video content about books and authors",
-  },
   "novel-story": {
     titleAr: "رواية فحكاية",
     titleEn: "Novel & Story",
@@ -46,9 +41,10 @@ const CHANNELS: Record<
 
 export function articleChannelMetadata(locale: Locale, channel: string): Metadata {
   const c = CHANNELS[channel] ?? CHANNELS["harvest"]!;
+  const basePath = isMediaChannel(channel) ? "media" : "articles";
   return buildPageMetadata({
     locale,
-    path: `/${locale}/articles/${channel}`,
+    path: `/${locale}/${basePath}/${channel}`,
     title: locale === "ar" ? c.titleAr : c.titleEn,
     description: locale === "ar" ? c.descAr : c.descEn,
     type: "website",

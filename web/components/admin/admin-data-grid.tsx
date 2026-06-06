@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { BookOpen } from "lucide-react";
 import { CardMedia } from "@/components/ui/card-media";
 import { cn } from "@/lib/utils";
@@ -73,13 +74,21 @@ export function AdminGridCardMedia({
   src,
   alt,
   fallback,
+  href,
 }: {
   src?: string | null;
   alt: string;
   fallback?: ReactNode;
+  href?: string;
 }) {
-  return (
-    <CardMedia className="bg-[var(--admin-surface-muted)]" rounded="none">
+  const media = (
+    <CardMedia
+      className={cn(
+        "bg-[var(--admin-surface-muted)]",
+        href && "transition-opacity group-hover/media:opacity-90",
+      )}
+      rounded="none"
+    >
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt={alt} className="h-full w-full object-cover" />
@@ -89,6 +98,18 @@ export function AdminGridCardMedia({
         </div>
       )}
     </CardMedia>
+  );
+
+  if (!href) return media;
+
+  return (
+    <Link
+      href={href}
+      className="group/media block shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--admin-surface)]"
+      aria-label={alt}
+    >
+      {media}
+    </Link>
   );
 }
 

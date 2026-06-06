@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
-import { ContentPageShell } from "@/components/sections/content-page-shell";
 import { SectionBlock } from "@/components/sections/section-block";
 import { TeamGrid } from "@/components/sections/team-grid";
+import { TeamCollageHero } from "@/components/sections/team-collage-hero";
 import { TeamQuoteBlock } from "@/components/sections/team-quote-block";
-import { TeamStatsMini } from "@/components/sections/team-stats-mini";
 import { TeamDepartments } from "@/components/sections/team-departments";
 import { CtaBand } from "@/components/sections/cta-band";
-import { getTeamContent, TEAM_MEMBERS } from "@/lib/content/team";
+import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
+import { getTeamContent } from "@/lib/content/team";
 import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -34,57 +34,53 @@ export default async function TeamPage() {
   const locale = (await getLocale()) as Locale;
   const content = getTeamContent(locale);
   const isAr = locale === "ar";
-  const featuredCount = TEAM_MEMBERS.filter((m) => m.featured).length;
 
   return (
-    <ContentPageShell
-      locale={locale}
-      hero={{
-        title: content.hero.title,
-        subtitle: content.hero.subtitle,
-        variant: "dark",
-        size: "lg",
-        breadcrumbs: [
+    <div className="min-h-screen bg-[var(--brand-gray-50)]">
+      <TeamCollageHero
+        locale={locale}
+        title={content.hero.title}
+        subtitle={content.hero.subtitle}
+        members={content.members}
+        breadcrumbs={[
           { label: isAr ? "الرئيسية" : "Home", href: `/${locale}` },
           { label: content.hero.title },
-        ],
-      }}
-    >
-      <SectionBlock lead={content.intro} />
-
-      <TeamStatsMini
-        locale={locale}
-        totalMembers={TEAM_MEMBERS.length}
-        featuredCount={featuredCount}
+        ]}
       />
 
-      <SectionBlock id="leadership" title={content.leadershipSection.title}>
-        <TeamGrid members={content.members} locale={locale} filter="featured" />
-      </SectionBlock>
+      <div className="container-platform py-14 md:py-16">
+        <AnimatedContentSections>
+          <SectionBlock lead={content.intro} />
 
-      <SectionBlock id="team" title={content.teamSection.title}>
-        <TeamGrid members={content.members} locale={locale} filter="non-featured" />
-      </SectionBlock>
+          <SectionBlock id="leadership" title={content.leadershipSection.title}>
+            <TeamGrid members={content.members} locale={locale} filter="featured" />
+          </SectionBlock>
 
-      <TeamDepartments
-        locale={locale}
-        eyebrow={content.departments.eyebrow}
-        title={content.departments.title}
-        items={content.departments.items}
-      />
+          <SectionBlock id="team" title={content.teamSection.title}>
+            <TeamGrid members={content.members} locale={locale} filter="non-featured" />
+          </SectionBlock>
 
-      <TeamQuoteBlock
-        quote={content.quote}
-        ctaHref={`/${locale}/contact`}
-        ctaLabel={content.cta}
-      />
+          <TeamDepartments
+            locale={locale}
+            eyebrow={content.departments.eyebrow}
+            title={content.departments.title}
+            items={content.departments.items}
+          />
 
-      <CtaBand
-        primaryHref={`/${locale}/contact`}
-        primaryLabel={content.cta}
-        secondaryHref={`/${locale}/about`}
-        secondaryLabel={isAr ? "من نحن" : "About Us"}
-      />
-    </ContentPageShell>
+          <TeamQuoteBlock
+            quote={content.quote}
+            ctaHref={`/${locale}/contact`}
+            ctaLabel={content.cta}
+          />
+
+          <CtaBand
+            primaryHref={`/${locale}/contact`}
+            primaryLabel={content.cta}
+            secondaryHref={`/${locale}/about`}
+            secondaryLabel={isAr ? "من نحن" : "About Us"}
+          />
+        </AnimatedContentSections>
+      </div>
+    </div>
   );
 }

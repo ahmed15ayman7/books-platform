@@ -31,6 +31,30 @@ export function htmlToArticleSource(html: string): string {
     },
   );
 
+  out = out.replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, (_, t: string) => `\n\n# ${stripInnerHtml(t)}\n\n`);
+  out = out.replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, (_, t: string) => `\n\n## ${stripInnerHtml(t)}\n\n`);
+  out = out.replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi, (_, t: string) => `\n\n### ${stripInnerHtml(t)}\n\n`);
+  out = out.replace(/<h[4-6][^>]*>([\s\S]*?)<\/h[4-6]>/gi, (_, t: string) => `\n\n### ${stripInnerHtml(t)}\n\n`);
+
+  out = out.replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, (_, t: string) => `**${stripInnerHtml(t)}**`);
+  out = out.replace(/<b[^>]*>([\s\S]*?)<\/b>/gi, (_, t: string) => `**${stripInnerHtml(t)}**`);
+  out = out.replace(/<em[^>]*>([\s\S]*?)<\/em>/gi, (_, t: string) => `*${stripInnerHtml(t)}*`);
+  out = out.replace(/<i[^>]*>([\s\S]*?)<\/i>/gi, (_, t: string) => `*${stripInnerHtml(t)}*`);
+
+  out = out.replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, (_, inner: string) =>
+    inner.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, (__: unknown, item: string) =>
+      `\n- ${stripInnerHtml(item)}`,
+    ),
+  );
+
+  out = out.replace(/<ol[^>]*>([\s\S]*?)<\/ol>/gi, (_, inner: string) => {
+    let n = 0;
+    return inner.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, (__: unknown, item: string) => {
+      n += 1;
+      return `\n${n}. ${stripInnerHtml(item)}`;
+    });
+  });
+
   out = out.replace(/<\/p>\s*<p[^>]*>/gi, "\n\n");
   out = out.replace(/<br\s*\/?>/gi, "\n");
   out = out.replace(/<\/h[1-6]>/gi, "\n\n");
@@ -42,6 +66,10 @@ export function htmlToArticleSource(html: string): string {
   out = out.replace(/&quot;/g, '"');
 
   return out.replace(/\r\n/g, "\n").trim();
+}
+
+function stripInnerHtml(html: string): string {
+  return html.replace(/<[^>]+>/g, "").trim();
 }
 
 function parseLineBlock(line: string): ArticleContentBlock | null {
@@ -77,6 +105,10 @@ function parseLineBlock(line: string): ArticleContentBlock | null {
     return { type: "list", items: [trimmed.replace(/^[-*]\s+/, "")] };
   }
 
+  if (/^\d+\.\s+/.test(trimmed)) {
+    return { type: "list", items: [trimmed.replace(/^\d+\.\s+/, "")] };
+  }
+
   return { type: "paragraph", text: trimmed };
 }
 
@@ -94,11 +126,11 @@ export function parseArticleContent(raw: string): ArticleContentBlock[] {
     const lines = chunk.split("\n").map((l) => l.trim()).filter(Boolean);
     if (lines.length === 0) continue;
 
-    const allList = lines.every((l) => /^[-*]\s+/.test(l));
+    const allList = lines.every((l) => /^[-*]\s+/.test(l) || /^\d+\.\s+/.test(l));
     if (allList) {
       blocks.push({
         type: "list",
-        items: lines.map((l) => l.replace(/^[-*]\s+/, "")),
+        items: lines.map((l) => l.replace(/^[-*]\s+/, "").replace(/^\d+\.\s+/, "")),
       });
       continue;
     }

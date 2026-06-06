@@ -30,6 +30,7 @@ import {
 } from "@/components/admin/admin-form-field";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface B2BSubscription {
   id: string;
@@ -72,7 +73,6 @@ export default function AdminB2BPage() {
   const [form, setForm] = useState(emptyForm);
   const draft = useFormDraft(formDraftId.adminB2b(editingId), form, setForm);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
   const [sort, setSort] = useState("createdAt:desc");
   const [isActive, setIsActive] = useState("all");
 
@@ -98,7 +98,6 @@ export default function AdminB2BPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    setError("");
     try {
       const url = editingId ? `/api/v1/admin/b2b/${editingId}` : "/api/v1/admin/b2b";
       const res = await fetch(url, {
@@ -107,12 +106,18 @@ export default function AdminB2BPage() {
         body: JSON.stringify(form),
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
-      if (!res.ok || !data.success) { setError(data.error?.message ?? "فشل الحفظ"); return; }
+      if (!res.ok || !data.success) {
+        adminToast.error(data.error?.message ?? "فشل الحفظ");
+        return;
+      }
+      adminToast.success(editingId ? "update" : "create", "الاشتراك");
       draft.clearDraft();
       setForm(emptyForm);
       setEditingId(null);
       await load();
-    } catch { setError("حدث خطأ"); }
+    } catch {
+      adminToast.error("حدث خطأ");
+    }
     finally { setSaving(false); }
   }
 
@@ -216,7 +221,6 @@ export default function AdminB2BPage() {
             <AdminSelect label="نوع الحزمة" value={form.packageType} onChange={set("packageType")} options={packageOptions} />
             <AdminInput label="تاريخ البداية" type="date" value={form.startDate} onChange={set("startDate")} />
             <AdminInput label="تاريخ الانتهاء *" type="date" value={form.endDate} onChange={set("endDate")} required />
-            {error && <p className="text-xs text-[var(--error)]">{error}</p>}
             <div className="flex gap-2">
               <Button type="submit" size="sm" disabled={saving} className="gap-1.5">
                 <Plus className="h-3.5 w-3.5" />

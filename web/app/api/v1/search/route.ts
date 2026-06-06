@@ -1,87 +1,65 @@
 import { type NextRequest } from "next/server";
-import { db } from "@/lib/db";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
+import { PAGINATION } from "@/lib/utils/constants";
+import { parseSearchSectionType } from "@/lib/search/search-types";
+import { GlobalSearchService } from "@/server/services/global-search.service";
 
 export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = request.nextUrl;
-    const q = searchParams.get("q")?.trim();
-    const type = searchParams.get("type") ?? "all";
-    const limit = Math.min(20, parseInt(searchParams.get("limit") ?? "10", 10));
+  const sp = request.nextUrl.searchParams;
+  const q = sp.get("q")?.trim() ?? "";
+  const type = parseSearchSectionType(sp.get("type"));
+  const page = Math.max(1, parseInt(sp.get("page") ?? "1", 10));
+  const limit = Math.min(
+    PAGINATION.MAX_PAGE_SIZE,
+    Math.max(1, parseInt(sp.get("limit") ?? String(PAGINATION.DEFAULT_PAGE_SIZE), 10)),
+  );
 
-    if (!q || q.length < 2) {
-      return apiSuccess({ books: [], articles: [], publishers: [], totalResults: 0, query: q ?? "" });
+  if (q.length < 2) {
+    return apiSuccess({
+      mode: type === "all" ? "preview" : "section",
+      query: q,
+      books: type === "all" ? { items: [], total: 0 } : [],
+      articles: type === "all" ? { items: [], total: 0 } : [],
+      media: type === "all" ? { items: [], total: 0 } : [],
+      publishers: type === "all" ? { items: [], total: 0 } : [],
+      authors: type === "all" ? { items: [], total: 0 } : [],
+      pagination: type === "all" ? undefined : {
+        page: 1,
+        limit,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
+    });
+  }
+
+  try {
+    const result = await GlobalSearchService.search({
+      q,
+      type,
+      page,
+      limit,
+      category: sp.get("category") ?? undefined,
+      status: sp.get("status") ?? undefined,
+      sort: (sp.get("sort") as "newest" | "oldest" | "title") ?? "newest",
+      channel: sp.get("channel") ?? undefined,
+      country: sp.get("country") ?? undefined,
+    });
+
+    if (!result) {
+      return apiSuccess({
+        mode: type === "all" ? "preview" : "section",
+        query: q,
+        books: type === "all" ? { items: [], total: 0 } : [],
+        articles: type === "all" ? { items: [], total: 0 } : [],
+        media: type === "all" ? { items: [], total: 0 } : [],
+        publishers: type === "all" ? { items: [], total: 0 } : [],
+        authors: type === "all" ? { items: [], total: 0 } : [],
+      });
     }
 
-    const searchCondition = {
-      contains: q,
-      mode: "insensitive" as const,
-    };
-
-    const [books, articles, publishers] = await Promise.all([
-      type === "all" || type === "book"
-        ? db.product.findMany({
-            where: {
-              published: true,
-              OR: [
-                { nameEn: searchCondition },
-                { nameAr: searchCondition },
-                { description: searchCondition },
-              ],
-            },
-            take: limit,
-            select: {
-              id: true,
-              slug: true,
-              nameEn: true,
-              nameAr: true,
-              imageUrl: true,
-              translationStatus: true,
-            },
-          })
-        : Promise.resolve([]),
-
-      type === "all" || type === "article"
-        ? db.article.findMany({
-            where: {
-              status: "publish",
-              OR: [
-                { title: searchCondition },
-                { excerpt: searchCondition },
-              ],
-            },
-            take: limit,
-            select: {
-              id: true,
-              slug: true,
-              title: true,
-              excerpt: true,
-              imageUrl: true,
-              channel: true,
-            },
-          })
-        : Promise.resolve([]),
-
-      type === "all" || type === "publisher"
-        ? db.publisher.findMany({
-            where: {
-              status: "publish",
-              title: searchCondition,
-            },
-            take: limit,
-            select: {
-              id: true,
-              slug: true,
-              title: true,
-              imageUrl: true,
-            },
-          })
-        : Promise.resolve([]),
-    ]);
-
-    const totalResults = books.length + articles.length + publishers.length;
-
-    return apiSuccess({ books, articles, publishers, totalResults, query: q });
+    return apiSuccess(result);
   } catch (error) {
     console.error("[GET /api/v1/search]", error);
     return ApiErrors.internal();

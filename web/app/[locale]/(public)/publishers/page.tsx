@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { PublisherService } from "@/server/services/publisher.service";
-import { BookService } from "@/server/services/book.service";
-import { ContentPageShell } from "@/components/sections/content-page-shell";
+import { PublishersHero } from "@/components/sections/publishers-hero";
+import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
 import { PublisherCard } from "@/components/sections/publisher-card";
 import { SectionBlock } from "@/components/sections/section-block";
 import { StaggerContainer, StaggerItem } from "@/components/motion";
 import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
+import { publicPublisherUrl } from "@/lib/admin/public-urls";
 import { Badge } from "@/components/ui/badge";
 import {
   CardMedia,
@@ -44,7 +45,8 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
   const t = await getTranslations("publishers");
   const page = Math.max(1, parseInt(sp.page ?? "1", 10));
 
-  const [{ publishers, pagination }, stats, countries, sponsored] = await Promise.all([
+  const [{ publishers, pagination }, countries, sponsored, logoPublishers] =
+    await Promise.all([
     PublisherService.list({
       page,
       limit: 20,
@@ -54,26 +56,46 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
       publishers: [],
       pagination: { page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false },
     })),
-    BookService.getStats().catch(() => ({ totalBooks: 0, totalPublishers: 0, totalTranslatedBooks: 0, totalCountries: 0 })),
     PublisherService.getAllCountries().catch(() => []),
     PublisherService.getSponsored(4).catch(() => []),
+    PublisherService.list({ page: 1, limit: 8 }).catch(() => ({ publishers: [] })),
   ]);
 
+  const heroLogos = [
+    ...sponsored.filter((p) => p.imageUrl).map((p) => ({
+      src: p.imageUrl!,
+      alt: localizedPublisherName(p, locale),
+      href: publicPublisherUrl(locale, p.slug),
+    })),
+    ...logoPublishers.publishers
+      .filter((p) => p.imageUrl && !sponsored.some((s) => s.id === p.id))
+      .slice(0, 8 - sponsored.length)
+      .map((p) => ({
+        src: p.imageUrl!,
+        alt: localizedPublisherName(p, locale),
+        href: publicPublisherUrl(locale, p.slug),
+      })),
+  ].slice(0, 8);
+
   return (
-    <ContentPageShell
-      locale={locale}
-      hero={{
-        title: t("title"),
-        subtitle:
+    <div className="min-h-screen bg-[var(--brand-gray-50)]">
+      <PublishersHero
+        locale={locale}
+        title={t("title")}
+        subtitle={
           locale === "ar"
-            ? `${stats.totalPublishers} ناشر من ${stats.totalCountries} دولة`
-            : `${stats.totalPublishers} publishers from ${stats.totalCountries} countries`,
-        breadcrumbs: [
+            ? "دار نشر من كل أنحاء العالم — دليل دور النشر العالمية"
+            : "Publishing houses from around the world — your global directory"
+        }
+        logos={heroLogos}
+        breadcrumbs={[
           { label: locale === "ar" ? "الرئيسية" : "Home", href: `/${locale}` },
           { label: t("title") },
-        ],
-      }}
-    >
+        ]}
+      />
+
+      <div className="container-platform py-14 md:py-16">
+        <AnimatedContentSections>
       {sponsored.length > 0 && page === 1 && !sp.search && !sp.country && (
         <SectionBlock
           id="featured-publishers"
@@ -89,7 +111,6 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
                   slug={pub.slug}
                   imageUrl={pub.imageUrl}
                   locale={locale}
-                  bookCount={0}
                 />
               </StaggerItem>
             ))}
@@ -165,7 +186,9 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
           </>
         )}
       </div>
-    </ContentPageShell>
+        </AnimatedContentSections>
+      </div>
+    </div>
   );
 }
 
@@ -177,7 +200,6 @@ interface PublisherListingCardProps {
     nameAr?: string | null;
     slug: string;
     imageUrl?: string | null;
-    booksCount: number;
     isSponsored: boolean;
     countries: { name: string; nameAr?: string | null; slug: string }[];
   };
@@ -225,10 +247,6 @@ function PublisherListingCard({ publisher, locale }: PublisherListingCardProps) 
             {isAr && country.nameAr ? country.nameAr : country.name}
           </span>
         )}
-
-        <span className="mt-auto text-[10px] text-[var(--brand-gray-500)]">
-          {publisher.booksCount} {isAr ? "كتاب" : "books"}
-        </span>
       </div>
     </Link>
   );

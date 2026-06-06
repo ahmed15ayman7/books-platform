@@ -23,7 +23,6 @@ interface Props {
 }
 
 const CHANNEL_LABELS: Record<string, string> = {
-  "watch-your-book": "شاهد كتابك",
   "books-talk": "حديث الكتب",
   "novel-story": "رواية فحكاية",
 };

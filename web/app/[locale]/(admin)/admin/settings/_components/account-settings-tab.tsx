@@ -14,6 +14,7 @@ import {
 import { usePasskeyGate } from "@/lib/admin/use-passkey-gate";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 export function AccountSettingsTab() {
   const [fullName, setFullName] = useState("");
@@ -28,8 +29,7 @@ export function AccountSettingsTab() {
   const [logs, setLogs] = useState<LoginHistoryRow[]>([]);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [status, setStatus] = useState("");
-  const { runWithPasskey, error: passkeyError } = usePasskeyGate();
+  const { runWithPasskey } = usePasskeyGate();
 
   useEffect(() => {
     void Promise.all([
@@ -53,7 +53,6 @@ export function AccountSettingsTab() {
 
   async function saveProfile(e: React.FormEvent) {
     e.preventDefault();
-    setStatus("");
     await runWithPasskey(async () => {
       const res = await fetch("/api/v1/admin/me/account", {
         method: "PATCH",
@@ -61,14 +60,17 @@ export function AccountSettingsTab() {
         body: JSON.stringify({ fullName }),
       });
       const data = (await res.json()) as { success: boolean };
-      if (data.success) profileDraft.clearDraft();
-      setStatus(data.success ? "تم تحديث الملف ✓" : "فشل التحديث");
+      if (data.success) {
+        profileDraft.clearDraft();
+        adminToast.success("update", "الملف الشخصي");
+      } else {
+        adminToast.error("فشل التحديث");
+      }
     });
   }
 
   async function changePassword(e: React.FormEvent) {
     e.preventDefault();
-    setStatus("");
     await runWithPasskey(async () => {
       const res = await fetch("/api/v1/admin/me/password", {
         method: "POST",
@@ -82,9 +84,9 @@ export function AccountSettingsTab() {
       if (data.success) {
         setCurrentPassword("");
         setNewPassword("");
-        setStatus("تم تغيير كلمة المرور ✓");
+        adminToast.success("update", "كلمة المرور");
       } else {
-        setStatus(data.error?.message ?? "فشل تغيير كلمة المرور");
+        adminToast.error(data.error?.message ?? "فشل تغيير كلمة المرور");
       }
     });
   }
@@ -137,14 +139,6 @@ export function AccountSettingsTab() {
       <AdminCard title="سجل تسجيل الدخول">
         <LoginHistoryTable logs={logs} />
       </AdminCard>
-
-      {(status || passkeyError) && (
-        <p
-          className={`text-sm ${status.includes("✓") ? "text-[var(--success)]" : "text-[var(--error)]"}`}
-        >
-          {passkeyError || status}
-        </p>
-      )}
     </div>
   );
 }

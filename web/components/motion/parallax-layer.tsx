@@ -30,7 +30,7 @@ export function ParallaxLayer({
 
   return (
     <div ref={ref} className={cn("overflow-hidden", className)}>
-      <motion.div style={{ y }} className="will-change-transform">
+      <motion.div style={{ y }} className="h-full w-full">
         {children}
       </motion.div>
     </div>

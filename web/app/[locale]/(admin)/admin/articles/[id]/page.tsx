@@ -25,7 +25,6 @@ const CHANNEL_LABELS: Record<string, string> = {
   harvest: "حصاد الكتب",
   ideas: "زبدة الأفكار",
   "world-reads": "العالم يقرأ",
-  "watch-your-book": "شاهد كتابك",
   "books-talk": "حديث الكتب",
   "novel-story": "رواية فحكاية",
 };

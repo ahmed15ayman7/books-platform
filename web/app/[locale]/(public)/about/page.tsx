@@ -3,7 +3,6 @@ import { getLocale } from "next-intl/server";
 import { AboutHeroSplit } from "@/components/sections/about/about-hero-split";
 import { AboutStorySplit } from "@/components/sections/about/about-story-split";
 import { AboutGalleryStrip } from "@/components/sections/about/about-gallery-strip";
-import { AboutStatsBand } from "@/components/sections/about/about-stats-band";
 import { AboutValuesGrid } from "@/components/sections/about/about-values-grid";
 import { AboutTimeline } from "@/components/sections/about/about-timeline";
 import { AboutUniquenessSplit } from "@/components/sections/about/about-uniqueness-split";
@@ -15,7 +14,6 @@ import { AboutCta } from "@/components/sections/about/about-cta";
 import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
 import { getAboutContent } from "@/lib/content/about";
 import { TEAM_MEMBERS } from "@/lib/content/team";
-import { BookService } from "@/server/services/book.service";
 import { ArticleService } from "@/server/services/article.service";
 import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -44,15 +42,7 @@ export default async function AboutPage() {
   const locale = (await getLocale()) as Locale;
   const content = getAboutContent(locale);
 
-  const [stats, latestMedia] = await Promise.all([
-    BookService.getStats().catch(() => ({
-      totalBooks: 0,
-      totalPublishers: 0,
-      totalTranslatedBooks: 0,
-      totalCountries: 0,
-    })),
-    ArticleService.getLatestMedia(3).catch(() => []),
-  ]);
+  const latestMedia = await ArticleService.getLatestMedia(3).catch(() => []);
 
   const teamMembers = TEAM_MEMBERS.filter((m) =>
     content.teamPreview.memberSlugs.includes(m.slug),
@@ -82,8 +72,6 @@ export default async function AboutPage() {
             imagePosition={content.intro.imagePosition}
             locale={locale}
           />
-
-          <AboutStatsBand locale={locale} {...stats} />
 
           <AboutValuesGrid
             locale={locale}

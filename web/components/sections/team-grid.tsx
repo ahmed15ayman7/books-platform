@@ -26,9 +26,9 @@ export function TeamGrid({ members, locale, filter = "all" }: TeamGridProps) {
 
   if (filter !== "all") {
     return (
-      <StaggerContainer className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <StaggerContainer className="flex flex-wrap gap-6 justify-center items-center">
         {filtered.map((member) => (
-          <StaggerItem key={member.slug}>
+          <StaggerItem key={member.slug} className="w-[30%]">
             <TeamMemberCard member={member} locale={locale} featured={filter === "featured"} />
           </StaggerItem>
         ))}
@@ -39,9 +39,9 @@ export function TeamGrid({ members, locale, filter = "all" }: TeamGridProps) {
   return (
     <div className="space-y-10">
       {leadership.length > 0 && (
-        <StaggerContainer className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <StaggerContainer className="flex flex-wrap gap-6 justify-center items-center">
           {leadership.map((member) => (
-            <StaggerItem key={member.slug}>
+            <StaggerItem key={member.slug} className="w-[30%]">
               <TeamMemberCard member={member} locale={locale} featured />
             </StaggerItem>
           ))}
@@ -49,9 +49,9 @@ export function TeamGrid({ members, locale, filter = "all" }: TeamGridProps) {
       )}
 
       {rest.length > 0 && (
-        <StaggerContainer className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <StaggerContainer className="flex flex-wrap gap-6 justify-center items-center">
           {rest.map((member) => (
-            <StaggerItem key={member.slug}>
+            <StaggerItem key={member.slug} className="w-[30%]">
               <TeamMemberCard member={member} locale={locale} />
             </StaggerItem>
           ))}
@@ -77,8 +77,9 @@ function TeamMemberCard({
   return (
     <AnimatedCard>
       <article
+        id={`member-${member.slug}`}
         className={cn(
-          "rounded-2xl border border-[var(--brand-gray-200)] bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md h-full",
+          "scroll-mt-28 rounded-2xl border border-[var(--brand-gray-200)] bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md h-full",
           featured && "ring-1 ring-[var(--brand-red-soft)]",
         )}
       >

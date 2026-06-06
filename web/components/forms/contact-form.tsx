@@ -102,7 +102,7 @@ export function ContactForm({ locale, topics }: ContactFormProps) {
           id="contact-topic"
           value={values.topic}
           onChange={(e) => setValues((p) => ({ ...p, topic: e.target.value }))}
-          className="mt-1 w-full rounded-md border border-[var(--brand-gray-200)] px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-md border border-[var(--brand-gray-200)] bg-white px-3 py-2 text-sm text-[var(--brand-gray-900)]"
         >
           {topics.map((t) => (
             <option key={t.value} value={t.value}>{t.label}</option>

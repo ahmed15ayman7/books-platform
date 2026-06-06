@@ -24,6 +24,7 @@ import {
 } from "@/components/admin/admin-data-grid";
 import { AdminListView } from "@/components/admin/admin-list-view";
 import { adminFieldClass } from "@/components/admin/admin-form-field";
+import { adminDropdownItemClass, adminDropdownPanelClass } from "@/lib/admin/dropdown-styles";
 import {
   Select,
   SelectContent,
@@ -254,9 +255,9 @@ export default function AdminOrdersPage() {
                     <SelectTrigger className={cn(adminFieldClass, "h-8 w-[140px] text-xs")}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="border-[var(--admin-border-strong)] bg-[var(--admin-surface)] text-[var(--admin-text)]">
+                    <SelectContent className={adminDropdownPanelClass}>
                       {["PENDING", "COMPLETED", "REFUNDED", "CANCELLED"].map((s) => (
-                        <SelectItem key={s} value={s} className="text-xs focus:bg-[var(--admin-hover)]">
+                        <SelectItem key={s} value={s} className={cn("text-xs", adminDropdownItemClass)}>
                           {s}
                         </SelectItem>
                       ))}

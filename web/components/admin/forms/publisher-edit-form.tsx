@@ -13,6 +13,8 @@ import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { adminPublisherViewPath } from "@/lib/admin/public-urls";
+import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface PublisherForm {
   name: string;
@@ -53,8 +55,6 @@ export function PublisherEditForm({ locale, id }: PublisherEditFormProps) {
   const [loading, setLoading] = useState(!isNew);
   const draft = useFormDraft(formDraftId.adminPublisher(id), form, setForm, { ready: !loading });
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [timestamps, setTimestamps] = useState<{ createdAt?: string; updatedAt?: string }>({});
 
   const load = useCallback(async () => {
@@ -91,39 +91,49 @@ export function PublisherEditForm({ locale, id }: PublisherEditFormProps) {
     void load();
   }, [load]);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submitPublisher(asDraft = false) {
     if (!form.nameAr.trim() && !form.name.trim()) {
-      setError("أدخل اسم الناشر بالعربية أو الإنجليزية");
+      adminToast.error("أدخل اسم الناشر بالعربية أو الإنجليزية");
       return;
     }
     setSaving(true);
-    setError("");
-    setSuccess(false);
     try {
       const url = isNew ? "/api/v1/admin/publishers" : `/api/v1/admin/publishers/${id}`;
       const res = await fetch(url, {
         method: isNew ? "POST" : "PATCH",
         headers: { ...adminAuthHeaders(), "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          status: asDraft ? "draft" : form.status,
+        }),
       });
       const data = await res.json() as { success: boolean; error?: { message: string }; data?: { id: string } };
       if (!res.ok || !data.success) {
-        setError(data.error?.message ?? "فشل الحفظ");
+        adminToast.error(data.error?.message ?? "فشل الحفظ");
         return;
       }
-      setSuccess(true);
       draft.clearDraft();
+      adminToast.success(asDraft ? "draft" : isNew ? "create" : "update", "الناشر");
       const savedId = isNew ? data.data?.id : id;
       if (savedId && isNew) {
         router.push(adminPublisherViewPath(locale, savedId));
       }
     } catch {
-      setError("حدث خطأ في الاتصال");
+      adminToast.error("حدث خطأ في الاتصال");
     } finally {
       setSaving(false);
     }
   }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await submitPublisher(false);
+  }
+
+  useAdminFormShortcuts({
+    onSave: () => void submitPublisher(false),
+    onSaveDraft: () => void submitPublisher(true),
+  });
 
   const set = (key: keyof PublisherForm) => (v: string | boolean) =>
     setForm((prev) => ({ ...prev, [key]: v }));
@@ -152,7 +162,7 @@ export function PublisherEditForm({ locale, id }: PublisherEditFormProps) {
         />
       )}
 
-      <form onSubmit={handleSubmit} className="max-w-3xl space-y-5">
+      <form onSubmit={handleSubmit} className="max-w-3xl space-y-5" data-admin-save-form>
         <FormDraftNotice
           showBanner={draft.showBanner}
           status={draft.status}
@@ -233,17 +243,6 @@ export function PublisherEditForm({ locale, id }: PublisherEditFormProps) {
             </div>
           </div>
         </AdminCard>
-
-        {error && (
-          <p className="form-error-banner rounded-lg px-4 py-2 text-sm">
-            {error}
-          </p>
-        )}
-        {success && (
-          <p className="rounded-lg bg-[var(--success-soft)] border border-[var(--success)]/30 px-4 py-2 text-sm text-[var(--success)]">
-            تم الحفظ بنجاح
-          </p>
-        )}
 
         <div className="flex gap-3">
           <Button type="submit" disabled={saving}>

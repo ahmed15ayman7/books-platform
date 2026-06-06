@@ -113,7 +113,6 @@ export default async function PublisherDetailPage({
             <SectionBlock
               id="books"
               title={isAr ? `كتب ${displayName}` : `Books by ${displayName}`}
-              lead={`${pagination.total} ${isAr ? "كتاب" : "books"}`}
             >
               {books.length === 0 ? (
                 <div className="py-20 text-center text-[var(--brand-gray-500)]">

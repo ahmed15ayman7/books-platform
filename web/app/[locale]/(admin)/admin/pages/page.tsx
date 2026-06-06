@@ -9,6 +9,7 @@ import { AdminCard } from "@/components/admin/admin-card";
 import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface StaticPage {
   id: string;
@@ -33,8 +34,6 @@ export default function AdminPagesPage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<StaticPage | null>(null);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
 
   const pageDraftValues: StaticPage = editing ?? {
     id: "",
@@ -68,8 +67,6 @@ export default function AdminPagesPage() {
     e.preventDefault();
     if (!editing) return;
     setSaving(true);
-    setError("");
-    setSuccess(false);
     try {
       const res = await fetch(`/api/v1/admin/static-pages/${editing.id}`, {
         method: "PATCH",
@@ -77,11 +74,16 @@ export default function AdminPagesPage() {
         body: JSON.stringify(editing),
       });
       const data = await res.json() as { success: boolean; error?: { message: string } };
-      if (!res.ok || !data.success) { setError(data.error?.message ?? "فشل الحفظ"); return; }
+      if (!res.ok || !data.success) {
+        adminToast.error(data.error?.message ?? "فشل الحفظ");
+        return;
+      }
       draft.clearDraft();
-      setSuccess(true);
+      adminToast.success("save", "الصفحة");
       await load();
-    } catch { setError("حدث خطأ"); }
+    } catch {
+      adminToast.error("حدث خطأ");
+    }
     finally { setSaving(false); }
   }
 
@@ -110,8 +112,6 @@ export default function AdminPagesPage() {
                       bodyEn: "",
                     }
                   );
-                  setSuccess(false);
-                  setError("");
                 }}
                 className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm transition-colors ${
                   editing?.slug === slug
@@ -156,9 +156,6 @@ export default function AdminPagesPage() {
                   />
                 </div>
               </AdminCard>
-
-              {error && <p className="text-sm text-[var(--error)]">{error}</p>}
-              {success && <p className="text-sm text-[var(--success)]">تم الحفظ بنجاح ✓</p>}
 
               <Button type="submit" disabled={saving}>
                 {saving ? "جاري الحفظ..." : "حفظ الصفحة"}

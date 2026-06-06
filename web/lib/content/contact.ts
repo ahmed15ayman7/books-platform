@@ -17,7 +17,9 @@ export interface ContactContent {
   hero: { title: string; subtitle: string };
   channels: {
     email: string;
+    secondaryEmail?: string;
     phone: string;
+    mobile?: string;
     officeHours: string;
   };
   faq: { eyebrow: string; title: string; items: FaqItem[] };
@@ -55,8 +57,8 @@ const faqItems: FaqItem[] = [
     id: "media",
     question: { ar: "كيف أُعرض كتابي فيديو؟", en: "How can my book be featured in video?" },
     answer: {
-      ar: "عبر قناة «شاهد كتابك» — تواصل مع فريق الميديا.",
-      en: "Through the Watch Your Book channel — contact our media team.",
+      ar: "عبر قنوات الميديا — تواصل مع فريق الميديا.",
+      en: "Through our media channels — contact our media team.",
     },
   },
   {
@@ -88,10 +90,12 @@ export function getContactContent(locale: Locale): ContactContent {
     },
     channels: {
       email: "info@booksplatform.net",
-      phone: "+966500000000",
+      secondaryEmail: "atefmazhar@yahoo.com",
+      phone: "+20 2 33460619",
+      mobile: "+20 100 577 2608",
       officeHours: isAr
-        ? "الأحد–الخميس، 9:00–17:00 (توقيت السعودية)"
-        : "Sun–Thu, 9:00 AM–5:00 PM (KSA)",
+        ? "متاح من 10:00 صباحاً إلى 7:00 مساءً"
+        : "Available from 10:00 AM to 7:00 PM",
     },
     faq: {
       eyebrow: isAr ? "أسئلة شائعة" : "FAQ",
@@ -121,7 +125,9 @@ export function getContactContent(locale: Locale): ContactContent {
     })),
     location: {
       title: isAr ? "موقعنا" : "Our Location",
-      body: isAr ? "المقر: المملكة العربية السعودية" : "Headquarters: Kingdom of Saudi Arabia",
+      body: isAr
+        ? "القاهرة، جمهورية مصر العربية"
+        : "Cairo, Arab Republic of Egypt",
     },
     formTopics: [
       { value: "general", label: isAr ? "استفسار عام" : "General" },

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { can } from "@/lib/admin/permissions-client";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface BookDeleteButtonProps {
   bookId: string;
@@ -29,11 +30,9 @@ export function BookDeleteButton({
 
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
 
   function executeDelete() {
-    setError("");
     startTransition(async () => {
       try {
         const res = await fetch(`/api/v1/admin/books/${bookId}`, {
@@ -46,10 +45,11 @@ export function BookDeleteButton({
         };
 
         if (!res.ok || !data.success) {
-          setError(data.error?.message ?? "فشل حذف الكتاب");
+          adminToast.error(data.error?.message ?? "فشل حذف الكتاب");
           return;
         }
 
+        adminToast.success("delete", bookTitle);
         setOpen(false);
         if (isBooksPage) {
           router.refresh();
@@ -58,7 +58,7 @@ export function BookDeleteButton({
         }
         onDeleted?.();
       } catch {
-        setError("حدث خطأ في الاتصال");
+        adminToast.error("حدث خطأ في الاتصال");
       }
     });
   }
@@ -73,10 +73,7 @@ export function BookDeleteButton({
             ? "h-9 w-9 border-[var(--admin-border-strong)] p-0 text-red-400 hover:border-red-800/60 hover:bg-red-950/30"
             : "gap-2 border-[var(--admin-border-strong)] text-red-400 hover:border-red-800/60 hover:bg-red-950/30"
         }
-        onClick={() => {
-          setError("");
-          setOpen(true);
-        }}
+        onClick={() => setOpen(true)}
       >
         <Trash2 className="h-4 w-4" />
         {variant === "text" ? "حذف" : null}
@@ -122,12 +119,6 @@ export function BookDeleteButton({
               <p className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-muted)] px-3 py-2 text-sm font-medium text-[var(--admin-text)]">
                 {bookTitle}
               </p>
-
-              {error && (
-                <p className="text-sm text-red-400" role="alert">
-                  {error}
-                </p>
-              )}
 
               <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                 <Button

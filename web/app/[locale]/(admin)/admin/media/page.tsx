@@ -44,12 +44,11 @@ interface MediaItem {
 }
 
 const mediaChannelLabel: Record<string, string> = {
-  "watch-your-book": "شاهد كتابك",
   "books-talk": "حديث الكتب",
   "novel-story": "رواية فحكاية",
 };
 
-const MEDIA_CHANNELS = ["watch-your-book", "books-talk", "novel-story"];
+const MEDIA_CHANNELS = ["books-talk", "novel-story"];
 
 export default function AdminMediaPage() {
   const params = useParams<{ locale?: string }>();
@@ -176,6 +175,7 @@ export default function AdminMediaPage() {
         src={row.imageUrl}
         alt={row.title}
         fallback={<Video className="h-10 w-10" />}
+        href={adminMediaViewPath(locale, row.id)}
       />
       <AdminGridCardBody>
         <h3 className="line-clamp-2 font-semibold text-[var(--admin-text)]">{row.title}</h3>

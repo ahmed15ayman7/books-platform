@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { notDeleted } from "@/lib/admin/audit-fields";
 import { PAGINATION } from "@/lib/utils/constants";
 import { MEDIA_CHANNELS } from "@/lib/media/youtube";
+import { MEDIA_HOME_CHANNELS } from "@/lib/nav/site-nav";
 import readingTime from "reading-time";
 
 const linkedProductSelect = {
@@ -44,6 +45,7 @@ export interface ArticleFilters {
   limit?: number;
   sort?: "newest" | "oldest";
   featured?: boolean;
+  mediaOnly?: boolean;
 }
 
 export const ArticleService = {
@@ -55,6 +57,7 @@ export const ArticleService = {
       limit = PAGINATION.DEFAULT_PAGE_SIZE,
       sort = "newest",
       featured,
+      mediaOnly,
     } = filters;
 
     const skip = (page - 1) * limit;
@@ -62,7 +65,11 @@ export const ArticleService = {
     const where = {
       status: "publish",
       ...notDeleted,
-      ...(channel && { channel }),
+      ...(mediaOnly && {
+        channel: channel ? channel : { in: [...MEDIA_CHANNELS] },
+        videoId: { not: null },
+      }),
+      ...(channel && !mediaOnly && { channel }),
       ...(categorySlug && { articleCategory: { slug: categorySlug } }),
       ...(featured !== undefined && { isFeatured: featured }),
     };
@@ -112,6 +119,7 @@ export const ArticleService = {
           orderBy: { commentDate: "asc" },
           select: {
             id: true,
+
             authorName: true,
             content: true,
             commentDate: true,
@@ -210,6 +218,46 @@ export const ArticleService = {
     return articles;
   },
 
+  async getMediaHome(limitPerChannel = 5) {
+    const mediaVideoSelect = {
+      id: true,
+      slug: true,
+      title: true,
+      excerpt: true,
+      imageUrl: true,
+      date: true,
+      channel: true,
+      videoId: true,
+      youtubeUrl: true,
+      products: linkedProductSelect,
+    } as const;
+
+    const channelVideos = await Promise.all(
+      MEDIA_HOME_CHANNELS.map((ch) =>
+        db.article.findMany({
+          where: {
+            status: "publish",
+            ...notDeleted,
+            channel: ch.slug,
+            videoId: { not: null },
+          },
+          orderBy: { date: "desc" },
+          take: limitPerChannel,
+          select: mediaVideoSelect,
+        }),
+      ),
+    );
+
+    return MEDIA_HOME_CHANNELS.map((ch, i) => ({
+      channel: {
+        slug: ch.slug,
+        nameAr: ch.labelAr,
+        nameEn: ch.labelEn,
+      },
+      videos: channelVideos[i] ?? [],
+    })).filter((section) => section.videos.length > 0);
+  },
+
   async getLatestMedia(limit = 4) {
     return db.article.findMany({
       where: {
@@ -281,35 +329,60 @@ export const ArticleService = {
   },
 
   async getFeaturedForHome() {
-    const channels = [
-      "harvest",
-      "ideas",
-      "world-reads",
-      "books-talk",
-      "watch-your-book",
-      "novel-story",
-    ];
+    const readingChannels = ["harvest", "ideas", "world-reads"] as const;
+    const mediaChannels = [...MEDIA_CHANNELS];
 
-    const results = await Promise.all(
-      channels.map((channel) =>
-        db.article.findMany({
-          where: { status: "publish", channel, ...notDeleted },
-          orderBy: { date: "desc" },
-          take: 3,
-          select: {
-            id: true,
-            slug: true,
-            title: true,
-            excerpt: true,
-            imageUrl: true,
-            date: true,
-            channel: true,
-            videoId: true,
-            products: linkedProductSelect,
-          },
-        }),
+    const [readingResults, mediaResults] = await Promise.all([
+      Promise.all(
+        readingChannels.map((channel) =>
+          db.article.findMany({
+            where: { status: "publish", channel,imageUrl: { not: null }, ...notDeleted },
+            orderBy: { date: "desc" },
+            take: 24,
+            select: {
+              id: true,
+              slug: true,
+              title: true,
+              excerpt: true,
+              content: true,
+              imageUrl: true,
+              date: true,
+              channel: true,
+              videoId: true,
+              products: linkedProductSelect,
+            },
+          }),
+        ),
       ),
-    );
+      Promise.all(
+        mediaChannels.map((channel) =>
+          db.article.findMany({
+            where: {
+              status: "publish",
+              channel,
+              videoId: { not: null },
+              ...notDeleted,
+            },
+            orderBy: { date: "desc" },
+            take: 3,
+            select: {
+              id: true,
+              slug: true,
+              title: true,
+              excerpt: true,
+              imageUrl: true,
+              date: true,
+              channel: true,
+              videoId: true,
+              products: linkedProductSelect,
+            },
+          }),
+        ),
+      ),
+    ]);
+
+    const channels = [...readingChannels, ...mediaChannels];
+    const results = [...readingResults, ...mediaResults];
 
     return channels.reduce(
       (acc, channel, index) => {

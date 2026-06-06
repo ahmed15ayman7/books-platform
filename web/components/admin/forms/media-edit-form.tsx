@@ -18,6 +18,8 @@ import {
 import { adminMediaViewPath } from "@/lib/admin/public-urls";
 import { ArticleLivePreview } from "@/components/admin/article-live-preview";
 import { ArticleMarkdownHint } from "@/components/admin/article-markdown-hint";
+import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
+import { adminToast } from "@/lib/admin/admin-toast";
 
 interface MediaForm {
   title: string;
@@ -40,7 +42,7 @@ const empty: MediaForm = {
   excerptEn: "",
   body: "",
   bodyEn: "",
-  channel: "watch-your-book",
+  channel: "books-talk",
   status: "draft",
   imageUrl: "",
   youtubeUrl: "",
@@ -48,7 +50,6 @@ const empty: MediaForm = {
 };
 
 const channelOptions = [
-  { value: "watch-your-book", label: "شاهد كتابك" },
   { value: "books-talk", label: "حديث الكتب" },
   { value: "novel-story", label: "رواية فحكاية" },
 ];
@@ -73,8 +74,6 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
   const [selectedBooks, setSelectedBooks] = useState<BookPickerItem[]>([]);
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [timestamps, setTimestamps] = useState<{ createdAt?: string; updatedAt?: string }>({});
 
   const previewVideoId = useMemo(() => parseYoutubeUrl(form.youtubeUrl).videoId, [form.youtubeUrl]);
@@ -97,7 +96,7 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
           excerptEn: String(d.excerptEn ?? ""),
           body: String(d.body ?? d.content ?? ""),
           bodyEn: String(d.bodyEn ?? ""),
-          channel: String(d.channel ?? "watch-your-book"),
+          channel: String(d.channel ?? "books-talk"),
           status: String(d.status ?? "draft"),
           imageUrl: String(d.imageUrl ?? ""),
           youtubeUrl: String(d.youtubeUrl ?? ""),
@@ -120,18 +119,16 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
     void load();
   }, [load]);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submitMedia(asDraft = false) {
     if (!previewVideoId) {
-      setError("رابط YouTube غير صالح");
+      adminToast.error("رابط YouTube غير صالح");
       return;
     }
     setSaving(true);
-    setError("");
-    setSuccess(false);
     try {
       const payload = {
         ...form,
+        status: asDraft ? "draft" : form.status,
         body: form.body,
         bodyEn: form.bodyEn,
         productIds,
@@ -146,20 +143,30 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
       });
       const data = await res.json() as { success: boolean; error?: { message: string }; data?: { id: string } };
       if (!res.ok || !data.success) {
-        setError(data.error?.message ?? "فشل الحفظ");
+        adminToast.error(data.error?.message ?? "فشل الحفظ");
         return;
       }
-      setSuccess(true);
+      adminToast.success(asDraft ? "draft" : isNew ? "create" : "update", "الفيديو");
       const savedId = isNew ? data.data?.id : id;
       if (savedId && isNew) {
         router.push(adminMediaViewPath(locale, savedId));
       }
     } catch {
-      setError("حدث خطأ في الاتصال");
+      adminToast.error("حدث خطأ في الاتصال");
     } finally {
       setSaving(false);
     }
   }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await submitMedia(false);
+  }
+
+  useAdminFormShortcuts({
+    onSave: () => void submitMedia(false),
+    onSaveDraft: () => void submitMedia(true),
+  });
 
   const set =
     (k: keyof MediaForm) =>
@@ -190,7 +197,7 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
         />
       )}
 
-      <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[1fr_360px]">
+      <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[1fr_360px]" data-admin-save-form>
         <div className="space-y-5">
           <AdminCard title="بيانات الفيديو">
             <div className="space-y-4">
@@ -253,17 +260,6 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
               />
             </div>
           </AdminCard>
-
-          {error && (
-            <p className="form-error-banner rounded-lg px-4 py-2 text-sm">
-              {error}
-            </p>
-          )}
-          {success && (
-            <p className="rounded-lg border border-[var(--success)]/30 bg-[var(--success-soft)] px-4 py-2 text-sm text-[var(--success)]">
-              تم الحفظ بنجاح
-            </p>
-          )}
 
           <div className="flex gap-3">
             <Button type="submit" disabled={saving || !previewVideoId}>

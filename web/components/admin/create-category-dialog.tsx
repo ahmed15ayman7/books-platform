@@ -15,6 +15,7 @@ import { AdminSlugInput } from "@/components/admin/admin-form-field";
 import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
+import { adminToast } from "@/lib/admin/admin-toast";
 import type { EntityOption } from "@/components/admin/admin-entity-combobox";
 
 interface CategoryFormState {
@@ -41,7 +42,6 @@ export function CreateCategoryDialog({
   const [form, setForm] = useState<CategoryFormState>(emptyForm);
   const draft = useFormDraft(formDraftId.adminCategoryDialog(), form, setForm, { enabled: open });
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     if (open) {
@@ -51,7 +51,6 @@ export function CreateCategoryDialog({
         nameAr: "",
         slug: seed ? slugify(seed) : "",
       });
-      setError("");
     }
   }, [open, initialName]);
 
@@ -61,15 +60,14 @@ export function CreateCategoryDialog({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    setError("");
     const finalSlug = form.slug.trim() || slugify(form.name);
     if (!form.name.trim()) {
-      setError("الاسم بالإنجليزية مطلوب");
+      adminToast.error("الاسم بالإنجليزية مطلوب");
       setSaving(false);
       return;
     }
     if (!finalSlug) {
-      setError("Slug مطلوب");
+      adminToast.error("Slug مطلوب");
       setSaving(false);
       return;
     }
@@ -90,9 +88,10 @@ export function CreateCategoryDialog({
         error?: { message: string };
       };
       if (!res.ok || !data.success || !data.data) {
-        setError(data.error?.message ?? "فشل إنشاء التصنيف");
+        adminToast.error(data.error?.message ?? "فشل إنشاء التصنيف");
         return;
       }
+      adminToast.success("create", "التصنيف");
       onCreated({
         id: data.data.id,
         name: data.data.name,
@@ -103,7 +102,7 @@ export function CreateCategoryDialog({
       onOpenChange(false);
       setForm(emptyForm);
     } catch {
-      setError("حدث خطأ في الاتصال");
+      adminToast.error("حدث خطأ في الاتصال");
     } finally {
       setSaving(false);
     }
@@ -144,7 +143,6 @@ export function CreateCategoryDialog({
             value={form.slug}
             onChange={(e) => set("slug")(e.target.value)}
           />
-          {error && <p className="text-xs text-[var(--error)]">{error}</p>}
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               إلغاء

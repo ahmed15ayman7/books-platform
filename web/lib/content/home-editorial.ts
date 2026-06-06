@@ -38,7 +38,7 @@ const servicesPreview: { key: string; title: BilingualString; desc: BilingualStr
   {
     key: "av",
     title: { ar: "مرئي", en: "Video" },
-    desc: { ar: "شاهد كتابك على YouTube", en: "Watch Your Book on YouTube" },
+    desc: { ar: "فيديوهات على YouTube", en: "Videos on YouTube" },
   },
   {
     key: "journal",
@@ -64,7 +64,7 @@ export function getHomeEditorial(locale: Locale) {
       })),
     },
     mediaSpotlight: {
-      title: isAr ? "أحدث الفيديوهات" : "Latest Videos",
+      title: isAr ? "إبداعات الميديا" : "Media Creations",
       subtitle: isAr ? "من قنوات الميديا" : "From our media channels",
       cta: isAr ? "كل الفيديوهات" : "All Videos",
     },
@@ -77,6 +77,14 @@ export function getHomeEditorial(locale: Locale) {
         desc: pickLocale(s.desc, locale),
       })),
       cta: isAr ? "كل الخدمات" : "All Services",
+    },
+    publishStrip: {
+      title: isAr ? "انشر كتابك" : "Publish Your Book",
+      description: isAr
+        ? "يتيح هذا القسم من منصة الكتب العالمية مساحة خاصة لإبداعات المؤلفين والباحثين العرب الذين يعولون على طباعة ونشر أعمالهم الأولى غير المنشورة، لعرضها أمام القرّاء والناشرين والمهتمين بالثقافة والمعرفة."
+        : "Books Platform dedicates this space to Arab authors and researchers preparing to print and publish their first unpublished works — giving them visibility among readers, publishers, and the wider knowledge community.",
+      cta: isAr ? "امنح كتابك فرصته الأولى للانتشار" : "Give your book its first chance to reach readers",
+      booksTitle: isAr ? "آخر الكتب المنشورة" : "Latest Published Books",
     },
   };
 }

@@ -6,6 +6,10 @@ import { BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ABOUT_IMAGES } from "@/lib/content/image-assets";
 
+function isRemoteImageUrl(url: string): boolean {
+  return url.startsWith("http://") || url.startsWith("https://");
+}
+
 interface SafeImageProps {
   src: string;
   alt: string;
@@ -15,6 +19,8 @@ interface SafeImageProps {
   className?: string;
   sizes?: string;
   priority?: boolean;
+  quality?: number;
+  unoptimized?: boolean;
   fallbackSrc?: string;
   onFallback?: () => void;
 }
@@ -28,11 +34,16 @@ export function SafeImage({
   className,
   sizes,
   priority,
+  quality,
+  unoptimized,
   fallbackSrc = ABOUT_IMAGES.placeholder,
   onFallback,
 }: SafeImageProps) {
   const [currentSrc, setCurrentSrc] = useState(src);
   const [failed, setFailed] = useState(false);
+  const isRemote = isRemoteImageUrl(currentSrc);
+  const imageUnoptimized = unoptimized ?? isRemote;
+  const imageQuality = quality ?? (isRemote ? 90 : 75);
 
   const handleError = useCallback(() => {
     if (currentSrc !== fallbackSrc) {
@@ -67,6 +78,8 @@ export function SafeImage({
         className={className}
         sizes={sizes}
         priority={priority}
+        quality={imageQuality}
+        unoptimized={imageUnoptimized}
         onError={handleError}
       />
     );
@@ -81,6 +94,8 @@ export function SafeImage({
       className={className}
       sizes={sizes}
       priority={priority}
+      quality={imageQuality}
+      unoptimized={imageUnoptimized}
       onError={handleError}
     />
   );

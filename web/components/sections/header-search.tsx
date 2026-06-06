@@ -1,32 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { modKeyLabel } from "@/lib/search/shortcut-labels";
 
 export function HeaderSearch() {
-  const [query, setQuery] = useState("");
-  const [focused, setFocused] = useState(false);
-  const router = useRouter();
   const params = useParams<{ locale?: string }>();
   const locale = params.locale ?? "ar";
   const isAr = locale === "ar";
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const q = query.trim();
-    if (!q) return;
-    router.push(`/${locale}/books?q=${encodeURIComponent(q)}`);
-  }
+  const href = `/${locale}/search`;
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className={`relative w-full max-w-xl transition-all rounded-2xl duration-[var(--motion-base)] ${
-        focused ? "shadow-[0_0_0_3px_rgba(177,30,46,0.35)]" : "shadow-[var(--shadow-soft)]"
-      }`}
-      role="search"
+    <Link
+      href={href}
+      className="group relative w-full max-w-xl transition-all duration-[var(--motion-base)] rounded-2xl shadow-[var(--shadow-soft)] hover:shadow-[0_0_0_3px_rgba(177,30,46,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]/40"
+      aria-label={isAr ? "بحث في المنصة" : "Search the platform"}
     >
       <div className="flex h-10 items-stretch overflow-hidden rounded-2xl border border-white/15 bg-white/95 shadow-sm">
         <div className="relative flex min-w-0 flex-1 items-center">
@@ -36,28 +25,23 @@ export function HeaderSearch() {
             }`}
             aria-hidden="true"
           />
-          <Input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            placeholder={
-              isAr ? "ابحث عن كتاب، مؤلف، ناشر..." : "Search books, authors, publishers..."
-            }
-            className={`h-full w-full border-0 bg-transparent shadow-none focus-visible:ring-0 text-sm text-[var(--brand-gray-900)] placeholder:text-[var(--brand-gray-400)] ${
+          <span
+            className={`block w-full truncate text-sm text-[var(--brand-gray-400)] ${
               isAr ? "pe-10 ps-4 text-right" : "ps-10 pe-4 text-left"
             }`}
-            aria-label={isAr ? "بحث في الكتب" : "Search books"}
-          />
+          >
+            {isAr ? "ابحث عن كتاب، مقال، ناشر، مؤلف..." : "Search books, articles, publishers, authors..."}
+          </span>
         </div>
-        <button
-          type="submit"
-          className="flex shrink-0 items-center justify-center rounded-e-2xl bg-[var(--brand-red)] px-5 text-sm font-semibold text-white transition-all duration-[var(--motion-base)] hover:scale-[1.02] hover:bg-[var(--brand-red-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/50"
-        >
+        <span className="hidden shrink-0 items-center gap-1.5 border-s border-[var(--brand-gray-200)] bg-[var(--brand-gray-50)] px-3 text-[10px] text-[var(--brand-gray-500)] sm:flex">
+          <kbd className="rounded border border-[var(--brand-gray-200)] bg-white px-1 py-0.5">
+            {modKeyLabel()}K
+          </kbd>
+        </span>
+        <span className="flex shrink-0 items-center justify-center rounded-e-2xl bg-[var(--brand-red)] px-5 text-sm font-semibold text-white transition-all duration-[var(--motion-base)] group-hover:bg-[var(--brand-red-hover)]">
           {isAr ? "بحث" : "Search"}
-        </button>
+        </span>
       </div>
-    </form>
+    </Link>
   );
 }

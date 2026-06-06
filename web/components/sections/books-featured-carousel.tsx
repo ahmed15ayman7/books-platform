@@ -93,7 +93,7 @@ export function BooksFeaturedCarousel({ books, locale }: BooksFeaturedCarouselPr
     <EmblaShowcase
       locale={locale}
       ariaLabel={isAr ? "كتب مميزة" : "Featured books"}
-      autoplayMs={6000}
+      pageOrder={0}
       slideClassName="min-w-0 shrink-0 grow-0 basis-full px-1"
       className="px-2"
     >

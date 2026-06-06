@@ -2,7 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Loader2, CheckCircle2, AlertCircle, ExternalLink } from "lucide-react";
+import { Save, Loader2 } from "lucide-react";
+import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
+import { adminToast } from "@/lib/admin/admin-toast";
 import { createBook, updateBook, type BookEditData } from "./actions";
 import { adminFieldClass } from "@/components/admin/admin-form-field";
 import { AdminMarkdownHint } from "@/components/admin/admin-markdown-hint";
@@ -27,6 +29,7 @@ import { cn } from "@/lib/utils";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
+import { adminDropdownItemClass, adminDropdownPanelClass } from "@/lib/admin/dropdown-styles";
 
 /* ─── Types ─────────────────────────────────────────────────────────── */
 interface Publisher  { id: string; title: string; name: string; nameAr?: string | null; slug: string }
@@ -88,7 +91,7 @@ function BookSelect({
       <SelectTrigger id={id} className={fieldCls}>
         <SelectValue placeholder={placeholder ?? "اختر..."} />
       </SelectTrigger>
-      <SelectContent className="border-[var(--admin-border-strong)] bg-[var(--admin-surface)] text-[var(--admin-text)]">
+      <SelectContent className={adminDropdownPanelClass}>
         {children}
       </SelectContent>
     </Select>
@@ -149,9 +152,6 @@ export function BookEditForm({
   const router = useRouter();
   const isCreate = !bookId;
   const [isPending, startTransition] = useTransition();
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const [errorMsg, setErrorMsg] = useState("");
-  const [savedPublicSlug, setSavedPublicSlug] = useState<string | null>(null);
 
   const [form, setForm] = useState<BookEditData>(initial);
   const draft = useFormDraft(formDraftId.adminBook(bookId), form, setForm);
@@ -207,24 +207,17 @@ export function BookEditForm({
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setStatus("idle");
-    setErrorMsg("");
-    setSavedPublicSlug(null);
-
+  function submitBook(asDraft = false) {
     const nameEn = form.nameEn.trim();
     const nameAr = form.nameAr.trim();
     const slug = form.slug.trim() || slugify(form.nameEn) || slugify(form.nameAr);
 
     if (!nameEn && !nameAr) {
-      setStatus("error");
-      setErrorMsg("الاسم بالعربية أو الإنجليزية مطلوب");
+      adminToast.error("الاسم بالعربية أو الإنجليزية مطلوب");
       return;
     }
     if (!slug) {
-      setStatus("error");
-      setErrorMsg("الرابط المختصر (Slug) مطلوب");
+      adminToast.error("الرابط المختصر (Slug) مطلوب");
       return;
     }
 
@@ -232,33 +225,41 @@ export function BookEditForm({
       ...form,
       nameEn: nameEn || nameAr,
       slug,
+      published: asDraft ? false : form.published,
     };
 
     startTransition(async () => {
       if (bookId) {
         const result = await updateBook(bookId, payload);
         if (!result.ok) {
-          setStatus("error");
-          setErrorMsg(result.error);
+          adminToast.error(result.error);
           return;
         }
         draft.clearDraft();
-        setSavedPublicSlug(slug);
-        setStatus("success");
-        setTimeout(() => setStatus("idle"), 8000);
+        if (asDraft) {
+          adminToast.success("draft", "الكتاب");
+        } else {
+          adminToast.success(isCreate ? "create" : "update", "الكتاب", {
+            description: `/${locale}/books/${slug}`,
+            action: {
+              label: "عرض",
+              onClick: () => window.open(`/${locale}/books/${slug}`, "_blank"),
+            },
+          });
+        }
         return;
       }
 
       const result = await createBook(payload);
       if (!result.ok) {
-        setStatus("error");
-        setErrorMsg(result.error);
+        adminToast.error(result.error);
         return;
       }
       if (result.id) {
         draft.clearDraft();
-        setSavedPublicSlug(result.slug ?? slug);
-        setStatus("success");
+        adminToast.success("create", "الكتاب", {
+          description: `/${locale}/books/${result.slug ?? slug}`,
+        });
         setTimeout(() => {
           router.push(`/${locale}/admin/books/${result.id}`);
         }, 4000);
@@ -266,11 +267,18 @@ export function BookEditForm({
     });
   }
 
-  const successMessage = isCreate ? "تم إنشاء الكتاب بنجاح" : "تم حفظ التغييرات بنجاح";
-  const publicSlug = savedPublicSlug ?? bookSlug ?? (form.slug.trim() || null);
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    submitBook(false);
+  }
+
+  useAdminFormShortcuts({
+    onSave: () => submitBook(false),
+    onSaveDraft: () => submitBook(true),
+  });
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6" dir="rtl">
+    <form onSubmit={handleSubmit} className="space-y-6" dir="rtl" data-admin-save-form>
       <FormDraftNotice
         showBanner={draft.showBanner}
         status={draft.status}
@@ -352,7 +360,7 @@ export function BookEditForm({
             onValueChange={(v) => set("language", v)}
             placeholder="— اختر اللغة —"
           >
-            <SelectItem value="_empty" className="focus:bg-[var(--admin-hover)]">
+            <SelectItem value="_empty" className={adminDropdownItemClass}>
               — اختر اللغة —
             </SelectItem>
             {(
@@ -372,7 +380,7 @@ export function BookEditForm({
                 ["ur", "الأردية"],
               ] as [string, string][]
             ).map(([code, name]) => (
-              <SelectItem key={code} value={code} className="focus:bg-[var(--admin-hover)]">
+              <SelectItem key={code} value={code} className={adminDropdownItemClass}>
                 {name} ({code.toUpperCase()})
               </SelectItem>
             ))}
@@ -418,9 +426,9 @@ export function BookEditForm({
             value={form.translationStatus}
             onValueChange={(v) => set("translationStatus", v)}
           >
-            <SelectItem value="NOT_TRANSLATED" className="focus:bg-[var(--admin-hover)]">غير مترجم</SelectItem>
-            <SelectItem value="NOMINATED" className="focus:bg-[var(--admin-hover)]">مرشح للترجمة</SelectItem>
-            <SelectItem value="TRANSLATED" className="focus:bg-[var(--admin-hover)]">مترجم</SelectItem>
+            <SelectItem value="NOT_TRANSLATED" className={adminDropdownItemClass}>غير مترجم</SelectItem>
+            <SelectItem value="NOMINATED" className={adminDropdownItemClass}>مرشح للترجمة</SelectItem>
+            <SelectItem value="TRANSLATED" className={adminDropdownItemClass}>مترجم</SelectItem>
           </BookSelect>
         </Field>
       </SectionCard>
@@ -512,9 +520,9 @@ export function BookEditForm({
             value={form.purchaseOption}
             onValueChange={(v) => set("purchaseOption", v)}
           >
-            <SelectItem value="NOT_AVAILABLE" className="focus:bg-[var(--admin-hover)]">غير متاح للشراء</SelectItem>
-            <SelectItem value="DIRECT" className="focus:bg-[var(--admin-hover)]">شراء مباشر</SelectItem>
-            <SelectItem value="REFERRAL" className="focus:bg-[var(--admin-hover)]">رابط إحالة</SelectItem>
+            <SelectItem value="NOT_AVAILABLE" className={adminDropdownItemClass}>غير متاح للشراء</SelectItem>
+            <SelectItem value="DIRECT" className={adminDropdownItemClass}>شراء مباشر</SelectItem>
+            <SelectItem value="REFERRAL" className={adminDropdownItemClass}>رابط إحالة</SelectItem>
           </BookSelect>
         </Field>
 
@@ -522,7 +530,7 @@ export function BookEditForm({
           <FieldLabel htmlFor="currency">العملة</FieldLabel>
           <BookSelect id="currency" value={form.currency} onValueChange={(v) => set("currency", v)}>
             {["USD","EUR","GBP","SAR","AED","EGP","KWD","BHD","QAR","OMR","JOD"].map((c) => (
-              <SelectItem key={c} value={c} className="focus:bg-[var(--admin-hover)]">
+              <SelectItem key={c} value={c} className={adminDropdownItemClass}>
                 {c}
               </SelectItem>
             ))}
@@ -592,40 +600,6 @@ export function BookEditForm({
           </Field>
         </div>
       </div>
-
-      {/* ── Status (أسفل النموذج) ─────────────────────────────────── */}
-      {status === "success" && (
-        <div
-          role="status"
-          className="rounded-xl border border-green-800/50 bg-green-950/40 px-4 py-3 text-sm text-green-400"
-        >
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 shrink-0" />
-            {successMessage}
-          </div>
-          {publicSlug && (
-            <a
-              href={`/${locale}/books/${publicSlug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 inline-flex items-center gap-1.5 text-[var(--brand-red)] hover:underline"
-              dir="ltr"
-            >
-              <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-              /{locale}/books/{publicSlug}
-            </a>
-          )}
-        </div>
-      )}
-      {status === "error" && (
-        <div
-          role="alert"
-          className="flex items-center gap-2 rounded-xl border border-red-800/50 bg-red-950/40 px-4 py-3 text-sm text-red-400"
-        >
-          <AlertCircle className="h-4 w-4 shrink-0" />
-          {errorMsg}
-        </div>
-      )}
 
       {/* ── Save bar ─────────────────────────────────────────────── */}
       <div className="sticky bottom-0 flex items-center justify-between gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-5 py-3 shadow-lg">

@@ -32,6 +32,7 @@ import {
   adminUpdatedAtColumn,
 } from "@/components/admin/admin-timestamps";
 import { formatAdminDateTime } from "@/lib/admin/format-dates";
+import { adminBookViewPath } from "@/lib/admin/public-urls";
 
 interface AdminBook {
   id: string;
@@ -183,7 +184,11 @@ export default function AdminBooksPage() {
 
   const renderCard = (row: AdminBook) => (
     <AdminGridCard>
-      <AdminGridCardMedia src={row.imageUrl} alt={row.nameAr ?? row.nameEn} />
+      <AdminGridCardMedia
+        src={row.imageUrl}
+        alt={row.nameAr ?? row.nameEn}
+        href={adminBookViewPath(locale, row.id)}
+      />
       <AdminGridCardBody>
         <h3 className="line-clamp-2 font-semibold text-[var(--admin-text)]">
           {row.nameAr ?? row.nameEn}

@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useParams } from "next/navigation";
 import Link from "next/link";
-import { Bell, ChevronRight, Home } from "lucide-react";
+import { Bell, ChevronRight, Home, Search } from "lucide-react";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
+import { useAdminChrome } from "@/lib/admin/admin-chrome-context";
+import { modKeyLabel } from "@/lib/search/shortcut-labels";
 import { AdminHubLinks } from "@/components/admin/admin-hub-links";
 
 const routeLabels: Record<string, string> = {
@@ -64,6 +66,7 @@ export function AdminTopbar() {
   const pathname = usePathname();
   const params = useParams<{ locale?: string }>();
   const locale = params.locale ?? "ar";
+  const { openSearch } = useAdminChrome();
   const [bookSlugs, setBookSlugs] = useState<Record<string, string>>({});
 
   const segments = pathname.split("/").filter(Boolean);
@@ -127,6 +130,26 @@ export function AdminTopbar() {
       </nav>
 
       <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={openSearch}
+          className="hidden items-center gap-2 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface-muted)] px-3 py-1.5 text-xs text-[var(--admin-text-subtle)] transition-colors hover:border-[var(--admin-border-strong)] hover:text-[var(--admin-text)] sm:flex"
+          aria-label="بحث لوحة التحكم"
+        >
+          <Search className="h-3.5 w-3.5" />
+          <span>بحث...</span>
+          <kbd className="rounded border border-[var(--admin-border)] bg-[var(--admin-surface)] px-1 py-0.5 text-[10px]">
+            {modKeyLabel()}K
+          </kbd>
+        </button>
+        <button
+          type="button"
+          onClick={openSearch}
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--admin-text-muted)] transition-colors hover:bg-[var(--admin-hover)] hover:text-[var(--admin-accent)] sm:hidden"
+          aria-label="بحث"
+        >
+          <Search className="h-4 w-4" />
+        </button>
         <AdminHubLinks />
         <button
           type="button"
