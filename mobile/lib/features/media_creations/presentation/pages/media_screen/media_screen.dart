@@ -2,31 +2,32 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../../core/router/app_routes.dart';
-import '../../../../../core/router/args/article_detail_args.dart';
-import '../../../../../core/theme/app_colors.dart';
-import '../../../../../core/widgets/app_bar_widget.dart';
-import '../../../../../core/widgets/bottom_nav_widget.dart';
-import '../../../../../core/widgets/error_state_widget.dart';
-import '../../cubit/articles_list_cubit/articles_list_cubit.dart';
-import '../../cubit/articles_list_cubit/articles_list_state.dart';
-import 'articles_body.dart';
-import 'articles_shimmer.dart';
+import 'package:booksplatform/core/router/app_routes.dart';
+import 'package:booksplatform/core/router/args/article_detail_args.dart';
+import 'package:booksplatform/core/theme/app_colors.dart';
+import 'package:booksplatform/core/widgets/app_bar_widget.dart';
+import 'package:booksplatform/core/widgets/bottom_nav_widget.dart';
+import 'package:booksplatform/core/widgets/error_state_widget.dart';
 
-class ArticlesScreen extends StatefulWidget {
-  const ArticlesScreen({super.key});
+import '../../cubit/media_list_cubit/media_list_cubit.dart';
+import '../../cubit/media_list_cubit/media_list_state.dart';
+import 'media_body.dart';
+import 'media_shimmer.dart';
+
+class MediaScreen extends StatefulWidget {
+  const MediaScreen({super.key});
 
   @override
-  State<ArticlesScreen> createState() => _ArticlesScreenState();
+  State<MediaScreen> createState() => _MediaScreenState();
 }
 
-class _ArticlesScreenState extends State<ArticlesScreen> {
+class _MediaScreenState extends State<MediaScreen> {
   late final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    context.read<ArticlesListCubit>().load();
+    context.read<MediaListCubit>().load();
     _scrollController.addListener(_onScroll);
   }
 
@@ -40,7 +41,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     if (!_scrollController.hasClients) return;
     final position = _scrollController.position;
     if (position.pixels >= position.maxScrollExtent - 300) {
-      context.read<ArticlesListCubit>().loadMore();
+      context.read<MediaListCubit>().loadMore();
     }
   }
 
@@ -53,49 +54,48 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
         children: [
           AppBarWidget(
             variant: AppBarVariant.title,
-            title: 'articles.title'.tr(),
+            title: 'media.title'.tr(),
             currentLocale: locale,
             onCart: () => Navigator.of(context).pushNamed(AppRoutes.cart),
             onLocaleChanged: (l) => context.setLocale(Locale(l)),
           ),
           Expanded(
-            child: BlocBuilder<ArticlesListCubit, ArticlesListState>(
+            child: BlocBuilder<MediaListCubit, MediaListState>(
               builder: (ctx, state) {
                 return AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
                   child: switch (state) {
-                    ArticlesListLoading() =>
-                      const ArticlesShimmer(key: ValueKey('loading')),
-                    ArticlesListError(:final message) => Center(
+                    MediaListLoading() =>
+                      const MediaShimmer(key: ValueKey('loading')),
+                    MediaListError(:final message) => Center(
                         key: const ValueKey('error'),
                         child: ErrorStateWidget(
                           message: message,
-                          onRetry: () =>
-                              ctx.read<ArticlesListCubit>().load(),
+                          onRetry: () => ctx.read<MediaListCubit>().load(),
                         ),
                       ),
-                    ArticlesListSuccess(
-                      :final articles,
+                    MediaListSuccess(
+                      :final items,
                       :final activeSlug,
                       :final hasNextPage,
                     ) =>
-                      ArticlesBody(
+                      MediaBody(
                         key: const ValueKey('success'),
-                        categories: ArticlesListCubit.channels,
-                        articles: articles,
+                        items: items,
                         activeSlug: activeSlug,
                         hasNextPage: hasNextPage,
                         locale: locale,
                         scrollController: _scrollController,
-                        onCategoryTap: (slug) =>
-                            ctx.read<ArticlesListCubit>().switchCategory(slug),
-                        onArticleTap: (a) => Navigator.of(ctx).pushNamed(
+                        onChannelTap: (slug) =>
+                            ctx.read<MediaListCubit>().switchChannel(slug),
+                        onItemTap: (item) => Navigator.of(ctx).pushNamed(
                           AppRoutes.articleDetail,
-                          arguments:
-                              ArticleDetailArgs(id: a.slug, title: a.title),
+                          arguments: ArticleDetailArgs(
+                            id: item.slug,
+                            title: item.title,
+                          ),
                         ),
-                        onRefresh: () =>
-                            ctx.read<ArticlesListCubit>().refresh(),
+                        onRefresh: () => ctx.read<MediaListCubit>().refresh(),
                       ),
                     _ => const SizedBox.shrink(key: ValueKey('initial')),
                   },
@@ -104,7 +104,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
             ),
           ),
           BottomNavWidget(
-            activeTab: BottomNavTab.articles,
+            activeTab: BottomNavTab.media,
             onTabSelected: (tab) => _onTabSelected(context, tab),
             onPublishTap: () =>
                 Navigator.of(context).pushNamed(AppRoutes.publish),
@@ -122,9 +122,9 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
       case BottomNavTab.books:
         Navigator.of(context).pushReplacementNamed(AppRoutes.books);
       case BottomNavTab.articles:
-        break;
+        Navigator.of(context).pushReplacementNamed(AppRoutes.articles);
       case BottomNavTab.media:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.media);
+        break;
       case BottomNavTab.publishers:
         Navigator.of(context).pushReplacementNamed(AppRoutes.publishers);
     }

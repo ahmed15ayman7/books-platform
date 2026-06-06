@@ -42,6 +42,14 @@ import 'package:booksplatform/features/books/presentation/cubit/home_content_cub
     as _i765;
 import 'package:booksplatform/features/cart/presentation/cubit/cart_cubit.dart'
     as _i309;
+import 'package:booksplatform/features/media_creations/data/datasources/media_remote_data_source_impl.dart'
+    as _i417;
+import 'package:booksplatform/features/media_creations/data/repositories/media_repository_impl.dart'
+    as _i575;
+import 'package:booksplatform/features/media_creations/domain/repositories/base_media_repository.dart'
+    as _i761;
+import 'package:booksplatform/features/media_creations/presentation/cubit/media_list_cubit/media_list_cubit.dart'
+    as _i699;
 import 'package:booksplatform/features/newsletter/data/datasources/newsletter_remote_data_source.dart'
     as _i684;
 import 'package:booksplatform/features/newsletter/data/repositories/newsletter_repository_impl.dart'
@@ -185,6 +193,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i481.BooksRemoteDataSourceImpl>(
       () => _i481.BooksRemoteDataSourceImpl(gh<_i473.ApiManager>()),
     );
+    gh.lazySingleton<_i417.MediaRemoteDataSourceImpl>(
+      () => _i417.MediaRemoteDataSourceImpl(gh<_i473.ApiManager>()),
+    );
     gh.lazySingleton<_i684.NewsletterRemoteDataSource>(
       () => _i684.NewsletterRemoteDataSource(gh<_i473.ApiManager>()),
     );
@@ -231,6 +242,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i365.PublishersRemoteDataSourceImpl>(),
       ),
     );
+    gh.lazySingleton<_i761.MediaRepository>(
+      () => _i575.MediaRepositoryImpl(gh<_i417.MediaRemoteDataSourceImpl>()),
+    );
     gh.factory<_i556.ArticlesListCubit>(
       () => _i556.ArticlesListCubit(gh<_i657.ArticlesRepository>()),
     );
@@ -244,6 +258,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i1073.SearchCubit>(
       () => _i1073.SearchCubit(gh<_i1067.SearchRepository>()),
+    );
+    gh.factory<_i699.MediaListCubit>(
+      () => _i699.MediaListCubit(gh<_i761.MediaRepository>()),
     );
     gh.factory<_i935.PublishersListCubit>(
       () => _i935.PublishersListCubit(gh<_i674.PublishersRepository>()),

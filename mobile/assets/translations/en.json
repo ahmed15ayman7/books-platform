@@ -269,5 +269,13 @@
 
   "ai_disclosure": "This content was generated with the assistance of artificial intelligence.",
 
-  "see_all": "See All"
+  "see_all": "See All",
+
+  "media": {
+    "title": "Media Creations",
+    "books_talk": "Book Talk",
+    "novel_story": "Novel & Story",
+    "all": "All",
+    "empty": "No content yet"
+  }
 }

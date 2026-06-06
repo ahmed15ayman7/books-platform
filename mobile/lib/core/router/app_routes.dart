@@ -10,6 +10,7 @@ class AppRoutes {
   static const String home = '/home';
   static const String books = '/books';
   static const String articles = '/articles';
+  static const String media = '/media';
   static const String publishers = '/publishers';
 
   // Detail screens

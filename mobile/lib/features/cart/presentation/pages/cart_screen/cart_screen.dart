@@ -72,6 +72,8 @@ class CartScreen extends StatelessWidget {
         Navigator.of(context).pushReplacementNamed(AppRoutes.books);
       case BottomNavTab.articles:
         Navigator.of(context).pushReplacementNamed(AppRoutes.articles);
+      case BottomNavTab.media:
+        Navigator.of(context).pushReplacementNamed(AppRoutes.media);
       case BottomNavTab.publishers:
         Navigator.of(context).pushReplacementNamed(AppRoutes.publishers);
     }

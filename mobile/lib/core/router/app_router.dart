@@ -5,6 +5,8 @@ import '../../features/articles/presentation/cubit/article_detail_cubit/article_
 import '../../features/articles/presentation/cubit/articles_list_cubit/articles_list_cubit.dart';
 import '../../features/articles/presentation/pages/article_detail_screen/article_detail_screen.dart';
 import '../../features/articles/presentation/pages/articles_screen/articles_screen.dart';
+import '../../features/media_creations/presentation/cubit/media_list_cubit/media_list_cubit.dart';
+import '../../features/media_creations/presentation/pages/media_screen/media_screen.dart';
 import '../../features/books/presentation/cubit/book_detail_cubit/book_detail_cubit.dart';
 import '../../features/books/presentation/cubit/catalog_cubit/catalog_cubit.dart';
 import '../../features/books/presentation/cubit/home_content_cubit/home_content_cubit.dart';
@@ -118,6 +120,15 @@ class AppRouter {
           builder: (_) => BlocProvider(
             create: (_) => getIt<ArticlesListCubit>(),
             child: const ArticlesScreen(),
+          ),
+        );
+
+      case AppRoutes.media:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider(
+            create: (_) => getIt<MediaListCubit>(),
+            child: const MediaScreen(),
           ),
         );
 
