@@ -73,7 +73,7 @@ export default async function HomePage() {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("home");
 
-  const [homeBooks, articlesMap, dbSlides, categories, articleCategories, mediaNovel, mediaBooksTalk] =
+  const [homeBooks, articlesMap, dbSlides, categories, mediaNovel, mediaBooksTalk] =
     await Promise.all([
     BookService.getHomeData().catch(() => ({
       newlyReleased: [],
@@ -86,7 +86,6 @@ export default async function HomePage() {
     ArticleService.getFeaturedForHome().catch(() => ({})),
     HeroSlideService.listActive().catch(() => []),
     BookService.getCategories().catch(() => []),
-    ArticleService.getCategories().catch(() => []),
     ArticleService.list({ page: 1, limit: 5, mediaOnly: true, channel: "novel-story", sort: "newest" }).catch(
       () => ({ articles: [] }),
     ),

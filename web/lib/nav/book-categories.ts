@@ -21,5 +21,5 @@ export const BOOK_CATEGORY_LABELS_EN: Record<BookCategoryLabelAr, string> = {
   "أديان وعقائد": "Religions & Beliefs",
   "اقتصاد وتنمية": "Economy & Development",
   "أفكار وسياسات": "Ideas & Politics",
-  "اخري":"Other"
+  "اخرى": "Other",
 };
