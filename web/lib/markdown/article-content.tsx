@@ -76,8 +76,8 @@ function InlineArticleImage({
     <figure className={cn("my-6 w-full text-center", compact && "my-4")}>
       <div
         className={cn(
-          "relative mx-auto overflow-hidden rounded-2xl border border-[var(--brand-gray-200)] bg-[var(--brand-gray-50)] shadow-[var(--shadow-soft)]",
-          compact ? "max-w-md" : "max-w-2xl",
+          "relative mx-auto overflow-hidden rounded-lg border border-[var(--brand-gray-200)] bg-[var(--brand-gray-50)]",
+          compact ? "max-w-[min(100%,420px)]" : "max-w-[min(100%,520px)]",
         )}
       >
         {!failed ? (
@@ -115,45 +115,31 @@ export function ArticleContent({ content, className }: ArticleContentProps) {
   if (blocks.length === 0) return null;
 
   return (
-    <article className={cn("article-prose prose-brand space-y-4", className)} dir="auto">
+    <article className={cn("article-prose prose-brand space-y-5", className)}>
       {blocks.map((block, index) => {
         switch (block.type) {
           case "heading": {
             const inner = inlineFormat(block.text);
-            if (block.level === 1) {
-              return (
-                <h2
-                  key={index}
-                  className="mt-8 mb-3 font-display text-2xl font-bold text-[var(--brand-red)] first:mt-0 md:text-3xl"
-                >
-                  {inner}
-                </h2>
-              );
-            }
-            if (block.level === 2) {
-              return (
-                <h3
-                  key={index}
-                  className="mt-6 mb-2 text-xl font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-2xl"
-                >
-                  {inner}
-                </h3>
-              );
-            }
+            const headingClass: Record<number, string> = {
+              1: "mt-10 mb-4 font-display text-3xl font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-4xl",
+              2: "mt-8 mb-3 font-display text-2xl font-bold text-[var(--brand-red)] first:mt-0 md:text-3xl",
+              3: "mt-7 mb-3 text-xl font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-2xl",
+              4: "mt-6 mb-2 text-lg font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-xl",
+              5: "mt-5 mb-2 text-base font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-lg",
+              6: "mt-4 mb-2 text-sm font-bold uppercase tracking-wide text-[var(--brand-gray-700)] first:mt-0",
+            };
+            const Tag = (`h${Math.min(block.level, 6)}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6");
             return (
-              <h4
-                key={index}
-                className="mt-4 mb-2 text-lg font-semibold text-[var(--brand-gray-900)] md:text-xl"
-              >
+              <Tag key={index} className={headingClass[block.level] ?? headingClass[4]}>
                 {inner}
-              </h4>
+              </Tag>
             );
           }
           case "paragraph":
             return (
               <p
                 key={index}
-                className="text-base leading-[1.85] text-[var(--brand-gray-700)] md:text-lg"
+                className="text-base leading-[1.9] text-[var(--brand-gray-800)] md:text-[17px]"
               >
                 {inlineFormat(block.text)}
               </p>

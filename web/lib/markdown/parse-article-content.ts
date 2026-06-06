@@ -1,7 +1,7 @@
 import { isImageUrl } from "./is-image-url";
 
 export type ArticleContentBlock =
-  | { type: "heading"; level: 1 | 2 | 3; text: string }
+  | { type: "heading"; level: 1 | 2 | 3 | 4 | 5 | 6; text: string }
   | { type: "paragraph"; text: string }
   | { type: "list"; items: string[] }
   | { type: "image"; src: string; alt: string; caption?: string }
@@ -9,7 +9,7 @@ export type ArticleContentBlock =
 
 const MD_IMAGE = /^!\[([^\]]*)\]\(([^)]+)\)\s*$/;
 const MD_LINK = /^\[([^\]]*)\]\(([^)]+)\)\s*$/;
-const MD_HEADING = /^(#{1,3})\s+(.+)$/;
+const MD_HEADING = /^(#{1,6})\s+(.+)$/;
 
 /** Normalize WordPress/HTML snippets into markdown-friendly text before parsing. */
 export function htmlToArticleSource(html: string): string {
@@ -34,7 +34,9 @@ export function htmlToArticleSource(html: string): string {
   out = out.replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, (_, t: string) => `\n\n# ${stripInnerHtml(t)}\n\n`);
   out = out.replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, (_, t: string) => `\n\n## ${stripInnerHtml(t)}\n\n`);
   out = out.replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi, (_, t: string) => `\n\n### ${stripInnerHtml(t)}\n\n`);
-  out = out.replace(/<h[4-6][^>]*>([\s\S]*?)<\/h[4-6]>/gi, (_, t: string) => `\n\n### ${stripInnerHtml(t)}\n\n`);
+  out = out.replace(/<h4[^>]*>([\s\S]*?)<\/h4>/gi, (_, t: string) => `\n\n#### ${stripInnerHtml(t)}\n\n`);
+  out = out.replace(/<h5[^>]*>([\s\S]*?)<\/h5>/gi, (_, t: string) => `\n\n##### ${stripInnerHtml(t)}\n\n`);
+  out = out.replace(/<h6[^>]*>([\s\S]*?)<\/h6>/gi, (_, t: string) => `\n\n###### ${stripInnerHtml(t)}\n\n`);
 
   out = out.replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, (_, t: string) => `**${stripInnerHtml(t)}**`);
   out = out.replace(/<b[^>]*>([\s\S]*?)<\/b>/gi, (_, t: string) => `**${stripInnerHtml(t)}**`);
@@ -97,7 +99,7 @@ function parseLineBlock(line: string): ArticleContentBlock | null {
 
   const heading = MD_HEADING.exec(trimmed);
   if (heading) {
-    const level = heading[1]!.length as 1 | 2 | 3;
+    const level = Math.min(heading[1]!.length, 6) as 1 | 2 | 3 | 4 | 5 | 6;
     return { type: "heading", level, text: heading[2]!.trim() };
   }
 

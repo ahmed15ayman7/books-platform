@@ -86,10 +86,10 @@ export default async function HomePage() {
     ArticleService.getFeaturedForHome().catch(() => ({})),
     HeroSlideService.listActive().catch(() => []),
     BookService.getCategories().catch(() => []),
-    ArticleService.list({ page: 1, limit: 5, mediaOnly: true, channel: "novel-story", sort: "newest" }).catch(
+    ArticleService.list({ page: 1, limit: 10, mediaOnly: true, channel: "novel-story", sort: "newest" }).catch(
       () => ({ articles: [] }),
     ),
-    ArticleService.list({ page: 1, limit: 5, mediaOnly: true, channel: "books-talk", sort: "newest" }).catch(
+    ArticleService.list({ page: 1, limit: 10, mediaOnly: true, channel: "books-talk", sort: "newest" }).catch(
       () => ({ articles: [] }),
     ),
   ]);
