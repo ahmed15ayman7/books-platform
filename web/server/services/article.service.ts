@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { notDeleted } from "@/lib/admin/audit-fields";
 import { PAGINATION } from "@/lib/utils/constants";
 import { MEDIA_CHANNELS } from "@/lib/media/youtube";
+import { MEDIA_HOME_CHANNELS } from "@/lib/nav/site-nav";
 import readingTime from "reading-time";
 
 const linkedProductSelect = {
@@ -118,6 +119,7 @@ export const ArticleService = {
           orderBy: { commentDate: "asc" },
           select: {
             id: true,
+
             authorName: true,
             content: true,
             commentDate: true,
@@ -214,6 +216,46 @@ export const ArticleService = {
     });
 
     return articles;
+  },
+
+  async getMediaHome(limitPerChannel = 5) {
+    const mediaVideoSelect = {
+      id: true,
+      slug: true,
+      title: true,
+      excerpt: true,
+      imageUrl: true,
+      date: true,
+      channel: true,
+      videoId: true,
+      youtubeUrl: true,
+      products: linkedProductSelect,
+    } as const;
+
+    const channelVideos = await Promise.all(
+      MEDIA_HOME_CHANNELS.map((ch) =>
+        db.article.findMany({
+          where: {
+            status: "publish",
+            ...notDeleted,
+            channel: ch.slug,
+            videoId: { not: null },
+          },
+          orderBy: { date: "desc" },
+          take: limitPerChannel,
+          select: mediaVideoSelect,
+        }),
+      ),
+    );
+
+    return MEDIA_HOME_CHANNELS.map((ch, i) => ({
+      channel: {
+        slug: ch.slug,
+        nameAr: ch.labelAr,
+        nameEn: ch.labelEn,
+      },
+      videos: channelVideos[i] ?? [],
+    })).filter((section) => section.videos.length > 0);
   },
 
   async getLatestMedia(limit = 4) {

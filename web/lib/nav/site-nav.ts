@@ -29,6 +29,12 @@ export const MEDIA_CHANNELS = [
   { slug: "novel-story", labelAr: "رواية فحكاية", labelEn: "Novel & Story" },
 ] as const;
 
+/** Homepage media spotlight order (novel-story before books-talk). */
+export const MEDIA_HOME_CHANNELS = [
+  { slug: "novel-story", labelAr: "رواية فحكاية", labelEn: "Novel & Story" },
+  { slug: "books-talk", labelAr: "حديث الكتب", labelEn: "Books Talk" },
+] as const;
+
 export function bookCategoryLabel(labelAr: BookCategoryLabelAr, locale: string): string {
   return locale === "ar" ? labelAr : BOOK_CATEGORY_LABELS_EN[labelAr];
 }
