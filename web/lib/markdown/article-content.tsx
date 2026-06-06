@@ -80,7 +80,7 @@ function InlineArticleImage({
       <div
         className={cn(
           "relative mx-auto overflow-hidden rounded-lg border border-[var(--brand-gray-200)] bg-[var(--brand-gray-50)]",
-          compact ? "max-w-[min(100%,420px)]" : "max-w-[min(100%,520px)]",
+          compact ? "max-w-[min(100%,420px)] max-h-[500px]" : "max-w-[min(100%,520px)] max-h-[500px]",
         )}
       >
         {!failed ? (
@@ -91,7 +91,7 @@ function InlineArticleImage({
             alt={alt}
             loading="lazy"
             decoding="async"
-            className="h-auto w-full object-contain"
+            className="h-auto w-full object-contain max-h-[500px]"
             onError={() => setFailed(true)}
           />
         ) : (

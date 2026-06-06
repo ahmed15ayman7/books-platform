@@ -26,7 +26,7 @@ interface ArticleDetailSidebarProps {
 
 function sidebarThumb(item: ArticleSidebarItem): string | null {
   return resolveArticleDisplayImage({
-    imageUrl: item.imageUrl,
+    imageUrl: item.imageUrl?? item.products?.[0]?.imageUrl,
     bookImageUrls: item.products?.map((p) => p.imageUrl),
     excerpt: item.excerpt,
     content: item.content,
