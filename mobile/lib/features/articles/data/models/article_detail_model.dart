@@ -57,7 +57,6 @@ class ArticleDetailModel {
   factory ArticleDetailModel.fromJson(Map<String, dynamic> json) {
     final author = json['author'] as Map<String, dynamic>?;
     final relatedRaw = json['relatedArticles'] as List<dynamic>? ?? [];
-    final bodyRaw = json['bodyParagraphs'] as List<dynamic>? ?? [];
     return ArticleDetailModel(
       id: json['_id'] as String? ?? json['id'] as String? ?? '',
       slug: json['slug'] as String? ?? '',
@@ -69,7 +68,7 @@ class ArticleDetailModel {
           (json['readingTime'] as num?)?.toInt() ?? 0,
       channel: json['channel'] as String? ?? '',
       categoryLabel: json['categoryLabel'] as String? ?? json['channel'] as String? ?? '',
-      bodyParagraphs: bodyRaw.map((e) => e.toString()).toList(),
+      bodyParagraphs: _parseBodyParagraphs(json),
       relatedArticles: relatedRaw
           .map((e) => ArticleModel.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -79,6 +78,29 @@ class ArticleDetailModel {
       videoUrl: json['youtubeUrl'] as String? ?? json['videoUrl'] as String?,
       imageUrl: _encodeUrl(_parseFirstImageUrl(json['imageUrl'] as String? ?? json['coverImageUrl'] as String?)),
     );
+  }
+
+  // The live API does not return a bodyParagraphs array. Body text lives in
+  // a string field whose name varies (body, content, or excerpt). Try each
+  // in priority order; split double-newlines into separate paragraphs.
+  static List<String> _parseBodyParagraphs(Map<String, dynamic> json) {
+    final raw = json['bodyParagraphs'] as List<dynamic>?;
+    if (raw != null && raw.isNotEmpty) {
+      return raw
+          .map((e) => e.toString().trim())
+          .where((s) => s.isNotEmpty)
+          .toList();
+    }
+    final text = json['body'] as String? ??
+        json['content'] as String? ??
+        json['excerpt'] as String? ??
+        '';
+    if (text.trim().isEmpty) return [];
+    return text
+        .split(RegExp(r'\n{2,}|\r\n\r\n'))
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
   }
 
   ArticleDetail toEntity() => ArticleDetail(
