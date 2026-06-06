@@ -9,6 +9,7 @@ import { ArticleDetailSidebar } from "@/components/sections/article-detail-sideb
 import { ArticleShareStrip } from "@/components/sections/article-share-strip";
 import { Calendar } from "lucide-react";
 import { formatDate } from "@/lib/utils/formatters";
+import { cn } from "@/lib/utils";
 import type { Locale } from "@/lib/i18n";
 import { articleSeoMetadata } from "@/lib/seo/metadata";
 import { youtubeEmbedUrl, youtubeThumbnail } from "@/lib/media/youtube";
@@ -16,8 +17,11 @@ import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-s
 import { isMediaChannel } from "@/lib/media/youtube";
 import { mediaHubHref, mediaNavLabel } from "@/lib/nav/site-nav";
 import { adminArticleEditPath, adminArticleViewPath } from "@/lib/admin/public-urls";
+import { ArticleDetailHero } from "@/components/sections/article-detail-hero";
 import { ArticleContent } from "@/lib/markdown/article-content";
 import { ArticleCommentsSection } from "@/components/sections/article-comments-section";
+import { articleLinkedBookDisplay } from "@/lib/i18n/article-linked-book";
+import { resolveArticleDisplayImage } from "@/lib/articles/resolve-display-image";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -86,6 +90,16 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   const isMedia = isMediaChannel(article.channel);
   const articleUrl = `https://booksplatform.net/${locale}/articles/${article.slug}`;
 
+  const linkedBook = articleLinkedBookDisplay(article.products?.[0], locale);
+  const heroCoverUrl =
+    resolveArticleDisplayImage({
+      imageUrl: linkedBook?.imageUrl ?? article.imageUrl,
+      bookImageUrls: article.products?.map((p) => p.imageUrl),
+      excerpt: article.excerpt,
+      content: article.content,
+    }) ?? null;
+  const heroCoverAlt = linkedBook?.name ?? article.title;
+
   const jsonLd: Record<string, unknown>[] = [
     {
       "@context": "https://schema.org",
@@ -124,6 +138,13 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         title={article.title}
       >
         <div className="min-h-screen bg-white pb-20">
+          <ArticleDetailHero
+            locale={locale}
+            title={article.title}
+            coverUrl={heroCoverUrl}
+            coverAlt={heroCoverAlt}
+          />
+
           <div className="container-platform py-8 md:py-10">
             <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-[var(--brand-gray-500)]">
               <Link href={`/${locale}`} className="hover:text-[var(--brand-red)]">
@@ -159,30 +180,33 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
 
             <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_280px] xl:grid-cols-[minmax(0,1fr)_300px] xl:gap-12">
               <main className="min-w-0">
-                <header className="mb-8">
-                  <h1 className="font-display text-2xl font-bold leading-snug text-[var(--brand-gray-900)] sm:text-3xl md:text-[2rem] text-balance">
-                    {article.title}
-                  </h1>
+                {(intro || article.date) && (
+                  <header className="mb-8">
+                    {intro && (
+                      <p className="text-base leading-relaxed text-[var(--brand-gray-700)] md:text-lg">
+                        {intro}
+                      </p>
+                    )}
 
-                  {intro && (
-                    <p className="mt-4 text-base leading-relaxed text-[var(--brand-gray-700)] md:text-lg">
-                      {intro}
-                    </p>
-                  )}
-
-                  {article.date && (
-                    <p className="mt-4 flex items-center gap-1.5 text-sm text-[var(--brand-gray-500)]">
-                      <Calendar className="h-4 w-4" aria-hidden="true" />
-                      {formatDate(article.date, locale)}
-                      {(article.authorFirstName ?? article.authorLastName) && (
-                        <>
-                          <span className="mx-1">·</span>
-                          {[article.authorFirstName, article.authorLastName].filter(Boolean).join(" ")}
-                        </>
-                      )}
-                    </p>
-                  )}
-                </header>
+                    {article.date && (
+                      <p
+                        className={cn(
+                          "flex items-center gap-1.5 text-sm text-[var(--brand-gray-500)]",
+                          intro && "mt-4",
+                        )}
+                      >
+                        <Calendar className="h-4 w-4" aria-hidden="true" />
+                        {formatDate(article.date, locale)}
+                        {(article.authorFirstName ?? article.authorLastName) && (
+                          <>
+                            <span className="mx-1">·</span>
+                            {[article.authorFirstName, article.authorLastName].filter(Boolean).join(" ")}
+                          </>
+                        )}
+                      </p>
+                    )}
+                  </header>
+                )}
 
                 {article.videoId && (
                   <div className="mb-8">
