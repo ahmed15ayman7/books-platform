@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../../core/theme/app_colors.dart';
 
 const _kCollapseThreshold = 250;
-const _kCollapsedHeight = 120.0;
+const _kCollapsedHeight = 200.0;
 
 class ArticleDetailBodyContent extends StatefulWidget {
   const ArticleDetailBodyContent({
@@ -147,22 +147,37 @@ class _CollapsedContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: _kCollapsedHeight.h,
-      child: ShaderMask(
-        shaderCallback: (bounds) => LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          stops: const [0.5, 1.0],
-          colors: [Colors.white, Colors.white.withValues(alpha: 0)],
-        ).createShader(bounds),
-        blendMode: BlendMode.dstIn,
-        child: OverflowBox(
-          alignment: Alignment.topCenter,
-          maxHeight: double.infinity,
-          child: child,
+    return Stack(
+      children: [
+        ClipRect(
+          child: SizedBox(
+            height: _kCollapsedHeight.h,
+            child: OverflowBox(
+              alignment: Alignment.topCenter,
+              maxHeight: double.infinity,
+              child: child,
+            ),
+          ),
         ),
-      ),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 72.h,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.surface.withValues(alpha: 0),
+                  AppColors.surface,
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
