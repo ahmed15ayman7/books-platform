@@ -25,7 +25,7 @@ export function FooterAnimatedGrid({ columns, locale }: FooterAnimatedGridProps)
 
   return (
     <>
-      <StaggerContainer className="grid grid-cols-2 gap-8 md:grid-cols-4">
+      <StaggerContainer className="grid grid-cols-2 gap-8 md:grid-cols-5">
         {columns.map((col) => (
           <StaggerItem key={col.title}>
             <div>
