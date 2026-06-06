@@ -128,7 +128,9 @@
     "featured": "مميز",
     "min_read": "min read",
     "min": "min",
-    "related": "مقالات ذات صلة"
+    "related": "مقالات ذات صلة",
+    "see_more": "اقرأ المزيد",
+    "see_less": "اقرأ أقل"
   },
 
   "article_detail": {

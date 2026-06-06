@@ -64,19 +64,6 @@ class ArticlesArticleRow extends StatelessWidget {
                         errorWidget: (_, _, _) => const SizedBox.shrink(),
                       ),
                     ),
-                  if (article.hasVideo)
-                    Positioned.fill(
-                      child: Container(
-                        color: Colors.black26,
-                        child: Center(
-                          child: Icon(
-                            Icons.play_circle_outline_rounded,
-                            color: Colors.white,
-                            size: 28.r,
-                          ),
-                        ),
-                      ),
-                    ),
                 ],
               ),
             ),

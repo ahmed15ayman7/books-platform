@@ -128,7 +128,9 @@
     "featured": "Featured",
     "min_read": "min read",
     "min": "min",
-    "related": "Related Articles"
+    "related": "Related Articles",
+    "see_more": "Read more",
+    "see_less": "Read less"
   },
 
   "article_detail": {

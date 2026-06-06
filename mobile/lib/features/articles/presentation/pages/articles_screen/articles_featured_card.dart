@@ -57,34 +57,6 @@ class ArticlesFeaturedCard extends StatelessWidget {
                       errorWidget: (_, _, _) => const SizedBox.shrink(),
                     ),
                   ),
-                if (article.hasVideo)
-                  Positioned.fill(
-                    child: Container(
-                      color: Colors.black26,
-                      child: Center(
-                        child: Container(
-                          width: 52.r,
-                          height: 52.r,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.92),
-                            shape: BoxShape.circle,
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color(0x4D000000),
-                                blurRadius: 24,
-                                offset: Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.play_arrow_rounded,
-                            color: AppColors.primary,
-                            size: 30.r,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
                 PositionedDirectional(
                   top: 12.h,
                   start: 12.w,
