@@ -53,6 +53,7 @@ dependencies:
   url_launcher: ^6.3.2
   flutter_launcher_icons: ^0.14.4
   google_fonts: ^6.2.1
+  flutter_markdown: ^0.7.7
   shared_preferences: ^2.5.5
   file_picker: ^8.1.7
   image_picker: ^1.1.2

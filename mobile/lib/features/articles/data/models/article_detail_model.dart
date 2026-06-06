@@ -80,9 +80,10 @@ class ArticleDetailModel {
     );
   }
 
-  // The live API does not return a bodyParagraphs array. Body text lives in
-  // a string field whose name varies (body, content, or excerpt). Try each
-  // in priority order; split double-newlines into separate paragraphs.
+  // The live API returns the article body in the 'content' field as Markdown.
+  // We return it as a single-element list so ArticleDetailBodyContent can
+  // pass it directly to MarkdownBody as one document (not split into pieces,
+  // which would break headers and multi-line formatting).
   static List<String> _parseBodyParagraphs(Map<String, dynamic> json) {
     final raw = json['bodyParagraphs'] as List<dynamic>?;
     if (raw != null && raw.isNotEmpty) {
@@ -91,16 +92,23 @@ class ArticleDetailModel {
           .where((s) => s.isNotEmpty)
           .toList();
     }
-    final text = json['body'] as String? ??
-        json['content'] as String? ??
+    final text = json['content'] as String? ??
+        json['body'] as String? ??
         json['excerpt'] as String? ??
         '';
     if (text.trim().isEmpty) return [];
-    return text
-        .split(RegExp(r'\n{2,}|\r\n\r\n'))
-        .map((s) => s.trim())
-        .where((s) => s.isNotEmpty)
-        .toList();
+    return [_stripWordPressShortcodes(text)];
+  }
+
+  // Strips WordPress caption shortcodes exported as escaped Markdown brackets.
+  // Opening tags like \[caption id="..." align="..." width="..."\] and the
+  // matching \[/caption\] are removed; any standard Markdown inside (e.g.
+  // inline images ![](url)) is kept.
+  static String _stripWordPressShortcodes(String raw) {
+    return raw
+        .replaceAll(RegExp(r'\\\[caption [^\]]*\]'), '')
+        .replaceAll(RegExp(r'\\\[/caption\\\]'), '')
+        .trim();
   }
 
   ArticleDetail toEntity() => ArticleDetail(
