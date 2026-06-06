@@ -69,11 +69,11 @@ export function CategoryGrid({
   categories,
   locale,
   className,
-  showSpecialLinks = true,
+  showSpecialLinks = false,
 }: CategoryGridProps) {
   const isAr = locale === "ar";
   const base = `/${locale}/books`;
-  const displayCategories = categories.slice(0, 8);
+  const displayCategories = categories.slice(0, 10);
 
   const allItems = [
     ...displayCategories.map((cat) => ({
