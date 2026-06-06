@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { isImageUrl } from "@/lib/markdown/is-image-url";
 import { htmlToArticleSource, parseArticleContent } from "@/lib/markdown/parse-article-content";
+import {
+  linkLabelFromUrl,
+} from "@/lib/markdown/normalize-article-source";
 
 describe("isImageUrl", () => {
   it("detects common image extensions", () => {
@@ -105,5 +108,38 @@ describe("parseArticleContent", () => {
         "الشغب الأبيض ![](https://booksplatform.net/wp-content/uploads/Gord-Hil-1-300x240.jpg) نبدأ",
       ),
     ).toBe(false);
+  });
+
+  it("strips escaped WordPress caption shortcodes and keeps caption text", () => {
+    const raw =
+      '\\[caption id="attachment_53526" align="aligncenter" width="320"\\] Immanuel Kant\\[/caption\\]\n\n![](https://example.com/kant.jpg)';
+    const blocks = parseArticleContent(raw);
+    expect(blocks.some((b) => b.type === "paragraph" && b.text.includes("*Immanuel Kant*"))).toBe(
+      true,
+    );
+    expect(blocks.some((b) => b.type === "image")).toBe(true);
+  });
+
+  it("converts caption shortcode with embedded img to image block", () => {
+    const raw =
+      '[caption id="53526"]<img src="/wp-content/uploads/kant.jpg" /> Immanuel Kant[/caption]';
+    const blocks = parseArticleContent(raw);
+    expect(blocks).toHaveLength(1);
+    expect(blocks[0]).toMatchObject({
+      type: "image",
+      alt: "Immanuel Kant",
+      caption: "Immanuel Kant",
+      src: "https://booksplatform.net/wp-content/uploads/kant.jpg",
+    });
+  });
+
+  it("linkifies parenthesized encoded Wikipedia URLs", () => {
+    const url =
+      "https://ar.wikipedia.org/wiki/%D8%A5%D9%8A%D9%85%D8%A7%D9%86%D9%88%D9%8A%D9%84_%D9%83%D8%A7%D9%86%D8%B7";
+    const blocks = parseArticleContent(`اقرأ المزيد (${url}) عن الفيلسوف.`);
+    expect(blocks[0]).toMatchObject({ type: "paragraph" });
+    const text = (blocks[0] as { text: string }).text;
+    expect(text).toContain(`[${linkLabelFromUrl(url)}](${url})`);
+    expect(linkLabelFromUrl(url)).toBe("إيمانويل كانط");
   });
 });

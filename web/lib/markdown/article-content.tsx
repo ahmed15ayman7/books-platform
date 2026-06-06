@@ -66,14 +66,17 @@ function inlineFormat(text: string): ReactNode[] {
 function InlineArticleImage({
   src,
   alt,
+  caption,
   compact,
 }: {
   src: string;
   alt: string;
+  caption?: string;
   compact?: boolean;
 }) {
   const [failed, setFailed] = useState(false);
   const resolvedSrc = normalizeImageSrc(src) ?? src;
+  const figcaption = caption ?? (alt !== "صورة" && alt !== "image" ? alt : null);
 
   return (
     <figure className={cn("my-6 w-full text-center", compact && "my-4")}>
@@ -100,8 +103,8 @@ function InlineArticleImage({
           </div>
         )}
       </div>
-      {alt && alt !== "صورة" && alt !== "image" && (
-        <figcaption className="mt-2 text-sm text-[var(--brand-gray-500)]">{alt}</figcaption>
+      {figcaption && (
+        <figcaption className="mt-2 text-sm text-[var(--brand-gray-500)]">{figcaption}</figcaption>
       )}
     </figure>
   );
@@ -162,6 +165,7 @@ export function ArticleContent({ content, className }: ArticleContentProps) {
                 key={index}
                 src={block.src}
                 alt={block.alt}
+                caption={block.caption}
               />
             );
           case "html":

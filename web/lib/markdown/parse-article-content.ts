@@ -1,5 +1,6 @@
 import { isImageUrl } from "./is-image-url";
 import { normalizeImageSrc } from "./normalize-image-url";
+import { normalizeArticleSource } from "./normalize-article-source";
 
 export type ArticleContentBlock =
   | { type: "heading"; level: 1 | 2 | 3 | 4 | 5 | 6; text: string }
@@ -97,7 +98,8 @@ function parseLineBlock(line: string): ArticleContentBlock | null {
 
   const mdImage = MD_IMAGE.exec(trimmed);
   if (mdImage) {
-    return toImageBlock(mdImage[2]!, mdImage[1]!.trim());
+    const alt = mdImage[1]!.trim();
+    return toImageBlock(mdImage[2]!, alt, alt || undefined);
   }
 
   const mdLink = MD_LINK.exec(trimmed);
@@ -136,7 +138,7 @@ function parseLineBlock(line: string): ArticleContentBlock | null {
 }
 
 export function parseArticleContent(raw: string): ArticleContentBlock[] {
-  const normalized = raw.replace(/\r\n/g, "\n").trim();
+  const normalized = normalizeArticleSource(raw.replace(/\r\n/g, "\n").trim());
   if (!normalized) return [];
 
   const looksLikeHtml = /<[a-z][\s\S]*>/i.test(normalized);
