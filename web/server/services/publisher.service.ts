@@ -114,6 +114,17 @@ export const PublisherService = {
       include: {
         countries: true,
         sponsored: true,
+        products: {
+          select: {
+            id: true,
+            slug: true,
+            nameEn: true,
+            nameAr: true,
+            imageUrl: true,
+            translationStatus: true,
+            primaryCategory: { select: { name: true, nameAr: true } },
+          },
+        },
       },
     });
     if (!row) return null;

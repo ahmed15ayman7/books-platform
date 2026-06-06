@@ -306,6 +306,46 @@ export const BookService = {
     return { totalBooks, totalPublishers, totalTranslatedBooks: totalTranslated, totalCountries };
   },
 
+  async getCategorySections() {
+    const bookSelect = {
+      id: true,
+      slug: true,
+      nameEn: true,
+      nameAr: true,
+      imageUrl: true,
+      translationStatus: true,
+      primaryCategory: {
+        select: { nameAr: true, name: true, slug: true },
+      },
+    } as const;
+
+    const categories = await this.getNavCategories();
+
+    const categoryBooks = await Promise.all(
+      categories.map((cat) =>
+        db.product.findMany({
+          where: { published: true, primaryCategoryId: cat.id },
+          orderBy: { position: "desc" },
+          take: 10,
+          select: bookSelect,
+        }),
+      ),
+    );
+
+    return categories
+      .map((cat, i) => ({ category: cat, books: categoryBooks[i] ?? [] }))
+      .filter((s) => s.books.length > 0)
+      .sort((a, b) => {
+        const ai = BOOK_CATEGORY_LABELS_AR.findIndex(
+          (label) => normalizeArabic(label) === normalizeArabic(a.category.nameAr ?? ""),
+        );
+        const bi = BOOK_CATEGORY_LABELS_AR.findIndex(
+          (label) => normalizeArabic(label) === normalizeArabic(b.category.nameAr ?? ""),
+        );
+        return ai - bi;
+      });
+  },
+
   async getFeaturedForHome() {
     const [newlyReleased, sponsoredPublishers] = await Promise.all([
       db.product.findMany({
@@ -364,9 +404,9 @@ export const BookService = {
       },
     } as const;
 
-    const [categories, newlyReleased, translated, nominated, sponsoredPublishers, topPublishers] =
+    const [categorySections, newlyReleased, translated, nominated, sponsoredPublishers, topPublishers] =
       await Promise.all([
-        this.getNavCategories(),
+        this.getCategorySections(),
       db.product.findMany({
         where: { published: true },
         orderBy: { position: "desc" },
@@ -413,30 +453,6 @@ export const BookService = {
         },
       }),
     ]);
-
-    const categoryBooks = await Promise.all(
-      categories.map((cat) =>
-        db.product.findMany({
-          where: { published: true, primaryCategoryId: cat.id },
-          orderBy: { position: "desc" },
-          take: 10,
-          select: bookSelect,
-        })
-      )
-    );
-
-    const categorySections = categories
-      .map((cat, i) => ({ category: cat, books: categoryBooks[i] ?? [] }))
-      .filter((s) => s.books.length > 0)
-      .sort((a, b) => {
-        const ai = BOOK_CATEGORY_LABELS_AR.findIndex(
-          (label) => normalizeArabic(label) === normalizeArabic(a.category.nameAr ?? ""),
-        );
-        const bi = BOOK_CATEGORY_LABELS_AR.findIndex(
-          (label) => normalizeArabic(label) === normalizeArabic(b.category.nameAr ?? ""),
-        );
-        return ai - bi;
-      });
 
     return {
       newlyReleased,
