@@ -1,6 +1,6 @@
 import type { Locale } from "@/lib/i18n";
 import { pickLocale, pickLocaleList, type BilingualString } from "./types";
-import { ABOUT_IMAGES } from "./image-assets";
+import { ABOUT_IMAGES, ABOUT_IMAGE_SOURCES } from "./image-assets";
 
 export interface AboutImage {
   src: string;
@@ -14,8 +14,12 @@ export interface AboutValue {
   image?: AboutImage;
 }
 
+export interface AboutHeroImage extends AboutImage {
+  aspect: "4/3" | "2/3";
+}
+
 export interface AboutContent {
-  hero: { title: string; subtitle: string; image: AboutImage };
+  hero: { title: string; subtitle: string; images: AboutHeroImage[] };
   intro: {
     eyebrow: string;
     title: string;
@@ -71,6 +75,29 @@ const storyGallery: Array<AboutImage & { caption: BilingualString }> = [
     src: ABOUT_IMAGES.gallery6,
     alt: { ar: "عالم المعرفة", en: "World of knowledge" },
     caption: { ar: "نافذة على العالم", en: "Window to the world" },
+  },
+];
+
+const heroImages: AboutHeroImage[] = [
+  {
+    src: ABOUT_IMAGE_SOURCES.aboutHero1,
+    alt: { ar: "مكتبة وكتب", en: "Library and books" },
+    aspect: "4/3",
+  },
+  {
+    src: ABOUT_IMAGE_SOURCES.aboutHero2,
+    alt: { ar: "قارئ مع كتاب", en: "Reader with a book" },
+    aspect: "2/3",
+  },
+  {
+    src: ABOUT_IMAGE_SOURCES.aboutHero3,
+    alt: { ar: "صفحات قاموس ومعرفة", en: "Dictionary pages and knowledge" },
+    aspect: "2/3",
+  },
+  {
+    src: ABOUT_IMAGE_SOURCES.aboutHero4,
+    alt: { ar: "صفحات مفتوحة من كتاب", en: "Open book pages" },
+    aspect: "4/3",
   },
 ];
 
@@ -214,10 +241,11 @@ export function getAboutContent(locale: Locale): AboutContent {
     hero: {
       title: pickLocale(hero.title, locale),
       subtitle: pickLocale(hero.subtitle, locale),
-      image: {
-        src: ABOUT_IMAGES.hero,
-        alt: { ar: "مكتبة وكتب — رمز المعرفة", en: "Library and books — symbol of knowledge" },
-      },
+      images: heroImages.map((img) => ({
+        src: img.src,
+        alt: img.alt,
+        aspect: img.aspect,
+      })),
     },
     intro: {
       eyebrow: isAr ? "مقدمة" : "Introduction",

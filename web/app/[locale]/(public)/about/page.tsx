@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
-import { AboutHeroSplit } from "@/components/sections/about/about-hero-split";
+import { AboutPageHero } from "@/components/sections/about/about-page-hero";
 import { AboutStorySplit } from "@/components/sections/about/about-story-split";
 import { AboutGalleryStrip } from "@/components/sections/about/about-gallery-strip";
 import { AboutValuesGrid } from "@/components/sections/about/about-values-grid";
@@ -50,11 +50,11 @@ export default async function AboutPage() {
 
   return (
     <div className="min-h-screen bg-[var(--brand-gray-50)]">
-      <AboutHeroSplit
+      <AboutPageHero
         locale={locale}
         title={content.hero.title}
         subtitle={content.hero.subtitle}
-        image={content.hero.image}
+        images={content.hero.images}
         primaryHref={`/${locale}/books`}
         primaryLabel={content.cta.primary}
         secondaryHref={`/${locale}/services`}
