@@ -75,8 +75,9 @@ export function EntityShareDialog({
   }
 
   async function handleTriggerClick() {
-    const shared = await tryNativeShare(payload);
-    if (!shared) setOpen(true);
+    // const shared = await tryNativeShare(payload);
+    setOpen(true);
+    // if (!shared)
   }
 
   const isAdmin = variant === "admin";
