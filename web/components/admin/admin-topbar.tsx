@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Bell, ChevronRight, Home, Search } from "lucide-react";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { useAdminChrome } from "@/lib/admin/admin-chrome-context";
-import { modKeyLabel } from "@/lib/search/shortcut-labels";
+import { searchShortcutKeyLabel } from "@/lib/search/shortcut-labels";
 import { AdminHubLinks } from "@/components/admin/admin-hub-links";
 
 const routeLabels: Record<string, string> = {
@@ -139,7 +139,7 @@ export function AdminTopbar() {
           <Search className="h-3.5 w-3.5" />
           <span>بحث...</span>
           <kbd className="rounded border border-[var(--admin-border)] bg-[var(--admin-surface)] px-1 py-0.5 text-[10px]">
-            {modKeyLabel()}K
+            {searchShortcutKeyLabel()}
           </kbd>
         </button>
         <button

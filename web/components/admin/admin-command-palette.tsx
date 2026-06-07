@@ -7,7 +7,7 @@ import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { useAdminChrome } from "@/lib/admin/admin-chrome-context";
 import { mapAdminSearchSections, type GlobalSearchPayload } from "@/lib/search/map-search-sections";
 import { adminSearchTheme } from "@/lib/search/palette-themes";
-import { modKeyLabel } from "@/lib/search/shortcut-labels";
+import { modKeyLabel, searchShortcutKeyLabel, searchShortcutLabel } from "@/lib/search/shortcut-labels";
 
 export function AdminCommandPalette() {
   const { searchOpen, closeSearch } = useAdminChrome();
@@ -33,7 +33,7 @@ export function AdminCommandPalette() {
       onClose={closeSearch}
       theme={adminSearchTheme}
       topClassName="top-[max(4.5rem,8vh)]"
-      modKeyLabel={modKeyLabel()}
+      modKeyLabel={searchShortcutLabel()}
       placeholder="ابحث عن كتاب، مقال، ميديا، ناشر، مؤلف..."
       emptyHint="اكتب حرفين على الأقل للبحث في كل أقسام لوحة التحكم"
       noResultsHint={(q) => `لا توجد نتائج لـ «${q}»`}
@@ -41,6 +41,10 @@ export function AdminCommandPalette() {
       fetchResults={fetchResults}
       footer={
         <>
+          <span>
+            <kbd className="rounded border border-[var(--admin-border)] px-1">{searchShortcutKeyLabel()}</kbd>{" "}
+            بحث
+          </span>
           <span>
             <kbd className="rounded border border-[var(--admin-border)] px-1">{modKeyLabel()}S</kbd>{" "}
             حفظ

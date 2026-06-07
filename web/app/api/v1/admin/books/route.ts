@@ -15,6 +15,7 @@ import {
   mergeAuthorCountIntoWhere,
   parseAuthorCountFilter,
 } from "@/lib/admin/book-author-count-filter";
+import { BOOK_SEARCH_FIELDS, buildTextSearchOr } from "@/lib/search/text-search-fields";
 
 const createBookSchema = z.object({
   nameEn: z.string().min(1).max(300),
@@ -63,14 +64,7 @@ export async function GET(request: NextRequest) {
       ...(translationStatus && translationStatus !== "all"
         ? { translationStatus }
         : {}),
-      ...(search
-        ? {
-            OR: [
-              { nameEn: { contains: search, mode: "insensitive" as const } },
-              { nameAr: { contains: search, mode: "insensitive" as const } },
-            ],
-          }
-        : {}),
+      ...(search && buildTextSearchOr(search, BOOK_SEARCH_FIELDS)),
     };
 
     const where = await mergeAuthorCountIntoWhere(baseWhere, authorCount);

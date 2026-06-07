@@ -7,6 +7,7 @@ import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { nextAuthorTermId } from "@/lib/admin/legacy-ids";
 import { buildOrderBy, parseSortParam } from "@/lib/admin/list-query";
+import { AUTHOR_SEARCH_FIELDS, buildTextSearchOr } from "@/lib/search/text-search-fields";
 
 const createSchema = z.object({
   name: z.string().min(1).max(200),
@@ -31,15 +32,7 @@ export async function GET(request: NextRequest) {
 
     const where = {
       spamFlag: null,
-      ...(search
-        ? {
-            OR: [
-              { name: { contains: search, mode: "insensitive" as const } },
-              { nameAr: { contains: search, mode: "insensitive" as const } },
-              { slug: { contains: search, mode: "insensitive" as const } },
-            ],
-          }
-        : {}),
+      ...(search && buildTextSearchOr(search, AUTHOR_SEARCH_FIELDS)),
     };
 
     const [rows, total] = await Promise.all([

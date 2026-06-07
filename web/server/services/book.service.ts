@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { notDeleted } from "@/lib/admin/audit-fields";
 import { normalizeArabic } from "@/lib/i18n/normalize-arabic";
 import { BOOK_CATEGORY_LABELS_AR } from "@/lib/nav/book-categories";
+import { BOOK_SEARCH_FIELDS, buildTextSearchOr } from "@/lib/search/text-search-fields";
 import { PAGINATION } from "@/lib/utils/constants";
 
 export interface BookFilters {
@@ -45,14 +46,7 @@ export const BookService = {
       ...(publisher && { publisher: { slug: publisher } }),
       ...(status && { translationStatus: status }),
       ...(featured !== undefined && { featured }),
-      ...(search && {
-        OR: [
-          { nameEn: { contains: search, mode: "insensitive" as const } },
-          { nameAr: { contains: search, mode: "insensitive" as const } },
-          { description: { contains: search, mode: "insensitive" as const } },
-          { descriptionAr: { contains: search, mode: "insensitive" as const } },
-        ],
-      }),
+      ...(search && buildTextSearchOr(search, BOOK_SEARCH_FIELDS)),
     };
 
     const orderBy =

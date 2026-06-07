@@ -13,6 +13,7 @@ import {
 } from "@/lib/admin/article-payload";
 import { MEDIA_CHANNELS } from "@/lib/media/youtube";
 import { nextArticleOriginalId } from "@/lib/admin/legacy-ids";
+import { ARTICLE_SEARCH_FIELDS, buildTextSearchOr } from "@/lib/search/text-search-fields";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth(request, "ADMIN", PERMISSIONS.articles.view);
@@ -36,9 +37,7 @@ export async function GET(request: NextRequest) {
       ...(channel && channel !== "all" ? { channel } : {}),
       ...(mediaOnly ? { channel: { in: [...MEDIA_CHANNELS] } } : {}),
       ...(hasVideo ? { videoId: { not: null } } : {}),
-      ...(search
-        ? { OR: [{ title: { contains: search, mode: "insensitive" as const } }] }
-        : {}),
+      ...(search && buildTextSearchOr(search, ARTICLE_SEARCH_FIELDS)),
     };
 
     const articleSortFields = ["updatedAt", "createdAt", "title", "date"] as const;

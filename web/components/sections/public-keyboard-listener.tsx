@@ -3,10 +3,6 @@
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 
-function isModKey(e: KeyboardEvent): boolean {
-  return e.metaKey || e.ctrlKey;
-}
-
 export function PublicKeyboardListener() {
   const router = useRouter();
   const params = useParams<{ locale?: string }>();
@@ -14,7 +10,7 @@ export function PublicKeyboardListener() {
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (!isModKey(e) || e.key.toLowerCase() !== "k") return;
+      if (!e.altKey || e.ctrlKey || e.metaKey || e.key.toLowerCase() !== "k") return;
       e.preventDefault();
       router.push(`/${locale}/search`);
     }

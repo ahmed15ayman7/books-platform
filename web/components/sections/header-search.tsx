@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Search } from "lucide-react";
-import { modKeyLabel } from "@/lib/search/shortcut-labels";
+import { searchShortcutKeyLabel } from "@/lib/search/shortcut-labels";
 
 export function HeaderSearch() {
   const params = useParams<{ locale?: string }>();
@@ -35,7 +35,7 @@ export function HeaderSearch() {
         </div>
         <span className="hidden shrink-0 items-center gap-1.5 border-s border-[var(--brand-gray-200)] bg-[var(--brand-gray-50)] px-3 text-[10px] text-[var(--brand-gray-500)] sm:flex">
           <kbd className="rounded border border-[var(--brand-gray-200)] bg-white px-1 py-0.5">
-            {modKeyLabel()}K
+            {searchShortcutKeyLabel()}
           </kbd>
         </span>
         <span className="flex shrink-0 items-center justify-center rounded-e-2xl bg-[var(--brand-red)] px-5 text-sm font-semibold text-white transition-all duration-[var(--motion-base)] group-hover:bg-[var(--brand-red-hover)]">

@@ -9,6 +9,7 @@ import { buildOrderBy, parseOptionalBool, parseSortParam } from "@/lib/admin/lis
 import { notDeleted } from "@/lib/admin/audit-fields";
 import { publisherBilingualDbData } from "@/lib/admin/publisher-fields";
 import { slugify } from "@/lib/admin/slugify";
+import { PUBLISHER_SEARCH_FIELDS, buildTextSearchOr } from "@/lib/search/text-search-fields";
 
 const createSchema = z.object({
   name: z.string().max(300).optional(),
@@ -42,15 +43,7 @@ export async function GET(request: NextRequest) {
       ...(status && status !== "all" ? { status } : {}),
       ...(sponsoredFilter === true ? { sponsored: { isNot: null } } : {}),
       ...(sponsoredFilter === false ? { sponsored: null } : {}),
-      ...(search
-        ? {
-            OR: [
-              { title: { contains: search, mode: "insensitive" as const } },
-              { name: { contains: search, mode: "insensitive" as const } },
-              { nameAr: { contains: search, mode: "insensitive" as const } },
-            ],
-          }
-        : {}),
+      ...(search && buildTextSearchOr(search, PUBLISHER_SEARCH_FIELDS)),
     };
 
     const publisherSortFields = ["updatedAt", "createdAt", "title", "name", "nameAr"] as const;
