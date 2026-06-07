@@ -29,7 +29,7 @@ export function FooterAnimatedGrid({ columns, locale }: FooterAnimatedGridProps)
         {columns.map((col) => (
           <StaggerItem key={col.title}>
             <div>
-              <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-[var(--brand-red)]">
+              <h3 className="mb-4 text-lg font-bold uppercase tracking-wider text-[var(--brand-red)]">
                 {col.title}
               </h3>
               <ul className="space-y-2" role="list">
@@ -37,7 +37,7 @@ export function FooterAnimatedGrid({ columns, locale }: FooterAnimatedGridProps)
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-white font-bold transition-all duration-[var(--motion-base)] hover:translate-x-0.5 hover:text-[var(--brand-red)] hover:underline"
+                      className="text-base text-white font-bold transition-all duration-[var(--motion-base)] hover:translate-x-0.5 hover:text-[var(--brand-red)] hover:underline"
                     >
                       {link.label}
                     </Link>

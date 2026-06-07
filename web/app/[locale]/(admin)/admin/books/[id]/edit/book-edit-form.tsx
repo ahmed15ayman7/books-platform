@@ -618,7 +618,7 @@ export function BookEditForm({
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand-red)] px-5 py-2 text-sm font-semibold text-[var(--admin-text)] transition-colors hover:bg-[var(--brand-red)]/90 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand-red)] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-red)]/90 disabled:opacity-60"
           >
             {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             {isCreate ? "إنشاء الكتاب" : "حفظ التغييرات"}
