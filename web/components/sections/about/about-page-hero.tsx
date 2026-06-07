@@ -1,20 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { SafeImage } from "@/components/ui/safe-image";
+import { EmblaShowcase } from "@/components/ui/embla-showcase";
 import type { AboutHeroImage } from "@/lib/content/about";
 import { pickLocale } from "@/lib/content/types";
 import type { Locale } from "@/lib/i18n";
-import {
-  BlurIn,
-  FadeIn,
-  HoverLift,
-  RevealText,
-  StaggerContainer,
-  StaggerItem,
-} from "@/components/motion";
+import { PageHero } from "@/components/sections/page-hero";
+import { HoverLift } from "@/components/motion";
 import { cn } from "@/lib/utils";
 
 interface AboutPageHeroProps {
@@ -28,40 +22,39 @@ interface AboutPageHeroProps {
   secondaryLabel: string;
 }
 
-const MOSAIC_LAYOUT: Array<{ aspect: "4/3" | "2/3" }> = [
-  { aspect: "4/3" },
-  { aspect: "2/3" },
-  { aspect: "2/3" },
-  { aspect: "4/3" },
-];
-
-function HeroImageTile({
+function AboutHeroCoverSlide({
   image,
   locale,
-  aspect,
   priority,
+  className,
 }: {
   image: AboutHeroImage;
   locale: Locale;
-  aspect: "4/3" | "2/3";
   priority?: boolean;
+  className?: string;
 }) {
+  const alt = pickLocale(image.alt, locale);
+
   return (
-    <div
+    <figure
       className={cn(
-        "relative overflow-hidden rounded-xl border border-[var(--brand-gray-200)] bg-white shadow-[var(--shadow-soft)]",
-        aspect === "2/3" ? "aspect-[2/3]" : "aspect-[4/3]",
+        "overflow-hidden rounded-xl border border-[var(--brand-gray-200)] bg-white shadow-[var(--shadow-soft)]",
+        className,
       )}
     >
-      <SafeImage
-        src={image.src}
-        alt={pickLocale(image.alt, locale)}
-        fill
-        className="object-cover"
-        sizes="(max-width:768px) 45vw, 280px"
-        priority={priority}
-      />
-    </div>
+      <div className="relative aspect-[2/3] w-full min-w-[140px] sm:min-w-[160px] md:min-w-0">
+        <Image
+          src={image.src}
+          alt={alt}
+          fill
+          className="object-cover"
+          sizes="(max-width:640px) 140px, 180px"
+          priority={priority}
+          unoptimized
+        />
+      </div>
+      <figcaption className="sr-only">{alt}</figcaption>
+    </figure>
   );
 }
 
@@ -76,80 +69,68 @@ export function AboutPageHero({
   secondaryLabel,
 }: AboutPageHeroProps) {
   const homeLabel = locale === "ar" ? "الرئيسية" : "Home";
+  const showcaseLabel = locale === "ar" ? "معرض صور المنصة" : "Platform imagery";
 
   return (
-    <section
-      className="relative overflow-hidden border-b border-[var(--brand-gray-200)] bg-gradient-to-br from-white via-[var(--brand-red-soft)]/25 to-[var(--brand-gray-50)] py-10 md:py-14"
-      dir={locale === "ar" ? "rtl" : "ltr"}
+    <PageHero
+      locale={locale}
+      variant="light"
+      title={title}
+      subtitle={subtitle}
+      className="relative overflow-hidden border-b border-[var(--brand-gray-200)] bg-gradient-to-br from-white via-[var(--brand-red-soft)]/25 to-[var(--brand-gray-50)]"
+      breadcrumbs={[
+        { label: homeLabel, href: `/${locale}` },
+        { label: title },
+      ]}
     >
-      <div className="container-platform relative z-10">
-        <StaggerContainer className="mb-4 flex flex-wrap items-center gap-1 text-sm text-[var(--brand-gray-500)]">
-          <StaggerItem>
-            <span className="inline-flex items-center gap-1">
-              <Link href={`/${locale}`} className="transition-colors hover:text-[var(--brand-red)] hover:underline">
-                {homeLabel}
-              </Link>
-            </span>
-          </StaggerItem>
-          <StaggerItem>
-            <span className="inline-flex items-center gap-1">
-              <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-60 rtl:rotate-180" aria-hidden="true" />
-              <span className="font-medium text-[var(--brand-gray-900)]">{title}</span>
-            </span>
-          </StaggerItem>
-        </StaggerContainer>
-
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-12">
-          <div className="min-w-0">
-            <BlurIn delay={0.1}>
-              <RevealText
-                text={title}
-                as="h1"
-                className="font-display text-display-sm font-bold text-[var(--brand-gray-900)] md:text-display-md"
+      <div className="mt-6 w-full space-y-6">
+        <div>
+          <p className="mb-3 text-sm font-semibold text-[var(--brand-gray-700)]">
+            {showcaseLabel}
+          </p>
+          <div className="hidden gap-4 md:grid md:grid-cols-3 lg:grid-cols-6">
+            {images.map((image, index) => (
+              <AboutHeroCoverSlide
+                key={image.src}
+                image={image}
+                locale={locale}
+                priority={index === 0}
               />
-            </BlurIn>
-            <FadeIn delay={0.2}>
-              <p className="mt-3 max-w-xl text-base leading-relaxed text-[var(--brand-gray-600)] md:text-lg">
-                {subtitle}
-              </p>
-            </FadeIn>
-            <StaggerContainer className="mt-8 flex flex-wrap gap-4" delay={0.35}>
-              <StaggerItem>
-                <HoverLift>
-                  <Button asChild size="lg">
-                    <Link href={primaryHref}>{primaryLabel}</Link>
-                  </Button>
-                </HoverLift>
-              </StaggerItem>
-              <StaggerItem>
-                <HoverLift>
-                  <Button asChild size="lg" variant="outline">
-                    <Link href={secondaryHref}>{secondaryLabel}</Link>
-                  </Button>
-                </HoverLift>
-              </StaggerItem>
-            </StaggerContainer>
+            ))}
           </div>
+          <div className="md:hidden">
+            <EmblaShowcase
+              locale={locale}
+              ariaLabel={showcaseLabel}
+              pageOrder={0}
+              slideClassName="min-w-0 shrink-0 grow-0 basis-auto px-1"
+            >
+              {images.map((image, index) => (
+                <AboutHeroCoverSlide
+                  key={image.src}
+                  image={image}
+                  locale={locale}
+                  priority={index === 0}
+                  className="mx-1 w-[140px] shrink-0"
+                />
+              ))}
+            </EmblaShowcase>
+          </div>
+        </div>
 
-          <BlurIn delay={0.15} className="min-w-0 lg:max-w-md lg:justify-self-end">
-            <StaggerContainer className="grid grid-cols-2 gap-3">
-              {images.slice(0, 4).map((image, index) => {
-                const layout = MOSAIC_LAYOUT[index] ?? { aspect: image.aspect };
-                return (
-                  <StaggerItem key={index}>
-                    <HeroImageTile
-                      image={image}
-                      locale={locale}
-                      aspect={layout.aspect ?? image.aspect}
-                      priority={index === 0}
-                    />
-                  </StaggerItem>
-                );
-              })}
-            </StaggerContainer>
-          </BlurIn>
+        <div className="flex flex-wrap gap-4">
+          <HoverLift>
+            <Button asChild size="lg">
+              <Link href={primaryHref}>{primaryLabel}</Link>
+            </Button>
+          </HoverLift>
+          <HoverLift>
+            <Button asChild size="lg" variant="outline">
+              <Link href={secondaryHref}>{secondaryLabel}</Link>
+            </Button>
+          </HoverLift>
         </div>
       </div>
-    </section>
+    </PageHero>
   );
 }

@@ -99,6 +99,16 @@ const heroImages: AboutHeroImage[] = [
     alt: { ar: "صفحات مفتوحة من كتاب", en: "Open book pages" },
     aspect: "4/3",
   },
+  {
+    src: ABOUT_IMAGE_SOURCES.aboutHero5,
+    alt: { ar: "بودكast ومحتوى صوتي", en: "Podcast and audio content" },
+    aspect: "2/3",
+  },
+  {
+    src: ABOUT_IMAGE_SOURCES.aboutHero6,
+    alt: { ar: "مكتبة ورفوف كتب", en: "Library bookshelves" },
+    aspect: "2/3",
+  },
 ];
 
 const hero: { title: BilingualString; subtitle: BilingualString } = {
