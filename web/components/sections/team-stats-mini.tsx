@@ -83,7 +83,7 @@ export function TeamStatsMini({ locale, totalMembers, featuredCount }: TeamStats
         />
         <MiniStat
           value={featuredCount}
-          label={isAr ? "قيادة" : "Leadership"}
+          label={isAr ? "مؤسس" : "Founder"}
           Icon={Star}
           index={1}
         />
