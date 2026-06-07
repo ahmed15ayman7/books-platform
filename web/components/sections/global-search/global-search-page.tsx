@@ -218,7 +218,7 @@ export function GlobalSearchPageClient({
                     <X className="h-4 w-4" />
                   </button>
                 )}
-                <div
+                {/* <div
                   className={`absolute top-1/2 hidden -translate-y-1/2 items-center gap-1 text-[10px] text-[var(--brand-gray-500)] sm:flex ${
                     isAr ? "start-4" : "end-4"
                   }`}
@@ -226,7 +226,7 @@ export function GlobalSearchPageClient({
                   <kbd className="rounded border border-[var(--brand-gray-200)] bg-[var(--brand-gray-50)] px-1.5 py-0.5">
                     {searchShortcutKeyLabel()}
                   </kbd>
-                </div>
+                </div> */}
               </div>
                 <button
                   type="submit"
