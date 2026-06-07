@@ -336,7 +336,7 @@
 
   .prose-brand h2,
   .prose-brand h3 {
-    color: var(--brand-gray-900);
+    color: var(--brand-red);
     font-weight: 700;
   }
 
