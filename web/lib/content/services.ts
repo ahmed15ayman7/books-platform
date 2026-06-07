@@ -6,20 +6,30 @@ export interface OutputMapBlock {
   title: BilingualString;
   body: BilingualString;
   bullets?: BilingualString[];
+  /** First block spans both grid columns with body and bullets side by side */
+  spanFullWidth?: boolean;
 }
 
 export interface ProductCard {
   key: string;
   title: BilingualString;
-  items: BilingualString[];
+  body: BilingualString;
+  audiences: BilingualString;
 }
 
 export interface ServicesPageContent {
   hero: { title: string; subtitle: string };
   platformServices: { title: string; intro: string; items: string[] };
-  outputMap: { title: string; blocks: { key: string; title: string; body: string; bullets?: string[] }[] };
+  outputMap: {
+    title: string;
+    blocks: { key: string; title: string; body: string; bullets?: string[]; spanFullWidth?: boolean }[];
+  };
   bibliography: { title: string; body: string };
-  products: { title: string; cards: { key: string; title: string; items: string[] }[] };
+  products: {
+    title: string;
+    audiencesLabel: string;
+    cards: { key: string; title: string; body: string; audiences: string }[];
+  };
   closing: string;
 }
 
@@ -72,20 +82,21 @@ const platformServiceItems: BilingualString[] = [
 
 const outputMapBlocks: OutputMapBlock[] = [
   {
-    key: "fastest-book",
-    title: { ar: "أسرع كتاب", en: "Fastest Book" },
+    key: "book-sections",
+    spanFullWidth: true,
+    title: { ar: "أقسام الكتب", en: "Book Sections" },
     body: {
-      ar: "مئات من ملخصات الكتب العربية والمترجمة في مختلف مجالات المعرفة، تم إعدادها وصياغتها بأسلوب شيق ومركز، لتمكن القارئ من الإلمام بأهم الأفكار الواردة في الكتاب في وقت قصير، وبما يعينه على اختيار الكتاب الأنسب لاقتنائه وقراءته بالكامل.",
-      en: "Hundreds of summaries of Arabic and translated books across various fields of knowledge, prepared and crafted in an engaging, concise style—enabling readers to grasp a book's key ideas quickly and choose the most suitable title to acquire and read in full.",
+      ar: "تتكون من سبعة أقسام رئيسية تغطي تصنيفات الكتب في جميع المجالات العلمية والمعرفية، ويتم نشر بيانات وعروض الكتب مع الأغلفة في القسم المخصص لها بحسب تصنيفها كالتالي:",
+      en: "It consists of seven main sections covering book categories across all scientific and knowledge fields. Book data and showcases with covers are published in the dedicated section according to category, as follows:",
     },
     bullets: [
-      { ar: "أدب - رواية", en: "Literature — Novel" },
-      { ar: "تاريخ - تراث", en: "History — Heritage" },
-      { ar: "فكر - فلسفة", en: "Thought — Philosophy" },
-      { ar: "سياسة - اقتصاد", en: "Politics — Economics" },
-      { ar: "علوم - تقنية", en: "Science — Technology" },
-      { ar: "إدارة - تنمية", en: "Management — Development" },
-      { ar: "فنون - رياضة", en: "Arts — Sports" },
+      { ar: "تقنيات وعلوم", en: "Technology & Science" },
+      { ar: "دراسات اجتماعية", en: "Social Studies" },
+      { ar: "لغات واداب", en: "Languages & Literature" },
+      { ar: "فلسفات وثقافات", en: "Philosophies & Cultures" },
+      { ar: "اديان وعقائد", en: "Religions & Beliefs" },
+      { ar: "اقتصاد وتنمية", en: "Economy & Development" },
+      { ar: "أفكار وسياسات", en: "Ideas & Policies" },
     ],
   },
   {
@@ -173,48 +184,63 @@ const outputMapBlocks: OutputMapBlock[] = [
 const productCards: ProductCard[] = [
   {
     key: "biblio",
-    title: { ar: "مخرجات ببليوغرافية", en: "Bibliographic Outputs" },
-    items: [
-      { ar: "كتالوجات وفهارس", en: "Catalogs and indexes" },
-      { ar: "بطاقات ببليوغرافية يومية", en: "Daily bibliographic records" },
-      { ar: "بيانات metadata للكتب", en: "Book metadata" },
-    ],
+    title: { ar: "مخرجات ببليوجرافية", en: "Bibliographic Outputs" },
+    body: {
+      ar: "توفير بيانات حديثة ومتجددة ومستمرة عن الكتب الجديدة التي تصدر في العالم مترجمة إلى العربية",
+      en: "Providing up-to-date, renewed, and continuous data on new books published worldwide and translated into Arabic",
+    },
+    audiences: {
+      ar: "المكتبات الوطنية – الجامعات ومراكز البحوث – دور النشر – الباحثين – المترجمين",
+      en: "National libraries — universities and research centers — publishers — researchers — translators",
+    },
   },
   {
     key: "journal",
     title: { ar: "مخرجات صحفية", en: "Journalistic Outputs" },
-    items: [
-      { ar: "مقالات وتقارير", en: "Articles and reports" },
-      { ar: "نشرات يومية", en: "Daily bulletins" },
-      { ar: "العالم يقرأ", en: "The World Reads" },
-    ],
+    body: {
+      ar: "تقديم خدمة خبرية يومية: أخبار الكتب",
+      en: "Providing a daily news service: book news",
+    },
+    audiences: {
+      ar: "الصحف – والمجلات – والمواقع الالكترونية – والقنوات التلفزيونية",
+      en: "Newspapers — magazines — websites — television channels",
+    },
   },
   {
     key: "research",
     title: { ar: "مخرجات بحثية", en: "Research Outputs" },
-    items: [
-      { ar: "دراسات ومراجع", en: "Studies and references" },
-      { ar: "تحليلات أكاديمية", en: "Academic analyses" },
-      { ar: "أوراق بحثية", en: "Research papers" },
-    ],
+    body: {
+      ar: "إعداد تقارير خاصة ونوعية.. مجمعة وتحليلية عن الكتب الجديدة. تصدر أسبوعيًا وشهريًا",
+      en: "Preparing special, curated, consolidated and analytical reports on new books. Published weekly and monthly",
+    },
+    audiences: {
+      ar: "مراكز البحوث والدراسات – والمجلات الفصلية والمتخصصة",
+      en: "Research and study centers — quarterly and specialized journals",
+    },
   },
   {
     key: "av",
     title: { ar: "مخرجات صوتية ومرئية", en: "Audio & Video Outputs" },
-    items: [
-      { ar: "فيديو YouTube", en: "YouTube video" },
-      { ar: "بودكاست", en: "Podcasts" },
-      { ar: "قنوات الميديا", en: "Media channels" },
-    ],
+    body: {
+      ar: "انتاج بودكاست - وفيديوهات",
+      en: "Producing podcasts and videos",
+    },
+    audiences: {
+      ar: "القنوات التلفزيونية – والمحطات الاذاعية – اطلاق قنوات خاصة على اليوتيوب والتلجرام والتيك توك",
+      en: "Television channels — radio stations — launching dedicated channels on YouTube, Telegram, and TikTok",
+    },
   },
   {
     key: "social",
     title: { ar: "مخرجات السوشيال ميديا", en: "Social Media Outputs" },
-    items: [
-      { ar: "منشورات قصيرة", en: "Short posts" },
-      { ar: "Carousel و Reels", en: "Carousels and reels" },
-      { ar: "بطاقات اقتباس", en: "Quote cards" },
-    ],
+    body: {
+      ar: "اطلاق صفحات مخصصة لأخبار وعروض الكتب الاجنبية الجديدة",
+      en: "Launching dedicated pages for news and showcases of new foreign books",
+    },
+    audiences: {
+      ar: "الجمهور العربي على السوشيال ميديا",
+      en: "The Arab audience on social media",
+    },
   },
 ];
 
@@ -232,8 +258,8 @@ export function getServicesContent(locale: Locale): ServicesPageContent {
   };
 
   const bibliographyBody: BilingualString = {
-    ar: "ببليوغرافيا المنصة هي قلب خدماتنا: فهرسة يومية للإصدارات العالمية، بطاقات ببليوغرافية دقيقة، وتصنيف احترافي يربط القارئ العربي بكل كتاب جديد في العالم — من الكشف إلى الوصف إلى التوزيع عبر المنصة والتطبيق وقنوات التواصل.",
-    en: "Platform bibliography is the heart of our services: daily indexing of global releases, precise bibliographic records, and professional categorization connecting the Arabic reader with every new book in the world — from discovery to description to distribution across the platform, app, and social channels.",
+    ar: "من أهم المخرجات التي سعت المنصة لتقديمها هي الببليوغرافيا، حيث توفر المنصة قاعدة بيانات ببليوغرافية متكاملة عن الكتب المترجمة من اللغة العربية وإلى عدد من اللغات العالمية، وهي في هذا السياق تهدف لتسهيل عملية الوصول للمعلومات الببليوغرافية، كما تهدف أيضاً إلى تسليط الضوء على حركة الترجمة من العربية وإليها، وتوفير أداة بحثية هامة للباحثين والمترجمين والناشرين، وتتضمن الببليوغرافيا بيانات تفصيلية عن الكتب المترجمة، بما في ذلك بيانات المؤلفين والمترجمين والناشرين، وتاريخ النشر، واللغة الأصلية، واللغة المترجم إليها، وغيرها من البيانات الهامة.",
+    en: "Among the most important outputs the platform has sought to provide is the bibliography. The platform offers an integrated bibliographic database of books translated from Arabic into a number of world languages. In this context, it aims to facilitate access to bibliographic information, shed light on the translation movement to and from Arabic, and provide an important research tool for researchers, translators, and publishers. The bibliography includes detailed data on translated books, including authors, translators, publishers, publication date, original language, target language, and other important data.",
   };
 
   const closing: BilingualString = {
@@ -258,6 +284,7 @@ export function getServicesContent(locale: Locale): ServicesPageContent {
         title: pickLocale(block.title, locale),
         body: pickLocale(block.body, locale),
         bullets: block.bullets ? pickLocaleList(block.bullets, locale) : undefined,
+        spanFullWidth: block.spanFullWidth,
       })),
     },
     bibliography: {
@@ -266,10 +293,12 @@ export function getServicesContent(locale: Locale): ServicesPageContent {
     },
     products: {
       title: isAr ? "مخرجات ومنتجات المنصة" : "Platform Outputs & Products",
+      audiencesLabel: isAr ? "الجهات المستهدفة:" : "Target audiences:",
       cards: productCards.map((card) => ({
         key: card.key,
         title: pickLocale(card.title, locale),
-        items: pickLocaleList(card.items, locale),
+        body: pickLocale(card.body, locale),
+        audiences: pickLocale(card.audiences, locale),
       })),
     },
     closing: pickLocale(closing, locale),

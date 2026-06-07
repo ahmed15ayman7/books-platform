@@ -63,6 +63,7 @@ export default async function ServicesPage() {
         <ServicesProductsCards
           locale={locale}
           title={content.products.title}
+          audiencesLabel={content.products.audiencesLabel}
           cards={content.products.cards}
         />
 
