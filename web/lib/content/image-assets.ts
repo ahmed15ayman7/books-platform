@@ -76,7 +76,7 @@ export function unsplashCoverUrl(photoId: string): string {
 }
 
 export const ABOUT_HERO_COVER_URLS = [
-  unsplashCoverUrl("photo-1481627834876-b7833e8f5570"),
+  "https://booksplatform.net/wp-content/uploads/Cover1.jpg",
   unsplashCoverUrl("photo-1516979187450-637abb88f58e"),
   unsplashCoverUrl("photo-1456513080510-7bf3a84b82f8"),
   unsplashCoverUrl("photo-1507842217343-583bb7270b66"),
