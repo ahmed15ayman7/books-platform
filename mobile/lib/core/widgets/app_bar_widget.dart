@@ -50,17 +50,23 @@ class AppBarWidget extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Leading: back button or brand logo
-          if (showBack)
-            _BackButton(onBack: onBack)
-          else if (variant == AppBarVariant.home)
-            _BrandLogo(locale: currentLocale)
-          else
-            Expanded(child: _TitleBlock(title: title, subtitle: subtitle)),
-
-          if (variant == AppBarVariant.home) const Spacer(),
-
-          // Trailing controls
+          Expanded(
+            child: Row(
+              children: [
+                if (showBack) ...[
+                  _BackButton(onBack: onBack),
+                  SizedBox(width: 10.w),
+                ],
+                if (variant == AppBarVariant.home)
+                  _BrandLogo(locale: currentLocale)
+                else
+                  Expanded(
+                    child: _TitleBlock(title: title, subtitle: subtitle),
+                  ),
+              ],
+            ),
+          ),
+          SizedBox(width: 10.w),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
