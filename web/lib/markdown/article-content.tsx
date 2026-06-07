@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { normalizeImageSrc } from "./normalize-image-url";
 import { resolveArticleImageSrc } from "./article-media-url";
-import { linkLabelFromUrl } from "./normalize-article-source";
+import { resolveLinkLabel } from "./normalize-article-source";
 import { parseArticleContent } from "./parse-article-content";
 
 const INLINE_TOKEN =
@@ -40,21 +40,19 @@ function inlineFormat(text: string): ReactNode[] {
           <InlineArticleImage key={key++} src={imageSrc} alt={m[1].trim() || "صورة"} compact />,
         );
       } else {
-        const label = m[1].trim() || linkLabelFromUrl(raw);
+        const label = resolveLinkLabel(m[1], raw);
         parts.push(<ExternalLink key={key++} href={raw} label={label} />);
       }
     } else if (m[3] !== undefined && m[4] !== undefined) {
-      const label = m[3].trim();
       const href = m[4].trim();
+      const label = resolveLinkLabel(m[3], href);
       const imageSrc = resolveArticleImageSrc(href);
       if (imageSrc) {
         parts.push(
           <InlineArticleImage key={key++} src={imageSrc} alt={label || "صورة"} compact />,
         );
       } else {
-        parts.push(
-          <ExternalLink key={key++} href={href} label={label || linkLabelFromUrl(href)} />,
-        );
+        parts.push(<ExternalLink key={key++} href={href} label={label} />);
       }
     } else if (m[5]) {
       const token = m[5];

@@ -1,6 +1,6 @@
 import { isImageUrl } from "./is-image-url";
 import { normalizeImageSrc } from "./normalize-image-url";
-import { normalizeArticleSource, linkLabelFromUrl } from "./normalize-article-source";
+import { normalizeArticleSource, linkLabelFromUrl, resolveLinkLabel } from "./normalize-article-source";
 import { isArticleImageUrl } from "./article-media-url";
 
 export type ArticleContentBlock =
@@ -105,7 +105,7 @@ function parseLineBlock(line: string): ArticleContentBlock | null {
       return toImageBlock(raw, alt, alt || undefined);
     }
     const label = alt || linkLabelFromUrl(raw);
-    return { type: "paragraph", text: `[${label}](${raw})` };
+    return { type: "paragraph", text: `[${resolveLinkLabel(label, raw)}](${raw})` };
   }
 
   const mdLink = MD_LINK.exec(trimmed);
@@ -115,7 +115,10 @@ function parseLineBlock(line: string): ArticleContentBlock | null {
     if (isArticleImageUrl(href)) {
       return toImageBlock(href, label, label || undefined);
     }
-    return { type: "paragraph", text: `[${label || linkLabelFromUrl(href)}](${href})` };
+    return {
+      type: "paragraph",
+      text: `[${resolveLinkLabel(label, href)}](${href})`,
+    };
   }
 
   if (/!\[[^\]]*\]\([^)]+\)/.test(trimmed)) {

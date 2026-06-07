@@ -1,18 +1,51 @@
 /** Decode a readable link label from a URL (e.g. Wikipedia slug → Arabic title). */
 import { isArticleImageUrl } from "./article-media-url";
 
+const ENCODED_LABEL = /%[0-9A-Fa-f]{2}/;
+
+/** Decode URL-encoded or slug-style link labels for display. */
+export function decodeLinkLabel(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed) return trimmed;
+
+  if (ENCODED_LABEL.test(trimmed)) {
+    try {
+      return decodeURIComponent(trimmed.replace(/\+/g, " ")).replace(/_/g, " ").trim();
+    } catch {
+      /* fall through */
+    }
+  }
+
+  return trimmed.replace(/_/g, " ");
+}
+
 export function linkLabelFromUrl(url: string): string {
   try {
     const parsed = new URL(url);
-    const lastSegment = parsed.pathname.split("/").filter(Boolean).pop();
-    if (lastSegment) {
-      const decoded = decodeURIComponent(lastSegment.replace(/_/g, " "));
-      if (decoded.trim()) return decoded;
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    for (let i = segments.length - 1; i >= 0; i -= 1) {
+      const decoded = decodeLinkLabel(segments[i]!);
+      if (decoded && !decoded.startsWith("wiki") && decoded.length > 1) {
+        return decoded;
+      }
+    }
+    if (parsed.hash) {
+      const fromHash = decodeLinkLabel(parsed.hash.replace(/^#/, ""));
+      if (fromHash) return fromHash;
     }
     return parsed.hostname.replace(/^www\./, "");
   } catch {
-    return url;
+    return decodeLinkLabel(url);
   }
+}
+
+/** Best display label for a markdown or auto-generated link. */
+export function resolveLinkLabel(label: string, href: string): string {
+  const trimmed = label.trim();
+  if (trimmed && trimmed !== href && !/^https?:\/\//i.test(trimmed)) {
+    return decodeLinkLabel(trimmed);
+  }
+  return linkLabelFromUrl(href);
 }
 
 /** Unescape WordPress/export-style backslash escapes in shortcodes and links. */
@@ -57,14 +90,31 @@ export function replaceCaptionShortcodes(text: string): string {
   });
 }
 
-/** Turn bare (https://...) URLs into markdown links with decoded labels. Skips markdown image/link syntax. */
+const EXTERNAL_URL_INNER = String.raw`https?:\/\/[^\s)\]،؛\[]+`;
+
+/** Turn (https://...) URLs into markdown links with decoded Arabic labels. */
 export function linkifyParenthesizedUrls(text: string): string {
-  return text.replace(/(?<!\])\(https?:\/\/[^\s)\]]+\)?/g, (match) => {
-    let url = match.slice(1);
-    if (url.endsWith(")")) url = url.slice(0, -1);
-    const label = linkLabelFromUrl(url);
-    return `[${label}](${url})`;
-  });
+  const openGuard = String.raw`(?<!\]\()(?<!!)`;
+  let out = text.replace(
+    new RegExp(String.raw`${openGuard}(${EXTERNAL_URL_INNER})\)`, "g"),
+    (_match, url: string) => `[${linkLabelFromUrl(url)}](${url})`,
+  );
+  out = out.replace(
+    new RegExp(String.raw`${openGuard}(${EXTERNAL_URL_INNER})(?=[،؛]|$|\s)`, "g"),
+    (_match, url: string) => `[${linkLabelFromUrl(url)}](${url})`,
+  );
+  return out;
+}
+
+/** Linkify bare http(s) URLs in prose (not inside markdown [label](url) syntax). */
+export function linkifyBareExternalUrls(text: string): string {
+  return text.replace(
+    new RegExp(String.raw`(^|[\s،؛!?…])(${EXTERNAL_URL_INNER})(?=[\s)\]،؛\[]|$)`, "g"),
+    (match, before: string, url: string) => {
+      if (isArticleImageUrl(url)) return match;
+      return `${before}[${linkLabelFromUrl(url)}](${url})`;
+    },
+  );
 }
 
 /** Convert markdown-image syntax that points at a non-image URL into a text link. */
@@ -76,11 +126,22 @@ export function demoteNonImageMarkdownImages(text: string): string {
   });
 }
 
+/** Normalize markdown links whose label is URL-encoded to decoded Arabic text. */
+export function decodeMarkdownLinkLabels(text: string): string {
+  return text.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, (full, label: string, url: string) => {
+    const resolved = resolveLinkLabel(label, url);
+    if (resolved === label.trim()) return full;
+    return `[${resolved}](${url})`;
+  });
+}
+
 /** Full WordPress/markdown cleanup before block parsing. */
 export function normalizeArticleSource(raw: string): string {
   let out = unescapeWordPressEscapes(raw);
   out = replaceCaptionShortcodes(out);
   out = demoteNonImageMarkdownImages(out);
   out = linkifyParenthesizedUrls(out);
+  out = linkifyBareExternalUrls(out);
+  out = decodeMarkdownLinkLabels(out);
   return out;
 }

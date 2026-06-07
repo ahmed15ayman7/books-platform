@@ -160,4 +160,21 @@ describe("parseArticleContent", () => {
       text: `[فيلسوف](${url})`,
     });
   });
+
+  it("linkifies bare Wikipedia URLs in prose", () => {
+    const url =
+      "https://ar.wikipedia.org/wiki/%D8%A5%D9%8A%D9%85%D8%A7%D9%86%D9%88%D9%8A%D9%84_%D9%83%D8%A7%D9%86%D8%B7";
+    const blocks = parseArticleContent(`هذا الرجل هو ${url}، والتحدي`);
+    const text = (blocks[0] as { text: string }).text;
+    expect(text).toContain(`[إيمانويل كانط](${url})`);
+  });
+
+  it("decodes URL-encoded markdown link labels to Arabic", () => {
+    const url =
+      "https://ar.wikipedia.org/wiki/%D8%A5%D9%8A%D9%85%D8%A7%D9%86%D9%88%D9%8A%D9%84_%D9%83%D8%A7%D9%86%D8%B7";
+    const encodedLabel = "%D8%A5%D9%8A%D9%85%D8%A7%D9%86%D9%88%D9%8A%D9%84_%D9%83%D8%A7%D9%86%D8%B7";
+    const blocks = parseArticleContent(`هذا الرجل هو [${encodedLabel}](${url})، والتحدي`);
+    const text = (blocks[0] as { text: string }).text;
+    expect(text).toContain("[إيمانويل كانط]");
+  });
 });
