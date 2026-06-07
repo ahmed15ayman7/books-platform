@@ -29,6 +29,8 @@ export const ABOUT_IMAGES = {
   aboutHero4: "/about/gallery-4.webp",
   aboutHero5: "/about/gallery-5.webp",
   aboutHero6: "/about/gallery-6.webp",
+  aboutHero7: "/about/concept.webp",
+  aboutHero8: "/about/intro.webp",
 } as const;
 
 /** Source URLs for one-time download (Unsplash) */
@@ -58,8 +60,10 @@ export const ABOUT_IMAGE_SOURCES: Record<keyof typeof ABOUT_IMAGES, string> = {
   aboutHero2: "https://images.unsplash.com/photo-1516979187450-637abb88f58e?w=500&q=80&fm=webp",
   aboutHero3: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=500&q=80&fm=webp",
   aboutHero4: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=700&q=80&fm=webp",
-  aboutHero5: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=500&q=80&fm=webp",
-  aboutHero6: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=500&q=80&fm=webp",
+  aboutHero5: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=500&q=80&fm=webp",
+  aboutHero6: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=500&q=80&fm=webp",
+  aboutHero7: "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=500&q=80&fm=webp",
+  aboutHero8: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=500&q=80&fm=webp",
 };
 
 export const TEAM_IMAGE_PATHS = TEAM_MEMBERS.map((m) => m.photoUrl).filter(

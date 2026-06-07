@@ -14,12 +14,8 @@ export interface AboutValue {
   image?: AboutImage;
 }
 
-export interface AboutHeroImage extends AboutImage {
-  aspect: "4/3" | "2/3";
-}
-
 export interface AboutContent {
-  hero: { title: string; subtitle: string; images: AboutHeroImage[] };
+  hero: { title: string; subtitle: string; images: AboutImage[] };
   intro: {
     eyebrow: string;
     title: string;
@@ -78,36 +74,38 @@ const storyGallery: Array<AboutImage & { caption: BilingualString }> = [
   },
 ];
 
-const heroImages: AboutHeroImage[] = [
+const heroImages: AboutImage[] = [
   {
     src: ABOUT_IMAGE_SOURCES.aboutHero1,
     alt: { ar: "مكتبة وكتب", en: "Library and books" },
-    aspect: "4/3",
   },
   {
     src: ABOUT_IMAGE_SOURCES.aboutHero2,
     alt: { ar: "قارئ مع كتاب", en: "Reader with a book" },
-    aspect: "2/3",
   },
   {
     src: ABOUT_IMAGE_SOURCES.aboutHero3,
     alt: { ar: "صفحات قاموس ومعرفة", en: "Dictionary pages and knowledge" },
-    aspect: "2/3",
   },
   {
     src: ABOUT_IMAGE_SOURCES.aboutHero4,
     alt: { ar: "صفحات مفتوحة من كتاب", en: "Open book pages" },
-    aspect: "4/3",
   },
   {
     src: ABOUT_IMAGE_SOURCES.aboutHero5,
-    alt: { ar: "بودكast ومحتوى صوتي", en: "Podcast and audio content" },
-    aspect: "2/3",
+    alt: { ar: "رفوف مكتبة", en: "Library shelves" },
   },
   {
     src: ABOUT_IMAGE_SOURCES.aboutHero6,
-    alt: { ar: "مكتبة ورفوف كتب", en: "Library bookshelves" },
-    aspect: "2/3",
+    alt: { ar: "ميكروفون وبودكast", en: "Podcast microphone" },
+  },
+  {
+    src: ABOUT_IMAGE_SOURCES.aboutHero7,
+    alt: { ar: "كتب مكدّسة", en: "Stacked books" },
+  },
+  {
+    src: ABOUT_IMAGE_SOURCES.aboutHero8,
+    alt: { ar: "عالم المعرفة", en: "World of knowledge" },
   },
 ];
 
@@ -254,7 +252,6 @@ export function getAboutContent(locale: Locale): AboutContent {
       images: heroImages.map((img) => ({
         src: img.src,
         alt: img.alt,
-        aspect: img.aspect,
       })),
     },
     intro: {
