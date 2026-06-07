@@ -24,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
     locale,
     path: `/${locale}/services`,
     title: locale === "ar" ? "خدماتنا | منصة الكتب العالمية" : "Our Services | Books Platform",
-    description: content.intro.lead.slice(0, 155),
+    description: content.intro.paragraphs[0]?.slice(0, 155) ?? "",
     keywords: locale === "ar" ? ["خدمات", "ببليوغرافيا"] : ["services", "bibliography"],
   });
 }
@@ -55,6 +55,7 @@ export default async function ServicesPage() {
     <div className="min-h-screen bg-white">
       <AboutHeroSplit
         variant="light"
+        textSize="lg"
         locale={locale}
         title={content.hero.title}
         subtitle={content.hero.subtitle}
@@ -72,7 +73,7 @@ export default async function ServicesPage() {
             locale={locale}
             eyebrow={content.intro.eyebrow}
             title={content.intro.title}
-            paragraphs={[content.intro.lead]}
+            paragraphs={content.intro.paragraphs}
             image={introImage}
             imagePosition="right"
             textSize="lg"
@@ -80,9 +81,9 @@ export default async function ServicesPage() {
 
           <ServicesPillarsGrid
             locale={locale}
-            eyebrow={content.intro.eyebrow}
-            title={isAr ? "ركائز الخدمة" : "Service Pillars"}
-            items={content.pillars}
+            eyebrow={content.pillars.eyebrow}
+            title={content.pillars.title}
+            items={content.pillars.items}
           />
 
           <ServicesDeliverables
@@ -124,6 +125,7 @@ export default async function ServicesPage() {
 
           <AboutQuoteBand
             variant="light"
+            textSize="lg"
             quote={content.cta.quote}
             tagline={content.hero.subtitle}
           />

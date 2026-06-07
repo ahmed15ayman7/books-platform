@@ -9,10 +9,17 @@ interface AboutQuoteBandProps {
   quote: string;
   tagline: string;
   variant?: "dark" | "light";
+  textSize?: "default" | "lg";
 }
 
-export function AboutQuoteBand({ quote, tagline, variant = "dark" }: AboutQuoteBandProps) {
+export function AboutQuoteBand({
+  quote,
+  tagline,
+  variant = "dark",
+  textSize = "default",
+}: AboutQuoteBandProps) {
   const isLight = variant === "light";
+  const isLarge = textSize === "lg";
 
   return (
     <AnimatedSection>
@@ -36,7 +43,8 @@ export function AboutQuoteBand({ quote, tagline, variant = "dark" }: AboutQuoteB
           <RevealLines
             lines={[quote]}
             lineClassName={cn(
-              "mx-auto max-w-3xl font-display text-xl font-bold md:text-2xl",
+              "mx-auto max-w-3xl font-display font-bold",
+              isLarge ? "text-2xl md:text-3xl" : "text-xl md:text-2xl",
               isLight ? "text-[var(--brand-gray-900)]" : "text-white",
             )}
           />
@@ -45,8 +53,14 @@ export function AboutQuoteBand({ quote, tagline, variant = "dark" }: AboutQuoteB
               className={cn(
                 "mx-auto mt-4 max-w-xl",
                 isLight
-                  ? "text-base text-[var(--brand-gray-600)] md:text-lg"
-                  : "text-sm text-[var(--brand-gray-300)] md:text-base",
+                  ? cn(
+                      "text-[var(--brand-gray-600)]",
+                      isLarge ? "text-lg md:text-xl" : "text-base md:text-lg",
+                    )
+                  : cn(
+                      "text-[var(--brand-gray-300)]",
+                      isLarge ? "text-base md:text-lg" : "text-sm md:text-base",
+                    ),
               )}
             >
               {tagline}

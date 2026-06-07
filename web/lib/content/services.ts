@@ -27,8 +27,8 @@ export interface PartnershipCard {
 
 export interface ServicesContent {
   hero: { title: string; subtitle: string };
-  intro: { eyebrow: string; title: string; lead: string };
-  pillars: ServicePillar[];
+  intro: { eyebrow: string; title: string; paragraphs: string[] };
+  pillars: { eyebrow: string; title: string; items: ServicePillar[] };
   workflow: { eyebrow: string; title: string; steps: { title: string; body: string }[] };
   deliverables: { eyebrow: string; title: string; items: { key: string; title: string; items: string[] }[] };
   media: { eyebrow: string; title: string; lead: string };
@@ -185,15 +185,24 @@ export function getServicesContent(locale: Locale): ServicesContent {
     intro: {
       eyebrow: isAr ? "خدمات المنصة" : "Platform Services",
       title: isAr ? "ماذا نقدّم؟" : "What We Offer",
-      lead: isAr
-        ? "تقدّم منصة الكتب مجموعة من الخدمات الجديدة والمميزة والحصرية للقرّاء والمؤلفين والناشرين والمترجمين."
-        : "Books Platform offers a range of new, distinctive, and exclusive services to readers, authors, publishers, and translators.",
+      paragraphs: [
+        isAr
+          ? "تقدّم منصة الكتب مجموعة من الخدمات الجديدة والمميزة والحصرية للقرّاء والمؤلفين والناشرين والمترجمين."
+          : "Books Platform offers a range of new, distinctive, and exclusive services to readers, authors, publishers, and translators.",
+        isAr
+          ? "تقديم خدمات ثقافية وإعلامية مبتكرة عبر نشرات يومية عن الكتب الجديدة، وإنتاج فيديوهات وبودكasts تسلّط الضوء على أهم الإصدارات، والتفاعل عبر تطبيق المنصة وقنوات التواصل."
+          : "Providing innovative cultural and media services through daily news bulletins on new books, as well as producing videos and podcasts highlighting the most important releases, and engaging audiences via the platform's mobile application and social media channels.",
+      ],
     },
-    pillars: pillars.map((p) => ({
-      ...p,
-      title: { ar: p.title.ar, en: p.title.en },
-      body: { ar: p.body.ar, en: p.body.en },
-    })),
+    pillars: {
+      eyebrow: isAr ? "ركائزنا" : "Our Pillars",
+      title: isAr ? "ركائز الخدمة" : "Service Pillars",
+      items: pillars.map((p) => ({
+        ...p,
+        title: { ar: p.title.ar, en: p.title.en },
+        body: { ar: p.body.ar, en: p.body.en },
+      })),
+    },
     workflow: {
       eyebrow: isAr ? "آلية العمل" : "How We Work",
       title: isAr ? "من الفكرة إلى القارئ" : "From Idea to Reader",

@@ -28,6 +28,7 @@ interface AboutHeroSplitProps {
   secondaryHref: string;
   secondaryLabel: string;
   variant?: "dark" | "light";
+  textSize?: "default" | "lg";
 }
 
 export function AboutHeroSplit({
@@ -40,9 +41,11 @@ export function AboutHeroSplit({
   secondaryHref,
   secondaryLabel,
   variant = "dark",
+  textSize = "default",
 }: AboutHeroSplitProps) {
   const imageAlt = pickLocale(image.alt, locale);
   const isLight = variant === "light";
+  const isLarge = textSize === "lg";
 
   return (
     <AnimatedSection
@@ -59,7 +62,8 @@ export function AboutHeroSplit({
               text={title}
               as="h1"
               className={cn(
-                "font-display text-display-md font-bold block",
+                "font-display font-bold block",
+                isLarge ? "text-display-lg" : "text-display-md",
                 isLight ? "text-[var(--brand-gray-900)]" : "text-white",
               )}
             />
@@ -68,8 +72,11 @@ export function AboutHeroSplit({
                 className={cn(
                   "mt-4 max-w-xl leading-relaxed",
                   isLight
-                    ? "text-lg text-[var(--brand-gray-600)] md:text-xl"
-                    : "text-lg text-[var(--brand-gray-300)]",
+                    ? cn(
+                        "text-[var(--brand-gray-600)]",
+                        isLarge ? "text-xl md:text-2xl" : "text-lg md:text-xl",
+                      )
+                    : cn("text-[var(--brand-gray-300)]", isLarge ? "text-xl" : "text-lg"),
                 )}
               >
                 {subtitle}
