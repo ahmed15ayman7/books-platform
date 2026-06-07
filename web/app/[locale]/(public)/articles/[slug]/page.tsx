@@ -137,7 +137,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         publicHref={`/${locale}/articles/${article.slug}`}
         title={article.title}
       >
-        <div className="min-h-screen bg-white pb-20">
+        <div className="min-h-screen bg-white pb-20" style={{direction: "rtl"}}>
           <ArticleDetailHero
             locale={locale}
             title={article.title}
