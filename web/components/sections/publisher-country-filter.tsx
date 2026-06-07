@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
@@ -23,6 +24,8 @@ interface PublisherCountryFilterProps {
 }
 
 const STORAGE_KEY = "publishers-country-visible-slugs";
+const PANEL_WIDTH = 320;
+const PANEL_MAX_HEIGHT = 288;
 
 function countryLabel(country: PublisherCountryOption, locale: Locale): string {
   return locale === "ar" && country.nameAr ? country.nameAr : country.name;
@@ -75,8 +78,33 @@ function chipClass(active: boolean): string {
     "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
     active
       ? "border-[var(--brand-red)] bg-[var(--brand-red)] text-white"
-      : "border-[var(--brand-gray-300)] text-[var(--brand-gray-600)] hover:border-[var(--brand-red)] hover:text-[var(--brand-red)]",
+      : "border-[var(--brand-gray-300)] bg-white text-[var(--brand-gray-600)] hover:border-[var(--brand-red)] hover:text-[var(--brand-red)]",
   );
+}
+
+function computePanelStyle(trigger: HTMLElement): CSSProperties {
+  const rect = trigger.getBoundingClientRect();
+  const width = Math.min(PANEL_WIDTH, window.innerWidth - 16);
+  const margin = 8;
+
+  let top = rect.bottom + margin;
+  if (top + PANEL_MAX_HEIGHT > window.innerHeight - margin) {
+    top = Math.max(margin, rect.top - PANEL_MAX_HEIGHT - margin);
+  }
+
+  let left = rect.left;
+  if (left + width > window.innerWidth - margin) {
+    left = window.innerWidth - width - margin;
+  }
+  left = Math.max(margin, left);
+
+  return {
+    position: "fixed",
+    top,
+    left,
+    width,
+    zIndex: 300,
+  };
 }
 
 export function PublisherCountryFilter({
@@ -89,7 +117,8 @@ export function PublisherCountryFilter({
   const isAr = locale === "ar";
   const router = useRouter();
   const listId = useId();
-  const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [visibleSlugs, setVisibleSlugs] = useState<string[]>(() =>
@@ -97,6 +126,10 @@ export function PublisherCountryFilter({
   );
   const [pickerOpen, setPickerOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [panelStyle, setPanelStyle] = useState<CSSProperties>({});
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     let stored: string[] | null = null;
@@ -117,24 +150,39 @@ export function PublisherCountryFilter({
     }
   }, [visibleSlugs]);
 
-  useEffect(() => {
-    if (!pickerOpen) return;
-    const onPointerDown = (event: MouseEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setPickerOpen(false);
-        setQuery("");
-      }
-    };
-    document.addEventListener("mousedown", onPointerDown);
-    return () => document.removeEventListener("mousedown", onPointerDown);
-  }, [pickerOpen]);
+  const repositionPanel = useCallback(() => {
+    if (!triggerRef.current) return;
+    setPanelStyle(computePanelStyle(triggerRef.current));
+  }, []);
 
   useEffect(() => {
-    if (pickerOpen) {
-      inputRef.current?.focus();
-    } else {
+    if (!pickerOpen) return;
+
+    repositionPanel();
+    inputRef.current?.focus({ preventScroll: true });
+
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (triggerRef.current?.contains(target) || panelRef.current?.contains(target)) return;
+      setPickerOpen(false);
       setQuery("");
-    }
+    };
+
+    const onReposition = () => repositionPanel();
+
+    document.addEventListener("mousedown", onPointerDown);
+    window.addEventListener("resize", onReposition);
+    window.addEventListener("scroll", onReposition, true);
+
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      window.removeEventListener("resize", onReposition);
+      window.removeEventListener("scroll", onReposition, true);
+    };
+  }, [pickerOpen, repositionPanel]);
+
+  useEffect(() => {
+    if (!pickerOpen) setQuery("");
   }, [pickerOpen]);
 
   const countryBySlug = useMemo(
@@ -181,30 +229,94 @@ export function PublisherCountryFilter({
 
   if (countries.length === 0) return null;
 
-  return (
-    <div ref={rootRef} className="relative mb-6 flex flex-wrap items-center gap-2">
-      <Link href={searchQuery ? `${baseHref}?search=${encodeURIComponent(searchQuery)}` : baseHref} className={chipClass(!activeCountry)}>
-        {isAr ? "الكل" : "All"}
-      </Link>
-
-      {visibleCountries.map((country) => (
-        <Link
-          key={country.id}
-          href={`${baseHref}?country=${encodeURIComponent(country.slug)}${searchSuffix}`}
-          className={chipClass(activeCountry === country.slug)}
+  const pickerPanel =
+    pickerOpen && mounted ? (
+      <>
+        <button
+          type="button"
+          aria-label={isAr ? "إغلاق" : "Close"}
+          className="fixed inset-0 z-[290] cursor-default bg-black/20"
+          onClick={() => setPickerOpen(false)}
+        />
+        <div
+          ref={panelRef}
+          id={listId}
+          style={panelStyle}
+          className="overflow-hidden rounded-xl border border-[var(--brand-gray-300)] bg-white shadow-2xl ring-1 ring-black/5"
+          role="dialog"
+          aria-label={isAr ? "اختر دولة" : "Choose country"}
         >
-          {countryLabel(country, locale)}
-        </Link>
-      ))}
+          <div className="border-b border-[var(--brand-gray-200)] bg-white p-2">
+            <div className="relative">
+              <Search
+                className="pointer-events-none absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--brand-gray-400)]"
+                aria-hidden="true"
+              />
+              <input
+                ref={inputRef}
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={isAr ? "ابحث عن دولة..." : "Search countries..."}
+                className="w-full rounded-md border border-[var(--brand-gray-300)] bg-white py-2 pe-3 ps-9 text-sm text-[var(--brand-gray-900)] outline-none focus:border-[var(--brand-red)] focus:ring-1 focus:ring-[var(--brand-red)]"
+              />
+            </div>
+          </div>
 
-      {hiddenCount > 0 && (
-        <div className="relative">
+          <ul className="max-h-56 overflow-y-auto bg-white py-1" role="listbox">
+            {filteredHidden.length === 0 ? (
+              <li className="px-3 py-2 text-sm text-[var(--brand-gray-500)]">
+                {isAr ? "لا توجد نتائج" : "No results"}
+              </li>
+            ) : (
+              filteredHidden.map((country) => (
+                <li key={country.id} role="option">
+                  <button
+                    type="button"
+                    onClick={() => handleSelectHiddenCountry(country.slug)}
+                    className="flex w-full flex-col bg-white px-3 py-2 text-start text-sm text-[var(--brand-gray-900)] hover:bg-[var(--brand-gray-100)]"
+                  >
+                    <span>{countryLabel(country, locale)}</span>
+                    {country.nameAr && country.name && countryLabel(country, locale) !== country.name && (
+                      <span className="text-xs text-[var(--brand-gray-500)]">{country.name}</span>
+                    )}
+                  </button>
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
+      </>
+    ) : null;
+
+  return (
+    <>
+      <div className="mb-6 flex flex-wrap items-center gap-2">
+        <Link
+          href={searchQuery ? `${baseHref}?search=${encodeURIComponent(searchQuery)}` : baseHref}
+          className={chipClass(!activeCountry)}
+        >
+          {isAr ? "الكل" : "All"}
+        </Link>
+
+        {visibleCountries.map((country) => (
+          <Link
+            key={country.id}
+            href={`${baseHref}?country=${encodeURIComponent(country.slug)}${searchSuffix}`}
+            className={chipClass(activeCountry === country.slug)}
+          >
+            {countryLabel(country, locale)}
+          </Link>
+        ))}
+
+        {hiddenCount > 0 && (
           <button
+            ref={triggerRef}
             type="button"
             onClick={() => setPickerOpen((open) => !open)}
             className={cn(
               chipClass(false),
-              "inline-flex items-center gap-1 bg-white",
+              "inline-flex items-center gap-1",
               pickerOpen && "border-[var(--brand-red)] text-[var(--brand-red)]",
             )}
             aria-expanded={pickerOpen}
@@ -212,55 +324,10 @@ export function PublisherCountryFilter({
           >
             +{hiddenCount.toLocaleString(isAr ? "ar-EG" : "en-US")}
           </button>
+        )}
+      </div>
 
-          {pickerOpen && (
-            <div
-              id={listId}
-              className="absolute start-0 top-full z-50 mt-2 w-[min(100vw-2rem,320px)] overflow-hidden rounded-lg border border-[var(--brand-gray-300)] bg-white shadow-lg"
-            >
-              <div className="border-b border-[var(--brand-gray-200)] p-2">
-                <div className="relative">
-                  <Search
-                    className="pointer-events-none absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--brand-gray-400)]"
-                    aria-hidden="true"
-                  />
-                  <input
-                    ref={inputRef}
-                    type="search"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder={isAr ? "ابحث عن دولة..." : "Search countries..."}
-                    className="w-full rounded-md border border-[var(--brand-gray-300)] bg-white py-2 pe-3 ps-9 text-sm text-[var(--brand-gray-900)] outline-none focus:border-[var(--brand-red)] focus:ring-1 focus:ring-[var(--brand-red)]"
-                  />
-                </div>
-              </div>
-
-              <ul className="max-h-56 overflow-y-auto py-1" role="listbox">
-                {filteredHidden.length === 0 ? (
-                  <li className="px-3 py-2 text-sm text-[var(--brand-gray-500)]">
-                    {isAr ? "لا توجد نتائج" : "No results"}
-                  </li>
-                ) : (
-                  filteredHidden.map((country) => (
-                    <li key={country.id} role="option">
-                      <button
-                        type="button"
-                        onClick={() => handleSelectHiddenCountry(country.slug)}
-                        className="flex w-full flex-col px-3 py-2 text-start text-sm text-[var(--brand-gray-900)] hover:bg-[var(--brand-gray-100)]"
-                      >
-                        <span>{countryLabel(country, locale)}</span>
-                        {country.nameAr && country.name && countryLabel(country, locale) !== country.name && (
-                          <span className="text-xs text-[var(--brand-gray-500)]">{country.name}</span>
-                        )}
-                      </button>
-                    </li>
-                  ))
-                )}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+      {mounted && pickerPanel ? createPortal(pickerPanel, document.body) : null}
+    </>
   );
 }
