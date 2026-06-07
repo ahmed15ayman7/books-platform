@@ -177,8 +177,8 @@ export function AuthorEditForm({ locale, id }: AuthorEditFormProps) {
               onArChange={(v) => setForm((p) => ({ ...p, bioAr: v }))}
               onEnChange={(v) => setForm((p) => ({ ...p, bio: v }))}
               labels={{ ar: "السيرة (عربي)", en: "Bio (English)" }}
-              multiline
-              rows={4}
+              richText={{ image: false }}
+              editorMinHeight={160}
               layout="full"
             />
           </div>

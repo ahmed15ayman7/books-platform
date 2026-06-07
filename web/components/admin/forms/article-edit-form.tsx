@@ -20,7 +20,7 @@ import {
   adminArticleViewPath,
 } from "@/lib/admin/public-urls";
 import { ArticleLivePreview } from "@/components/admin/article-live-preview";
-import { ArticleMarkdownHint } from "@/components/admin/article-markdown-hint";
+import { AdminRichTextHint } from "@/components/admin/admin-rich-text-hint";
 import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
 import { adminToast } from "@/lib/admin/admin-toast";
 
@@ -265,7 +265,7 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
         </AdminCard>
 
         <AdminCard title="المحتوى">
-          <ArticleMarkdownHint />
+          <AdminRichTextHint />
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <AdminBilingualField
               arValue={form.title}
@@ -290,8 +290,8 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
               onArChange={(v) => setForm((p) => ({ ...p, body: v }))}
               onEnChange={(v) => setForm((p) => ({ ...p, bodyEn: v }))}
               labels={{ ar: "المحتوى الكامل (عربي)", en: "Full body (English)" }}
-              multiline
-              rows={16}
+              richText={{ image: true }}
+              editorMinHeight={360}
             />
           </div>
         </AdminCard>

@@ -191,8 +191,8 @@ export function CreatePublisherDialog({
                 onArChange={(v) => set("contentAr")(v)}
                 onEnChange={(v) => set("content")(v)}
                 labels={{ ar: "الوصف (عربي)", en: "الوصف (إنجليزي)" }}
-                multiline
-                rows={4}
+                richText={{ image: false }}
+                editorMinHeight={160}
               />
             </div>
           </div>

@@ -187,8 +187,8 @@ export function AuthorFormDialog({
               onArChange={(v) => set("bioAr")(v)}
               onEnChange={(v) => set("bio")(v)}
               labels={{ ar: "نبذة (عربي)", en: "نبذة (إنجليزي)" }}
-              multiline
-              rows={4}
+              richText={{ image: false }}
+              editorMinHeight={140}
             />
           </div>
 

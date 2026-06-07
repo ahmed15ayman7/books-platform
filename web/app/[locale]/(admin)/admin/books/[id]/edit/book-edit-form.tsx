@@ -7,7 +7,7 @@ import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
 import { adminToast } from "@/lib/admin/admin-toast";
 import { createBook, updateBook, type BookEditData } from "./actions";
 import { adminFieldClass } from "@/components/admin/admin-form-field";
-import { AdminMarkdownHint } from "@/components/admin/admin-markdown-hint";
+import { AdminRichTextHint } from "@/components/admin/admin-rich-text-hint";
 import { AdminEntityCombobox, type EntityOption } from "@/components/admin/admin-entity-combobox";
 import { CreateAuthorDialog } from "@/components/admin/create-author-dialog";
 import { CreatePublisherDialog } from "@/components/admin/create-publisher-dialog";
@@ -576,7 +576,7 @@ export function BookEditForm({
           />
 
           <Field className="lg:col-span-2">
-            <AdminMarkdownHint />
+            <AdminRichTextHint />
           </Field>
 
           <AdminBilingualField
@@ -584,13 +584,12 @@ export function BookEditForm({
             enValue={form.description}
             onArChange={(v) => set("descriptionAr", v)}
             onEnChange={(v) => set("description", v)}
-            labels={{ ar: "ملخص الكتاب (Markdown) — عربي", en: "ملخص الكتاب (Markdown) — إنجليزي" }}
+            labels={{ ar: "ملخص الكتاب — عربي", en: "ملخص الكتاب — إنجليزي" }}
             inputClassName={fieldCls}
-            arPlaceholder={"## فكرة الكتاب\n\n**كلمة مفتاحية** مهمة في السياق…"}
-            enPlaceholder={"## About this book\n\n**Keyword** highlighted in context…"}
-            multiline
-            rows={12}
-            enMonospace
+            arPlaceholder="اكتب ملخص الكتاب…"
+            enPlaceholder="Write the book summary…"
+            richText={{ image: false }}
+            editorMinHeight={320}
             layout="half"
           />
 
