@@ -177,4 +177,22 @@ describe("parseArticleContent", () => {
     const text = (blocks[0] as { text: string }).text;
     expect(text).toContain("[إيمانويل كانط]");
   });
+
+  it("joins bold label and parenthesized URL into one markdown link", () => {
+    const url =
+      "https://ar.wikipedia.org/wiki/%D8%A5%D9%8A%D9%85%D8%A7%D9%86%D9%88%D9%8A%D9%84_%D9%83%D8%A7%D9%86%D8%B7";
+    const blocks = parseArticleContent(`**هذا الرجل هو [إيمانويل كانط]** (${url})، **والتحدي**`);
+    const text = (blocks[0] as { text: string }).text;
+    expect(text).toContain("**هذا الرجل هو [إيمانويل كانط]");
+    expect(text).toContain(`](${url})`);
+    expect(text).not.toContain(`]** (${url})`);
+  });
+
+  it("keeps markdown links inside bold paragraphs intact", () => {
+    const url =
+      "https://ar.wikipedia.org/wiki/%D8%A5%D9%8A%D9%85%D8%A7%D9%86%D9%88%D9%8A%D9%84_%D9%83%D8%A7%D9%86%D8%B7";
+    const input = `**هذا الرجل هو [إيمانويل كانط](${url})، والتحدي الذي وضعه أمام نفسه كان ضخما**`;
+    const blocks = parseArticleContent(input);
+    expect((blocks[0] as { text: string }).text).toBe(input);
+  });
 });

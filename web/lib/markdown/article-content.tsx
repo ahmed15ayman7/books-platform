@@ -7,9 +7,6 @@ import { resolveArticleImageSrc } from "./article-media-url";
 import { resolveLinkLabel } from "./normalize-article-source";
 import { parseArticleContent } from "./parse-article-content";
 
-const INLINE_TOKEN =
-  /!\[([^\]]*)\]\(([^)]+)\)|\[([^\]]+)\]\(([^)]+)\)|(\*\*[^*]+\*\*|__[^_]+__|\*[^*]+\*|_[^_]+_)/g;
-
 function ExternalLink({ href, label }: { href: string; label: string }) {
   return (
     <a
@@ -23,55 +20,74 @@ function ExternalLink({ href, label }: { href: string; label: string }) {
   );
 }
 
+const INLINE_RE =
+  /!\[([^\]]*)\]\(([^)]+)\)|\[([^\]]+)\]\(([^)]+)\)|\*\*([\s\S]+?)\*\*|__([\s\S]+?)__|\*([^*]+?)\*|_([^_]+?)_/g;
+
+function renderInlineLink(
+  href: string,
+  label: string,
+  key: number,
+  compact?: boolean,
+): ReactNode {
+  const imageSrc = resolveArticleImageSrc(href);
+  if (imageSrc) {
+    return (
+      <InlineArticleImage key={key} src={imageSrc} alt={label || "صورة"} compact={compact} />
+    );
+  }
+  return <ExternalLink key={key} href={href} label={resolveLinkLabel(label, href)} />;
+}
+
 function inlineFormat(text: string): ReactNode[] {
-  const parts: ReactNode[] = [];
-  let last = 0;
-  let m: RegExpExecArray | null;
   let key = 0;
 
-  while ((m = INLINE_TOKEN.exec(text)) !== null) {
-    if (m.index > last) parts.push(text.slice(last, m.index));
+  function parseSegment(segment: string): ReactNode[] {
+    const parts: ReactNode[] = [];
+    let last = 0;
+    let m: RegExpExecArray | null;
+    INLINE_RE.lastIndex = 0;
 
-    if (m[1] !== undefined && m[2] !== undefined) {
-      const raw = m[2].trim();
-      const imageSrc = resolveArticleImageSrc(raw);
-      if (imageSrc) {
-        parts.push(
-          <InlineArticleImage key={key++} src={imageSrc} alt={m[1].trim() || "صورة"} compact />,
-        );
-      } else {
-        const label = resolveLinkLabel(m[1], raw);
-        parts.push(<ExternalLink key={key++} href={raw} label={label} />);
-      }
-    } else if (m[3] !== undefined && m[4] !== undefined) {
-      const href = m[4].trim();
-      const label = resolveLinkLabel(m[3], href);
-      const imageSrc = resolveArticleImageSrc(href);
-      if (imageSrc) {
-        parts.push(
-          <InlineArticleImage key={key++} src={imageSrc} alt={label || "صورة"} compact />,
-        );
-      } else {
-        parts.push(<ExternalLink key={key++} href={href} label={label} />);
-      }
-    } else if (m[5]) {
-      const token = m[5];
-      if (token.startsWith("**") || token.startsWith("__")) {
+    while ((m = INLINE_RE.exec(segment)) !== null) {
+      if (m.index > last) parts.push(segment.slice(last, m.index));
+
+      if (m[1] !== undefined && m[2] !== undefined) {
+        parts.push(renderInlineLink(m[2].trim(), m[1].trim(), key++, true));
+      } else if (m[3] !== undefined && m[4] !== undefined) {
+        parts.push(renderInlineLink(m[4].trim(), m[3].trim(), key++));
+      } else if (m[5] !== undefined) {
         parts.push(
           <strong key={key++} className="font-bold text-[var(--brand-gray-900)]">
-            {token.slice(2, -2)}
+            {parseSegment(m[5])}
           </strong>,
         );
-      } else {
-        parts.push(<em key={key++}>{token.slice(1, -1)}</em>);
+      } else if (m[6] !== undefined) {
+        parts.push(
+          <strong key={key++} className="font-bold text-[var(--brand-gray-900)]">
+            {parseSegment(m[6])}
+          </strong>,
+        );
+      } else if (m[7] !== undefined) {
+        parts.push(
+          <em key={key++} className="italic">
+            {parseSegment(m[7])}
+          </em>,
+        );
+      } else if (m[8] !== undefined) {
+        parts.push(
+          <em key={key++} className="italic">
+            {parseSegment(m[8])}
+          </em>,
+        );
       }
+
+      last = m.index + m[0].length;
     }
 
-    last = m.index + m[0].length;
+    if (last < segment.length) parts.push(segment.slice(last));
+    return parts.length ? parts : [segment];
   }
 
-  if (last < text.length) parts.push(text.slice(last));
-  return parts.length ? parts : [text];
+  return parseSegment(text);
 }
 
 function InlineArticleImage({

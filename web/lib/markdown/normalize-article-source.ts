@@ -135,10 +135,21 @@ export function decodeMarkdownLinkLabels(text: string): string {
   });
 }
 
+/** Rejoin [label] (url) and **[label]** (url) into proper markdown links. */
+export function joinSplitMarkdownLinks(text: string): string {
+  let out = text.replace(
+    /\*\*\[([^\]]+)\]\*\*\s*\((https?:\/\/[^)\s]+)\)/g,
+    "**[$1]($2)**",
+  );
+  out = out.replace(/\[([^\]]+)\]\s+\((https?:\/\/[^)\s]+)\)/g, "[$1]($2)");
+  return out;
+}
+
 /** Full WordPress/markdown cleanup before block parsing. */
 export function normalizeArticleSource(raw: string): string {
   let out = unescapeWordPressEscapes(raw);
   out = replaceCaptionShortcodes(out);
+  out = joinSplitMarkdownLinks(out);
   out = demoteNonImageMarkdownImages(out);
   out = linkifyParenthesizedUrls(out);
   out = linkifyBareExternalUrls(out);
