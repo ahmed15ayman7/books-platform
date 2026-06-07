@@ -6,11 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/widgets/expandable_content.dart';
 
-const _kCollapseThreshold = 250;
-const _kCollapsedHeight = 200.0;
-
-class ArticleDetailBodyContent extends StatefulWidget {
+class ArticleDetailBodyContent extends StatelessWidget {
   const ArticleDetailBodyContent({
     super.key,
     required this.paragraphs,
@@ -20,56 +18,32 @@ class ArticleDetailBodyContent extends StatefulWidget {
   final String? pullQuote;
 
   @override
-  State<ArticleDetailBodyContent> createState() =>
-      _ArticleDetailBodyContentState();
-}
-
-class _ArticleDetailBodyContentState extends State<ArticleDetailBodyContent> {
-  bool _expanded = false;
-
-  bool get _isLong =>
-      widget.paragraphs.fold(0, (sum, p) => sum + p.length) >
-      _kCollapseThreshold;
-
-  @override
   Widget build(BuildContext context) {
-    if (widget.paragraphs.isEmpty) return const SizedBox.shrink();
+    if (paragraphs.isEmpty) return const SizedBox.shrink();
 
-    final contentColumn = _buildContentColumn();
-
-    if (!_isLong) return contentColumn;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (_expanded)
-          contentColumn
-        else
-          _CollapsedContent(child: contentColumn),
-        SizedBox(height: 12.h),
-        _ToggleButton(
-          expanded: _expanded,
-          onTap: () => setState(() => _expanded = !_expanded),
-        ),
-      ],
+    return ExpandableContent(
+      isLong: ExpandableContent.areParagraphsLong(paragraphs),
+      seeMoreLabel: 'articles.see_more'.tr(),
+      seeLessLabel: 'articles.see_less'.tr(),
+      child: _buildContentColumn(),
     );
   }
 
   Widget _buildContentColumn() {
     final children = <Widget>[];
-    for (int i = 0; i < widget.paragraphs.length; i++) {
-      children.add(_buildMarkdown(widget.paragraphs[i]));
-      if (i == 1 && widget.pullQuote != null) {
+    for (int i = 0; i < paragraphs.length; i++) {
+      children.add(_buildMarkdown(paragraphs[i]));
+      if (i == 1 && pullQuote != null) {
         children.add(SizedBox(height: 18.h));
-        children.add(ArticleDetailPullQuote(text: widget.pullQuote!));
+        children.add(ArticleDetailPullQuote(text: pullQuote!));
         children.add(SizedBox(height: 18.h));
-      } else if (i < widget.paragraphs.length - 1) {
+      } else if (i < paragraphs.length - 1) {
         children.add(SizedBox(height: 16.h));
       }
     }
-    if (widget.pullQuote != null && widget.paragraphs.length <= 1) {
+    if (pullQuote != null && paragraphs.length <= 1) {
       children.add(SizedBox(height: 18.h));
-      children.add(ArticleDetailPullQuote(text: widget.pullQuote!));
+      children.add(ArticleDetailPullQuote(text: pullQuote!));
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,81 +111,6 @@ class _ArticleDetailBodyContentState extends State<ArticleDetailBodyContent> {
       listBullet: body,
       tableHead: body.copyWith(fontWeight: FontWeight.w700),
       tableBody: body,
-    );
-  }
-}
-
-class _CollapsedContent extends StatelessWidget {
-  const _CollapsedContent({required this.child});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        ClipRect(
-          child: SizedBox(
-            height: _kCollapsedHeight.h,
-            child: OverflowBox(
-              alignment: Alignment.topCenter,
-              maxHeight: double.infinity,
-              child: child,
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 72.h,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  AppColors.surface.withValues(alpha: 0),
-                  AppColors.surface,
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ToggleButton extends StatelessWidget {
-  const _ToggleButton({required this.expanded, required this.onTap});
-  final bool expanded;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            expanded ? 'articles.see_less'.tr() : 'articles.see_more'.tr(),
-            style: GoogleFonts.cairo(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w700,
-              color: AppColors.primary,
-            ),
-          ),
-          SizedBox(width: 4.w),
-          Icon(
-            expanded
-                ? Icons.keyboard_arrow_up_rounded
-                : Icons.keyboard_arrow_down_rounded,
-            color: AppColors.primary,
-            size: 18.r,
-          ),
-        ],
-      ),
     );
   }
 }
