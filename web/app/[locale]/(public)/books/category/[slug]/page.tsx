@@ -9,6 +9,7 @@ import { ContentPageShell } from "@/components/sections/content-page-shell";
 import { EditorialSplit } from "@/components/sections/editorial-split";
 import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
 import type { Locale } from "@/lib/i18n";
+import { PAGINATION } from "@/lib/utils/constants";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 interface CategoryPageProps {
@@ -41,9 +42,16 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
   const [categories, { books, pagination }] = await Promise.all([
     BookService.getCategories().catch(() => []),
-    BookService.list({ page, limit: 16, category: slug }).catch(() => ({
+    BookService.list({ page, limit: PAGINATION.DEFAULT_PAGE_SIZE, category: slug }).catch(() => ({
       books: [],
-      pagination: { page: 1, limit: 16, total: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false },
+      pagination: {
+        page: 1,
+        limit: PAGINATION.DEFAULT_PAGE_SIZE,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
     })),
   ]);
 

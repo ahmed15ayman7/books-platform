@@ -290,7 +290,7 @@ export const ArticleService = {
     });
   },
 
-  async listByCategory(slug: string, page = 1, limit = 10) {
+  async listByCategory(slug: string, page = 1, limit = PAGINATION.DEFAULT_PAGE_SIZE) {
     const category = await db.articleCategory.findFirst({
       where: { slug },
       select: { id: true, name: true, nameAr: true, slug: true },

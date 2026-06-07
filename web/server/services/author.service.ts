@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { notDeleted } from "@/lib/admin/audit-fields";
+import { PAGINATION } from "@/lib/utils/constants";
 const publishedBookByAuthor = {
   some: {
     published: true,
@@ -27,7 +28,7 @@ export const AuthorService = {
     });
   },
 
-  async getAuthorBooks(slug: string, page = 1, limit = 16) {
+  async getAuthorBooks(slug: string, page = 1, limit = PAGINATION.DEFAULT_PAGE_SIZE) {
     const author = await db.author.findFirst({
       where: { slug, spamFlag: null },
       select: { id: true },

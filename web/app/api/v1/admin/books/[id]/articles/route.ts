@@ -4,6 +4,7 @@ import { apiPaginated, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { notDeleted } from "@/lib/admin/audit-fields";
 import { isMediaChannel } from "@/lib/media/youtube";
+import { PAGINATION } from "@/lib/utils/constants";
 
 export async function GET(
   request: NextRequest,
@@ -23,7 +24,10 @@ export async function GET(
   try {
     const { searchParams } = request.nextUrl;
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
-    const limit = Math.min(50, parseInt(searchParams.get("limit") ?? "20", 10));
+    const limit = Math.min(
+      PAGINATION.MAX_PAGE_SIZE,
+      parseInt(searchParams.get("limit") ?? String(PAGINATION.DEFAULT_PAGE_SIZE), 10),
+    );
     const skip = (page - 1) * limit;
 
     const where = {

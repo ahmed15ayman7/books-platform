@@ -2,6 +2,7 @@ import { type NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { z } from "zod";
 import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
+import { PAGINATION } from "@/lib/utils/constants";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { buildOrderBy, parseOptionalBool, parseSortParam } from "@/lib/admin/list-query";
@@ -47,7 +48,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
-    const limit = Math.min(50, parseInt(searchParams.get("limit") ?? "20", 10));
+    const limit = Math.min(PAGINATION.MAX_PAGE_SIZE, parseInt(searchParams.get("limit") ?? String(PAGINATION.DEFAULT_PAGE_SIZE), 10));
     const isActive = parseOptionalBool(searchParams.get("isActive"));
     const { sortBy, sortOrder } = parseSortParam(searchParams.get("sort"), "createdAt");
     const skip = (page - 1) * limit;
