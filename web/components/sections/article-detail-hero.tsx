@@ -23,7 +23,7 @@ function BookmarkRibbon({ className }: { className?: string }) {
 }
 
 export function ArticleDetailHero({ locale, title, coverUrl, coverAlt }: ArticleDetailHeroProps) {
-  const isAr = locale === "ar";
+  // const isAr = locale === "ar";
 
   return (
     <section className="relative w-full overflow-hidden bg-[var(--brand-gray-100)] py-8 md:py-10" style={{direction: "rtl"}}>
