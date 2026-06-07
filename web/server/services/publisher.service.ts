@@ -131,7 +131,7 @@ export const PublisherService = {
     return mapPublisherImage(row);
   },
 
-  async getPublisherBooks(slug: string, page = 1, limit = PAGINATION.DEFAULT_PAGE_SIZE) {
+  async getPublisherBooks(slug: string, page = 1, limit: number = PAGINATION.DEFAULT_PAGE_SIZE) {
     const publisher = await db.publisher.findFirst({
       where: { slug },
       select: { id: true },

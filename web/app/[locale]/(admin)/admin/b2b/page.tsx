@@ -1,5 +1,7 @@
 "use client";
 
+import { PAGINATION } from "@/lib/utils/constants";
+
 import { useCallback, useEffect, useState } from "react";
 import { Plus, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -79,7 +81,7 @@ export default function AdminB2BPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const q = new URLSearchParams({ page: String(page), limit: "20" });
+      const q = new URLSearchParams({ page: String(page), limit: String(PAGINATION.DEFAULT_PAGE_SIZE) });
       appendListParams(q, { sort, isActive });
       const res = await fetch(`/api/v1/admin/b2b?${q}`, { headers: adminAuthHeaders() });
       const data = await res.json() as { success: boolean; data?: B2BSubscription[]; pagination?: { totalPages: number; total: number } };
@@ -277,7 +279,7 @@ export default function AdminB2BPage() {
             emptyMessage="لا توجد اشتراكات بعد"
             renderCard={renderCard}
           />
-          <AdminPagination page={page} totalPages={totalPages} onPage={setPage} total={total} pageSize={20} />
+          <AdminPagination page={page} totalPages={totalPages} onPage={setPage} total={total} pageSize={PAGINATION.DEFAULT_PAGE_SIZE} />
         </div>
       </div>
     </div>

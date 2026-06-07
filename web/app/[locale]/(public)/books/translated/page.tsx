@@ -9,6 +9,7 @@ import { localizedBookName } from "@/lib/i18n/book-locale";
 import { publicBookUrl } from "@/lib/admin/public-urls";
 import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+import { PAGINATION } from "@/lib/utils/constants";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as Locale;
@@ -38,12 +39,19 @@ export default async function TranslatedBooksPage({ searchParams }: Props) {
   const [{ books, pagination }, heroResult] = await Promise.all([
     BookService.list({
       page,
-      limit: 20,
+      limit: PAGINATION.DEFAULT_PAGE_SIZE,
       status: "TRANSLATED",
       sort,
     }).catch(() => ({
       books: [],
-      pagination: { page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false },
+      pagination: {
+        page: 1,
+        limit: PAGINATION.DEFAULT_PAGE_SIZE,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
     })),
     BookService.list({ page: 1, limit: 12, status: "TRANSLATED", sort: "newest" }).catch(() => ({
       books: [],

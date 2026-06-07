@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { ArticleService } from "@/server/services/article.service";
 import { ArticleChannelPage } from "@/components/sections/article-channel-page";
 import type { Locale } from "@/lib/i18n";
+import { PAGINATION } from "@/lib/utils/constants";
 import { articleChannelMetadata } from "@/lib/seo/article-channels";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -18,8 +19,21 @@ export default async function HarvestPage({ searchParams }: Props) {
   const t = await getTranslations("articles");
   const page = Math.max(1, parseInt(sp.page ?? "1", 10));
 
-  const { articles, pagination } = await ArticleService.list({ channel: "harvest", page, limit: 10 })
-    .catch(() => ({ articles: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false } }));
+  const { articles, pagination } = await ArticleService.list({
+    channel: "harvest",
+    page,
+    limit: PAGINATION.DEFAULT_PAGE_SIZE,
+  }).catch(() => ({
+    articles: [],
+    pagination: {
+      page: 1,
+      limit: PAGINATION.DEFAULT_PAGE_SIZE,
+      total: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPrevPage: false,
+    },
+  }));
 
   return (
     <ArticleChannelPage

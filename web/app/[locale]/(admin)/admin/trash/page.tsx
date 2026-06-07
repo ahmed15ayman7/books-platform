@@ -1,5 +1,7 @@
 "use client";
 
+import { PAGINATION } from "@/lib/utils/constants";
+
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -89,7 +91,7 @@ export default function AdminTrashPage() {
       const q = new URLSearchParams({
         type: activeType,
         page: String(page),
-        limit: "20",
+        limit: String(PAGINATION.DEFAULT_PAGE_SIZE),
       });
       const res = await fetch(`/api/v1/admin/trash?${q}`, {
         headers: adminAuthHeaders(),

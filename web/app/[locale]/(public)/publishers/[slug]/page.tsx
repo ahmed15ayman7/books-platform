@@ -17,6 +17,7 @@ import {
   localizedPublisherName,
 } from "@/lib/i18n/publisher-locale";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+import { PAGINATION } from "@/lib/utils/constants";
 import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-shell";
 import { adminPublisherEditPath, adminPublisherViewPath } from "@/lib/admin/public-urls";
 
@@ -52,9 +53,16 @@ export default async function PublisherDetailPage({
 
   const [publisher, { books, pagination }] = await Promise.all([
     PublisherService.getBySlug(slug).catch(() => null),
-    PublisherService.getPublisherBooks(slug, page, 16).catch(() => ({
+    PublisherService.getPublisherBooks(slug, page).catch(() => ({
       books: [],
-      pagination: { page: 1, limit: 16, total: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false },
+      pagination: {
+        page: 1,
+        limit: PAGINATION.DEFAULT_PAGE_SIZE,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
     })),
   ]);
 

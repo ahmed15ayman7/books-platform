@@ -1,5 +1,7 @@
 "use client";
 
+import { PAGINATION } from "@/lib/utils/constants";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -67,7 +69,7 @@ export default function AdminMediaPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const q = new URLSearchParams({ page: String(page), limit: "20", mediaOnly: "true" });
+      const q = new URLSearchParams({ page: String(page), limit: String(PAGINATION.DEFAULT_PAGE_SIZE), mediaOnly: "true" });
       if (search.trim()) q.set("search", search.trim());
       appendListParams(q, { sort, channel, status });
       const res = await fetch(`/api/v1/admin/articles?${q}`, { headers: adminAuthHeaders() });

@@ -1,5 +1,7 @@
 "use client";
 
+import { PAGINATION } from "@/lib/utils/constants";
+
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -82,7 +84,7 @@ export default function AdminBooksPage() {
   const loadBooks = useCallback(async () => {
     setLoading(true);
     try {
-      const q = new URLSearchParams({ page: String(page), limit: "20" });
+      const q = new URLSearchParams({ page: String(page), limit: String(PAGINATION.DEFAULT_PAGE_SIZE) });
       if (search.trim()) q.set("search", search.trim());
       appendListParams(q, { sort, published, translationStatus, featured, authorCount });
       const res = await fetch(`/api/v1/admin/books?${q}`, {
@@ -337,7 +339,7 @@ export default function AdminBooksPage() {
         totalPages={totalPages}
         onPage={setPage}
         total={total}
-        pageSize={20}
+        pageSize={PAGINATION.DEFAULT_PAGE_SIZE}
       />
     </div>
   );

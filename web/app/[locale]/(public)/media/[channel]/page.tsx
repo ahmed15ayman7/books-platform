@@ -7,6 +7,7 @@ import { MEDIA_CHANNELS as NAV_MEDIA_CHANNELS } from "@/lib/nav/site-nav";
 import { MEDIA_CHANNELS } from "@/lib/media/youtube";
 import type { Locale } from "@/lib/i18n";
 import { articleChannelMetadata } from "@/lib/seo/article-channels";
+import { PAGINATION } from "@/lib/utils/constants";
 
 interface Props {
   params: Promise<{ channel: string; locale: string }>;
@@ -39,12 +40,19 @@ export default async function MediaChannelRoutePage({ params, searchParams }: Pr
   const { articles, pagination } = await ArticleService.list({
     channel,
     page,
-    limit: 12,
+    limit: PAGINATION.DEFAULT_PAGE_SIZE,
     mediaOnly: true,
     sort: "newest",
   }).catch(() => ({
     articles: [],
-    pagination: { page: 1, limit: 12, total: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false },
+    pagination: {
+      page: 1,
+      limit: PAGINATION.DEFAULT_PAGE_SIZE,
+      total: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPrevPage: false,
+    },
   }));
 
   const title =

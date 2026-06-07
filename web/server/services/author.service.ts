@@ -28,7 +28,7 @@ export const AuthorService = {
     });
   },
 
-  async getAuthorBooks(slug: string, page = 1, limit = PAGINATION.DEFAULT_PAGE_SIZE) {
+  async getAuthorBooks(slug: string, page = 1, limit: number = PAGINATION.DEFAULT_PAGE_SIZE) {
     const author = await db.author.findFirst({
       where: { slug, spamFlag: null },
       select: { id: true },

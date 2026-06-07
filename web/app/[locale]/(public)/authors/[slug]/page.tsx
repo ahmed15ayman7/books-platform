@@ -10,6 +10,7 @@ import { BooksPagination } from "@/components/sections/books-pagination";
 import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
 import { StaggerContainer, StaggerItem } from "@/components/motion";
 import type { Locale } from "@/lib/i18n";
+import { PAGINATION } from "@/lib/utils/constants";
 import {
   localizedAuthorAlternateName,
   localizedAuthorBio,
@@ -54,11 +55,11 @@ export default async function AuthorDetailPage({
 
   const [author, { books, pagination }] = await Promise.all([
     AuthorService.getBySlug(slug).catch(() => null),
-    AuthorService.getAuthorBooks(slug, page, 16).catch(() => ({
+    AuthorService.getAuthorBooks(slug, page).catch(() => ({
       books: [],
       pagination: {
         page: 1,
-        limit: 16,
+        limit: PAGINATION.DEFAULT_PAGE_SIZE,
         total: 0,
         totalPages: 0,
         hasNextPage: false,
