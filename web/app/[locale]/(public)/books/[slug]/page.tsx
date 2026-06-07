@@ -167,7 +167,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             edition={localizedBookEdition(book, locale)}
             dimensions={book.dimensions}
             translationStatus={book.translationStatus}
-            notes={book.notes}
+            // notes={book.notes}
             publisher={book.publisher}
             primaryCategory={book.primaryCategory}
             categories={book.categories}
