@@ -41,6 +41,17 @@
   "english": "English",
   "arabic": "العربية",
 
+  "language_choose": {
+    "title": "اختر لغتك",
+    "subtitle": "يمكنك تغيير اللغة لاحقاً من شريط التطبيق",
+    "arabic_subtitle": "Arabic",
+    "english_subtitle": "اللغة الإنجليزية"
+  },
+
+  "nav": {
+    "publishers": "الناشرون"
+  },
+
   "common": {
     "all": "الكل",
     "see_all": "عرض الكل",

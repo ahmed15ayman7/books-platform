@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -62,7 +63,7 @@ class BottomNavWidget extends StatelessWidget {
         tab: BottomNavTab.publishers,
         icon: Icons.business_outlined,
         activeIcon: Icons.business_rounded,
-        label: ar ? 'الناشرون' : 'Publishers',
+        label: 'nav.publishers'.tr(),
       ),
     ];
 

@@ -25,11 +25,6 @@ class MoreBottomSheet extends StatelessWidget {
           titleKey: 'translated_books_title',
           onTap: () => _navigate(context, AppRoutes.translatedBooks),
         ),
-        _MoreTile(
-          icon: Icons.notifications_outlined,
-          titleKey: 'notifications_title',
-          onTap: () => _navigate(context, AppRoutes.notificationSettings),
-        ),
         const Divider(height: 1),
         _MoreTile(
           icon: Icons.info_outline_rounded,

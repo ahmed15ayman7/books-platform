@@ -41,6 +41,17 @@
   "english": "English",
   "arabic": "العربية",
 
+  "language_choose": {
+    "title": "Choose your language",
+    "subtitle": "You can change this later from the language toggle in the app bar",
+    "arabic_subtitle": "Arabic",
+    "english_subtitle": "English language"
+  },
+
+  "nav": {
+    "publishers": "Publisher"
+  },
+
   "common": {
     "all": "All",
     "see_all": "All",
