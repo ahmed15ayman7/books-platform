@@ -1,8 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+  type CSSProperties,
+} from "react";
 import { createPortal } from "react-dom";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
@@ -120,6 +128,7 @@ export function PublisherCountryFilter({
 }: PublisherCountryFilterProps) {
   const isAr = locale === "ar";
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const listId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -242,14 +251,25 @@ export function PublisherCountryFilter({
   );
 
   const baseHref = `/${locale}/publishers`;
-  const searchSuffix = searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : "";
+
+  const buildCountryHref = useCallback(
+    (slug?: string) => {
+      const params = new URLSearchParams();
+      if (searchQuery) params.set("search", searchQuery);
+      if (slug) params.set("country", slug);
+      const query = params.toString();
+      return query ? `${baseHref}?${query}` : baseHref;
+    },
+    [baseHref, searchQuery],
+  );
 
   const navigateToCountry = useCallback(
-    (slug: string) => {
-      const href = `${baseHref}?country=${encodeURIComponent(slug)}${searchSuffix}`;
-      router.push(href);
+    (slug?: string) => {
+      startTransition(() => {
+        router.push(buildCountryHref(slug), { scroll: false });
+      });
     },
-    [baseHref, router, searchSuffix],
+    [buildCountryHref, router],
   );
 
   function handleSelectHiddenCountry(slug: string) {
@@ -322,22 +342,32 @@ export function PublisherCountryFilter({
 
   return (
     <>
-      <div className="mb-6 flex flex-wrap items-center gap-2">
-        <Link
-          href={searchQuery ? `${baseHref}?search=${encodeURIComponent(searchQuery)}` : baseHref}
+      <div
+        className={cn(
+          "mb-6 flex flex-wrap items-center gap-2 transition-opacity",
+          isPending && "pointer-events-none opacity-60",
+        )}
+        aria-busy={isPending}
+      >
+        <button
+          type="button"
+          onClick={() => navigateToCountry()}
           className={chipClass(!activeCountry)}
+          aria-pressed={!activeCountry}
         >
           {isAr ? "الكل" : "All"}
-        </Link>
+        </button>
 
         {visibleCountries.map((country) => (
-          <Link
+          <button
             key={country.id}
-            href={`${baseHref}?country=${encodeURIComponent(country.slug)}${searchSuffix}`}
+            type="button"
+            onClick={() => navigateToCountry(country.slug)}
             className={chipClass(activeCountry === country.slug)}
+            aria-pressed={activeCountry === country.slug}
           >
             {countryLabel(country, locale)}
-          </Link>
+          </button>
         ))}
 
         {hiddenCount > 0 && (
