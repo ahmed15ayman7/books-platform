@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: kSplashFadeDuration,
     );
     _fadeIn = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
     _controller.forward();
@@ -58,7 +58,7 @@ class _SplashScreenState extends State<SplashScreen>
           opacity: _fadeIn,
           child: Center(
             child: Image.asset(
-              'assets/branding/logo.webp',
+              kBrandingLogoAsset,
               width: 300.w,
             ),
           ),

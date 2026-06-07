@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../features/cart/presentation/cubit/cart_cubit.dart';
+import '../constants/app_constants.dart';
 import '../di/injection_container.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_shadows.dart';
@@ -94,14 +95,14 @@ class _BrandLogo extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 34.r,
-          height: 34.r,
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(9.r),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(9.r),
+          child: Image.asset(
+            kBrandingAppIconAsset,
+            width: 34.r,
+            height: 34.r,
+            fit: BoxFit.cover,
           ),
-          child: Icon(Icons.menu_book_rounded, color: Colors.white, size: 20.r),
         ),
         SizedBox(width: 8.w),
         Column(

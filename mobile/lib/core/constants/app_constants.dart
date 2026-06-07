@@ -4,7 +4,8 @@ const double kDesignHeight = 844.0;
 const String kAppName = 'BooksPlatform';
 
 const Duration kAnimationDuration = Duration(milliseconds: 300);
-const Duration kSplashDuration = Duration(seconds: 2);
+const Duration kSplashDuration = Duration(milliseconds: 2500);
+const Duration kSplashFadeDuration = Duration(milliseconds: 1000);
 
 const int kDefaultPageSize = 20;
 
@@ -25,3 +26,7 @@ const String kOnboardingDoneKey = 'onboarding_done';
 const String kWishlistKey = 'wishlist_slugs';
 const String kCartKey = 'cart_items';
 const String kNotifOptInKey = 'notif_opt_in';
+
+// Branding assets
+const String kBrandingLogoAsset = 'assets/branding/logo.webp';
+const String kBrandingAppIconAsset = 'assets/branding/app_icon_1024.png';
