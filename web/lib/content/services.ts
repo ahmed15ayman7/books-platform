@@ -25,60 +25,48 @@ export interface ServicesPageContent {
 
 const platformServiceItems: BilingualString[] = [
   {
-    ar: "سرعة الكشف والاطلاع على الإصدارات العالمية والفهرسة والوصف الببليوغرافي لها.",
-    en: "Rapid discovery of global releases with bibliographic indexing and description.",
+    ar: "رصد وانتقاء أحدث الكتب الصادرة في العالم بكل اللغات وفي كافة التصنيفات.",
+    en: "Monitoring and curating the latest books published worldwide, in all languages and across all categories.",
   },
   {
-    ar: "إعلام وتسويق وهندسة إلكترونية للكتب الجديدة والمتميزة على مختلف المنصات والقنوات.",
-    en: "Promotion, marketing, and digital engineering for new and distinctive books across platforms and channels.",
+    ar: "تقديم بيانات كاملة ونبذات وافية عن جديد الكتب باللغتين العربية والإنجليزية.",
+    en: "Providing complete data and comprehensive summaries of new books in both Arabic and English.",
   },
   {
-    ar: "تصنيف دقيق للكتب وفق تصنيف محلي واحترافي للعالم.",
-    en: "Precise book categorization using a local yet professional global taxonomy.",
+    ar: "نشر بيانات الكتب في القسم المخصص لها في المنصة بحسب تصنيفها.",
+    en: "Publishing book data in their dedicated sections on the platform according to category.",
   },
   {
-    ar: "توجيه القرّاء لاستخدام المنصة لكافة القرّاء من العامة والمتخصصين والباحثين.",
-    en: "Guiding all readers — general, specialist, and researcher — to use the platform effectively.",
+    ar: "إعداد نشرات إخبارية يومية وفيديوهات وبودكاست عن أهم الكتب.",
+    en: "Producing daily news bulletins, videos, and podcasts about the most important books.",
   },
   {
-    ar: "خدمة بحثية لمتابعة الإصدارات والترجمات العربية للكتب.",
-    en: "Research service tracking book releases and Arabic translations.",
+    ar: "إعداد تقارير تحليلية مجمّعة لحصاد الكتب العربية والأجنبية تصدر أسبوعياً.",
+    en: "Preparing consolidated analytical reports on Arabic and foreign book harvests, published weekly.",
   },
   {
-    ar: "تخديم شديدي القراءة باقتراح الكتب المشابهة لما قرأوه وجديرة بالقراءة.",
-    en: "Serving avid readers with recommendations similar to what they have read and worth reading.",
+    ar: "تقديم خدمات تفاعلية وأدوات التشبيك بين كافة عناصر العملية الثقافية.",
+    en: "Offering interactive services and networking tools connecting all elements of the cultural process.",
   },
   {
-    ar: "ترشيح الإصدارات المعنية بالترجمة.",
-    en: "Nominating editions suitable for translation.",
+    ar: "تعريف الناشرين العرب بالكتب الأجنبية الجديدة وترشيحها للترجمة إلى العربية.",
+    en: "Introducing Arab publishers to new foreign books and nominating them for translation into Arabic.",
   },
   {
-    ar: "توثيق وترجمة لقائمة أكثر الكتب مبيعاً ورواجاً باللغة العربية.",
-    en: "Documenting and translating lists of the best-selling and most popular books in Arabic.",
+    ar: "التنسيق مع المترجمين الراغبين في نيل حقوق الترجمة للكتب الأجنبية.",
+    en: "Coordinating with translators seeking to obtain translation rights for foreign books.",
   },
   {
-    ar: "تمكين المؤلفين والمؤلفات من نشر كتاباتهم وكتبهم على المنصة.",
-    en: "Enabling authors to publish their writings and books on the platform.",
+    ar: "التعريف بالأبحاث والدراسات والمؤلفات العربية الجديدة التي لم تُنشر بعد.",
+    en: "Highlighting new Arabic research, studies, and manuscripts that have not yet been published.",
   },
   {
-    ar: "تمكين دور النشر من إطلاع جمهورها ومرتاديها على الكتب الجديدة.",
-    en: "Enabling publishers to showcase new books to their audiences and visitors.",
+    ar: "التسويق الشبكي على الإنترنت عبر منصات التواصل الاجتماعي، والترويج باستخدام برامج وقوائم إيميلات خاصة تضم ملايين القراء والباحثين.",
+    en: "Online network marketing through social media platforms, and promotion via dedicated email programs and lists reaching millions of readers and researchers.",
   },
   {
-    ar: "خدمة تجارية لدور النشر لطلب بيع وتسويق كتبها في العالم العربي والشرق الأوسط.",
-    en: "Commercial service for publishers to sell and market their books in the Arab world and Middle East.",
-  },
-  {
-    ar: "تزويد المترجمين بالعربية بالاطلاع على أهم وأحدث الكتب والروائع العالمية القابلة للترجمة.",
-    en: "Providing Arabic translators access to the most important and latest world books eligible for translation.",
-  },
-  {
-    ar: "إطلاع المبدعين والمعنيين بنشر كتاب مترجم أو مؤلف أفكار أو معرفة للنشر وشراء حقوق نشر كتبهم.",
-    en: "Informing creators interested in publishing translated or authored works and acquiring publishing rights.",
-  },
-  {
-    ar: "تقديم خدمات ثقافية وإعلامية مبتكرة عبر نشرات يومية عن الكتب الجديدة، وإنتاج فيديوهات وبودكاست تسلّط الضوء على أهم الإصدارات، والتفاعل عبر تطبيق المنصة وقنوات التواصل.",
-    en: "Delivering innovative cultural and media services through daily bulletins on new books, videos and podcasts highlighting key releases, and engagement via the app and social channels.",
+    ar: "خدمة تسهيل شراء الكتب الجديدة بالإحالة إلى مصدر البيع وموقع الناشر، أو عن طريق خدمة الدفع الإلكتروني وشراء الكتب مباشرة من خلال المنصة.",
+    en: "Facilitating purchase of new books by referral to the seller and publisher website, or through electronic payment and direct purchase via the platform.",
   },
 ];
 
@@ -235,8 +223,8 @@ export function getServicesContent(locale: Locale): ServicesPageContent {
   };
 
   const platformIntro: BilingualString = {
-    ar: "تقدّم منصة الكتب مجموعة من الخدمات الجديدة والمميزة والحصرية للقرّاء والمؤلفين والناشرين والمترجمين.",
-    en: "Books Platform offers a range of new, distinctive, and exclusive services to readers, authors, publishers, and translators.",
+    ar: "خدمات جديدة ومميزة وحصرية تقدمها «منصة الكتب العالمية» للقارئ والمؤلف والناشر والمترجم، كما يلي:",
+    en: "New, distinctive, and exclusive services offered by Books Platform to the reader, author, publisher, and translator, as follows:",
   };
 
   const bibliographyBody: BilingualString = {
