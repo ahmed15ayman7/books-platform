@@ -1,10 +1,8 @@
-// TODO: confirm videoUrl field name with backend (Risk #6)
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 
@@ -24,31 +22,45 @@ class ArticleDetailVideoPlayer extends StatefulWidget {
 }
 
 class _ArticleDetailVideoPlayerState extends State<ArticleDetailVideoPlayer> {
-  late final YoutubePlayerController _controller;
+  String? _videoId;
 
   static String? _extractVideoId(String url) {
-    // Handle youtu.be/ID and youtube.com/watch?v=ID formats
     final uri = Uri.tryParse(url);
-    if (uri == null) return null;
-    if (uri.host.contains('youtu.be')) return uri.pathSegments.firstOrNull;
-    return uri.queryParameters['v'];
+    if (uri == null || uri.host.isEmpty) {
+      return RegExp(r'^[a-zA-Z0-9_-]{11}$').hasMatch(url) ? url : null;
+    }
+    if (uri.host.contains('youtu.be')) {
+      return uri.pathSegments.firstOrNull;
+    }
+    if (uri.host.contains('youtube.com')) {
+      final v = uri.queryParameters['v'];
+      if (v != null && v.isNotEmpty) return v;
+      if (uri.pathSegments.length >= 2 &&
+          (uri.pathSegments.first == 'embed' ||
+              uri.pathSegments.first == 'v' ||
+              uri.pathSegments.first == 'shorts')) {
+        return uri.pathSegments[1];
+      }
+    }
+    return null;
   }
 
   @override
   void initState() {
     super.initState();
-    final videoId = _extractVideoId(widget.videoUrl) ?? widget.videoUrl;
-    _controller = YoutubePlayerController.fromVideoId(
-      videoId: videoId,
-      autoPlay: false,
-      params: const YoutubePlayerParams(showFullscreenButton: true),
-    );
+    _videoId = _extractVideoId(widget.videoUrl);
   }
 
-  @override
-  void dispose() {
-    _controller.close();
-    super.dispose();
+  Future<void> _openInYoutube() async {
+    final uri = Uri.parse(
+      _videoId != null
+          ? 'https://www.youtube.com/watch?v=$_videoId'
+          : widget.videoUrl,
+    );
+    final openedInApp = await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+    if (!openedInApp) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 
   @override
@@ -58,13 +70,62 @@ class _ArticleDetailVideoPlayerState extends State<ArticleDetailVideoPlayer> {
       children: [
         AspectRatio(
           aspectRatio: 16 / 9,
-          child: YoutubePlayer(controller: _controller),
+          child: _VideoLauncher(videoId: _videoId, onTap: _openInYoutube),
         ),
         if (widget.showAiDisclosure) ...[
           SizedBox(height: 8.h),
           const _AiDisclosureBanner(),
         ],
       ],
+    );
+  }
+}
+
+class _VideoLauncher extends StatelessWidget {
+  const _VideoLauncher({this.videoId, required this.onTap});
+
+  final String? videoId;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(8.r),
+          image: videoId != null
+              ? DecorationImage(
+                  image: NetworkImage(
+                    'https://img.youtube.com/vi/$videoId/hqdefault.jpg',
+                  ),
+                  fit: BoxFit.cover,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.black45,
+                    BlendMode.darken,
+                  ),
+                )
+              : null,
+        ),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.play_circle_outline, color: Colors.white, size: 48.sp),
+              SizedBox(height: 8.h),
+              Text(
+                'watch_on_youtube'.tr(),
+                style: GoogleFonts.tajawal(
+                  fontSize: 14.sp,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -83,8 +144,11 @@ class _AiDisclosureBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.auto_awesome_rounded,
-              size: 16.sp, color: AppColors.warning),
+          Icon(
+            Icons.auto_awesome_rounded,
+            size: 16.sp,
+            color: AppColors.warning,
+          ),
           SizedBox(width: 8.w),
           Expanded(
             child: Text(
@@ -102,7 +166,10 @@ class _AiDisclosureBanner extends StatelessWidget {
 }
 
 class ArticleDetailVideoPlaceholder extends StatelessWidget {
-  const ArticleDetailVideoPlaceholder({super.key, this.showAiDisclosure = false});
+  const ArticleDetailVideoPlaceholder({
+    super.key,
+    this.showAiDisclosure = false,
+  });
   final bool showAiDisclosure;
 
   @override

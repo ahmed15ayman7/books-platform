@@ -73,9 +73,12 @@ class ArticleDetailModel {
           .map((e) => ArticleModel.fromJson(e as Map<String, dynamic>))
           .toList(),
       pullQuote: json['pullQuote'] as String?,
-      // videoId presence determines whether this article has embeddable video
       hasVideo: ((json['videoId'] as String?) ?? '').isNotEmpty,
-      videoUrl: json['youtubeUrl'] as String? ?? json['videoUrl'] as String?,
+      videoUrl: json['youtubeUrl'] as String? ??
+          json['videoUrl'] as String? ??
+          (((json['videoId'] as String?) ?? '').isNotEmpty
+              ? 'https://www.youtube.com/watch?v=${json['videoId']}'
+              : null),
       imageUrl: _encodeUrl(_parseFirstImageUrl(json['imageUrl'] as String? ?? json['coverImageUrl'] as String?)),
     );
   }
