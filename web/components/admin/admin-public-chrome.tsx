@@ -4,6 +4,7 @@ import { createContext, useContext } from "react";
 import Link from "next/link";
 import { Pencil, ExternalLink, Eye, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { EntityShareDialog } from "@/components/share/entity-share-dialog";
 import { useAdminSession } from "@/hooks/use-admin-session";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +17,8 @@ export interface AdminPageContextValue {
   adminViewHref?: string;
   publicHref: string;
   title?: string;
+  imageUrl?: string | null;
+  sharePublicUrl?: string;
 }
 
 const AdminPageContext = createContext<AdminPageContextValue | null>(null);
@@ -49,8 +52,21 @@ export function AdminInlineEdit({ editHref, adminViewHref, className }: AdminInl
 
   if (isLoading || !isAdmin || !edit) return null;
 
+  const shareUrl = ctx?.sharePublicUrl;
+  const shareTitle = ctx?.title;
+
   return (
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
+      {shareUrl && shareTitle && (
+        <EntityShareDialog
+          title={shareTitle}
+          publicUrl={shareUrl}
+          imageUrl={ctx?.imageUrl}
+          variant="admin"
+          size="sm"
+          triggerLabel="مشاركة"
+        />
+      )}
       {view && (
         <Link href={view}>
           <Button

@@ -22,6 +22,7 @@ import {
 } from "@/lib/i18n/book-locale";
 import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
 import { bookSeoMetadata } from "@/lib/seo/metadata";
+import { absoluteUrl } from "@/lib/seo/site";
 
 interface BookPageProps {
   params: Promise<{ slug: string; locale: string }>;
@@ -88,6 +89,8 @@ export default async function BookDetailPage({ params }: BookPageProps) {
       | "translationStatus.PARTIAL",
   );
 
+  const publicBookUrl = absoluteUrl(`/${locale}/books/${book.slug}`);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Book",
@@ -134,6 +137,8 @@ export default async function BookDetailPage({ params }: BookPageProps) {
           adminViewHref={`/${locale}/admin/books/${book.id}`}
           publicHref={`/${locale}/books/${book.slug}`}
           title={displayName}
+          imageUrl={book.imageUrl}
+          sharePublicUrl={publicBookUrl}
         >
         <div className="container-platform py-8 space-y-10 pb-24">
           <BookDetailHero
@@ -155,6 +160,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             visitPublisherLabel={t("visitPublisher")}
             addToWishlistLabel={t("addToWishlist")}
             shareLabel={locale === "ar" ? "مشاركة" : "Share"}
+            publicUrl={publicBookUrl}
           />
 
           <BookBiblioTable

@@ -22,6 +22,7 @@ import { ArticleContent } from "@/lib/markdown/article-content";
 import { ArticleCommentsSection } from "@/components/sections/article-comments-section";
 import { articleLinkedBookDisplay } from "@/lib/i18n/article-linked-book";
 import { resolveArticleDisplayImage } from "@/lib/articles/resolve-display-image";
+import { absoluteUrl } from "@/lib/seo/site";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -88,7 +89,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
 
   const intro = stripHtml(article.excerpt);
   const isMedia = isMediaChannel(article.channel);
-  const articleUrl = `https://booksplatform.net/${locale}/articles/${article.slug}`;
+  const articleUrl = absoluteUrl(`/${locale}/articles/${article.slug}`);
 
   const linkedBook = articleLinkedBookDisplay(article.products?.[0], locale);
   const heroCoverUrl =
@@ -136,6 +137,8 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         adminViewHref={adminArticleViewPath(locale, article.id, article.channel)}
         publicHref={`/${locale}/articles/${article.slug}`}
         title={article.title}
+        imageUrl={heroCoverUrl ?? article.imageUrl}
+        sharePublicUrl={articleUrl}
       >
         <div className="min-h-screen bg-white pb-20" style={{direction: "rtl"}}>
           <ArticleDetailHero
@@ -220,7 +223,12 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
                   <p className="text-base leading-relaxed text-[var(--brand-gray-700)]">{intro}</p>
                 )}
 
-                <ArticleShareStrip locale={locale} url={articleUrl} title={article.title} />
+                <ArticleShareStrip
+                  locale={locale}
+                  url={articleUrl}
+                  title={article.title}
+                  imageUrl={heroCoverUrl ?? article.imageUrl}
+                />
 
                 {article.products && article.products.length > 0 && (
                   <RelatedBooksSection locale={locale} books={article.products} />

@@ -29,7 +29,6 @@ import { HomeMissionStrip } from "@/components/sections/home/home-mission-strip"
 import { HomeMediaSpotlight } from "@/components/sections/home/home-media-spotlight";
 import { HomeArticlesShowcase } from "@/components/sections/home/home-articles-showcase";
 import { HomePublishSection } from "@/components/sections/home/home-publish-section";
-import { HomeServicesPreview } from "@/components/sections/home/home-services-preview";
 import { shuffleArray } from "@/lib/utils/shuffle";
 import { resolveArticleDisplayImage } from "@/lib/articles/resolve-display-image";
 
@@ -482,13 +481,13 @@ export default async function HomePage() {
 
 
 
-      <HomeServicesPreview
+      {/* <HomeServicesPreview
         locale={locale}
         title={editorial.servicesPreview.title}
         subtitle={editorial.servicesPreview.subtitle}
         cta={editorial.servicesPreview.cta}
         items={editorial.servicesPreview.items}
-      />
+      /> */}
 
       {/* ── Newsletter ────────────────────────────────────────── */}
       <NewsletterStrip />

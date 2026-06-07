@@ -22,7 +22,7 @@ export const ABOUT_IMAGES = {
   auth: "/about/auth.webp",
   authorDefault: "/about/author-default.webp",
   servicesHero: "/about/hero.webp",
-  servicesBibliography: "/about/concept.webp",
+  servicesBibliography: "/about/vision.webp",
 } as const;
 
 /** Source URLs for one-time download (Unsplash) */
@@ -47,7 +47,7 @@ export const ABOUT_IMAGE_SOURCES: Record<keyof typeof ABOUT_IMAGES, string> = {
   auth: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&q=80&fm=webp",
   authorDefault: "https://images.unsplash.com/photo-1516979187450-637abb88f58e?w=600&q=80&fm=webp",
   servicesHero: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1600&q=80&fm=webp",
-  servicesBibliography: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80&fm=webp",
+  servicesBibliography: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1200&q=80&fm=webp",
 };
 
 export const TEAM_IMAGE_PATHS = TEAM_MEMBERS.map((m) => m.photoUrl).filter(

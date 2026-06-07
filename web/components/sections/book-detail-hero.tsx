@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ExternalLink, Heart, Share2, ShoppingCart, Star } from "lucide-react";
+import { ExternalLink, Heart, ShoppingCart, Star } from "lucide-react";
 import { BookDetailCover } from "@/components/sections/book-detail-cover";
+import { EntityShareButton } from "@/components/share/entity-share-button";
 import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BookSummaryMarkdown } from "@/lib/markdown/book-summary-markdown";
@@ -36,6 +37,7 @@ interface BookDetailHeroProps {
   visitPublisherLabel: string;
   addToWishlistLabel: string;
   shareLabel: string;
+  publicUrl: string;
 }
 
 export function BookDetailHero({
@@ -57,6 +59,7 @@ export function BookDetailHero({
   visitPublisherLabel,
   addToWishlistLabel,
   shareLabel,
+  publicUrl,
 }: BookDetailHeroProps) {
   const isAr = locale === "ar";
 
@@ -160,14 +163,12 @@ export function BookDetailHero({
           >
             <Heart className="h-4 w-4" aria-hidden="true" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="flex-1 border border-[var(--brand-gray-200)] text-[var(--brand-gray-600)] hover:border-[var(--brand-red)] hover:bg-[var(--brand-red-soft)] hover:text-[var(--brand-red)]"
-            aria-label={shareLabel}
-          >
-            <Share2 className="h-4 w-4" aria-hidden="true" />
-          </Button>
+          <EntityShareButton
+            title={displayName}
+            publicUrl={publicUrl}
+            imageUrl={imageUrl}
+            ariaLabel={shareLabel}
+          />
         </div>
       </div>
     </div>
