@@ -431,7 +431,7 @@ export const BookService = {
       }),
       db.publisher.findMany({
         where: { status: "publish" },
-        orderBy: { order: "desc" },
+        orderBy: { products: { _count: "desc" } },
         take: 12,
         select: {
           id: true,
