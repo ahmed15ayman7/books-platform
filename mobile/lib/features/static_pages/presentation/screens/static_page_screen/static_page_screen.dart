@@ -1,13 +1,13 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:booksplatform/core/router/args/static_page_args.dart';
 import 'package:booksplatform/core/theme/app_colors.dart';
 import 'package:booksplatform/core/widgets/app_bar_widget.dart';
 import 'package:booksplatform/core/widgets/app_loading_indicator.dart';
+import 'package:booksplatform/core/widgets/app_markdown_body.dart';
 import 'package:booksplatform/core/widgets/error_state_widget.dart';
 
 import '../../cubit/static_page_cubit.dart';
@@ -23,22 +23,55 @@ class StaticPageScreen extends StatefulWidget {
 }
 
 class _StaticPageScreenState extends State<StaticPageScreen> {
+  var _didLoad = false;
+
   @override
-  void initState() {
-    super.initState();
-    context.read<StaticPageCubit>().load(widget.args.slug, widget.args.title);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_didLoad) {
+      _didLoad = true;
+      _loadPage();
+    }
+  }
+
+  void _loadPage() {
+    final locale = context.locale.languageCode;
+    context.read<StaticPageCubit>().load(
+          widget.args.slug,
+          _titleForSlug(widget.args.slug),
+          locale,
+        );
+  }
+
+  String _titleForSlug(String slug) {
+    return switch (slug) {
+      'privacy' => 'privacy_policy_title'.tr(),
+      'terms' => 'terms_of_use_title'.tr(),
+      _ => widget.args.title,
+    };
   }
 
   @override
   Widget build(BuildContext context) {
+    final locale = context.locale.languageCode;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Column(
         children: [
           AppBarWidget(
             variant: AppBarVariant.title,
-            title: widget.args.title,
+            title: _titleForSlug(widget.args.slug),
             showBack: true,
+            currentLocale: locale,
+            onLocaleChanged: (l) async {
+              await context.setLocale(Locale(l));
+              if (!context.mounted) return;
+              context.read<StaticPageCubit>().load(
+                    widget.args.slug,
+                    _titleForSlug(widget.args.slug),
+                    l,
+                  );
+            },
           ),
           Expanded(
             child: BlocBuilder<StaticPageCubit, StaticPageState>(
@@ -49,10 +82,10 @@ class _StaticPageScreenState extends State<StaticPageScreen> {
                 if (state is StaticPageError) {
                   return Center(
                     child: ErrorStateWidget(
-                      message: state.message,
-                      onRetry: () => context
-                          .read<StaticPageCubit>()
-                          .load(widget.args.slug, widget.args.title),
+                      message: state.message == 'static_page_unavailable'
+                          ? 'static_page.unavailable'.tr()
+                          : state.message,
+                      onRetry: _loadPage,
                     ),
                   );
                 }
@@ -61,35 +94,7 @@ class _StaticPageScreenState extends State<StaticPageScreen> {
                     top: false,
                     child: SingleChildScrollView(
                       padding: EdgeInsetsDirectional.all(16.r),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SelectableText(
-                            state.content,
-                            style: GoogleFonts.cairo(
-                              fontSize: 14.sp,
-                              color: AppColors.textPrimary,
-                              height: 1.7,
-                            ),
-                          ),
-                          if (state.slug == 'contact') ...[
-                            SizedBox(height: 16.h),
-                            GestureDetector(
-                              onTap: () => launchUrl(
-                                Uri.parse('mailto:contact@booksplatform.net'),
-                              ),
-                              child: Text(
-                                'contact@booksplatform.net',
-                                style: GoogleFonts.inter(
-                                  fontSize: 14.sp,
-                                  color: AppColors.primary,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
+                      child: AppMarkdownBody(data: state.content),
                     ),
                   );
                 }

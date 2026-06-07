@@ -17,9 +17,13 @@ const _heroSubtitle = (
   en: 'We are happy to hear from you at any time. Reach out with any question.',
 );
 
-const _phone = '+20 100 000 0000';
-const _hours = (ar: 'السبت – الخميس، 9 ص – 5 م', en: 'Sat – Thu, 9 AM – 5 PM');
-const _emails = ['contact@booksplatform.net', 'info@booksplatform.net'];
+const _phone = '01005772608 (2+)';
+const _phoneDialUri = 'tel:+201005772608';
+const _hours = (
+  ar: 'متاح من الساعة 10:00 صباحًا حتى 19:00 مساءً',
+  en: 'Available from 10:00 AM to 7:00 PM',
+);
+const _emails = ['info@booksplatform.net', 'atefmazhar@yahoo.com'];
 
 const _followLabel = (ar: 'تابعنا على', en: 'Follow us on');
 
@@ -99,14 +103,17 @@ class ContactBody extends StatelessWidget {
                 Icon(Icons.phone_outlined,
                     color: Colors.white.withValues(alpha: 0.85), size: 34.r),
                 SizedBox(height: 10.h),
-                Text(
-                  _phone,
-                  textDirection: TextDirection.ltr,
-                  style: GoogleFonts.inter(
-                    fontSize: 24.sp,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    letterSpacing: 0.01 * 24.sp,
+                GestureDetector(
+                  onTap: () => launchUrl(Uri.parse(_phoneDialUri)),
+                  child: Text(
+                    _phone,
+                    textDirection: TextDirection.ltr,
+                    style: GoogleFonts.inter(
+                      fontSize: 24.sp,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: 0.01 * 24.sp,
+                    ),
                   ),
                 ),
                 SizedBox(height: 8.h),

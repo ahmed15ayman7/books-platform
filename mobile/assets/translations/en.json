@@ -266,6 +266,10 @@
 
   "about_us_title": "About Us",
   "contact_us_title": "Contact Us",
+
+  "static_page": {
+    "unavailable": "This page is not available right now."
+  },
   "services_title": "Our Services",
   "team_title": "Our Team",
   "privacy_policy_title": "Privacy Policy",

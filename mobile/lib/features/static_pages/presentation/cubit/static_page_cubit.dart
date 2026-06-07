@@ -8,13 +8,21 @@ import 'static_page_state.dart';
 class StaticPageCubit extends Cubit<StaticPageState> {
   StaticPageCubit() : super(const StaticPageInitial());
 
-  Future<void> load(String slug, String title) async {
+  Future<void> load(String slug, String title, String locale) async {
     emit(const StaticPageLoading());
-    try {
-      final content = await rootBundle.loadString('assets/static/$slug.md');
-      emit(StaticPageLoaded(slug: slug, title: title, content: content));
-    } catch (_) {
-      emit(StaticPageError('Page not available'));
+    final paths = [
+      'assets/static/${slug}_$locale.md',
+      'assets/static/$slug.md',
+    ];
+    for (final path in paths) {
+      try {
+        final content = await rootBundle.loadString(path);
+        emit(StaticPageLoaded(slug: slug, title: title, content: content));
+        return;
+      } catch (_) {
+        continue;
+      }
     }
+    emit(const StaticPageError('static_page_unavailable'));
   }
 }

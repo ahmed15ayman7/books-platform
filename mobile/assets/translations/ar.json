@@ -266,6 +266,10 @@
 
   "about_us_title": "من نحن",
   "contact_us_title": "تواصل معنا",
+
+  "static_page": {
+    "unavailable": "هذه الصفحة غير متاحة حالياً."
+  },
   "services_title": "خدماتنا",
   "team_title": "فريق العمل",
   "privacy_policy_title": "سياسة الخصوصية",

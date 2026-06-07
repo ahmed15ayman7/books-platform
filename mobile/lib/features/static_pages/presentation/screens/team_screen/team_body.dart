@@ -3,11 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:booksplatform/core/theme/app_colors.dart';
+import 'package:booksplatform/core/widgets/network_avatar_widget.dart';
 import 'package:booksplatform/features/static_pages/presentation/widgets/belief_band.dart';
 import 'package:booksplatform/features/static_pages/presentation/widgets/info_page_hero.dart';
 import 'package:booksplatform/features/static_pages/presentation/widgets/section_title.dart';
 
 import '../../helpers/bilingual_helper.dart';
+import 'team_member_urls.dart';
 
 // ignore_for_file: lines_longer_than_80_chars
 
@@ -31,22 +33,10 @@ const _belief = (
   en: 'Teamwork is the foundation of meaningful, lasting knowledge',
 );
 
-// gradient stop pairs per member (start, end)
-const _gradients = [
-  [Color(0xFF46467F), Color(0xFF2B2540)],
-  [Color(0xFFB11E2E), Color(0xFF8B1623)],
-  [Color(0xFF1F7A6D), Color(0xFF0F3D3E)],
-  [Color(0xFF4338CA), Color(0xFF1E1B4B)],
-  [Color(0xFFC8902A), Color(0xFF7A4A12)],
-  [Color(0xFF7A1F33), Color(0xFF3A0D18)],
-  [Color(0xFF475569), Color(0xFF1F2937)],
-  [Color(0xFF2F7A45), Color(0xFF14331F)],
-  [Color(0xFFA9824A), Color(0xFF5C4326)],
-];
-
 const _members = [
   (
     initials: 'ع م',
+    imageUrl: TeamMemberUrls.atefMazhar,
     name: (ar: 'عاطف مظهر', en: 'Atef Mazhar'),
     role: (ar: 'المدير العام', en: 'General Manager'),
     bio: (
@@ -56,6 +46,7 @@ const _members = [
   ),
   (
     initials: 'م م',
+    imageUrl: TeamMemberUrls.mariamMazhar,
     name: (ar: 'مريم مظهر', en: 'Mariam Mazhar'),
     role: (ar: 'المدير التنفيذي', en: 'Executive Director'),
     bio: (
@@ -65,6 +56,7 @@ const _members = [
   ),
   (
     initials: 'س م',
+    imageUrl: TeamMemberUrls.saraMazhar,
     name: (ar: 'سارة مظهر', en: 'Sara Mazhar'),
     role: (ar: 'مديرة التقنيات', en: 'Head of Technology'),
     bio: (
@@ -74,6 +66,7 @@ const _members = [
   ),
   (
     initials: 'م و',
+    imageUrl: TeamMemberUrls.mohamedAbouElwafa,
     name: (ar: 'محمد أبو الوفا', en: 'Mohamed Abu Al-Wafa'),
     role: (ar: 'مدير التحرير (الإنجليزية)', en: 'Editor-in-Chief (English)'),
     bio: (
@@ -83,6 +76,7 @@ const _members = [
   ),
   (
     initials: 'ه م',
+    imageUrl: TeamMemberUrls.hanyMowafi,
     name: (ar: 'هاني موافي', en: 'Hany Mowafy'),
     role: (ar: 'مدير التحرير (العربية)', en: 'Editor-in-Chief (Arabic)'),
     bio: (
@@ -92,6 +86,7 @@ const _members = [
   ),
   (
     initials: 'ز ش',
+    imageUrl: TeamMemberUrls.zakariaElShal,
     name: (ar: 'زكريا الشال', en: 'Zakaria El-Shal'),
     role: (ar: 'مدير التسويق', en: 'Marketing Director'),
     bio: (
@@ -101,6 +96,7 @@ const _members = [
   ),
   (
     initials: 'ع س',
+    imageUrl: TeamMemberUrls.abdelrahmanSaeed,
     name: (ar: 'عبد الرحمن سعيد', en: 'Abdelrahman Saeed'),
     role: (ar: 'مدير وحدة المونتاج و AI', en: 'Head of Editing & AI'),
     bio: (
@@ -110,6 +106,7 @@ const _members = [
   ),
   (
     initials: 'ح ف',
+    imageUrl: TeamMemberUrls.hatemFarag,
     name: (ar: 'د. حاتم فرج', en: 'Dr. Hatem Farag'),
     role: (ar: 'المستشار العلمي', en: 'Scientific Advisor'),
     bio: (
@@ -119,6 +116,7 @@ const _members = [
   ),
   (
     initials: 'أ ش',
+    imageUrl: TeamMemberUrls.ahmedElShal,
     name: (ar: 'أحمد الشال', en: 'Ahmed El-Shal'),
     role: (ar: 'مدير البرمجة و SEO', en: 'Dev & SEO Lead'),
     bio: (
@@ -171,7 +169,6 @@ class TeamBody extends StatelessWidget {
           child: Column(
             children: List.generate(_members.length, (i) {
               final m = _members[i];
-              final grad = _gradients[i];
               return Padding(
                 padding: EdgeInsets.only(bottom: 13.h),
                 child: Container(
@@ -192,16 +189,9 @@ class TeamBody extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 64.r,
-                        height: 64.r,
+                      DecoratedBox(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            begin: AlignmentDirectional.topStart,
-                            end: AlignmentDirectional.bottomEnd,
-                            colors: [grad[0], grad[1]],
-                          ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.18),
@@ -210,16 +200,15 @@ class TeamBody extends StatelessWidget {
                             ),
                           ],
                           border: Border.all(
-                              color: AppColors.surface, width: 2),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          m.initials,
-                          style: GoogleFonts.cairo(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
+                            color: AppColors.surface,
+                            width: 2,
                           ),
+                        ),
+                        child: NetworkAvatarWidget(
+                          size: 64.r,
+                          initials: m.initials,
+                          imageUrl: m.imageUrl,
+                          initialsFontSize: 18.sp,
                         ),
                       ),
                       SizedBox(width: 15.w),
