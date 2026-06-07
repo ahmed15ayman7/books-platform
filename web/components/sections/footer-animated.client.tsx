@@ -52,14 +52,27 @@ export function FooterAnimatedGrid({ columns, locale }: FooterAnimatedGridProps)
       <FadeIn delay={0.3}>
         <div className="mt-10 border-t border-[var(--brand-gray-800)] pt-6">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-xs text-white font-bold">
-              {new Date().getFullYear()} ©{" "}
-              <span className="text-[var(--brand-red)]">
-                {isAr ? "منصة الكتب العالمية" : "Books Platform"}
-              </span>
-              {" — "}
-              {isAr ? "جميع الحقوق محفوظة" : "All rights reserved"}
-            </p>
+            <div className="flex flex-col items-center gap-1 sm:items-start">
+              <p className="text-xs font-bold text-white">
+                {new Date().getFullYear()} ©{" "}
+                <span className="text-[var(--brand-red)]">
+                  {isAr ? "منصة الكتب العالمية" : "Books Platform"}
+                </span>
+                {" — "}
+                {isAr ? "جميع الحقوق محفوظة" : "All rights reserved"}
+              </p>
+              <p className="text-xs text-[var(--brand-gray-400)]">
+                {isAr ? "تصميم الموقع:" : "Site design:"}{" "}
+                <a
+                  href="https://real.com.eg"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-[var(--brand-gray-300)] transition-colors hover:text-[var(--brand-red)] hover:underline"
+                >
+                  real.com.eg
+                </a>
+              </p>
+            </div>
             <div className="flex items-center gap-2">
               {SOCIAL_LINKS.map((social) => (
                 <IconPulse key={social.href}>
