@@ -65,6 +65,7 @@ export default async function AboutPage() {
         subtitle={content.hero.subtitle}
         covers={heroCovers}
         variant="translated"
+        coverMode="photo"
         breadcrumbs={[
           { label: isAr ? "الرئيسية" : "Home", href: `/${locale}` },
           { label: content.hero.title },

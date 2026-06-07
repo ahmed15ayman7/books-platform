@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { ChevronRight } from "lucide-react";
+import { SafeImage } from "@/components/ui/safe-image";
 import { cn } from "@/lib/utils";
 import type { Locale } from "@/lib/i18n";
 import type { BreadcrumbItem } from "@/components/sections/page-hero";
@@ -21,37 +21,46 @@ interface CatalogCollageHeroProps {
   covers: CoverItem[];
   breadcrumbs?: BreadcrumbItem[];
   variant?: "translated" | "nominated";
+  /** book = object-contain for covers; photo = object-cover for uniform tiles */
+  coverMode?: "book" | "photo";
   children?: React.ReactNode;
 }
 
 const ROTATIONS = [-8, 6, -4, 10, -6, 8, -10, 5, -5, 7, -7, 4];
 
+const COVER_TILE_CLASS = "aspect-[2/3] w-full";
+
 function CollageCover({
   cover,
+  coverMode,
   className,
   style,
   sizes,
+  priority,
 }: {
   cover: CoverItem;
+  coverMode: "book" | "photo";
   className?: string;
   style?: React.CSSProperties;
   sizes: string;
+  priority?: boolean;
 }) {
+  const isPhoto = coverMode === "photo";
   const inner = (
-    <>
-      <Image
-        src={cover.src}
-        alt={cover.alt}
-        fill
-        unoptimized={cover.src.startsWith("http")}
-        className="object-contain p-1"
-        sizes={sizes}
-      />
-    </>
+    <SafeImage
+      src={cover.src}
+      alt={cover.alt}
+      fill
+      className={cn(isPhoto ? "object-cover" : "object-contain p-1")}
+      sizes={sizes}
+      priority={priority}
+    />
   );
 
   const shellClass = cn(
-    "relative overflow-hidden rounded-lg bg-white/10 shadow-lg ring-1 ring-white/20",
+    "relative overflow-hidden rounded-lg shadow-lg ring-1 ring-white/20",
+    isPhoto ? "bg-white/5" : "bg-white/10",
+    COVER_TILE_CLASS,
     cover.href && "transition-transform duration-300 hover:scale-105 hover:shadow-xl hover:ring-white/40",
     className,
   );
@@ -83,6 +92,7 @@ export function CatalogCollageHero({
   covers,
   breadcrumbs = [],
   variant = "translated",
+  coverMode = "book",
   children,
 }: CatalogCollageHeroProps) {
   const isAr = locale === "ar";
@@ -150,9 +160,10 @@ export function CatalogCollageHero({
                 <CollageCover
                   key={`${cover.href ?? cover.src}-${i}`}
                   cover={cover}
-                  className="aspect-[2/3]"
+                  coverMode={coverMode}
                   style={{ transform: `rotate(${ROTATIONS[i % ROTATIONS.length]}deg)` }}
                   sizes="120px"
+                  priority={i === 0}
                 />
               ))}
             </div>
@@ -165,8 +176,10 @@ export function CatalogCollageHero({
             <CollageCover
               key={`m-${cover.href ?? cover.src}-${i}`}
               cover={cover}
-              className="h-28 w-20 shrink-0 rounded-md"
+              coverMode={coverMode}
+              className="w-20 shrink-0"
               sizes="80px"
+              priority={i === 0}
             />
           ))}
         </div>

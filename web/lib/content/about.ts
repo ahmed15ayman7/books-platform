@@ -1,6 +1,6 @@
 import type { Locale } from "@/lib/i18n";
 import { pickLocale, pickLocaleList, type BilingualString } from "./types";
-import { ABOUT_IMAGES, ABOUT_IMAGE_SOURCES } from "./image-assets";
+import { ABOUT_IMAGES, ABOUT_HERO_COVER_URLS } from "./image-assets";
 
 export interface AboutImage {
   src: string;
@@ -76,36 +76,36 @@ const storyGallery: Array<AboutImage & { caption: BilingualString }> = [
 
 const heroImages: AboutImage[] = [
   {
-    src: ABOUT_IMAGE_SOURCES.aboutHero1,
+    src: ABOUT_HERO_COVER_URLS[0],
     alt: { ar: "مكتبة وكتب", en: "Library and books" },
   },
   {
-    src: ABOUT_IMAGE_SOURCES.aboutHero2,
-    alt: { ar: "قارئ مع كتاب", en: "Reader with a book" },
-  },
-  {
-    src: ABOUT_IMAGE_SOURCES.aboutHero3,
-    alt: { ar: "صفحات قاموس ومعرفة", en: "Dictionary pages and knowledge" },
-  },
-  {
-    src: ABOUT_IMAGE_SOURCES.aboutHero4,
-    alt: { ar: "صفحات مفتوحة من كتاب", en: "Open book pages" },
-  },
-  {
-    src: ABOUT_IMAGE_SOURCES.aboutHero5,
-    alt: { ar: "رفوف مكتبة", en: "Library shelves" },
-  },
-  {
-    src: ABOUT_IMAGE_SOURCES.aboutHero6,
-    alt: { ar: "ميكروفون وبودكast", en: "Podcast microphone" },
-  },
-  {
-    src: ABOUT_IMAGE_SOURCES.aboutHero7,
+    src: ABOUT_HERO_COVER_URLS[1],
     alt: { ar: "كتب مكدّسة", en: "Stacked books" },
   },
   {
-    src: ABOUT_IMAGE_SOURCES.aboutHero8,
-    alt: { ar: "عالم المعرفة", en: "World of knowledge" },
+    src: ABOUT_HERO_COVER_URLS[2],
+    alt: { ar: "صفحات قاموس ومعرفة", en: "Dictionary pages and knowledge" },
+  },
+  {
+    src: ABOUT_HERO_COVER_URLS[3],
+    alt: { ar: "صفحات مفتوحة من كتاب", en: "Open book pages" },
+  },
+  {
+    src: ABOUT_HERO_COVER_URLS[4],
+    alt: { ar: "رفوف مكتبة", en: "Library shelves" },
+  },
+  {
+    src: ABOUT_HERO_COVER_URLS[5],
+    alt: { ar: "ميكروفون وبودكast", en: "Podcast microphone" },
+  },
+  {
+    src: ABOUT_HERO_COVER_URLS[6],
+    alt: { ar: "مجموعة كتب", en: "Book collection" },
+  },
+  {
+    src: ABOUT_HERO_COVER_URLS[7],
+    alt: { ar: "كتابة ومعرفة", en: "Writing and knowledge" },
   },
 ];
 

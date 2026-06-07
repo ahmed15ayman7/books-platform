@@ -70,6 +70,22 @@ export const TEAM_IMAGE_PATHS = TEAM_MEMBERS.map((m) => m.photoUrl).filter(
   (p): p is string => Boolean(p),
 );
 
+/** Uniform 2:3 cover crop for collage heroes (400×600). */
+export function unsplashCoverUrl(photoId: string): string {
+  return `https://images.unsplash.com/${photoId}?w=400&h=600&fit=crop&q=80&fm=webp`;
+}
+
+export const ABOUT_HERO_COVER_URLS = [
+  unsplashCoverUrl("photo-1481627834876-b7833e8f5570"),
+  unsplashCoverUrl("photo-1516979187450-637abb88f58e"),
+  unsplashCoverUrl("photo-1456513080510-7bf3a84b82f8"),
+  unsplashCoverUrl("photo-1507842217343-583bb7270b66"),
+  unsplashCoverUrl("photo-1521587760476-6c12a4b040da"),
+  unsplashCoverUrl("photo-1478737270239-2f02b77fc618"),
+  unsplashCoverUrl("photo-1495446815901-a7297e633e8d"),
+  unsplashCoverUrl("photo-1457369804613-52c61a468e7d"),
+] as const;
+
 export const VERIFIED_STATIC_IMAGES: string[] = [
   ...Object.values(ABOUT_IMAGES),
   ...TEAM_IMAGE_PATHS,
