@@ -1,17 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:booksplatform/core/router/args/static_page_args.dart';
 import 'package:booksplatform/core/theme/app_colors.dart';
 import 'package:booksplatform/core/widgets/app_bar_widget.dart';
 import 'package:booksplatform/core/widgets/app_loading_indicator.dart';
-import 'package:booksplatform/core/widgets/app_markdown_body.dart';
 import 'package:booksplatform/core/widgets/error_state_widget.dart';
 
 import '../../cubit/static_page_cubit.dart';
 import '../../cubit/static_page_state.dart';
+import 'legal_page_body.dart';
 
 class StaticPageScreen extends StatefulWidget {
   const StaticPageScreen({super.key, required this.args});
@@ -93,8 +91,11 @@ class _StaticPageScreenState extends State<StaticPageScreen> {
                   return SafeArea(
                     top: false,
                     child: SingleChildScrollView(
-                      padding: EdgeInsetsDirectional.all(16.r),
-                      child: AppMarkdownBody(data: state.content),
+                      child: LegalPageBody(
+                        slug: widget.args.slug,
+                        lang: locale,
+                        markdown: state.content,
+                      ),
                     ),
                   );
                 }
