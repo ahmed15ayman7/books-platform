@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/book_cover_widget.dart';
+import '../../../../core/widgets/book_cover_filled_widget.dart';
 import '../../../../core/widgets/translation_status_badge.dart';
 import '../../domain/entities/book.dart';
 
@@ -56,7 +56,7 @@ class FeaturedBookHeroWidget extends StatelessWidget {
                     aspectRatio: 3 / 4,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.r),
-                      child: BookCoverWidget(
+                      child: BookCoverFilledWidget(
                         coverColors: book.coverColors,
                         titleAr: book.titleAr,
                         titleEn: book.titleEn,

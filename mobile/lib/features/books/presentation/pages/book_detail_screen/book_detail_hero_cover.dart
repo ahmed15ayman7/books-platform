@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../core/theme/app_colors.dart';
-import '../../../../../core/widgets/book_cover_widget.dart';
+import '../../../../../core/widgets/book_cover_filled_widget.dart';
 import '../../../domain/entities/book.dart';
 
 class BookDetailHeroCover extends StatelessWidget {
@@ -39,7 +39,7 @@ class BookDetailHeroCover extends StatelessWidget {
           Positioned.fill(
             child: Opacity(
               opacity: 0.5,
-              child: BookCoverWidget(
+              child: BookCoverFilledWidget(
                 coverColors: book.coverColors,
                 titleAr: book.titleAr,
                 titleEn: book.titleEn,
