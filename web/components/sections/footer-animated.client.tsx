@@ -37,7 +37,7 @@ export function FooterAnimatedGrid({ columns, locale }: FooterAnimatedGridProps)
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-[var(--brand-gray-400)] transition-all duration-[var(--motion-base)] hover:translate-x-0.5 hover:text-[var(--brand-red)] hover:underline"
+                      className="text-sm text-white font-bold transition-all duration-[var(--motion-base)] hover:translate-x-0.5 hover:text-[var(--brand-red)] hover:underline"
                     >
                       {link.label}
                     </Link>
@@ -52,7 +52,7 @@ export function FooterAnimatedGrid({ columns, locale }: FooterAnimatedGridProps)
       <FadeIn delay={0.3}>
         <div className="mt-10 border-t border-[var(--brand-gray-800)] pt-6">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-xs text-[var(--brand-gray-500)]">
+            <p className="text-xs text-white font-bold">
               {new Date().getFullYear()} ©{" "}
               <span className="text-[var(--brand-red)]">
                 {isAr ? "منصة الكتب العالمية" : "Books Platform"}

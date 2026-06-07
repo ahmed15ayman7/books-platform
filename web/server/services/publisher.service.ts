@@ -191,7 +191,7 @@ export const PublisherService = {
 
   async getAllCountries() {
     return db.country.findMany({
-      orderBy: { name: "asc" },
+      orderBy: { linkedCount: "desc" },
       select: { id: true, name: true, nameAr: true, slug: true },
     });
   },
