@@ -68,6 +68,10 @@ function buildVisibleSlugs(
   return visible.slice(0, visibleCount);
 }
 
+function slugsEqual(a: string[], b: string[]): boolean {
+  return a.length === b.length && a.every((slug, index) => slug === b[index]);
+}
+
 function promoteSlug(current: string[], slug: string, visibleCount: number): string[] {
   const without = current.filter((s) => s !== slug);
   return [slug, ...without].slice(0, visibleCount);
@@ -120,6 +124,12 @@ export function PublisherCountryFilter({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const skipStorageWriteRef = useRef(true);
+
+  const countrySlugsKey = useMemo(
+    () => countries.map((country) => country.slug).join("\0"),
+    [countries],
+  );
 
   const [visibleSlugs, setVisibleSlugs] = useState<string[]>(() =>
     buildVisibleSlugs(countries, null, activeCountry, visibleCount),
@@ -139,10 +149,18 @@ export function PublisherCountryFilter({
     } catch {
       stored = null;
     }
-    setVisibleSlugs(buildVisibleSlugs(countries, stored, activeCountry, visibleCount));
-  }, [countries, activeCountry, visibleCount]);
+
+    const next = buildVisibleSlugs(countries, stored, activeCountry, visibleCount);
+    skipStorageWriteRef.current = true;
+    setVisibleSlugs((prev) => (slugsEqual(prev, next) ? prev : next));
+  }, [countrySlugsKey, activeCountry, visibleCount, countries]);
 
   useEffect(() => {
+    if (skipStorageWriteRef.current) {
+      skipStorageWriteRef.current = false;
+      return;
+    }
+
     try {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(visibleSlugs));
     } catch {
@@ -152,7 +170,17 @@ export function PublisherCountryFilter({
 
   const repositionPanel = useCallback(() => {
     if (!triggerRef.current) return;
-    setPanelStyle(computePanelStyle(triggerRef.current));
+    const nextStyle = computePanelStyle(triggerRef.current);
+    setPanelStyle((prev) => {
+      if (
+        prev.top === nextStyle.top &&
+        prev.left === nextStyle.left &&
+        prev.width === nextStyle.width
+      ) {
+        return prev;
+      }
+      return nextStyle;
+    });
   }, []);
 
   useEffect(() => {
@@ -168,16 +196,19 @@ export function PublisherCountryFilter({
       setQuery("");
     };
 
-    const onReposition = () => repositionPanel();
+    let rafId = 0;
+    const onReposition = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(repositionPanel);
+    };
 
     document.addEventListener("mousedown", onPointerDown);
     window.addEventListener("resize", onReposition);
-    window.addEventListener("scroll", onReposition, true);
 
     return () => {
+      cancelAnimationFrame(rafId);
       document.removeEventListener("mousedown", onPointerDown);
       window.removeEventListener("resize", onReposition);
-      window.removeEventListener("scroll", onReposition, true);
     };
   }, [pickerOpen, repositionPanel]);
 
@@ -187,7 +218,7 @@ export function PublisherCountryFilter({
 
   const countryBySlug = useMemo(
     () => new Map(countries.map((country) => [country.slug, country])),
-    [countries],
+    [countrySlugsKey, countries],
   );
 
   const visibleCountries = useMemo(

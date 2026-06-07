@@ -91,29 +91,46 @@ export function replaceCaptionShortcodes(text: string): string {
 }
 
 const EXTERNAL_URL_INNER = String.raw`https?:\/\/[^\s)\]،؛\[]+`;
+const MD_LINK = /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
+
+function withProtectedMarkdownLinks(
+  text: string,
+  transform: (plain: string) => string,
+): string {
+  const saved: string[] = [];
+  const protectedText = text.replace(MD_LINK, (full) => {
+    saved.push(full);
+    return `\x00MDLINK${saved.length - 1}\x00`;
+  });
+  const transformed = transform(protectedText);
+  return transformed.replace(/\x00MDLINK(\d+)\x00/g, (_, index: string) => saved[Number(index)] ?? "");
+}
 
 /** Turn (https://...) URLs into markdown links with decoded Arabic labels. */
 export function linkifyParenthesizedUrls(text: string): string {
-  const openGuard = String.raw`(?<!\]\()(?<!!)`;
-  let out = text.replace(
-    new RegExp(String.raw`${openGuard}(${EXTERNAL_URL_INNER})\)`, "g"),
-    (_match, url: string) => `[${linkLabelFromUrl(url)}](${url})`,
-  );
-  out = out.replace(
-    new RegExp(String.raw`${openGuard}(${EXTERNAL_URL_INNER})(?=[،؛]|$|\s)`, "g"),
-    (_match, url: string) => `[${linkLabelFromUrl(url)}](${url})`,
-  );
-  return out;
+  return withProtectedMarkdownLinks(text, (plain) => {
+    let out = plain.replace(
+      /(?<!\])\((https?:\/\/[^)\s\[]+)\)/g,
+      (_match, url: string) => `[${linkLabelFromUrl(url)}](${url})`,
+    );
+    out = out.replace(
+      /(?<!\]\()(https?:\/\/[^\s)\]،؛\[]+)(?=[،؛]|$|\s)/g,
+      (_match, url: string) => `[${linkLabelFromUrl(url)}](${url})`,
+    );
+    return out;
+  });
 }
 
 /** Linkify bare http(s) URLs in prose (not inside markdown [label](url) syntax). */
 export function linkifyBareExternalUrls(text: string): string {
-  return text.replace(
-    new RegExp(String.raw`(^|[\s،؛!?…])(${EXTERNAL_URL_INNER})(?=[\s)\]،؛\[]|$)`, "g"),
-    (match, before: string, url: string) => {
-      if (isArticleImageUrl(url)) return match;
-      return `${before}[${linkLabelFromUrl(url)}](${url})`;
-    },
+  return withProtectedMarkdownLinks(text, (plain) =>
+    plain.replace(
+      new RegExp(String.raw`(^|[\s،؛!?…])(${EXTERNAL_URL_INNER})(?=[\s)\]،؛\[]|$)`, "g"),
+      (match, before: string, url: string) => {
+        if (isArticleImageUrl(url)) return match;
+        return `${before}[${linkLabelFromUrl(url)}](${url})`;
+      },
+    ),
   );
 }
 

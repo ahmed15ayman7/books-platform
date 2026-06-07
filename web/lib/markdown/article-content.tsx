@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { normalizeImageSrc } from "./normalize-image-url";
 import { resolveArticleImageSrc } from "./article-media-url";
@@ -20,8 +20,9 @@ function ExternalLink({ href, label }: { href: string; label: string }) {
   );
 }
 
-const INLINE_RE =
-  /!\[([^\]]*)\]\(([^)]+)\)|\[([^\]]+)\]\(([^)]+)\)|\*\*([\s\S]+?)\*\*|__([\s\S]+?)__|\*([^*]+?)\*|_([^_]+?)_/g;
+function createInlineRegex(): RegExp {
+  return /!\[([^\]]*)\]\(([^)]+)\)|\[([^\]]+)\]\(([^)]+)\)|\*\*([\s\S]+?)\*\*|__([\s\S]+?)__|\*([^*]+?)\*|_([^_]+?)_/g;
+}
 
 function renderInlineLink(
   href: string,
@@ -43,11 +44,11 @@ function inlineFormat(text: string): ReactNode[] {
 
   function parseSegment(segment: string): ReactNode[] {
     const parts: ReactNode[] = [];
+    const inlineRe = createInlineRegex();
     let last = 0;
     let m: RegExpExecArray | null;
-    INLINE_RE.lastIndex = 0;
 
-    while ((m = INLINE_RE.exec(segment)) !== null) {
+    while ((m = inlineRe.exec(segment)) !== null) {
       if (m.index > last) parts.push(segment.slice(last, m.index));
 
       if (m[1] !== undefined && m[2] !== undefined) {
@@ -81,6 +82,7 @@ function inlineFormat(text: string): ReactNode[] {
       }
 
       last = m.index + m[0].length;
+      inlineRe.lastIndex = last;
     }
 
     if (last < segment.length) parts.push(segment.slice(last));
@@ -143,7 +145,7 @@ interface ArticleContentProps {
 }
 
 export function ArticleContent({ content, className }: ArticleContentProps) {
-  const blocks = parseArticleContent(content);
+  const blocks = useMemo(() => parseArticleContent(content), [content]);
   if (blocks.length === 0) return null;
 
   return (

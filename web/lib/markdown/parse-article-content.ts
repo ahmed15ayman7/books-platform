@@ -14,8 +14,28 @@ const MD_IMAGE = /^!\[([^\]]*)\]\(([^)]+)\)\s*$/;
 const MD_LINK = /^\[([^\]]*)\]\(([^)]+)\)\s*$/;
 const MD_HEADING = /^(#{1,6})\s+(.+)$/;
 
+const MAX_HTML_TRANSFORM_CHARS = 500_000;
+
+function stripHtmlFallback(html: string): string {
+  return html
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>\s*<p[^>]*>/gi, "\n\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/\r\n/g, "\n")
+    .trim();
+}
+
 /** Normalize WordPress/HTML snippets into markdown-friendly text before parsing. */
 export function htmlToArticleSource(html: string): string {
+  if (html.length > MAX_HTML_TRANSFORM_CHARS) {
+    return stripHtmlFallback(html);
+  }
+
   let out = html;
 
   out = out.replace(/<img[^>]+src=["']([^"']+)["'][^>]*\/?>/gi, (_, src: string) =>
