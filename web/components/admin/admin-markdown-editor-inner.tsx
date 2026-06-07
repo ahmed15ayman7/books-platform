@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
@@ -37,9 +37,14 @@ export function AdminMarkdownEditorInner({
   className,
 }: AdminMarkdownEditorProps) {
   const features = useMemo(() => resolveMarkdownEditorFeatures(featuresProp), [featuresProp]);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const lastEmitted = useRef(value);
   const lastExternal = useRef(value);
   const initialContent = useMemo(() => normalizeInboundMarkdown(value), []);
+
+  const toggleFullscreen = useCallback(() => {
+    setIsFullscreen((prev) => !prev);
+  }, []);
 
   const debouncedOnChange = useDebouncedCallback((md: string) => {
     const normalized = normalizeOutboundMarkdown(md);
@@ -125,17 +130,50 @@ export function AdminMarkdownEditorInner({
     };
   }, [debouncedOnChange]);
 
+  useEffect(() => {
+    if (!isFullscreen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsFullscreen(false);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isFullscreen]);
+
   return (
     <div
       className={cn(
-        "admin-markdown-editor overflow-hidden rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)]",
+        "admin-markdown-editor flex flex-col overflow-hidden rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)]",
         "focus-within:border-[var(--brand-red)] focus-within:ring-1 focus-within:ring-[var(--brand-red)]",
+        isFullscreen && "fixed inset-0 z-[100] m-0 rounded-none border-0",
         disabled && "opacity-60",
         className,
       )}
     >
-      <AdminMarkdownEditorToolbar editor={editor} features={features} disabled={disabled} />
-      <EditorContent editor={editor} />
+      <AdminMarkdownEditorToolbar
+        editor={editor}
+        features={features}
+        disabled={disabled}
+        isFullscreen={isFullscreen}
+        onToggleFullscreen={toggleFullscreen}
+      />
+      <div
+        className={cn(
+          "min-h-0 overflow-y-auto",
+          isFullscreen ? "flex-1" : "max-h-[min(70vh,720px)]",
+        )}
+      >
+        <EditorContent editor={editor} />
+      </div>
       <style jsx global>{`
         .admin-markdown-editor .ProseMirror p.is-editor-empty:first-child::before {
           color: var(--admin-text-subtle);

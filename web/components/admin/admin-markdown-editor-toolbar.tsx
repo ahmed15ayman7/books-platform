@@ -7,6 +7,8 @@ import {
   Link2,
   List,
   ListOrdered,
+  Maximize2,
+  Minimize2,
   Redo2,
   Undo2,
   ImageIcon,
@@ -18,6 +20,8 @@ interface AdminMarkdownEditorToolbarProps {
   editor: Editor | null;
   features: Required<MarkdownEditorFeatures>;
   disabled?: boolean;
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
 }
 
 function ToolbarButton({
@@ -60,6 +64,8 @@ export function AdminMarkdownEditorToolbar({
   editor,
   features,
   disabled,
+  isFullscreen = false,
+  onToggleFullscreen,
 }: AdminMarkdownEditorToolbarProps) {
   if (!editor) return null;
 
@@ -101,7 +107,7 @@ export function AdminMarkdownEditorToolbar({
 
   return (
     <div
-      className="flex flex-wrap items-center gap-1 border-b border-[var(--admin-border)] bg-[var(--admin-surface-muted)] px-2 py-1.5"
+      className="sticky top-0 z-10 flex shrink-0 flex-wrap items-center gap-1 border-b border-[var(--admin-border)] bg-[var(--admin-surface-muted)] px-2 py-1.5"
       role="toolbar"
       aria-label="أدوات التنسيق"
     >
@@ -203,6 +209,23 @@ export function AdminMarkdownEditorToolbar({
         <ToolbarButton label="صورة" disabled={isDisabled} onClick={insertImage}>
           <ImageIcon className="h-4 w-4" aria-hidden="true" />
         </ToolbarButton>
+      )}
+
+      {onToggleFullscreen && (
+        <>
+          <div className="ms-auto" aria-hidden="true" />
+          <ToolbarDivider />
+          <ToolbarButton
+            label={isFullscreen ? "الخروج من ملء الشاشة" : "ملء الشاشة"}
+            onClick={onToggleFullscreen}
+          >
+            {isFullscreen ? (
+              <Minimize2 className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <Maximize2 className="h-4 w-4" aria-hidden="true" />
+            )}
+          </ToolbarButton>
+        </>
       )}
     </div>
   );
