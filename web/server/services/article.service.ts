@@ -119,7 +119,6 @@ export const ArticleService = {
           orderBy: { commentDate: "asc" },
           select: {
             id: true,
-
             authorName: true,
             content: true,
             commentDate: true,

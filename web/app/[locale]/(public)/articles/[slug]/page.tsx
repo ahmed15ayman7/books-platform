@@ -140,7 +140,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         <div className="min-h-screen bg-white pb-20">
           <ArticleDetailHero
             locale={locale}
-            title={article.title}
+            title={locale === "ar" ? article.title : article.titleEn ?? article.title}
             coverUrl={heroCoverUrl}
             coverAlt={heroCoverAlt}
           />
@@ -215,7 +215,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
                 )}
 
                 {article.content ? (
-                  <ArticleContent content={article.content} />
+                  <ArticleContent content={locale === "ar" ? article.content : article.contentEn ?? article.content} />
                 ) : intro ? null : (
                   <p className="text-base leading-relaxed text-[var(--brand-gray-700)]">{intro}</p>
                 )}
