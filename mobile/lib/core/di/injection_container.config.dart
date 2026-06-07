@@ -256,6 +256,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i14.RatingsRepository>(
       () => _i341.RatingsRepositoryImpl(gh<_i519.RatingsRemoteDataSource>()),
     );
+    gh.factory<_i618.PublisherDetailCubit>(
+      () => _i618.PublisherDetailCubit(gh<_i674.PublishersRepository>()),
+    );
     gh.factory<_i1073.SearchCubit>(
       () => _i1073.SearchCubit(gh<_i1067.SearchRepository>()),
     );
@@ -264,12 +267,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i935.PublishersListCubit>(
       () => _i935.PublishersListCubit(gh<_i674.PublishersRepository>()),
-    );
-    gh.factory<_i618.PublisherDetailCubit>(
-      () => _i618.PublisherDetailCubit(
-        gh<_i674.PublishersRepository>(),
-        gh<_i407.BooksRepository>(),
-      ),
     );
     gh.factory<_i557.PublishCubit>(
       () => _i557.PublishCubit(

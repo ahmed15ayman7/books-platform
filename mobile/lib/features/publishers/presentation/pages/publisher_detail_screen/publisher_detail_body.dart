@@ -33,7 +33,7 @@ class PublisherDetailBody extends StatelessWidget {
         SliverToBoxAdapter(
           child: PublisherDetailHeader(publisher: publisher, ar: ar),
         ),
-        if (publisher.aboutAr != null && publisher.aboutAr!.isNotEmpty) ...[
+        if (publisher.displayAbout(locale)?.isNotEmpty ?? false) ...[
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsetsDirectional.fromSTEB(16.w, 20.h, 16.w, 0),
@@ -46,7 +46,7 @@ class PublisherDetailBody extends StatelessWidget {
             child: Padding(
               padding: EdgeInsetsDirectional.fromSTEB(16.w, 10.h, 16.w, 0),
               child: Text(
-                publisher.aboutAr!,
+                publisher.displayAbout(locale)!,
                 style: GoogleFonts.tajawal(
                   fontSize: 14.sp,
                   color: AppColors.textSecondary,
@@ -85,6 +85,7 @@ class PublisherDetailBody extends StatelessWidget {
                 (_, i) => PublisherDetailBookCard(
                   book: books[i],
                   locale: locale,
+                  publisherName: publisher.displayName(locale),
                   onTap: () => onBookTap(books[i]),
                 ),
                 childCount: books.length,

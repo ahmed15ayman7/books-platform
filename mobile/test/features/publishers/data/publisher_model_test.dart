@@ -51,9 +51,39 @@ void main() {
     });
 
     group('toEntity()', () {
-      test('aboutAr reflects description from API', () {
+      test('aboutEn reflects description from API', () {
         final json = _baseJson({'description': 'وصف الناشر'});
-        expect(PublisherModel.fromJson(json).toEntity().aboutAr, 'وصف الناشر');
+        expect(PublisherModel.fromJson(json).toEntity().aboutEn, 'وصف الناشر');
+      });
+
+      test('aboutAr reflects contentAr from API', () {
+        final json = _baseJson({'contentAr': 'وصف عربي'});
+        expect(PublisherModel.fromJson(json).toEntity().aboutAr, 'وصف عربي');
+      });
+
+      test('aboutEn reflects content from API', () {
+        final json = _baseJson({'content': 'English about'});
+        expect(PublisherModel.fromJson(json).toEntity().aboutEn, 'English about');
+      });
+
+      test('imageUrl maps to entity', () {
+        final json = _baseJson({
+          'imageUrl': 'https://example.com/logo.png',
+        });
+        expect(
+          PublisherModel.fromJson(json).toEntity().imageUrl,
+          'https://example.com/logo.png',
+        );
+      });
+
+      test('imageFeatured falls back when imageUrl is absent', () {
+        final json = _baseJson({
+          'imageFeatured': 'https://example.com/featured.png',
+        });
+        expect(
+          PublisherModel.fromJson(json).toEntity().imageUrl,
+          'https://example.com/featured.png',
+        );
       });
     });
   });

@@ -15,11 +15,13 @@ class PublisherDetailBookCard extends StatelessWidget {
     required this.book,
     required this.onTap,
     this.locale = 'ar',
+    this.publisherName,
   });
 
   final PublisherBook book;
   final VoidCallback onTap;
   final String locale;
+  final String? publisherName;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +46,8 @@ class PublisherDetailBookCard extends StatelessWidget {
                     coverColors: book.coverColors,
                     titleAr: book.titleAr,
                     titleEn: book.titleEn,
-                    publisher: book.publisher,
+                    publisher: publisherName ?? book.publisher,
+                    imageUrl: book.imageUrl,
                   ),
                   if (book.isNew)
                     PositionedDirectional(
@@ -90,7 +93,7 @@ class PublisherDetailBookCard extends StatelessWidget {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    book.publisher,
+                    publisherName ?? book.publisher,
                     style: GoogleFonts.inter(
                       fontSize: 11.5.sp,
                       color: AppColors.textSecondary,

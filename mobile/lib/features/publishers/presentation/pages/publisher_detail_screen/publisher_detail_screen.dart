@@ -55,7 +55,7 @@ class _PublisherDetailScreenState extends State<PublisherDetailScreen> {
                   children: [
                 AppBarWidget(
                   variant: AppBarVariant.title,
-                  title: publisher.name,
+                  title: publisher.displayName(locale),
                   showBack: true,
                   currentLocale: locale,
                   onLocaleChanged: (l) => context.setLocale(Locale(l)),

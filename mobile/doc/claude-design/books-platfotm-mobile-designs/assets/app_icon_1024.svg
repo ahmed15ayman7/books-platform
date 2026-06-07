@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <rect width="1024" height="1024" fill="#1a1a1a"/>
+  
+  <!-- B letterform as outline (stroke only, no fill) -->
+  <text 
+    x="512" 
+    y="880"
+    font-family="'DejaVu Serif', Georgia, 'Times New Roman', serif"
+    font-size="860"
+    font-weight="900"
+    text-anchor="middle"
+    fill="none"
+    stroke="white"
+    stroke-width="32"
+    stroke-linejoin="round"
+  >B</text>
+
+  <!-- Red bookmark ribbon overlapping the top-left of the B stem -->
+  <polygon 
+    points="166,105  271,105  271,395  218,320  166,395"
+    fill="#b91c1c"
+  />
+</svg>

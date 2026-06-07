@@ -5,6 +5,8 @@ import '../../../../core/network/api_envelope.dart';
 import '../../../../core/network/api_manager.dart';
 import '../../../../core/network/failure.dart';
 import '../../domain/entities/publisher.dart';
+import '../../domain/entities/publisher_book.dart';
+import '../models/publisher_book_model.dart';
 import '../models/publisher_model.dart';
 
 @lazySingleton
@@ -14,7 +16,6 @@ class PublishersRemoteDataSourceImpl {
   final ApiManager _api;
 
   List<String>? _cachedCountries;
-  // $mobile-debug-skill | Problem: filter chips display Arabic names but the API expects English names — sending Arabic returns total:0. Fix: cache the AR→EN mapping and translate before the API call.
   final Map<String, String> _arToEnCountry = {};
 
   Future<Either<Failure, PaginatedResponse<Publisher>>> getPublishers({
@@ -39,14 +40,28 @@ class PublishersRemoteDataSourceImpl {
         ),
       );
 
-  Future<Either<Failure, Publisher>> getPublisherBySlug(String slug) =>
-      _api.get(
-        path: '/publishers/$slug',
-        fromJson: (json) => ApiEnvelope.fromJson(
-          json,
-          fromData: PublisherModel.fromJson,
-        ).data!.toEntity(),
-      );
+  Future<Either<Failure, (Publisher, List<PublisherBook>)>>
+      getPublisherBySlug(String slug) => _api.get(
+            path: '/publishers/$slug',
+            fromJson: (json) {
+              final dataJson =
+                  (json as Map<String, dynamic>)['data']
+                      as Map<String, dynamic>;
+              final publisherModel = PublisherModel.fromJson(dataJson);
+              final publisher = publisherModel.toEntity();
+
+              final productsRaw =
+                  dataJson['products'] as List<dynamic>? ?? [];
+              final books = productsRaw
+                  .map((p) => PublisherBookModel.fromJson(
+                        p as Map<String, dynamic>,
+                        publisherName: publisherModel.title,
+                      ).toEntity())
+                  .toList();
+
+              return (publisher, books);
+            },
+          );
 
   Future<Either<Failure, List<String>>> getCountries() async {
     if (_cachedCountries != null) return right(_cachedCountries!);
@@ -71,7 +86,6 @@ class PublishersRemoteDataSourceImpl {
     );
   }
 
-  // Kept for backward compatibility with mock-data callers (e.g. the home cubit)
   Future<Either<Failure, List<Publisher>>> getPublishersLegacy({
     String? countryName,
     String? search,

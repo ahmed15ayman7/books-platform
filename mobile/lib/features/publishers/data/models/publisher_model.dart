@@ -9,9 +9,11 @@ class PublisherModel {
     required this.countries,
     required this.countriesAr,
     required this.countrySlugs,
+    this.nameAr = '',
     this.isSponsored = false,
     this.imageUrl,
     this.excerpt,
+    this.contentAr,
     this.website,
     this.email,
   });
@@ -23,9 +25,11 @@ class PublisherModel {
   final List<String> countries;
   final List<String> countriesAr;
   final List<String> countrySlugs;
+  final String nameAr;
   final bool isSponsored;
   final String? imageUrl;
   final String? excerpt;
+  final String? contentAr;
   final String? website;
   final String? email;
 
@@ -35,9 +39,10 @@ class PublisherModel {
     return PublisherModel(
       id: json['_id'] as String? ?? json['id'] as String? ?? '',
       slug: json['slug'] as String? ?? '',
-      title: json['title'] as String? ?? json['name'] as String? ?? '',
+      title: json['name'] as String? ?? json['title'] as String? ?? '',
       bookCount: (json['booksCount'] as num?)?.toInt() ??
-          (json['bookCount'] as num?)?.toInt() ?? 0,
+          (json['bookCount'] as num?)?.toInt() ??
+          (json['products'] as List?)?.length ?? 0,
       countries: countriesRaw
           .map((e) => e is Map ? (e['name'] as String? ?? '') : e.toString())
           .where((c) => c.isNotEmpty)
@@ -51,17 +56,23 @@ class PublisherModel {
           .where((c) => c.isNotEmpty)
           .toList(),
       isSponsored: json['isSponsored'] as bool? ?? false,
-      imageUrl: json['imageUrl'] as String? ?? json['logoUrl'] as String?,
-      excerpt: json['description'] as String? ?? json['excerpt'] as String?,
-      website: json['website'] as String?,
+      imageUrl: json['imageUrl'] as String? ??
+          json['imageFeatured'] as String? ??
+          json['logoUrl'] as String?,
+      excerpt: json['content'] as String? ??
+          json['description'] as String? ??
+          json['excerpt'] as String?,
+      contentAr: json['contentAr'] as String?,
+      website: json['websiteUrl'] as String? ?? json['website'] as String?,
       email: json['contactEmail'] as String? ?? json['email'] as String?,
+      nameAr: json['nameAr'] as String? ?? '',
     );
   }
 
   Publisher toEntity() => Publisher(
-        // $mobile-debug-skill | Problem: entity id was set to the DB id (cmpyf…) so navigation called /publishers/<db-id> → 404. Fix: use the URL slug instead — it's what the detail endpoint accepts.
         id: slug.isNotEmpty ? slug : id,
         name: title,
+        nameAr: nameAr,
         countryAr: countriesAr.isNotEmpty
             ? countriesAr[0]
             : (countries.isNotEmpty ? countries[0] : ''),
@@ -70,7 +81,9 @@ class PublisherModel {
         countryFlag: '',
         bookCount: bookCount,
         isSponsored: isSponsored,
+        imageUrl: imageUrl,
         website: website,
-        aboutAr: excerpt,
+        aboutEn: excerpt,
+        aboutAr: contentAr,
       );
 }

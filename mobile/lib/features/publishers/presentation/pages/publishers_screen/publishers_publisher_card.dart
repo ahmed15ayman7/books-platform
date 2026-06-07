@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_shadows.dart';
+import '../../../../../core/widgets/network_avatar_widget.dart';
 import '../../../domain/entities/publisher.dart';
 
 class PublishersPublisherCard extends StatelessWidget {
@@ -21,7 +22,8 @@ class PublishersPublisherCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ar = locale == 'ar';
-    final initials = publisher.name
+    final displayName = publisher.displayName(locale);
+    final initials = displayName
         .split(' ')
         .take(2)
         .map((w) => w.isNotEmpty ? w[0] : '')
@@ -38,23 +40,12 @@ class PublishersPublisherCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              width: 54.r,
-              height: 54.r,
-              decoration: BoxDecoration(
-                color: AppColors.secondary,
-                borderRadius: BorderRadius.circular(16.r),
-              ),
-              child: Center(
-                child: Text(
-                  initials,
-                  style: GoogleFonts.cairo(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+            NetworkAvatarWidget(
+              size: 54.r,
+              initials: initials,
+              imageUrl: publisher.imageUrl,
+              borderRadius: BorderRadius.circular(16.r),
+              initialsFontSize: 18.sp,
             ),
             SizedBox(width: 14.w),
             Expanded(
@@ -65,7 +56,7 @@ class PublishersPublisherCard extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          publisher.name,
+                          displayName,
                           style: GoogleFonts.cairo(
                             fontSize: 15.sp,
                             fontWeight: FontWeight.w700,

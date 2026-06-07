@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_shadows.dart';
+import '../../../../../core/widgets/network_avatar_widget.dart';
 import '../../../domain/entities/search_result.dart';
 import 'search_book_thumbnail.dart';
 
@@ -116,27 +117,17 @@ class SearchResultsList extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Container(
-                    width: 46.r,
-                    height: 46.r,
-                    decoration: BoxDecoration(
-                      color: AppColors.secondary,
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Center(
-                      child: Text(
-                        publisher.name
-                            .split(' ')
-                            .take(2)
-                            .map((w) => w.isNotEmpty ? w[0] : '')
-                            .join(),
-                        style: GoogleFonts.cairo(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+                  NetworkAvatarWidget(
+                    size: 46.r,
+                    initials: publisher
+                        .displayName(locale)
+                        .split(' ')
+                        .take(2)
+                        .map((w) => w.isNotEmpty ? w[0] : '')
+                        .join(),
+                    imageUrl: publisher.imageUrl,
+                    borderRadius: BorderRadius.circular(12.r),
+                    initialsFontSize: 15.sp,
                   ),
                   SizedBox(width: 12.w),
                   Expanded(
@@ -144,7 +135,7 @@ class SearchResultsList extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          publisher.name,
+                          publisher.displayName(locale),
                           style: GoogleFonts.cairo(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w700,

@@ -12,6 +12,7 @@ class PublisherBook extends Equatable {
     required this.coverColors,
     required this.categorySlug,
     required this.status,
+    this.imageUrl,
     this.isNew = false,
   });
 
@@ -19,11 +20,12 @@ class PublisherBook extends Equatable {
   final String titleAr;
   final String titleEn;
   final String publisher;
+  final String? imageUrl;
   final List<Color> coverColors;
   final String categorySlug;
   final TranslationStatus status;
   final bool isNew;
 
   @override
-  List<Object?> get props => [id, titleAr, titleEn, status, categorySlug, isNew];
+  List<Object?> get props => [id, titleAr, titleEn, status, categorySlug, imageUrl, isNew];
 }

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_shadows.dart';
+import '../../../../../core/widgets/network_avatar_widget.dart';
 import '../../../domain/entities/publisher.dart';
 
 class PublisherDetailHeader extends StatelessWidget {
@@ -18,7 +19,8 @@ class PublisherDetailHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initials = publisher.name
+    final displayName = publisher.displayName(ar ? 'ar' : 'en');
+    final initials = displayName
         .split(' ')
         .take(2)
         .map((w) => w.isNotEmpty ? w[0].toUpperCase() : '')
@@ -42,27 +44,17 @@ class PublisherDetailHeader extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Container(
-            width: 80.r,
-            height: 80.r,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                initials,
-                style: GoogleFonts.cairo(
-                  fontSize: 28.sp,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.primary,
-                ),
-              ),
-            ),
+          NetworkAvatarWidget(
+            size: 80.r,
+            initials: initials,
+            imageUrl: publisher.imageUrl,
+            backgroundColor: Colors.white,
+            initialsColor: AppColors.primary,
+            initialsFontSize: 28.sp,
           ),
           SizedBox(height: 12.h),
           Text(
-            publisher.name,
+            displayName,
             textAlign: TextAlign.center,
             style: GoogleFonts.cairo(
               fontSize: 20.sp,
