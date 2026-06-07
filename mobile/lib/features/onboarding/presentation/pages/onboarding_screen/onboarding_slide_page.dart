@@ -30,7 +30,7 @@ const kOnboardingSlides = [
     subEn:
         'Discover every significant book published worldwide — sorted into eight fields of knowledge.',
     accentColor: AppColors.primary,
-    imagePath: 'assets/onboard-discover.png',
+    imagePath: 'assets/onboarding/onboard-discover.png',
   ),
   OnboardingSlide(
     titleAr: 'تابِع رحلة الترجمة',
@@ -40,7 +40,7 @@ const kOnboardingSlides = [
     subEn:
         "See what's translated and what's nominated — a window onto the world's ideas, in your language.",
     accentColor: Color(0xFF46467F),
-    imagePath: 'assets/onboard-translate.png',
+    imagePath: 'assets/onboarding/onboard-translate.png',
   ),
   OnboardingSlide(
     titleAr: 'اقرأ، اقتنِ، وانشر',
@@ -50,7 +50,7 @@ const kOnboardingSlides = [
     subEn:
         'Collect the books you love and give your own book its first chance — your first book is free.',
     accentColor: AppColors.primary,
-    imagePath: 'assets/onboard-publish.png',
+    imagePath: 'assets/onboarding/onboard-publish.png',
   ),
 ];
 
