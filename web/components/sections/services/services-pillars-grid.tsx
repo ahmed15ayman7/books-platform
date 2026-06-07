@@ -2,11 +2,12 @@
 
 import { BookMarked, FileText, Mic, Newspaper, Search, Share2 } from "lucide-react";
 import type { ServicePillar } from "@/lib/content/services";
-import type { AboutValue } from "@/lib/content/about";
 import type { Locale } from "@/lib/i18n";
-import { AboutValuesGrid } from "@/components/sections/about/about-values-grid";
+import { pickLocale } from "@/lib/content/types";
+import { SectionBlock } from "@/components/sections/section-block";
+import { ValueCard, ValueCardGrid } from "@/components/sections/value-card";
 
-const PILLAR_ICONS = {
+const ICONS = {
   biblio: BookMarked,
   journal: Newspaper,
   research: Search,
@@ -26,24 +27,22 @@ export function ServicesPillarsGrid({
   title: string;
   items: ServicePillar[];
 }) {
-  const values: AboutValue[] = items.map((item) => ({
-    key: item.key,
-    title: item.title,
-    body: item.body,
-  }));
-
   return (
-    <AboutValuesGrid
-      locale={locale}
-      id="pillars"
-      eyebrow={eyebrow}
-      title={title}
-      items={values}
-      icons={PILLAR_ICONS}
-      defaultIcon={BookMarked}
-      textSize="lg"
-      cardSize="lg"
-      columns={3}
-    />
+    <SectionBlock id="pillars" eyebrow={eyebrow} title={title} textSize="lg" staggerChildren={false}>
+      <ValueCardGrid className="lg:grid-cols-3">
+        {items.map((item) => {
+          const Icon = ICONS[item.key as keyof typeof ICONS] ?? BookMarked;
+          return (
+            <ValueCard
+              key={item.key}
+              icon={Icon}
+              title={pickLocale(item.title, locale)}
+              body={pickLocale(item.body, locale)}
+              size="lg"
+            />
+          );
+        })}
+      </ValueCardGrid>
+    </SectionBlock>
   );
 }

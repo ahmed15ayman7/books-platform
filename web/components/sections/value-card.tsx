@@ -46,7 +46,7 @@ export function ValueCard({
         <h3
           className={cn(
             "mt-4 font-bold text-[var(--brand-gray-900)]",
-            isLarge && "text-lg md:text-xl",
+            isLarge && "text-xl md:text-2xl",
           )}
         >
           {title}
@@ -54,7 +54,7 @@ export function ValueCard({
         <p
           className={cn(
             "mt-2 leading-relaxed text-[var(--brand-gray-600)]",
-            isLarge ? "text-base md:text-lg" : "text-sm md:text-base",
+            isLarge ? "text-lg md:text-xl" : "text-sm md:text-base",
           )}
         >
           {body}
