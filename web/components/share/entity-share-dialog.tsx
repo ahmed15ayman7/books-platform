@@ -15,7 +15,6 @@ import {
   buildSharePostText,
   buildPlatformShareUrl,
   SHARE_PLATFORMS,
-  tryNativeShare,
   type EntitySharePayload,
   type SharePlatform,
 } from "@/lib/share/entity-share";
