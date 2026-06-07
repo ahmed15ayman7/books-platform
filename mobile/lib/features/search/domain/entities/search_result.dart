@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../articles/domain/entities/article.dart';
 import '../../../books/domain/entities/book.dart';
 import '../../../publishers/domain/entities/publisher.dart';
 
@@ -21,4 +22,11 @@ final class PublisherSearchResult extends SearchResult {
   final Publisher publisher;
   @override
   List<Object?> get props => [publisher.id];
+}
+
+final class ArticleSearchResult extends SearchResult {
+  const ArticleSearchResult(this.article);
+  final Article article;
+  @override
+  List<Object?> get props => [article.id];
 }

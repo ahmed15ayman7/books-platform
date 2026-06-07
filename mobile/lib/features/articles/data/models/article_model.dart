@@ -18,11 +18,13 @@ class ArticleModel {
     this.authorLastName = '',
     this.imageUrl,
     this.hasVideo = false,
+    this.titleEn,
   });
 
   final String id;
   final String slug;
   final String title;
+  final String? titleEn;
   final String excerpt;
   final String channel;
   final String categoryLabel;
@@ -41,6 +43,7 @@ class ArticleModel {
       id: json['_id'] as String? ?? json['id'] as String? ?? '',
       slug: json['slug'] as String? ?? '',
       title: json['title'] as String? ?? json['titleAr'] as String? ?? '',
+      titleEn: json['titleEn'] as String?,
       excerpt: json['excerpt'] as String? ?? json['summary'] as String? ?? '',
       channel: json['channel'] as String? ?? '',
       categoryLabel: category?['name'] as String? ?? json['channel'] as String? ?? '',
@@ -76,6 +79,7 @@ class ArticleModel {
         id: id,
         slug: slug,
         title: title,
+        titleEn: titleEn,
         excerpt: excerpt,
         channel: channel,
         categoryLabel: categoryLabel,

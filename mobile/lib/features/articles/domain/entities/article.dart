@@ -18,10 +18,12 @@ class Article extends Equatable {
     this.authorLastName = '',
     this.readingTime = 0,
     this.imageUrl,
+    this.titleEn,
   });
 
   final String id;
   final String title;
+  final String? titleEn;
   final String excerpt;
   final String categoryLabel;
   final String categoryLabelAr;
@@ -37,6 +39,12 @@ class Article extends Equatable {
   final String? imageUrl;
 
   String get authorFullName => '$authorFirstName $authorLastName'.trim();
+
+  String displayTitle(String locale) {
+    if (locale == 'ar') return title;
+    if (titleEn != null && titleEn!.isNotEmpty) return titleEn!;
+    return title;
+  }
 
   // Channel key constants
   static const String kChannelHarvest = 'harvest';

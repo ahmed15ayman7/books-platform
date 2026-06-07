@@ -24,7 +24,9 @@ void main() {
         books: [],
         articles: [],
         publishers: [],
-        totalResults: 0,
+        booksTotal: 0,
+        articlesTotal: 0,
+        publishersTotal: 0,
       );
       when(() => mockDataSource.search(
             any(),
@@ -40,7 +42,12 @@ void main() {
 
     test('getSuggestions returns Right<List<SearchSuggestion>>', () async {
       const suggestions = [
-        SearchSuggestion(type: 'book', label: 'Test Book', slug: 'test-book'),
+        SearchSuggestion(
+          type: 'book',
+          label: 'Test Book',
+          slug: 'test-book',
+          labelEn: 'Test Book EN',
+        ),
       ];
       when(() => mockDataSource.getSuggestions(
             any(),

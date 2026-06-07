@@ -152,12 +152,19 @@
   },
 
   "search": {
-    "hint": "Search books and publishers…",
+    "hint": "Search books, articles, and publishers…",
     "recent_searches": "Recent searches",
     "no_results_prefix": "No results for",
     "suggestions_title": "Try one of these suggestions:",
+    "suggestions_header": "Suggestions",
     "book_label": "Book",
-    "publisher_label": "Publisher"
+    "publisher_label": "Publisher",
+    "article_label": "Article",
+    "tab_all": "All",
+    "tab_books": "Books",
+    "tab_articles": "Articles",
+    "tab_publishers": "Publishers",
+    "tab_empty": "No {} results for this search"
   },
 
   "publish": {

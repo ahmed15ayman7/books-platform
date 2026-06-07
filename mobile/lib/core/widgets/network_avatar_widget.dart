@@ -28,6 +28,8 @@ class NetworkAvatarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final radius = borderRadius ?? BorderRadius.circular(size / 2);
     final hasImage = imageUrl != null && imageUrl!.isNotEmpty;
+    final cacheSize =
+        (size * MediaQuery.devicePixelRatioOf(context)).round();
 
     return Container(
       width: size,
@@ -41,6 +43,8 @@ class NetworkAvatarWidget extends StatelessWidget {
           ? CachedNetworkImage(
               imageUrl: imageUrl!,
               fit: BoxFit.cover,
+              memCacheWidth: cacheSize,
+              memCacheHeight: cacheSize,
               placeholder: (_, _) => _initials(),
               errorWidget: (_, _, _) => _initials(),
             )
