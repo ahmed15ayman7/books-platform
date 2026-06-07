@@ -119,23 +119,35 @@ const hero: { title: BilingualString; subtitle: BilingualString } = {
 
 const introParagraphs: BilingualString[] = [
   {
-    ar: "برزت فكرة منصة الكتب كمبادرة ثقافية عربية ومشروع استنارة رائد يهدف إلى مواكبة التقدم العالمي في العلم والمعرفة، وتشجيع حركة الترجمة وإحياء عادات القراءة ومفهوم الثقافة لدى الجمهور العربي.",
-    en: "The idea of Books Platform emerged as an Arab cultural initiative and an enlightening, pioneering project aimed at keeping pace with global progress in science and knowledge. It seeks to encourage the translation movement and revive reading habits and the concept of culture among Arab audiences.",
+    ar: "انطلقت «منصة الكتب» كمبادرة ثقافية عربية طموحة، تسعى إلى ردم الفجوة المعرفية ومواكبة الحراك العلمي العالمي. تهدف المنصة إلى إحياء ثقافة القراءة في المجتمع العربي، وتنشيط حركة الترجمة، وتعزيز الوعي المعرفي لدى الجمهور.",
+    en: "Books Platform launched as an ambitious Arab cultural initiative seeking to bridge the knowledge gap and keep pace with global scientific momentum. The platform aims to revive reading culture in Arab society, energize the translation movement, and strengthen intellectual awareness among audiences.",
   },
   {
-    ar: "مبادرة منصة الكتب جهود طموحة تتطلب جهدًا كبيرًا وشراكات متنوعة، وهي في موقع قوي لأن تصبح من أكثر الكيانات الثقافية تأثيرًا في العالم العربي. وبصفتها مشروعًا مؤسسيًا، فهي منفتحة على كل أشكال الشراكة والدعم — ماليًا وتقنيًا وإعلاميًا وتسويقيًا.",
-    en: "The Books Platform initiative is an ambitious endeavor that requires extensive efforts and diverse partnerships. It is strongly positioned to become one of the most influential cultural entities in the Arab world. As an institutional project, it remains open to all forms of partnership and support — financial, technical, media-related, and marketing-oriented.",
+    ar: "باعتبارها مشروعاً مؤسسياً متكاملاً، تمتلك «منصة الكتب» المقومات الاستراتيجية لتكون ركيزة أساسية في المشهد الثقافي العربي. وتأكيداً على نهجها الانفتاحي، ترحب المنصة بكافة أشكال الشراكات الاستراتيجية والدعم—سواء على الصعيد المالي، التقني، الإعلامي، أو التسويقي—لتحقيق أهدافها في إحداث أثر ثقافي ملموس.",
+    en: "As an integrated institutional project, Books Platform possesses the strategic foundations to become a cornerstone of the Arab cultural landscape. Affirming its open approach, the platform welcomes all forms of strategic partnerships and support—whether financial, technical, media, or marketing—to achieve its goal of creating tangible cultural impact.",
   },
 ];
 
 const conceptParagraphs: BilingualString[] = [
   {
-    ar: "تقوم فكرة منصة الكتب على إطلاق موقع إلكتروني وتطبيق للهاتف المحمول يقدّمان كتبًا أجنبية حديثة النشر لم تُترجم بعد إلى العربية، عبر رصد الاتجاهات العالمية في النشر ومتابعة إصدارات دور النشر الدولية في العلوم والفنون والأدب ومجالات المعرفة، وتوفير بيانات ببليوغرافية كاملة عن كل كتاب.",
-    en: "The concept of Books Platform is based on launching a website and a mobile application that introduce newly published foreign books which have not yet been translated into Arabic. This is achieved by monitoring global publishing trends, tracking releases from international publishing houses across sciences, arts, literature, and knowledge fields, and providing complete bibliographic data for each book.",
+    ar: "تتبلور فكرة «منصة الكتب» في تقديم نافذة رقمية متطورة (عبر موقع إلكتروني وتطبيق ذكي) تعمل كجسر معرفي بين القارئ العربي وأحدث الإصدارات العالمية. وتتمحور آلية عملها حول:",
+    en: "The concept of Books Platform crystallizes in offering an advanced digital window (through a website and a smart app) that serves as a knowledge bridge between the Arab reader and the latest global publications. Its operating mechanism focuses on:",
   },
   {
-    ar: "يُقدَّم كل هذا المحتوى للقارئ العربي لتشجيع القراءة والتعريف بإنتاج العالم العلمي والثقافي.",
-    en: "All of this content is delivered to the Arab reader to encourage reading and to introduce them to global scientific and cultural production.",
+    ar: "• رصد الاتجاهات العالمية: متابعة دقيقة لأحدث الإصدارات الدولية في شتى حقول المعرفة، من علوم وفنون وآداب.",
+    en: "• Global trend monitoring: precise tracking of the latest international releases across fields of knowledge, from sciences and arts to literature.",
+  },
+  {
+    ar: "• الانتقاء النوعي: التركيز على الكتب النوعية الحديثة التي لم تُترجم بعد إلى اللغة العربية.",
+    en: "• Selective curation: focusing on notable recent books that have not yet been translated into Arabic.",
+  },
+  {
+    ar: "• التوثيق المنهجي: توفير بيانات ببليوغرافية شاملة ودقيقة لكل إصدار لضمان وصول القارئ إلى المعلومة الموثقة.",
+    en: "• Systematic documentation: providing comprehensive, accurate bibliographic data for each title to ensure readers access verified information.",
+  },
+  {
+    ar: "يهدف هذا المحتوى إلى تزويد القارئ العربي بأدوات معرفية متجددة، وتعريفه بالإنتاج الفكري العالمي، بما يعزز من حضوره في السياق الثقافي والحضاري المعاصر.",
+    en: "This content aims to equip the Arab reader with renewed knowledge tools, introduce them to global intellectual output, and strengthen their presence in the contemporary cultural and civilizational context.",
   },
 ];
 
@@ -256,7 +268,7 @@ export function getAboutContent(locale: Locale): AboutContent {
     },
     intro: {
       eyebrow: isAr ? "مقدمة" : "Introduction",
-      title: isAr ? "البداية" : "Introduction",
+      title: isAr ? "مقدمة" : "Introduction",
       paragraphs: pickLocaleList(introParagraphs, locale),
       image: {
         src: ABOUT_IMAGES.intro,
@@ -266,7 +278,7 @@ export function getAboutContent(locale: Locale): AboutContent {
     },
     concept: {
       eyebrow: isAr ? "المفهوم" : "Concept",
-      title: isAr ? "فكرة المنصة" : "The Platform Concept",
+      title: isAr ? "فكرة المنصة وآلية العمل" : "Platform Concept & How It Works",
       paragraphs: pickLocaleList(conceptParagraphs, locale),
       image: {
         src: ABOUT_IMAGES.concept,
