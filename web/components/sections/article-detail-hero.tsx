@@ -68,10 +68,9 @@ export function ArticleDetailHero({ locale, title, coverUrl, coverAlt }: Article
           >
             <BookmarkRibbon className="absolute start-4 top-1/2 h-11 w-3 -translate-y-1/2 md:start-5 md:h-12 md:w-3.5" />
             <h1
-              className={cn(
-                "font-display text-xl font-bold leading-snug text-[var(--brand-red-hover)] sm:text-2xl md:text-[1.65rem]",
-                "pe-2 ps-10 text-right md:ps-12",
-              )}
+              className={
+                "font-display text-xl font-bold leading-snug text-[var(--brand-red-hover)] sm:text-2xl md:text-[1.65rem] pe-2 ps-10 text-right md:ps-12 "
+              }
             >
               {title}
             </h1>
