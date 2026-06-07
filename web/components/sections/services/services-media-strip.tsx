@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { SectionBlock } from "@/components/sections/section-block";
 import { MediaVideoCard } from "@/components/sections/media-video-card";
+import { Button } from "@/components/ui/button";
 import type { Locale } from "@/lib/i18n";
-import { SlideIn, StaggerContainer, StaggerItem, FadeIn } from "@/components/motion";
+import { StaggerContainer, StaggerItem, FadeIn } from "@/components/motion";
 
 interface MediaItem {
   slug: string;
@@ -30,27 +31,24 @@ export function ServicesMediaStrip({
   const withVideo = videos.filter((v) => v.videoId);
 
   return (
-    <SectionBlock id="media" eyebrow={eyebrow} title={title} lead={lead} staggerChildren={false}>
-      <div className="grid gap-6 lg:grid-cols-2">
-        <SlideIn from="start">
-          <div className="space-y-3">
-            <Link
-              href={`/${locale}/media/books-talk`}
-              className="block text-sm font-medium text-[var(--brand-red)] hover:underline"
-            >
-              {isAr ? "حديث الكتب" : "Books Talk"} →
-            </Link>
-            <Link
-              href={`/${locale}/media/novel-story`}
-              className="block text-sm font-medium text-[var(--brand-red)] hover:underline"
-            >
-              {isAr ? "رواية فحكاية" : "Novel & Story"} →
-            </Link>
+    <SectionBlock id="media" eyebrow={eyebrow} title={title} lead={lead} textSize="lg" staggerChildren={false}>
+      {withVideo.length === 0 ? (
+        <FadeIn>
+          <div className="rounded-xl border border-dashed border-[var(--brand-gray-300)] bg-white p-10 text-center">
+            <p className="text-lg text-[var(--brand-gray-600)] md:text-xl">
+              {isAr ? "تابع أحدث الفيديوهات على قنوات الميديا." : "Follow the latest videos on our media channels."}
+            </p>
+            <Button asChild className="mt-5" variant="outline" size="lg">
+              <Link href={`/${locale}/media`}>
+                {isAr ? "تصفّح القنوات" : "Browse channels"}
+              </Link>
+            </Button>
           </div>
-        </SlideIn>
-        <StaggerContainer className="grid gap-4 sm:grid-cols-3">
-          {withVideo.length > 0 ? (
-            withVideo.slice(0, 3).map((v) => (
+        </FadeIn>
+      ) : (
+        <>
+          <StaggerContainer className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {withVideo.slice(0, 3).map((v) => (
               <StaggerItem key={v.slug}>
                 <MediaVideoCard
                   slug={v.slug}
@@ -60,16 +58,24 @@ export function ServicesMediaStrip({
                   locale={locale}
                 />
               </StaggerItem>
-            ))
-          ) : (
-            <FadeIn className="col-span-full">
-              <p className="text-sm text-[var(--brand-gray-500)]">
-                {isAr ? "لا توجد فيديوهات بعد — تصفّح القنوات" : "No videos yet — browse channels"}
-              </p>
-            </FadeIn>
-          )}
-        </StaggerContainer>
-      </div>
+            ))}
+          </StaggerContainer>
+          <FadeIn className="mt-6 flex flex-wrap gap-4">
+            <Link
+              href={`/${locale}/media/books-talk`}
+              className="text-base font-medium text-[var(--brand-red)] hover:underline md:text-lg"
+            >
+              {isAr ? "حديث الكتب" : "Books Talk"} →
+            </Link>
+            <Link
+              href={`/${locale}/media/novel-story`}
+              className="text-base font-medium text-[var(--brand-red)] hover:underline md:text-lg"
+            >
+              {isAr ? "رواية فحكاية" : "Novel & Story"} →
+            </Link>
+          </FadeIn>
+        </>
+      )}
     </SectionBlock>
   );
 }

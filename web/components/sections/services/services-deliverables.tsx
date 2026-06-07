@@ -16,18 +16,18 @@ export function ServicesDeliverables({
   items: Deliverable[];
 }) {
   return (
-    <SectionBlock id="deliverables" eyebrow={eyebrow} title={title}>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <SectionBlock id="deliverables" eyebrow={eyebrow} title={title} textSize="lg">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((d) => (
           <article
             key={d.key}
-            className="rounded-xl border border-[var(--brand-gray-200)] bg-white p-5 shadow-sm"
+            className="rounded-2xl border border-[var(--brand-gray-200)] bg-white p-6 shadow-sm"
           >
-            <h3 className="font-bold text-[var(--brand-gray-900)]">{d.title}</h3>
-            <ul className="mt-3 space-y-1 text-sm text-[var(--brand-gray-600)]">
+            <h3 className="text-lg font-bold text-[var(--brand-gray-900)] md:text-xl">{d.title}</h3>
+            <ul className="mt-4 space-y-2 text-base text-[var(--brand-gray-600)] md:text-lg">
               {d.items.map((item) => (
                 <li key={item} className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-red)]" />
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand-red)]" />
                   {item}
                 </li>
               ))}

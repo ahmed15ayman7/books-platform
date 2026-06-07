@@ -19,16 +19,18 @@ export function ServicesPartnerships({
   items: Partnership[];
 }) {
   return (
-    <SectionBlock id="partnerships" eyebrow={eyebrow} title={title}>
+    <SectionBlock id="partnerships" eyebrow={eyebrow} title={title} textSize="lg">
       <div className="grid gap-5 md:grid-cols-3">
         {items.map((p) => (
           <article
             key={p.key}
             className="flex flex-col rounded-2xl border border-[var(--brand-gray-200)] bg-white p-6 shadow-sm"
           >
-            <h3 className="font-bold text-[var(--brand-gray-900)]">{p.title}</h3>
-            <p className="mt-2 flex-1 text-sm text-[var(--brand-gray-600)]">{p.body}</p>
-            <Button asChild variant="outline" size="sm" className="mt-4 w-fit">
+            <h3 className="text-lg font-bold text-[var(--brand-gray-900)] md:text-xl">{p.title}</h3>
+            <p className="mt-3 flex-1 text-base leading-relaxed text-[var(--brand-gray-600)] md:text-lg">
+              {p.body}
+            </p>
+            <Button asChild variant="outline" size="lg" className="mt-5 w-fit">
               <Link href={p.href}>{p.title}</Link>
             </Button>
           </article>

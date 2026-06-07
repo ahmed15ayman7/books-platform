@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
-import { ContentPageShell } from "@/components/sections/content-page-shell";
-import { SectionBlock } from "@/components/sections/section-block";
+import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
 import { CtaBand } from "@/components/sections/cta-band";
+import { ServicesHeroSplit } from "@/components/sections/services/services-hero-split";
+import { ServicesIntroSplit } from "@/components/sections/services/services-intro-split";
 import { ServicesPillarsGrid } from "@/components/sections/services/services-pillars-grid";
 import { ServicesWorkflow } from "@/components/sections/services/services-workflow";
 import { ServicesDeliverables } from "@/components/sections/services/services-deliverables";
 import { ServicesMediaStrip } from "@/components/sections/services/services-media-strip";
 import { ServicesPartnerships } from "@/components/sections/services/services-partnerships";
+import { ServicesQuoteBand } from "@/components/sections/services/services-quote-band";
 import { getServicesContent } from "@/lib/content/services";
+import { ABOUT_IMAGES } from "@/lib/content/image-assets";
 import { ArticleService } from "@/server/services/article.service";
 import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -31,62 +34,90 @@ export default async function ServicesPage() {
   const isAr = locale === "ar";
   const latestMedia = await ArticleService.getLatestMedia(3).catch(() => []);
 
+  const heroImage = {
+    src: ABOUT_IMAGES.concept,
+    alt: {
+      ar: "خدمات منصة الكتب",
+      en: "Books Platform services",
+    },
+  };
+
+  const introImage = {
+    src: ABOUT_IMAGES.intro,
+    alt: {
+      ar: "محتوى وخدمات ثقافية",
+      en: "Cultural content and services",
+    },
+  };
+
   return (
-    <ContentPageShell
-      locale={locale}
-      hero={{
-        title: content.hero.title,
-        subtitle: content.hero.subtitle,
-        variant: "dark",
-        size: "lg",
-        breadcrumbs: [
-          { label: isAr ? "الرئيسية" : "Home", href: `/${locale}` },
-          { label: content.hero.title },
-        ],
-      }}
-    >
-      <SectionBlock id="introduction" eyebrow={content.intro.eyebrow} title={content.intro.title} lead={content.intro.lead} />
-
-      <ServicesPillarsGrid
+    <div className="min-h-screen bg-white">
+      <ServicesHeroSplit
         locale={locale}
-        eyebrow={content.intro.eyebrow}
-        title={isAr ? "ركائز الخدمة" : "Service Pillars"}
-        items={content.pillars}
-      />
-
-      <ServicesWorkflow
-        eyebrow={content.workflow.eyebrow}
-        title={content.workflow.title}
-        steps={content.workflow.steps}
-      />
-
-      <ServicesDeliverables
-        eyebrow={content.deliverables.eyebrow}
-        title={content.deliverables.title}
-        items={content.deliverables.items}
-      />
-
-      <ServicesMediaStrip
-        locale={locale}
-        eyebrow={content.media.eyebrow}
-        title={content.media.title}
-        lead={content.media.lead}
-        videos={latestMedia}
-      />
-
-      <ServicesPartnerships
-        eyebrow={content.partnerships.eyebrow}
-        title={content.partnerships.title}
-        items={content.partnerships.items}
-      />
-
-      <CtaBand
-        quote={content.cta.quote}
+        title={content.hero.title}
+        subtitle={content.hero.subtitle}
+        image={heroImage}
         primaryHref={`/${locale}/contact`}
         primaryLabel={content.cta.primary}
         secondaryHref={`/${locale}/publish`}
         secondaryLabel={content.cta.secondary}
       />
-    </ContentPageShell>
+
+      <div className="container-platform py-14 md:py-16">
+        <AnimatedContentSections>
+          <ServicesIntroSplit
+            id="introduction"
+            locale={locale}
+            eyebrow={content.intro.eyebrow}
+            title={content.intro.title}
+            lead={content.intro.lead}
+            image={introImage}
+            imagePosition="right"
+          />
+
+          <ServicesPillarsGrid
+            locale={locale}
+            eyebrow={content.intro.eyebrow}
+            title={isAr ? "ركائز الخدمة" : "Service Pillars"}
+            items={content.pillars}
+          />
+
+          <ServicesWorkflow
+            eyebrow={content.workflow.eyebrow}
+            title={content.workflow.title}
+            steps={content.workflow.steps}
+          />
+
+          <ServicesDeliverables
+            eyebrow={content.deliverables.eyebrow}
+            title={content.deliverables.title}
+            items={content.deliverables.items}
+          />
+
+          <ServicesMediaStrip
+            locale={locale}
+            eyebrow={content.media.eyebrow}
+            title={content.media.title}
+            lead={content.media.lead}
+            videos={latestMedia}
+          />
+
+          <ServicesPartnerships
+            eyebrow={content.partnerships.eyebrow}
+            title={content.partnerships.title}
+            items={content.partnerships.items}
+          />
+
+          <ServicesQuoteBand quote={content.cta.quote} />
+
+          <CtaBand
+            primaryHref={`/${locale}/contact`}
+            primaryLabel={content.cta.primary}
+            secondaryHref={`/${locale}/publish`}
+            secondaryLabel={content.cta.secondary}
+          />
+        </AnimatedContentSections>
+      </div>
+    </div>
   );
 }

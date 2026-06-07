@@ -28,8 +28,8 @@ export function ServicesPillarsGrid({
   items: ServicePillar[];
 }) {
   return (
-    <SectionBlock id="pillars" eyebrow={eyebrow} title={title}>
-      <ValueCardGrid>
+    <SectionBlock id="pillars" eyebrow={eyebrow} title={title} textSize="lg" staggerChildren={false}>
+      <ValueCardGrid className="lg:grid-cols-3">
         {items.map((item) => {
           const Icon = ICONS[item.key as keyof typeof ICONS] ?? BookMarked;
           return (
@@ -38,6 +38,7 @@ export function ServicesPillarsGrid({
               icon={Icon}
               title={pickLocale(item.title, locale)}
               body={pickLocale(item.body, locale)}
+              size="lg"
             />
           );
         })}
