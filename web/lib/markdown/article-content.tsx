@@ -155,12 +155,12 @@ export function ArticleContent({ content, className }: ArticleContentProps) {
           case "heading": {
             const inner = inlineFormat(block.text);
             const headingClass: Record<number, string> = {
-              1: "mt-10 mb-4 font-display text-3xl font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-4xl",
+              1: "mt-10 mb-4 font-display text-3xl font-bold text-[var(--brand-red)] first:mt-0 md:text-4xl",
               2: "mt-8 mb-3 font-display text-2xl font-bold text-[var(--brand-red)] first:mt-0 md:text-3xl",
-              3: "mt-7 mb-3 text-xl font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-2xl",
-              4: "mt-6 mb-2 text-lg font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-xl",
-              5: "mt-5 mb-2 text-base font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-lg",
-              6: "mt-4 mb-2 text-sm font-bold uppercase tracking-wide text-[var(--brand-gray-700)] first:mt-0",
+              3: "mt-7 mb-3 text-xl font-bold text-[var(--brand-red)] first:mt-0 md:text-2xl",
+              4: "mt-6 mb-2 text-lg font-bold text-[var(--brand-red)] first:mt-0 md:text-xl",
+              5: "mt-5 mb-2 text-base font-bold text-[var(--brand-red)] first:mt-0 md:text-lg",
+              6: "mt-4 mb-2 text-sm font-bold uppercase tracking-wide text-[var(--brand-red)] first:mt-0",
             };
             const Tag = (`h${Math.min(block.level, 6)}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6");
             return (
