@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
+import { AboutHeroSplit } from "@/components/sections/about/about-hero-split";
+import { AboutStorySplit } from "@/components/sections/about/about-story-split";
+import { AboutTimeline } from "@/components/sections/about/about-timeline";
+import { AboutPartnersStrip } from "@/components/sections/about/about-partners-strip";
+import { AboutQuoteBand } from "@/components/sections/about/about-quote-band";
+import { AboutMediaShowcase } from "@/components/sections/about/about-media-showcase";
+import { AboutCta } from "@/components/sections/about/about-cta";
 import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
-import { CtaBand } from "@/components/sections/cta-band";
-import { ServicesHeroSplit } from "@/components/sections/services/services-hero-split";
-import { ServicesIntroSplit } from "@/components/sections/services/services-intro-split";
 import { ServicesPillarsGrid } from "@/components/sections/services/services-pillars-grid";
-import { ServicesWorkflow } from "@/components/sections/services/services-workflow";
 import { ServicesDeliverables } from "@/components/sections/services/services-deliverables";
-import { ServicesMediaStrip } from "@/components/sections/services/services-media-strip";
 import { ServicesPartnerships } from "@/components/sections/services/services-partnerships";
-import { ServicesQuoteBand } from "@/components/sections/services/services-quote-band";
 import { getServicesContent } from "@/lib/content/services";
 import { ABOUT_IMAGES } from "@/lib/content/image-assets";
 import { ArticleService } from "@/server/services/article.service";
@@ -35,7 +36,7 @@ export default async function ServicesPage() {
   const latestMedia = await ArticleService.getLatestMedia(3).catch(() => []);
 
   const heroImage = {
-    src: ABOUT_IMAGES.concept,
+    src: ABOUT_IMAGES.hero,
     alt: {
       ar: "خدمات منصة الكتب",
       en: "Books Platform services",
@@ -52,7 +53,8 @@ export default async function ServicesPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <ServicesHeroSplit
+      <AboutHeroSplit
+        variant="light"
         locale={locale}
         title={content.hero.title}
         subtitle={content.hero.subtitle}
@@ -65,14 +67,15 @@ export default async function ServicesPage() {
 
       <div className="container-platform py-14 md:py-16">
         <AnimatedContentSections>
-          <ServicesIntroSplit
+          <AboutStorySplit
             id="introduction"
             locale={locale}
             eyebrow={content.intro.eyebrow}
             title={content.intro.title}
-            lead={content.intro.lead}
+            paragraphs={[content.intro.lead]}
             image={introImage}
             imagePosition="right"
+            textSize="lg"
           />
 
           <ServicesPillarsGrid
@@ -82,24 +85,19 @@ export default async function ServicesPage() {
             items={content.pillars}
           />
 
-          <ServicesWorkflow
-            eyebrow={content.workflow.eyebrow}
-            title={content.workflow.title}
-            steps={content.workflow.steps}
-          />
-
           <ServicesDeliverables
+            locale={locale}
             eyebrow={content.deliverables.eyebrow}
             title={content.deliverables.title}
             items={content.deliverables.items}
           />
 
-          <ServicesMediaStrip
-            locale={locale}
-            eyebrow={content.media.eyebrow}
-            title={content.media.title}
-            lead={content.media.lead}
-            videos={latestMedia}
+          <AboutTimeline
+            id="workflow"
+            eyebrow={content.workflow.eyebrow}
+            title={content.workflow.title}
+            steps={content.workflow.steps}
+            textSize="lg"
           />
 
           <ServicesPartnerships
@@ -108,9 +106,31 @@ export default async function ServicesPage() {
             items={content.partnerships.items}
           />
 
-          <ServicesQuoteBand quote={content.cta.quote} />
+          <AboutPartnersStrip
+            locale={locale}
+            eyebrow={isAr ? "شركاؤنا" : "Our Partners"}
+            title={isAr ? "دور نشر ومؤسسات ثقافية" : "Publishers & Cultural Institutions"}
+            textSize="lg"
+          />
 
-          <CtaBand
+          <AboutMediaShowcase
+            locale={locale}
+            eyebrow={content.media.eyebrow}
+            title={content.media.title}
+            lead={content.media.lead}
+            videos={latestMedia}
+            textSize="lg"
+          />
+
+          <AboutQuoteBand
+            variant="light"
+            quote={content.cta.quote}
+            tagline={content.hero.subtitle}
+          />
+
+          <AboutCta
+            quote={content.cta.quote}
+            tagline={content.hero.subtitle}
             primaryHref={`/${locale}/contact`}
             primaryLabel={content.cta.primary}
             secondaryHref={`/${locale}/publish`}

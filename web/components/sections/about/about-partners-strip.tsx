@@ -9,6 +9,7 @@ interface AboutPartnersStripProps {
   locale: Locale;
   eyebrow: string;
   title: string;
+  textSize?: "default" | "lg";
 }
 
 const PLACEHOLDER_NAMES = [
@@ -18,7 +19,12 @@ const PLACEHOLDER_NAMES = [
   { ar: "شريك إعلامي", en: "Media Partner" },
 ];
 
-export async function AboutPartnersStrip({ locale, eyebrow, title }: AboutPartnersStripProps) {
+export async function AboutPartnersStrip({
+  locale,
+  eyebrow,
+  title,
+  textSize = "default",
+}: AboutPartnersStripProps) {
   const isAr = locale === "ar";
   const sponsored = await PublisherService.getSponsored(8).catch(() => []);
 
@@ -38,7 +44,7 @@ export async function AboutPartnersStrip({ locale, eyebrow, title }: AboutPartne
         }));
 
   return (
-    <SectionBlock id="partners" eyebrow={eyebrow} title={title} staggerChildren={false}>
+    <SectionBlock id="partners" eyebrow={eyebrow} title={title} textSize={textSize} staggerChildren={false}>
       <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory">
         {items.map((item) => (
           <Link

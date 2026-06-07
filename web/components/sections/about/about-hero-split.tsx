@@ -16,6 +16,7 @@ import {
   StaggerItem,
   HoverLift,
 } from "@/components/motion";
+import { cn } from "@/lib/utils";
 
 interface AboutHeroSplitProps {
   locale: Locale;
@@ -26,6 +27,7 @@ interface AboutHeroSplitProps {
   primaryLabel: string;
   secondaryHref: string;
   secondaryLabel: string;
+  variant?: "dark" | "light";
 }
 
 export function AboutHeroSplit({
@@ -37,17 +39,41 @@ export function AboutHeroSplit({
   primaryLabel,
   secondaryHref,
   secondaryLabel,
+  variant = "dark",
 }: AboutHeroSplitProps) {
   const imageAlt = pickLocale(image.alt, locale);
+  const isLight = variant === "light";
 
   return (
-    <AnimatedSection className="bg-[var(--brand-black)] text-white">
+    <AnimatedSection
+      className={
+        isLight
+          ? "border-b border-[var(--brand-gray-200)] bg-white text-[var(--brand-gray-900)]"
+          : "bg-[var(--brand-black)] text-white"
+      }
+    >
       <div className="container-platform py-12 md:py-16">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div>
-            <RevealText text={title} as="h1" className="font-display text-display-md font-bold text-white block" />
+            <RevealText
+              text={title}
+              as="h1"
+              className={cn(
+                "font-display text-display-md font-bold block",
+                isLight ? "text-[var(--brand-gray-900)]" : "text-white",
+              )}
+            />
             <FadeIn delay={0.2}>
-              <p className="mt-4 max-w-xl text-lg text-[var(--brand-gray-300)]">{subtitle}</p>
+              <p
+                className={cn(
+                  "mt-4 max-w-xl leading-relaxed",
+                  isLight
+                    ? "text-lg text-[var(--brand-gray-600)] md:text-xl"
+                    : "text-lg text-[var(--brand-gray-300)]",
+                )}
+              >
+                {subtitle}
+              </p>
             </FadeIn>
             <StaggerContainer className="mt-8 flex flex-wrap gap-4" delay={0.35}>
               <StaggerItem>
@@ -59,7 +85,16 @@ export function AboutHeroSplit({
               </StaggerItem>
               <StaggerItem>
                 <HoverLift>
-                  <Button asChild size="lg" variant="outline" className="border-white/30 text-white hover:bg-white hover:text-[var(--brand-red)]">
+                  <Button
+                    asChild
+                    size="lg"
+                    variant="outline"
+                    className={
+                      isLight
+                        ? undefined
+                        : "border-white/30 text-white hover:bg-white hover:text-[var(--brand-red)]"
+                    }
+                  >
                     <Link href={secondaryHref}>{secondaryLabel}</Link>
                   </Button>
                 </HoverLift>
@@ -69,7 +104,9 @@ export function AboutHeroSplit({
           <BlurIn>
             <ParallaxLayer className="relative aspect-[4/3] overflow-hidden rounded-2xl">
               <SafeImage src={image.src} alt={imageAlt} fill className="object-cover" priority sizes="(max-width:1024px) 100vw, 50vw" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[var(--brand-black)]/40 to-transparent" />
+              {!isLight && (
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--brand-black)]/40 to-transparent" />
+              )}
             </ParallaxLayer>
           </BlurIn>
         </div>

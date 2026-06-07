@@ -16,6 +16,7 @@ interface AboutStorySplitProps {
   image: AboutImage;
   imagePosition: "left" | "right";
   locale: Locale;
+  textSize?: "default" | "lg";
 }
 
 export function AboutStorySplit({
@@ -26,12 +27,20 @@ export function AboutStorySplit({
   image,
   imagePosition,
   locale,
+  textSize = "default",
 }: AboutStorySplitProps) {
   const imageAlt = pickLocale(image.alt, locale);
   const imageFirst = imagePosition === "left";
+  const isLarge = textSize === "lg";
 
   return (
-    <SectionBlock id={id} eyebrow={eyebrow} title={title} staggerChildren={false}>
+    <SectionBlock
+      id={id}
+      eyebrow={eyebrow}
+      title={title}
+      textSize={textSize}
+      staggerChildren={false}
+    >
       <div className={cn("grid items-center gap-8 lg:grid-cols-2", imageFirst && "lg:[direction:ltr]")}>
         <BlurIn className={cn(!imageFirst && "lg:order-2")}>
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
@@ -39,7 +48,12 @@ export function AboutStorySplit({
           </div>
         </BlurIn>
         <SlideIn from={imageFirst ? "end" : "start"} className={cn(!imageFirst && "lg:order-1")}>
-          <div className="space-y-4 text-base leading-relaxed text-[var(--brand-gray-700)] md:text-lg">
+          <div
+            className={cn(
+              "space-y-4 leading-relaxed text-[var(--brand-gray-700)]",
+              isLarge ? "text-lg md:text-xl" : "text-base md:text-lg",
+            )}
+          >
             {paragraphs.map((p, i) => (
               <FadeIn key={i} delay={0.1 + i * 0.08}>
                 <p>{p}</p>
