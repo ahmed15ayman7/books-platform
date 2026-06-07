@@ -9,7 +9,6 @@ import '../../../../../core/helpers/snack_bar_helper.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/app_bar_widget.dart';
-import '../../../../../core/widgets/bottom_nav_widget.dart';
 import '../../cubit/publish_cubit.dart';
 import '../../cubit/publish_state.dart';
 import 'publish_author_step.dart';
@@ -136,23 +135,8 @@ class _PublishScreenState extends State<PublishScreen> {
             : null;
 
         return Scaffold(
-          backgroundColor: AppColors.background,
-          bottomNavigationBar: SafeArea(
-            top: false,
-            child: PublishNavigationSection(
-              step: currentStep,
-              totalSteps: _totalSteps,
-              onBack: () => _onBack(ctx),
-              onPrimary: currentStep < _totalSteps - 1
-                  ? () => _onNext(ctx, currentStep)
-                  : (_agreedToContentStandards && !isLoading)
-                  ? () => ctx.read<PublishCubit>().submit()
-                  : null,
-              isLoading: isLoading,
-            ),
-          ),
+          backgroundColor: AppColors.surface,
           body: SafeArea(
-            bottom: false,
             child: Column(
               children: [
                 AppBarWidget(
@@ -168,7 +152,7 @@ class _PublishScreenState extends State<PublishScreen> {
                       16.w,
                       18.h,
                       16.w,
-                      8.h,
+                      24.h,
                     ),
                     child: Column(
                       children: [
@@ -212,15 +196,21 @@ class _PublishScreenState extends State<PublishScreen> {
                         SizedBox(height: 16.h),
                         const PublishPromoSection(),
                         SizedBox(height: 18.h),
+                        PublishNavigationSection(
+                          step: currentStep,
+                          totalSteps: _totalSteps,
+                          onBack: () => _onBack(ctx),
+                          onPrimary: currentStep < _totalSteps - 1
+                              ? () => _onNext(ctx, currentStep)
+                              : (_agreedToContentStandards && !isLoading)
+                              ? () => ctx.read<PublishCubit>().submit()
+                              : null,
+                          isLoading: isLoading,
+                        ),
+                        SizedBox(height: 18.h),
                       ],
                     ),
                   ),
-                ),
-                BottomNavWidget(
-                  activeTab: null,
-                  onTabSelected: (tab) => _onTabSelected(context, tab),
-                  onPublishTap: () {},
-                  currentLocale: locale,
                 ),
               ],
             ),
@@ -228,23 +218,6 @@ class _PublishScreenState extends State<PublishScreen> {
         );
       },
     );
-  }
-
-  void _onTabSelected(BuildContext context, BottomNavTab tab) {
-    switch (tab) {
-      case BottomNavTab.home:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
-      case BottomNavTab.books:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.books);
-      case BottomNavTab.articles:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.articles);
-      case BottomNavTab.media:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.media);
-      case BottomNavTab.publishers:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.publishers);
-      case BottomNavTab.wishlist:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.wishlist);
-    }
   }
 }
 
