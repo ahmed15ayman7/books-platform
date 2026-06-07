@@ -26,7 +26,7 @@ export function ArticleDetailHero({ locale, title, coverUrl, coverAlt }: Article
   const isAr = locale === "ar";
 
   return (
-    <section className="relative w-full overflow-hidden bg-[var(--brand-gray-100)] py-8 md:py-10">
+    <section className="relative w-full overflow-hidden bg-[var(--brand-gray-100)] py-8 md:py-10" style={{direction: "rtl"}}>
       {coverUrl && (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -44,7 +44,7 @@ export function ArticleDetailHero({ locale, title, coverUrl, coverAlt }: Article
         <div
           className={cn(
             "flex flex-col items-center gap-6 md:flex-row md:items-center md:justify-center md:gap-10 lg:gap-14",
-            !isAr && "md:flex-row-reverse",
+            // !isAr && "md:flex-row-reverse",
           )}
         >
           {coverUrl && (
