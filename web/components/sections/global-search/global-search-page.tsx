@@ -13,7 +13,6 @@ import { SearchSectionFilters } from "@/components/sections/global-search/search
 import type { Locale } from "@/lib/i18n";
 import type { GlobalSearchResult, SearchSectionType } from "@/lib/search/search-types";
 import { parseSearchSectionType } from "@/lib/search/search-types";
-import { searchShortcutKeyLabel } from "@/lib/search/shortcut-labels";
 
 interface CategoryOption {
   id: string;

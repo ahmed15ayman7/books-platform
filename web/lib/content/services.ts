@@ -1,287 +1,285 @@
 import type { Locale } from "@/lib/i18n";
 import { pickLocale, pickLocaleList, type BilingualString } from "./types";
 
-export interface ServicePillar {
+export interface OutputMapBlock {
   key: string;
   title: BilingualString;
   body: BilingualString;
+  bullets?: BilingualString[];
 }
 
-export interface WorkflowStep {
-  title: BilingualString;
-  body: BilingualString;
-}
-
-export interface Deliverable {
+export interface ProductCard {
   key: string;
   title: BilingualString;
   items: BilingualString[];
 }
 
-export interface PartnershipCard {
-  key: string;
-  title: BilingualString;
-  body: BilingualString;
-  href: string;
-}
-
-export interface ServicesContent {
+export interface ServicesPageContent {
   hero: { title: string; subtitle: string };
-  intro: { eyebrow: string; title: string; paragraphs: string[] };
-  pillars: { eyebrow: string; title: string; items: ServicePillar[] };
-  workflow: { eyebrow: string; title: string; steps: { title: string; body: string }[] };
-  deliverables: { eyebrow: string; title: string; items: { key: string; title: string; items: string[] }[] };
-  media: { eyebrow: string; title: string; lead: string };
-  partnerships: { eyebrow: string; title: string; items: { key: string; title: string; body: string; href: string }[] };
-  cta: { quote: string; primary: string; secondary: string };
+  platformServices: { title: string; intro: string; items: string[] };
+  outputMap: { title: string; blocks: { key: string; title: string; body: string; bullets?: string[] }[] };
+  bibliography: { title: string; body: string };
+  products: { title: string; cards: { key: string; title: string; items: string[] }[] };
+  closing: string;
 }
 
-const pillars: ServicePillar[] = [
+const platformServiceItems: BilingualString[] = [
+  {
+    ar: "سرعة الكشف والاطلاع على الإصدارات العالمية والفهرسة والوصف الببليوغرافي لها.",
+    en: "Rapid discovery of global releases with bibliographic indexing and description.",
+  },
+  {
+    ar: "إعلام وتسويق وهندسة إلكترونية للكتب الجديدة والمتميزة على مختلف المنصات والقنوات.",
+    en: "Promotion, marketing, and digital engineering for new and distinctive books across platforms and channels.",
+  },
+  {
+    ar: "تصنيف دقيق للكتب وفق تصنيف محلي واحترافي للعالم.",
+    en: "Precise book categorization using a local yet professional global taxonomy.",
+  },
+  {
+    ar: "توجيه القرّاء لاستخدام المنصة لكافة القرّاء من العامة والمتخصصين والباحثين.",
+    en: "Guiding all readers — general, specialist, and researcher — to use the platform effectively.",
+  },
+  {
+    ar: "خدمة بحثية لمتابعة الإصدارات والترجمات العربية للكتب.",
+    en: "Research service tracking book releases and Arabic translations.",
+  },
+  {
+    ar: "تخديم شديدي القراءة باقتراح الكتب المشابهة لما قرأوه وجديرة بالقراءة.",
+    en: "Serving avid readers with recommendations similar to what they have read and worth reading.",
+  },
+  {
+    ar: "ترشيح الإصدارات المعنية بالترجمة.",
+    en: "Nominating editions suitable for translation.",
+  },
+  {
+    ar: "توثيق وترجمة لقائمة أكثر الكتب مبيعاً ورواجاً باللغة العربية.",
+    en: "Documenting and translating lists of the best-selling and most popular books in Arabic.",
+  },
+  {
+    ar: "تمكين المؤلفين والمؤلفات من نشر كتاباتهم وكتبهم على المنصة.",
+    en: "Enabling authors to publish their writings and books on the platform.",
+  },
+  {
+    ar: "تمكين دور النشر من إطلاع جمهورها ومرتاديها على الكتب الجديدة.",
+    en: "Enabling publishers to showcase new books to their audiences and visitors.",
+  },
+  {
+    ar: "خدمة تجارية لدور النشر لطلب بيع وتسويق كتبها في العالم العربي والشرق الأوسط.",
+    en: "Commercial service for publishers to sell and market their books in the Arab world and Middle East.",
+  },
+  {
+    ar: "تزويد المترجمين بالعربية بالاطلاع على أهم وأحدث الكتب والروائع العالمية القابلة للترجمة.",
+    en: "Providing Arabic translators access to the most important and latest world books eligible for translation.",
+  },
+  {
+    ar: "إطلاع المبدعين والمعنيين بنشر كتاب مترجم أو مؤلف أفكار أو معرفة للنشر وشراء حقوق نشر كتبهم.",
+    en: "Informing creators interested in publishing translated or authored works and acquiring publishing rights.",
+  },
+  {
+    ar: "تقديم خدمات ثقافية وإعلامية مبتكرة عبر نشرات يومية عن الكتب الجديدة، وإنتاج فيديوهات وبودكاست تسلّط الضوء على أهم الإصدارات، والتفاعل عبر تطبيق المنصة وقنوات التواصل.",
+    en: "Delivering innovative cultural and media services through daily bulletins on new books, videos and podcasts highlighting key releases, and engagement via the app and social channels.",
+  },
+];
+
+const outputMapBlocks: OutputMapBlock[] = [
+  {
+    key: "fastest-book",
+    title: { ar: "أسرع كتاب", en: "Fastest Book" },
+    body: {
+      ar: "خدمة يومية للكتب الجديدة في العالم.",
+      en: "A daily service for new books worldwide.",
+    },
+    bullets: [
+      { ar: "صحيفة يومية للكتب الجديدة", en: "Daily newspaper for new books" },
+      { ar: "نشرة ومخزن ببليوغرافي للكتب الجديدة worldwide", en: "Bibliographic bulletin and archive for new books worldwide" },
+      { ar: "خدمة اتصال بين القرّاء والكتب على مستوى العالم", en: "Connecting readers with books globally" },
+    ],
+  },
+  {
+    key: "specialized",
+    title: { ar: "كتب متخصصة", en: "Specialized Books" },
+    body: {
+      ar: "مكتبة إلكترونية متخصصة online specialized library.",
+      en: "An online specialized electronic library.",
+    },
+  },
+  {
+    key: "literary-studies",
+    title: { ar: "أدب دراسات نقدية", en: "Literature & Critical Studies" },
+    body: {
+      ar: "بيت المعرفة للمنصة في الأدب والدراسات النقدية.",
+      en: "The platform's knowledge hub for literature and critical studies.",
+    },
+  },
+  {
+    key: "publish-book",
+    title: { ar: "نشر كتابك", en: "Publish Your Book" },
+    body: {
+      ar: "مساعدة المؤلفين والمؤلفات على نشر كتاباتهم وكتبهم.",
+      en: "Helping authors publish their writings and books.",
+    },
+  },
+  {
+    key: "authors",
+    title: { ar: "مؤلفون", en: "Authors" },
+    body: {
+      ar: "منصة للمؤلفين الذين لا يجدون من ينشر لهم.",
+      en: "A platform for authors who cannot find a publisher.",
+    },
+  },
+  {
+    key: "books-sky",
+    title: { ar: "سماء الكتب", en: "Books Sky" },
+    body: {
+      ar: "تجميع كل منتجات المنصة في مكان واحد.",
+      en: "Aggregating all platform products in one place.",
+    },
+  },
+  {
+    key: "world-reads",
+    title: { ar: "العالم يقرأ", en: "The World Reads" },
+    body: {
+      ar: "قسم يومي يعرض ما يقرأه العالم من كتب.",
+      en: "A daily section showing what the world is reading.",
+    },
+  },
+  {
+    key: "learning-radar",
+    title: { ar: "رصد التعلم", en: "Learning Radar" },
+    body: {
+      ar: "رصد أحدث الكتب في مجال التعلم والتطوير.",
+      en: "Tracking the latest books in learning and development.",
+    },
+  },
+  {
+    key: "reading-scenes",
+    title: { ar: "مشاهد القراءة", en: "Reading Scenes" },
+    body: {
+      ar: "جولة أسبوعية في مشاهد القراءة حول العالم.",
+      en: "A weekly tour of reading scenes around the world.",
+    },
+  },
+  {
+    key: "book-life",
+    title: { ar: "حياة كتاب", en: "A Book's Life" },
+    body: {
+      ar: "برنامج نصف شهري عن حياة الكتاب من الفكرة إلى القارئ.",
+      en: "A biweekly program on a book's life from idea to reader.",
+    },
+  },
+  {
+    key: "novel-story",
+    title: { ar: "رواية في حكاية", en: "Novel in a Story" },
+    body: {
+      ar: "قناة مخصصة للرواية والسرد العالمي.",
+      en: "A channel dedicated to novels and global storytelling.",
+    },
+  },
+];
+
+const productCards: ProductCard[] = [
   {
     key: "biblio",
     title: { ar: "مخرجات ببليوغرافية", en: "Bibliographic Outputs" },
-    body: {
-      ar: "كتالوجات، فهارس، وبطاقات ببليوغرافية يومية للإصدارات الجديدة من دور النشر العالمية.",
-      en: "Catalogs, indexes, and daily bibliographic records for new releases from global publishers.",
-    },
+    items: [
+      { ar: "كتالوجات وفهارس", en: "Catalogs and indexes" },
+      { ar: "بطاقات ببليوغرافية يومية", en: "Daily bibliographic records" },
+      { ar: "بيانات metadata للكتب", en: "Book metadata" },
+    ],
   },
   {
     key: "journal",
     title: { ar: "مخرجات صحفية", en: "Journalistic Outputs" },
-    body: {
-      ar: "مقالات، تقارير، ونشرات إعلامية — بما فيها «العالم العربي يقرأ».",
-      en: "Articles, reports, and media bulletins — including \"The Arab World Reads\".",
-    },
+    items: [
+      { ar: "مقالات وتقارير", en: "Articles and reports" },
+      { ar: "نشرات يومية", en: "Daily bulletins" },
+      { ar: "العالم يقرأ", en: "The World Reads" },
+    ],
   },
   {
     key: "research",
     title: { ar: "مخرجات بحثية", en: "Research Outputs" },
-    body: {
-      ar: "دراسات، مراجع، وتحليلات أكاديمية مع إشراف علمي على المنشورات.",
-      en: "Studies, references, and academic analyses with scholarly oversight.",
-    },
-  },
-  {
-    key: "av",
-    title: { ar: "صوت ومرئي", en: "Audio & Video" },
-    body: {
-      ar: "بودكast، فيديو YouTube، وقنوات الميديا للكتب والمؤلفين.",
-      en: "Podcasts, YouTube video, and media channels for books and authors.",
-    },
-  },
-  {
-    key: "social",
-    title: { ar: "سوشيال", en: "Social Content" },
-    body: {
-      ar: "محتوى قصير للانتشار على المنصات الاجتماعية وتعزيز الوعي بالقراءة.",
-      en: "Short-form content for social platforms to promote reading awareness.",
-    },
-  },
-  {
-    key: "cms",
-    title: { ar: "إدارة محتوى", en: "Content Management" },
-    body: {
-      ar: "نشر وترتيب المحتوى على المنصة بمعايير تحريرية واحترافية.",
-      en: "Publishing and organizing platform content with editorial standards.",
-    },
-  },
-];
-
-const workflowSteps: WorkflowStep[] = [
-  {
-    title: { ar: "اكتشاف", en: "Discovery" },
-    body: {
-      ar: "رصد الإصدارات العالمية ومتابعة دور النشر.",
-      en: "Monitoring global releases and tracking publishers.",
-    },
-  },
-  {
-    title: { ar: "فهرسة", en: "Indexing" },
-    body: {
-      ar: "بيانات ببليوغرافية كاملة وتصنيف دقيق.",
-      en: "Complete bibliographic data and accurate categorization.",
-    },
-  },
-  {
-    title: { ar: "إنتاج محتوى", en: "Content Production" },
-    body: {
-      ar: "مقالات، فيديو، وبودكast حسب القناة.",
-      en: "Articles, video, and podcasts by channel.",
-    },
-  },
-  {
-    title: { ar: "نشر وتوزيع", en: "Publishing" },
-    body: {
-      ar: "المنصة، التطبيق، وقنوات التواصل.",
-      en: "Platform, app, and social channels.",
-    },
-  },
-  {
-    title: { ar: "قياس وتطوير", en: "Measurement" },
-    body: {
-      ar: "تحليلات، SEO، وتحسين تجربة القارئ.",
-      en: "Analytics, SEO, and reader experience optimization.",
-    },
-  },
-];
-
-const deliverables: Deliverable[] = [
-  {
-    key: "biblio",
-    title: { ar: "ببليوغرافية", en: "Bibliography" },
     items: [
-      { ar: "بطاقة كتاب", en: "Book record card" },
-      { ar: "فهرس تصنيف", en: "Category index" },
-      { ar: "تصدير metadata", en: "Metadata export" },
-    ],
-  },
-  {
-    key: "journal",
-    title: { ar: "صحفي", en: "Journalism" },
-    items: [
-      { ar: "تقرير", en: "Report" },
-      { ar: "مقال رأي", en: "Opinion piece" },
-      { ar: "نشرة يومية", en: "Daily bulletin" },
-    ],
-  },
-  {
-    key: "research",
-    title: { ar: "بحثي", en: "Research" },
-    items: [
-      { ar: "مراجعة", en: "Review" },
-      { ar: "ملخص", en: "Summary" },
-      { ar: "ورقة بحثية", en: "Research paper" },
+      { ar: "دراسات ومراجع", en: "Studies and references" },
+      { ar: "تحليلات أكاديمية", en: "Academic analyses" },
+      { ar: "أوراق بحثية", en: "Research papers" },
     ],
   },
   {
     key: "av",
-    title: { ar: "مرئي", en: "Visual" },
+    title: { ar: "مخرجات صوتية ومرئية", en: "Audio & Video Outputs" },
     items: [
       { ar: "فيديو YouTube", en: "YouTube video" },
-      { ar: "بودكast", en: "Podcast" },
-      { ar: "Reel", en: "Reel" },
+      { ar: "بودكاست", en: "Podcasts" },
+      { ar: "قنوات الميديا", en: "Media channels" },
     ],
   },
   {
     key: "social",
-    title: { ar: "سوشيال", en: "Social" },
+    title: { ar: "مخرجات السوشيال ميديا", en: "Social Media Outputs" },
     items: [
-      { ar: "منشور", en: "Post" },
-      { ar: "Carousel", en: "Carousel" },
-      { ar: "Quote card", en: "Quote card" },
+      { ar: "منشورات قصيرة", en: "Short posts" },
+      { ar: "Carousel و Reels", en: "Carousels and reels" },
+      { ar: "بطاقات اقتباس", en: "Quote cards" },
     ],
   },
 ];
 
-export function getServicesContent(locale: Locale): ServicesContent {
+export function getServicesContent(locale: Locale): ServicesPageContent {
   const isAr = locale === "ar";
+
+  const heroSubtitle: BilingualString = {
+    ar: "خدمات جديدة ومميزة وغير مسبوقة تقدّمها منصة الكتب للقارئ والمؤلف والناشر والمترجم",
+    en: "New, distinctive and unprecedented services offered by Books Platform to the reader, author, publisher and translator",
+  };
+
+  const platformIntro: BilingualString = {
+    ar: "تقدّم منصة الكتب مجموعة من الخدمات الجديدة والمميزة والحصرية للقرّاء والمؤلفين والناشرين والمترجمين.",
+    en: "Books Platform offers a range of new, distinctive, and exclusive services to readers, authors, publishers, and translators.",
+  };
+
+  const bibliographyBody: BilingualString = {
+    ar: "ببليوغرافيا المنصة هي قلب خدماتنا: فهرسة يومية للإصدارات العالمية، بطاقات ببليوغرافية دقيقة، وتصنيف احترافي يربط القارئ العربي بكل كتاب جديد في العالم — من الكشف إلى الوصف إلى التوزيع عبر المنصة والتطبيق وقنوات التواصل.",
+    en: "Platform bibliography is the heart of our services: daily indexing of global releases, precise bibliographic records, and professional categorization connecting the Arabic reader with every new book in the world — from discovery to description to distribution across the platform, app, and social channels.",
+  };
+
+  const closing: BilingualString = {
+    ar: "منصة الكتب العالمية جسر معرفة يربط العالم بالقارئ العربي — ببليوغرافيا، إعلام، بحث، وصوت ومرئي وسوشيال — لبناء ثقافة قراءة عربية معاصرة ومتصلة بالعالم.",
+    en: "Books Platform is a knowledge bridge connecting the world with the Arabic reader — through bibliography, media, research, audio-visual, and social content — building a contemporary Arabic reading culture connected to the world.",
+  };
+
   return {
     hero: {
       title: isAr ? "خدماتنا" : "Our Services",
-      subtitle: isAr
-        ? "خدمات جديدة ومميزة وغير مسبوقة تقدّمها منصة الكتب للقارئ والمؤلف والناشر والمترجم"
-        : "New, distinctive and unprecedented services offered by Books Platform to the reader, author, publisher and translator",
+      subtitle: pickLocale(heroSubtitle, locale),
     },
-    intro: {
-      eyebrow: isAr ? "خدمات المنصة" : "Platform Services",
-      title: isAr ? "ماذا نقدّم؟" : "What We Offer",
-      paragraphs: [
-        isAr
-          ? "تقدّم منصة الكتب مجموعة من الخدمات الجديدة والمميزة والحصرية للقرّاء والمؤلفين والناشرين والمترجمين."
-          : "Books Platform offers a range of new, distinctive, and exclusive services to readers, authors, publishers, and translators.",
-        isAr
-          ? "تقديم خدمات ثقافية وإعلامية مبتكرة عبر نشرات يومية عن الكتب الجديدة، وإنتاج فيديوهات وبودكasts تسلّط الضوء على أهم الإصدارات، والتفاعل عبر تطبيق المنصة وقنوات التواصل."
-          : "Providing innovative cultural and media services through daily news bulletins on new books, as well as producing videos and podcasts highlighting the most important releases, and engaging audiences via the platform's mobile application and social media channels.",
-      ],
+    platformServices: {
+      title: isAr ? "خدمات المنصة" : "Platform Services",
+      intro: pickLocale(platformIntro, locale),
+      items: pickLocaleList(platformServiceItems, locale),
     },
-    pillars: {
-      eyebrow: isAr ? "ركائزنا" : "Our Pillars",
-      title: isAr ? "ركائز الخدمة" : "Service Pillars",
-      items: pillars.map((p) => ({
-        ...p,
-        title: { ar: p.title.ar, en: p.title.en },
-        body: { ar: p.body.ar, en: p.body.en },
+    outputMap: {
+      title: isAr ? "خريطة مخرجات المنصة" : "Platform Outputs Map",
+      blocks: outputMapBlocks.map((block) => ({
+        key: block.key,
+        title: pickLocale(block.title, locale),
+        body: pickLocale(block.body, locale),
+        bullets: block.bullets ? pickLocaleList(block.bullets, locale) : undefined,
       })),
     },
-    workflow: {
-      eyebrow: isAr ? "آلية العمل" : "How We Work",
-      title: isAr ? "من الفكرة إلى القارئ" : "From Idea to Reader",
-      steps: workflowSteps.map((s) => ({
-        title: pickLocale(s.title, locale),
-        body: pickLocale(s.body, locale),
+    bibliography: {
+      title: isAr ? "ببليوغرافيا المنصة" : "Platform Bibliography",
+      body: pickLocale(bibliographyBody, locale),
+    },
+    products: {
+      title: isAr ? "مخرجات ومنتجات المنصة" : "Platform Outputs & Products",
+      cards: productCards.map((card) => ({
+        key: card.key,
+        title: pickLocale(card.title, locale),
+        items: pickLocaleList(card.items, locale),
       })),
     },
-    deliverables: {
-      eyebrow: isAr ? "مخرجات" : "Deliverables",
-      title: isAr ? "ما نُسلّمه" : "What We Deliver",
-      items: deliverables.map((d) => ({
-        key: d.key,
-        title: pickLocale(d.title, locale),
-        items: pickLocaleList(d.items, locale),
-      })),
-    },
-    media: {
-      eyebrow: isAr ? "ميديا" : "Media",
-      title: isAr ? "قدراتنا المرئية" : "Our Media Capabilities",
-      lead: isAr
-        ? "فيديو، بودكast، وقنوات متخصصة — شاهد أحدث محتوى المنصة."
-        : "Video, podcasts, and specialized channels — watch our latest content.",
-    },
-    partnerships: {
-      eyebrow: isAr ? "شراكات" : "Partnerships",
-      title: isAr ? "نماذج الشراكة" : "Partnership Models",
-      items: [
-        {
-          key: "institutions",
-          title: { ar: "مؤسسات ثقافية", en: "Cultural Institutions" },
-          body: {
-            ar: "شراكات محتوى، رعاية، وفهرسة مشتركة.",
-            en: "Content partnerships, sponsorship, and shared indexing.",
-          },
-          href: "/contact",
-        },
-        {
-          key: "publishers",
-          title: { ar: "دور نشر", en: "Publishers" },
-          body: {
-            ar: "عرض الكتب، ترجمة، وتسويق مشترك.",
-            en: "Book listing, translation, and co-marketing.",
-          },
-          href: "/publishers",
-        },
-        {
-          key: "creators",
-          title: { ar: "مبدعون ومؤلفون", en: "Creators & Authors" },
-          body: {
-            ar: "نشر كتاب، مقالات، وفيديو.",
-            en: "Book publishing, articles, and video.",
-          },
-          href: "/publish",
-        },
-      ].map((p) => ({
-        ...p,
-        title: pickLocale(p.title, locale),
-        body: pickLocale(p.body, locale),
-        href: `/${locale}${p.href}`,
-      })),
-    },
-    cta: {
-      quote: isAr
-        ? "«لنبني معاً جسر المعرفة بين العالم والقارئ العربي»"
-        : "\"Let's build the knowledge bridge between the world and the Arabic reader together.\"",
-      primary: isAr ? "تواصل معنا" : "Contact Us",
-      secondary: isAr ? "انشر كتابك" : "Publish Your Book",
-    },
-  };
-}
-
-export function getServicePillarIcons(): Record<string, string> {
-  return {
-    biblio: "BookMarked",
-    journal: "Newspaper",
-    research: "Search",
-    av: "Mic",
-    social: "Share2",
-    cms: "FileText",
+    closing: pickLocale(closing, locale),
   };
 }
