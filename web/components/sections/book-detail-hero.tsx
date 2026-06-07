@@ -71,7 +71,7 @@ export function BookDetailHero({
       </div>
 
       <div className="rounded-xl border border-[var(--brand-red-soft)] bg-gradient-to-br from-[var(--brand-red-soft)]/40 to-white px-5 py-6 md:px-7 md:py-8">
-        <h1 className="font-display text-3xl font-black leading-tight text-[var(--brand-red)] text-balance sm:text-4xl md:text-[2.5rem]">
+        <h1 className="font-display text-3xl font-black leading-tight text-[var(--brand-red)]  sm:text-4xl md:text-[2.5rem]">
           {displayName}
         </h1>
         {alternateName && (

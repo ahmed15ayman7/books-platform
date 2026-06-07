@@ -125,7 +125,7 @@ export function ArticleCard({
           >
             <h3
               className={cn(
-                "font-bold text-[var(--brand-gray-900)] group-hover:text-[var(--brand-red)] transition-colors text-balance line-clamp-2",
+                "font-bold text-[var(--brand-gray-900)] group-hover:text-[var(--brand-red)] transition-colors  line-clamp-2",
                 featured ? "text-lg" : "text-base",
               )}
             >
