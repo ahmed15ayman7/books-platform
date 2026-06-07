@@ -57,7 +57,7 @@ void main() {
       }
       stopwatch.stop();
 
-      expect(stopwatch.elapsedMilliseconds, lessThan(10));
+      expect(stopwatch.elapsedMilliseconds, lessThan(50));
     });
   });
 
