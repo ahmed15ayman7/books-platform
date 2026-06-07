@@ -51,7 +51,6 @@ dependencies:
   equatable: ^2.0.8
   intl: ^0.20.2
   url_launcher: ^6.3.2
-  flutter_launcher_icons: ^0.14.4
   google_fonts: ^6.2.1
   flutter_markdown: ^0.7.7
   shared_preferences: ^2.5.5
@@ -75,6 +74,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   build_runner: ^2.15.0
   injectable_generator: ^3.0.2
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -91,6 +91,7 @@ flutter:
   assets:
     - assets/translations/
     - assets/static/
+    - assets/branding/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -117,3 +118,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/branding/app_icon_1024.png"
+  remove_alpha_ios: true

@@ -1,9 +1,7 @@
 import 'dart:async';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/constants/app_constants.dart';
@@ -53,47 +51,16 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    final locale = context.locale.languageCode;
     return Scaffold(
       backgroundColor: AppColors.secondary,
-      body: FadeTransition(
-        opacity: _fadeIn,
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 80.r,
-                height: 80.r,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(22.r),
-                ),
-                child: Icon(
-                  Icons.menu_book_rounded,
-                  color: Colors.white,
-                  size: 44.r,
-                ),
-              ),
-              SizedBox(height: 20.h),
-              Text(
-                locale == 'ar' ? 'منصة الكتب' : 'Books',
-                style: GoogleFonts.cairo(
-                  fontSize: 28.sp,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                ),
-              ),
-              Text(
-                locale == 'ar' ? 'العالمية' : 'PLATFORM',
-                style: GoogleFonts.inter(
-                  fontSize: 11.sp,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
-                  letterSpacing: 0.14 * 11.sp,
-                ),
-              ),
-            ],
+      body: SafeArea(
+        child: FadeTransition(
+          opacity: _fadeIn,
+          child: Center(
+            child: Image.asset(
+              'assets/branding/logo.webp',
+              width: 300.w,
+            ),
           ),
         ),
       ),
