@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:booksplatform/core/constants/social_icon_assets.dart';
 import 'package:booksplatform/core/constants/social_links.dart';
 import 'package:booksplatform/core/di/injection_container.dart';
 import 'package:booksplatform/core/helpers/url_launcher_helper.dart';
@@ -45,32 +47,32 @@ const _sendAnotherLabel = (ar: 'إرسال رسالة أخرى', en: 'Send anoth
 // Social network items
 const _socials = [
   (
-    icon: Icons.close_rounded,
+    assetPath: SocialIconAssets.x,
     url: SocialLinks.x,
     semanticsLabel: 'X',
   ),
   (
-    icon: Icons.facebook_outlined,
+    assetPath: SocialIconAssets.facebook,
     url: SocialLinks.facebook,
     semanticsLabel: 'Facebook',
   ),
   (
-    icon: Icons.camera_alt_outlined,
+    assetPath: SocialIconAssets.instagram,
     url: SocialLinks.instagram,
     semanticsLabel: 'Instagram',
   ),
   (
-    icon: Icons.send_rounded,
+    assetPath: SocialIconAssets.telegram,
     url: SocialLinks.telegram,
     semanticsLabel: 'Telegram',
   ),
   (
-    icon: Icons.smart_display_outlined,
+    assetPath: SocialIconAssets.youtube,
     url: SocialLinks.youtube,
     semanticsLabel: 'YouTube',
   ),
   (
-    icon: Icons.business_center_outlined,
+    assetPath: SocialIconAssets.linkedIn,
     url: SocialLinks.linkedIn,
     semanticsLabel: 'LinkedIn',
   ),
@@ -196,10 +198,11 @@ class ContactBody extends StatelessWidget {
         Padding(
           padding: EdgeInsetsDirectional.fromSTEB(16.w, 20.h, 16.w, 0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
                 localizedText(_followLabel, lang),
+                textAlign: TextAlign.center,
                 style: GoogleFonts.cairo(
                   fontSize: 13.sp,
                   fontWeight: FontWeight.w700,
@@ -207,16 +210,20 @@ class ContactBody extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 11.h),
-              Wrap(
-                spacing: 10.w,
-                runSpacing: 10.h,
-                children: _socials
+              SizedBox(
+                width: double.infinity,
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 10.w,
+                  runSpacing: 10.h,
+                  children: _socials
                     .map((s) => _SocialIcon(
-                          icon: s.icon,
+                          assetPath: s.assetPath,
                           url: s.url,
                           semanticsLabel: s.semanticsLabel,
                         ))
                     .toList(),
+                ),
               ),
             ],
           ),
@@ -514,12 +521,12 @@ class _Field extends StatelessWidget {
 
 class _SocialIcon extends StatelessWidget {
   const _SocialIcon({
-    required this.icon,
+    required this.assetPath,
     required this.url,
     required this.semanticsLabel,
   });
 
-  final IconData icon;
+  final String assetPath;
   final String? url;
   final String semanticsLabel;
 
@@ -537,7 +544,13 @@ class _SocialIcon extends StatelessWidget {
           border: Border.all(color: AppColors.divider),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: AppColors.textPrimary, size: 20.r),
+        child: Center(
+          child: SvgPicture.asset(
+            assetPath,
+            width: 20.r,
+            height: 20.r,
+          ),
+        ),
       ),
     );
 
