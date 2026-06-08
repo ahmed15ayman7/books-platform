@@ -12,6 +12,7 @@
 import 'package:booksplatform/core/di/register_module.dart' as _i4;
 import 'package:booksplatform/core/helpers/dialog_helper.dart' as _i502;
 import 'package:booksplatform/core/helpers/snack_bar_helper.dart' as _i517;
+import 'package:booksplatform/core/helpers/url_launcher_helper.dart' as _i573;
 import 'package:booksplatform/core/network/api_manager.dart' as _i473;
 import 'package:booksplatform/core/network/connectivity_helper.dart' as _i403;
 import 'package:booksplatform/core/network/dio_factory.dart' as _i339;
@@ -181,6 +182,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i232.WishlistCubit>(
       () => _i232.WishlistCubit(gh<_i230.WishlistRepository>()),
+    );
+    gh.lazySingleton<_i573.UrlLauncherHelper>(
+      () => _i573.UrlLauncherHelper(gh<_i517.SnackBarHelper>()),
     );
     gh.lazySingleton<_i309.CartCubit>(
       () => _i309.CartCubit(gh<_i498.CartStorage>()),

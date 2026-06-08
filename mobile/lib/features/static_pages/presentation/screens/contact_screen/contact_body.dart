@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
 
+import 'package:booksplatform/core/constants/social_links.dart';
+import 'package:booksplatform/core/di/injection_container.dart';
+import 'package:booksplatform/core/helpers/url_launcher_helper.dart';
 import 'package:booksplatform/core/theme/app_colors.dart';
 import 'package:booksplatform/features/static_pages/presentation/widgets/info_page_hero.dart';
 
@@ -42,12 +44,36 @@ const _sendAnotherLabel = (ar: 'إرسال رسالة أخرى', en: 'Send anoth
 
 // Social network items
 const _socials = [
-  (label: 'X', icon: Icons.close_rounded),
-  (label: 'f', icon: Icons.facebook_outlined),
-  (label: '📷', icon: Icons.camera_alt_outlined),
-  (label: '✈', icon: Icons.send_rounded),
-  (label: '▶', icon: Icons.smart_display_outlined),
-  (label: 'in', icon: Icons.business_center_outlined),
+  (
+    icon: Icons.close_rounded,
+    url: SocialLinks.x,
+    semanticsLabel: 'X',
+  ),
+  (
+    icon: Icons.facebook_outlined,
+    url: SocialLinks.facebook,
+    semanticsLabel: 'Facebook',
+  ),
+  (
+    icon: Icons.camera_alt_outlined,
+    url: SocialLinks.instagram,
+    semanticsLabel: 'Instagram',
+  ),
+  (
+    icon: Icons.send_rounded,
+    url: SocialLinks.telegram,
+    semanticsLabel: 'Telegram',
+  ),
+  (
+    icon: Icons.smart_display_outlined,
+    url: SocialLinks.youtube,
+    semanticsLabel: 'YouTube',
+  ),
+  (
+    icon: Icons.business_center_outlined,
+    url: SocialLinks.linkedIn,
+    semanticsLabel: 'LinkedIn',
+  ),
 ];
 
 // ── Widget ─────────────────────────────────────────────────────────────────
@@ -104,7 +130,8 @@ class ContactBody extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.85), size: 34.r),
                 SizedBox(height: 10.h),
                 GestureDetector(
-                  onTap: () => launchUrl(Uri.parse(_phoneDialUri)),
+                  onTap: () => getIt<UrlLauncherHelper>()
+                      .launchExternalUrl(_phoneDialUri),
                   child: Text(
                     _phone,
                     textDirection: TextDirection.ltr,
@@ -134,21 +161,24 @@ class ContactBody extends StatelessWidget {
                       .map((em) => Padding(
                             padding: EdgeInsets.only(bottom: 11.h),
                             child: GestureDetector(
-                              onTap: () =>
-                                  launchUrl(Uri.parse('mailto:$em')),
+                              onTap: () => getIt<UrlLauncherHelper>()
+                                  .launchExternalUrl('mailto:$em'),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(Icons.mail_outline_rounded,
                                       color: AppColors.primary, size: 17.r),
                                   SizedBox(width: 9.w),
-                                  Text(
-                                    em,
-                                    textDirection: TextDirection.ltr,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 13.5.sp,
-                                      color: Colors.white
-                                          .withValues(alpha: 0.9),
+                                  Flexible(
+                                    child: Text(
+                                      em,
+                                      textDirection: TextDirection.ltr,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 13.5.sp,
+                                        color: Colors.white
+                                            .withValues(alpha: 0.9),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -181,16 +211,10 @@ class ContactBody extends StatelessWidget {
                 spacing: 10.w,
                 runSpacing: 10.h,
                 children: _socials
-                    .map((s) => Container(
-                          width: 44.r,
-                          height: 44.r,
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            border: Border.all(color: AppColors.divider),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(s.icon,
-                              color: AppColors.textPrimary, size: 20.r),
+                    .map((s) => _SocialIcon(
+                          icon: s.icon,
+                          url: s.url,
+                          semanticsLabel: s.semanticsLabel,
                         ))
                     .toList(),
               ),
@@ -482,6 +506,56 @@ class _Field extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+// ── Social icon ────────────────────────────────────────────────────────────
+
+class _SocialIcon extends StatelessWidget {
+  const _SocialIcon({
+    required this.icon,
+    required this.url,
+    required this.semanticsLabel,
+  });
+
+  final IconData icon;
+  final String? url;
+  final String semanticsLabel;
+
+  bool get _isActive => url != null;
+
+  @override
+  Widget build(BuildContext context) {
+    final child = Opacity(
+      opacity: _isActive ? 1 : 0.45,
+      child: Container(
+        width: 44.r,
+        height: 44.r,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          border: Border.all(color: AppColors.divider),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: AppColors.textPrimary, size: 20.r),
+      ),
+    );
+
+    return Semantics(
+      label: semanticsLabel,
+      button: _isActive,
+      enabled: _isActive,
+      child: _isActive
+          ? Material(
+              color: Colors.transparent,
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: () =>
+                    getIt<UrlLauncherHelper>().launchExternalUrl(url!),
+                child: child,
+              ),
+            )
+          : child,
     );
   }
 }

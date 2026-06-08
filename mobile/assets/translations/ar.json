@@ -273,6 +273,7 @@
 
   "about_us_title": "من نحن",
   "contact_us_title": "تواصل معنا",
+  "social_link_error": "تعذّر فتح الرابط. حاول مرة أخرى.",
 
   "static_page": {
     "unavailable": "هذه الصفحة غير متاحة حالياً."

@@ -273,6 +273,7 @@
 
   "about_us_title": "About Us",
   "contact_us_title": "Contact Us",
+  "social_link_error": "Could not open link. Please try again.",
 
   "static_page": {
     "unavailable": "This page is not available right now."
