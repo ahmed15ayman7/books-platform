@@ -80,7 +80,7 @@ export const ArticleService = {
         where,
         skip,
         take: limit,
-        orderBy: sort === "newest" ? { date: "desc" } : { date: "asc" },
+        orderBy: sort === "newest" ? { createdAt: "desc" } : { date: "asc" },
         select: articleListSelect,
       }),
       db.article.count({ where }),
