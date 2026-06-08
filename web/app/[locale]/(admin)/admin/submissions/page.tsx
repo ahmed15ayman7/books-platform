@@ -1,5 +1,7 @@
 "use client";
 
+import { PAGINATION } from "@/lib/utils/constants";
+
 import { useCallback, useEffect, useState } from "react";
 import { Eye, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -60,7 +62,7 @@ export default function AdminSubmissionsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const q = new URLSearchParams({ page: String(page), limit: "20" });
+      const q = new URLSearchParams({ page: String(page), limit: String(PAGINATION.DEFAULT_PAGE_SIZE) });
       if (search.trim()) q.set("search", search.trim());
       appendListParams(q, { sort, status });
       const res = await fetch(`/api/v1/admin/submissions?${q}`, { headers: adminAuthHeaders() });
@@ -256,7 +258,7 @@ export default function AdminSubmissionsPage() {
         emptyMessage="لا توجد طلبات بعد"
         renderCard={renderCard}
       />
-      <AdminPagination page={page} totalPages={totalPages} onPage={setPage} total={total} pageSize={20} />
+      <AdminPagination page={page} totalPages={totalPages} onPage={setPage} total={total} pageSize={PAGINATION.DEFAULT_PAGE_SIZE} />
 
       {/* Detail Modal */}
       {modal.open && modal.item && (

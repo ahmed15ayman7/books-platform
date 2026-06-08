@@ -210,7 +210,7 @@ export function getTeamContent(locale: Locale): TeamPageContent {
       })),
     },
     leadershipSection: {
-      title: isAr ? "القيادة" : "Leadership",
+      title: isAr ? "المؤسسون" : "Founders",
     },
     teamSection: {
       title: isAr ? "فريق العمل" : "The Team",

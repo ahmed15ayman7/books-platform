@@ -201,5 +201,17 @@
     "about": "About Us",
     "team": "Our Team",
     "contact": "Contact Us"
+  },
+  "consent": {
+    "cookieTitle": "Cookie consent",
+    "cookieMessage": "We use cookies to save your preferences — helping you reach your favorite books and articles faster.",
+    "cookieAccept": "Accept",
+    "cookieLater": "Later",
+    "cookiePrivacy": "Privacy Policy",
+    "notificationTitle": "Enable notifications",
+    "notificationMessage": "Enable notifications to get updates about new books and articles.",
+    "notificationEnable": "Enable",
+    "notificationLater": "Later",
+    "designCredit": "This website was designed by real.com.eg"
   }
 }

@@ -22,9 +22,9 @@ interface ScatterSlot {
 
 /** Front row — leadership (featured), center stage, highest z-index. */
 const LEADERSHIP_SLOTS: ScatterSlot[] = [
-  { top: "14%", insetInlineStart: "30%", rotate: -3, scale: 1.14, zIndex: 30 },
-  { top: "4%", insetInlineStart: "6%", rotate: -11, scale: 1.06, zIndex: 28 },
-  { top: "6%", insetInlineEnd: "4%", rotate: 9, scale: 1.06, zIndex: 28 },
+  { top: "14%", insetInlineStart: "40%", rotate: -3, scale: 1.14, zIndex: 30 },
+  { top: "4%", insetInlineStart: "15%", rotate: -11, scale: 1.06, zIndex: 28 },
+  { top: "6%", insetInlineEnd: "14%", rotate: 9, scale: 1.06, zIndex: 28 },
 ];
 
 /** Background — rest of team, pushed to edges/corners, smaller & lower z-index. */
@@ -32,11 +32,11 @@ const TEAM_SLOTS: ScatterSlot[] = [
   { top: "0%", insetInlineStart: "-5%", rotate: -15, scale: 0.8, zIndex: 2 },
   { top: "1%", insetInlineEnd: "-4%", rotate: 12, scale: 0.78, zIndex: 1 },
   { top: "32%", insetInlineStart: "-8%", rotate: 13, scale: 0.82, zIndex: 4 },
+  { top: "62%", insetInlineEnd: "0%", rotate: -6, scale: 0.79, zIndex: 5 },
+  { top: "60%", insetInlineStart: "0%", rotate: 9, scale: 0.81, zIndex: 5 },
   { top: "34%", insetInlineEnd: "-6%", rotate: -8, scale: 0.8, zIndex: 4 },
-  { top: "50%", insetInlineStart: "-5%", rotate: 9, scale: 0.81, zIndex: 5 },
-  { top: "52%", insetInlineEnd: "-4%", rotate: -6, scale: 0.79, zIndex: 5 },
-  { top: "68%", insetInlineStart: "2%", rotate: 7, scale: 0.84, zIndex: 7 },
-  { top: "70%", insetInlineEnd: "0%", rotate: -10, scale: 0.82, zIndex: 7 },
+  { top: "68%", insetInlineStart: "30%", rotate: 7, scale: 0.84, zIndex: 7 },
+  { top: "70%", insetInlineEnd: "30%", rotate: -10, scale: 0.82, zIndex: 7 },
 ];
 
 function buildCollageItems(members: TeamMemberData[]) {

@@ -6,7 +6,7 @@ import { GlobalSearchPalette } from "@/components/search/global-search-palette";
 import { usePublicChrome } from "@/lib/public/public-chrome-context";
 import { mapPublicSearchSections, type GlobalSearchPayload } from "@/lib/search/map-search-sections";
 import { publicSearchTheme } from "@/lib/search/palette-themes";
-import { modKeyLabel } from "@/lib/search/shortcut-labels";
+import { searchShortcutKeyLabel, searchShortcutLabel } from "@/lib/search/shortcut-labels";
 
 export function PublicCommandPalette() {
   const { searchOpen, closeSearch } = usePublicChrome();
@@ -36,7 +36,7 @@ export function PublicCommandPalette() {
       onClose={closeSearch}
       theme={publicSearchTheme}
       topClassName="top-[max(7rem,12vh)]"
-      modKeyLabel={modKeyLabel()}
+      modKeyLabel={searchShortcutLabel()}
       placeholder={
         isAr
           ? "ابحث عن كتاب، مقال، ميديا، ناشر، مؤلف..."
@@ -54,7 +54,7 @@ export function PublicCommandPalette() {
       fetchResults={fetchResults}
       footer={
         <span>
-          <kbd className="rounded border border-[var(--brand-gray-200)] px-1">{modKeyLabel()}K</kbd>{" "}
+          <kbd className="rounded border border-[var(--brand-gray-200)] px-1">{searchShortcutKeyLabel()}</kbd>{" "}
           {isAr ? "بحث" : "Search"} ·{" "}
           <kbd className="rounded border border-[var(--brand-gray-200)] px-1">Esc</kbd>{" "}
           {isAr ? "إغلاق" : "Close"}

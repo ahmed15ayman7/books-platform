@@ -17,6 +17,7 @@ interface EditorialSplitProps {
   imagePosition: "left" | "right";
   locale: Locale;
   variant?: "default" | "dark" | "band";
+  textSize?: "default" | "lg";
 }
 
 export function EditorialSplit({
@@ -29,6 +30,7 @@ export function EditorialSplit({
   imagePosition,
   locale: _locale,
   variant = "default",
+  textSize = "default",
 }: EditorialSplitProps) {
   const imageFirst = imagePosition === "left";
 
@@ -75,7 +77,7 @@ export function EditorialSplit({
   }
 
   return (
-    <SectionBlock id={id} eyebrow={eyebrow} title={title} staggerChildren={false}>
+    <SectionBlock id={id} eyebrow={eyebrow} title={title} textSize={textSize} staggerChildren={false}>
       {content}
     </SectionBlock>
   );

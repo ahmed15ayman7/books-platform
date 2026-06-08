@@ -21,6 +21,16 @@ export const ABOUT_IMAGES = {
   legal: "/about/legal.webp",
   auth: "/about/auth.webp",
   authorDefault: "/about/author-default.webp",
+  servicesHero: "/about/hero.webp",
+  servicesBibliography: "/about/intro.webp",
+  aboutHero1: "/about/gallery-1.webp",
+  aboutHero2: "/about/gallery-2.webp",
+  aboutHero3: "/about/gallery-3.webp",
+  aboutHero4: "/about/gallery-4.webp",
+  aboutHero5: "/about/gallery-5.webp",
+  aboutHero6: "/about/gallery-6.webp",
+  aboutHero7: "/about/concept.webp",
+  aboutHero8: "/about/intro.webp",
 } as const;
 
 /** Source URLs for one-time download (Unsplash) */
@@ -44,11 +54,37 @@ export const ABOUT_IMAGE_SOURCES: Record<keyof typeof ABOUT_IMAGES, string> = {
   legal: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80&fm=webp",
   auth: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&q=80&fm=webp",
   authorDefault: "https://images.unsplash.com/photo-1516979187450-637abb88f58e?w=600&q=80&fm=webp",
+  servicesHero: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1600&q=80&fm=webp",
+  servicesBibliography: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1200&q=80&fm=webp",
+  aboutHero1: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=700&q=80&fm=webp",
+  aboutHero2: "https://images.unsplash.com/photo-1516979187450-637abb88f58e?w=500&q=80&fm=webp",
+  aboutHero3: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=500&q=80&fm=webp",
+  aboutHero4: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=700&q=80&fm=webp",
+  aboutHero5: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=500&q=80&fm=webp",
+  aboutHero6: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=500&q=80&fm=webp",
+  aboutHero7: "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=500&q=80&fm=webp",
+  aboutHero8: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=500&q=80&fm=webp",
 };
 
 export const TEAM_IMAGE_PATHS = TEAM_MEMBERS.map((m) => m.photoUrl).filter(
   (p): p is string => Boolean(p),
 );
+
+/** Uniform 2:3 cover crop for collage heroes (400×600). */
+export function unsplashCoverUrl(photoId: string): string {
+  return `https://images.unsplash.com/${photoId}?w=400&h=600&fit=crop&q=80&fm=webp`;
+}
+
+export const ABOUT_HERO_COVER_URLS = [
+  "https://booksplatform.net/wp-content/uploads/Cover1.jpg",
+  unsplashCoverUrl("photo-1516979187450-637abb88f58e"),
+  unsplashCoverUrl("photo-1456513080510-7bf3a84b82f8"),
+  unsplashCoverUrl("photo-1507842217343-583bb7270b66"),
+  unsplashCoverUrl("photo-1521587760476-6c12a4b040da"),
+  unsplashCoverUrl("photo-1478737270239-2f02b77fc618"),
+  unsplashCoverUrl("photo-1495446815901-a7297e633e8d"),
+  unsplashCoverUrl("photo-1457369804613-52c61a468e7d"),
+] as const;
 
 export const VERIFIED_STATIC_IMAGES: string[] = [
   ...Object.values(ABOUT_IMAGES),

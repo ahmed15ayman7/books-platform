@@ -17,7 +17,7 @@ import {
 } from "@/components/admin/admin-bilingual-field";
 import { adminMediaViewPath } from "@/lib/admin/public-urls";
 import { ArticleLivePreview } from "@/components/admin/article-live-preview";
-import { ArticleMarkdownHint } from "@/components/admin/article-markdown-hint";
+import { AdminRichTextHint } from "@/components/admin/admin-rich-text-hint";
 import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
 import { adminToast } from "@/lib/admin/admin-toast";
 
@@ -208,7 +208,7 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
                 placeholder="https://www.youtube.com/watch?v=..."
                 required
               />
-              <ArticleMarkdownHint />
+              <AdminRichTextHint />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <AdminBilingualField
                   arValue={form.title}
@@ -233,8 +233,8 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
                   onArChange={(v) => setForm((p) => ({ ...p, body: v }))}
                   onEnChange={(v) => setForm((p) => ({ ...p, bodyEn: v }))}
                   labels={{ ar: "الوصف (عربي)", en: "Description (English)" }}
-                  multiline
-                  rows={4}
+                  richText={{ image: true }}
+                  editorMinHeight={200}
                 />
               </div>
             </div>

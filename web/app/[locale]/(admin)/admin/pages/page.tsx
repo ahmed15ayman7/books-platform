@@ -7,6 +7,7 @@ import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminCard } from "@/components/admin/admin-card";
 import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
+import { AdminRichTextHint } from "@/components/admin/admin-rich-text-hint";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 import { adminToast } from "@/lib/admin/admin-toast";
@@ -137,7 +138,8 @@ export default function AdminPagesPage() {
                 onDismiss={draft.dismiss}
               />
               <AdminCard>
-                <div className="grid gap-4 sm:grid-cols-2">
+                <AdminRichTextHint />
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <AdminBilingualField
                     arValue={editing.titleAr}
                     enValue={editing.titleEn}
@@ -151,8 +153,8 @@ export default function AdminPagesPage() {
                     onArChange={(v) => setEditing((p) => (p ? { ...p, bodyAr: v } : p))}
                     onEnChange={(v) => setEditing((p) => (p ? { ...p, bodyEn: v } : p))}
                     labels={{ ar: "المحتوى (عربي)", en: "Content (English)" }}
-                    multiline
-                    rows={12}
+                    richText={{ image: true }}
+                    editorMinHeight={320}
                   />
                 </div>
               </AdminCard>

@@ -50,7 +50,7 @@ export const SOCIAL_LINKS = {
 } as const;
 
 export const PAGINATION = {
-  DEFAULT_PAGE_SIZE: 12,
+  DEFAULT_PAGE_SIZE: 24,
   MAX_PAGE_SIZE: 50,
 } as const;
 

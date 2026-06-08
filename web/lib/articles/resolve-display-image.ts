@@ -1,28 +1,12 @@
-import { isImageUrl } from "@/lib/markdown/is-image-url";
+import { normalizeImageSrc } from "@/lib/markdown/normalize-image-url";
 import {
   htmlToArticleSource,
   parseArticleContent,
 } from "@/lib/markdown/parse-article-content";
 
-const INVALID_LITERALS = new Set(["null", "undefined", "false", "0", "none", "#", "n/a", "na"]);
-
 /** Normalize and validate a URL before using it as a card/thumbnail image. */
 export function normalizeArticleImageUrl(raw: string | null | undefined): string | null {
-  if (!raw) return null;
-  const trimmed = raw.trim();
-  if (!trimmed || INVALID_LITERALS.has(trimmed.toLowerCase())) return null;
-
-  let candidate = trimmed;
-  if (candidate.startsWith("//")) {
-    candidate = `https:${candidate}`;
-  } else if (candidate.startsWith("/")) {
-    candidate = `https://booksplatform.net${candidate}`;
-  }
-
-  if (!/^https?:\/\//i.test(candidate)) return null;
-  if (!isImageUrl(candidate)) return null;
-
-  return candidate;
+  return normalizeImageSrc(raw);
 }
 
 function firstImageFromText(raw: string | null | undefined): string | null {

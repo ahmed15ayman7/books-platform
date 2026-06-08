@@ -119,7 +119,6 @@ export const ArticleService = {
           orderBy: { commentDate: "asc" },
           select: {
             id: true,
-
             authorName: true,
             content: true,
             commentDate: true,
@@ -291,7 +290,7 @@ export const ArticleService = {
     });
   },
 
-  async listByCategory(slug: string, page = 1, limit = 10) {
+  async listByCategory(slug: string, page = 1, limit: number = PAGINATION.DEFAULT_PAGE_SIZE) {
     const category = await db.articleCategory.findFirst({
       where: { slug },
       select: { id: true, name: true, nameAr: true, slug: true },

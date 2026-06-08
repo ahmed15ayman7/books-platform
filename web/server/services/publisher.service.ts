@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { notDeleted } from "@/lib/admin/audit-fields";
+import { PUBLISHER_SEARCH_FIELDS, buildTextSearchOr } from "@/lib/search/text-search-fields";
 import { PAGINATION } from "@/lib/utils/constants";
 
 export interface PublisherFilters {
@@ -41,13 +42,7 @@ export const PublisherService = {
       ...(country && {
         countries: { some: { slug: country } },
       }),
-      ...(search && {
-        OR: [
-          { title: { contains: search, mode: "insensitive" as const } },
-          { name: { contains: search, mode: "insensitive" as const } },
-          { nameAr: { contains: search, mode: "insensitive" as const } },
-        ],
-      }),
+      ...(search && buildTextSearchOr(search, PUBLISHER_SEARCH_FIELDS)),
     };
 
     const [publishers, total] = await Promise.all([
@@ -131,7 +126,7 @@ export const PublisherService = {
     return mapPublisherImage(row);
   },
 
-  async getPublisherBooks(slug: string, page = 1, limit = 12) {
+  async getPublisherBooks(slug: string, page = 1, limit: number = PAGINATION.DEFAULT_PAGE_SIZE) {
     const publisher = await db.publisher.findFirst({
       where: { slug },
       select: { id: true },
@@ -191,7 +186,7 @@ export const PublisherService = {
 
   async getAllCountries() {
     return db.country.findMany({
-      orderBy: { name: "asc" },
+      orderBy: { linkedCount: "desc" },
       select: { id: true, name: true, nameAr: true, slug: true },
     });
   },

@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { isImageUrl } from "@/lib/markdown/is-image-url";
 import { htmlToArticleSource, parseArticleContent } from "@/lib/markdown/parse-article-content";
+import {
+  linkLabelFromUrl,
+} from "@/lib/markdown/normalize-article-source";
 
 describe("isImageUrl", () => {
   it("detects common image extensions", () => {
@@ -72,5 +75,124 @@ describe("parseArticleContent", () => {
   it("parses markdown headings", () => {
     const blocks = parseArticleContent("## Section title\n\nBody text");
     expect(blocks[0]).toMatchObject({ type: "heading", level: 2, text: "Section title" });
+  });
+
+  it("parses h4 headings", () => {
+    const blocks = parseArticleContent("#### Section title\n\nBody text");
+    expect(blocks[0]).toMatchObject({ type: "heading", level: 4, text: "Section title" });
+  });
+
+  it("keeps prose with inline markdown images as paragraphs", () => {
+    const line =
+      "الشغب الأبيض ![](https://booksplatform.net/wp-content/uploads/Gord-Hil-1-300x240.jpg) نبدأ من قلب فانكوفر";
+    const blocks = parseArticleContent(`${line}\n\n### خاتمة`);
+    expect(blocks[0]).toMatchObject({ type: "paragraph", text: line });
+  });
+
+  it("normalizes relative wp upload paths in image blocks", () => {
+    const blocks = parseArticleContent("/wp-content/uploads/cover-11-224x300.jpg");
+    expect(blocks[0]).toMatchObject({
+      type: "image",
+      src: "https://booksplatform.net/wp-content/uploads/cover-11-224x300.jpg",
+    });
+  });
+
+  it("skips markdown horizontal rules", () => {
+    const blocks = parseArticleContent("Intro\n\n* * *\n\nOutro");
+    expect(blocks.map((b) => b.type)).toEqual(["paragraph", "paragraph"]);
+  });
+
+  it("does not treat prose containing wp-content as a bare image URL", () => {
+    expect(
+      isImageUrl(
+        "الشغب الأبيض ![](https://booksplatform.net/wp-content/uploads/Gord-Hil-1-300x240.jpg) نبدأ",
+      ),
+    ).toBe(false);
+  });
+
+  it("strips escaped WordPress caption shortcodes and keeps caption text", () => {
+    const raw =
+      '\\[caption id="attachment_53526" align="aligncenter" width="320"\\] Immanuel Kant\\[/caption\\]\n\n![](https://example.com/kant.jpg)';
+    const blocks = parseArticleContent(raw);
+    expect(blocks.some((b) => b.type === "paragraph" && b.text.includes("*Immanuel Kant*"))).toBe(
+      true,
+    );
+    expect(blocks.some((b) => b.type === "image")).toBe(true);
+  });
+
+  it("converts caption shortcode with embedded img to image block", () => {
+    const raw =
+      '[caption id="53526"]<img src="/wp-content/uploads/kant.jpg" /> Immanuel Kant[/caption]';
+    const blocks = parseArticleContent(raw);
+    expect(blocks).toHaveLength(1);
+    expect(blocks[0]).toMatchObject({
+      type: "image",
+      alt: "Immanuel Kant",
+      caption: "Immanuel Kant",
+      src: "https://booksplatform.net/wp-content/uploads/kant.jpg",
+    });
+  });
+
+  it("linkifies parenthesized encoded Wikipedia URLs", () => {
+    const url =
+      "https://ar.wikipedia.org/wiki/%D8%A5%D9%8A%D9%85%D8%A7%D9%86%D9%88%D9%8A%D9%84_%D9%83%D8%A7%D9%86%D8%B7";
+    const blocks = parseArticleContent(`اقرأ المزيد (${url}) عن الفيلسوف.`);
+    expect(blocks[0]).toMatchObject({ type: "paragraph" });
+    const text = (blocks[0] as { text: string }).text;
+    expect(text).toContain(`[${linkLabelFromUrl(url)}](${url})`);
+    expect(linkLabelFromUrl(url)).toBe("إيمانويل كانط");
+  });
+
+  it("linkifies Wikipedia URLs without a closing parenthesis", () => {
+    const url =
+      "https://ar.wikipedia.org/wiki/%D8%A5%D9%8A%D9%85%D8%A7%D9%86%D9%88%D9%8A%D9%84_%D9%83%D8%A7%D9%86%D8%B7";
+    const blocks = parseArticleContent(`اقرأ (${url} عن الفيلسوف.`);
+    const text = (blocks[0] as { text: string }).text;
+    expect(text).toContain(`[${linkLabelFromUrl(url)}](${url})`);
+  });
+
+  it("turns markdown-image syntax with external URLs into text links", () => {
+    const url =
+      "https://ar.wikipedia.org/wiki/%D8%A5%D9%8A%D9%85%D8%A7%D9%86%D9%88%D9%8A%D9%84_%D9%83%D8%A7%D9%86%D8%B7";
+    const blocks = parseArticleContent(`![فيلسوف](${url})`);
+    expect(blocks[0]).toMatchObject({
+      type: "paragraph",
+      text: `[فيلسوف](${url})`,
+    });
+  });
+
+  it("linkifies bare Wikipedia URLs in prose", () => {
+    const url =
+      "https://ar.wikipedia.org/wiki/%D8%A5%D9%8A%D9%85%D8%A7%D9%86%D9%88%D9%8A%D9%84_%D9%83%D8%A7%D9%86%D8%B7";
+    const blocks = parseArticleContent(`هذا الرجل هو ${url}، والتحدي`);
+    const text = (blocks[0] as { text: string }).text;
+    expect(text).toContain(`[إيمانويل كانط](${url})`);
+  });
+
+  it("decodes URL-encoded markdown link labels to Arabic", () => {
+    const url =
+      "https://ar.wikipedia.org/wiki/%D8%A5%D9%8A%D9%85%D8%A7%D9%86%D9%88%D9%8A%D9%84_%D9%83%D8%A7%D9%86%D8%B7";
+    const encodedLabel = "%D8%A5%D9%8A%D9%85%D8%A7%D9%86%D9%88%D9%8A%D9%84_%D9%83%D8%A7%D9%86%D8%B7";
+    const blocks = parseArticleContent(`هذا الرجل هو [${encodedLabel}](${url})، والتحدي`);
+    const text = (blocks[0] as { text: string }).text;
+    expect(text).toContain("[إيمانويل كانط]");
+  });
+
+  it("joins bold label and parenthesized URL into one markdown link", () => {
+    const url =
+      "https://ar.wikipedia.org/wiki/%D8%A5%D9%8A%D9%85%D8%A7%D9%86%D9%88%D9%8A%D9%84_%D9%83%D8%A7%D9%86%D8%B7";
+    const blocks = parseArticleContent(`**هذا الرجل هو [إيمانويل كانط]** (${url})، **والتحدي**`);
+    const text = (blocks[0] as { text: string }).text;
+    expect(text).toContain("**هذا الرجل هو [إيمانويل كانط]");
+    expect(text).toContain(`](${url})`);
+    expect(text).not.toContain(`]** (${url})`);
+  });
+
+  it("keeps markdown links inside bold paragraphs intact", () => {
+    const url =
+      "https://ar.wikipedia.org/wiki/%D8%A5%D9%8A%D9%85%D8%A7%D9%86%D9%88%D9%8A%D9%84_%D9%83%D8%A7%D9%86%D8%B7";
+    const input = `**هذا الرجل هو [إيمانويل كانط](${url})، والتحدي الذي وضعه أمام نفسه كان ضخما**`;
+    const blocks = parseArticleContent(input);
+    expect((blocks[0] as { text: string }).text).toBe(input);
   });
 });

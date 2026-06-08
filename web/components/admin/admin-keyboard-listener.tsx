@@ -12,11 +12,9 @@ export function AdminKeyboardListener() {
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (!isModKey(e)) return;
-
       const key = e.key.toLowerCase();
 
-      if (key === "k") {
+      if (key === "k" && e.altKey && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         if (searchOpen) {
           closeSearch();
@@ -25,6 +23,8 @@ export function AdminKeyboardListener() {
         }
         return;
       }
+
+      if (!isModKey(e)) return;
 
       if (key === "s") {
         e.preventDefault();

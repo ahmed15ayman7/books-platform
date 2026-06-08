@@ -11,17 +11,14 @@ import type {
   GlobalSearchSectionResult,
   SearchSectionType,
 } from "@/lib/search/search-types";
+import {
+  ARTICLE_SEARCH_FIELDS,
+  AUTHOR_SEARCH_FIELDS,
+  buildTextSearchOr,
+} from "@/lib/search/text-search-fields";
 import readingTime from "reading-time";
 
 const PREVIEW_TAKE = 6;
-
-function buildTextSearch(q: string, fields: string[]) {
-  return {
-    OR: fields.map((field) => ({
-      [field]: { contains: q, mode: "insensitive" as const },
-    })),
-  };
-}
 
 function paginationMeta(page: number, limit: number, total: number) {
   const totalPages = Math.ceil(total / limit) || 0;
@@ -38,7 +35,7 @@ function paginationMeta(page: number, limit: number, total: number) {
 async function searchAuthors(q: string, page: number, limit: number) {
   const where = {
     spamFlag: null,
-    ...buildTextSearch(q, ["name", "nameAr", "slug"]),
+    ...buildTextSearchOr(q, AUTHOR_SEARCH_FIELDS),
   };
 
   const skip = (page - 1) * limit;
@@ -86,7 +83,7 @@ async function searchArticles(
           channel: channel ? channel : { notIn: [...MEDIA_CHANNEL_SLUGS] },
         }),
     ...(categorySlug && { articleCategory: { slug: categorySlug } }),
-    ...buildTextSearch(q, ["title", "titleEn", "slug", "excerpt"]),
+    ...buildTextSearchOr(q, ARTICLE_SEARCH_FIELDS),
   };
 
   const orderBy =

@@ -2,12 +2,14 @@ import { type NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { z } from "zod";
 import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
+import { PAGINATION } from "@/lib/utils/constants";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { buildOrderBy, parseOptionalBool, parseSortParam } from "@/lib/admin/list-query";
 import { notDeleted } from "@/lib/admin/audit-fields";
 import { publisherBilingualDbData } from "@/lib/admin/publisher-fields";
 import { slugify } from "@/lib/admin/slugify";
+import { PUBLISHER_SEARCH_FIELDS, buildTextSearchOr } from "@/lib/search/text-search-fields";
 
 const createSchema = z.object({
   name: z.string().max(300).optional(),
@@ -29,7 +31,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
-    const limit = Math.min(50, parseInt(searchParams.get("limit") ?? "20", 10));
+    const limit = Math.min(PAGINATION.MAX_PAGE_SIZE, parseInt(searchParams.get("limit") ?? String(PAGINATION.DEFAULT_PAGE_SIZE), 10));
     const search = searchParams.get("search") ?? undefined;
     const status = searchParams.get("status") ?? undefined;
     const sponsoredFilter = parseOptionalBool(searchParams.get("sponsored"));
@@ -41,15 +43,7 @@ export async function GET(request: NextRequest) {
       ...(status && status !== "all" ? { status } : {}),
       ...(sponsoredFilter === true ? { sponsored: { isNot: null } } : {}),
       ...(sponsoredFilter === false ? { sponsored: null } : {}),
-      ...(search
-        ? {
-            OR: [
-              { title: { contains: search, mode: "insensitive" as const } },
-              { name: { contains: search, mode: "insensitive" as const } },
-              { nameAr: { contains: search, mode: "insensitive" as const } },
-            ],
-          }
-        : {}),
+      ...(search && buildTextSearchOr(search, PUBLISHER_SEARCH_FIELDS)),
     };
 
     const publisherSortFields = ["updatedAt", "createdAt", "title", "name", "nameAr"] as const;

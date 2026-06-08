@@ -1,27 +1,28 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { getLocale } from "next-intl/server";
 import { ArticleService } from "@/server/services/article.service";
-import { ArticleCard } from "@/components/sections/article-card";
 import { YoutubeEmbed } from "@/components/sections/youtube-embed";
 import { RelatedBooksSection } from "@/components/sections/related-books-section";
-import { Badge } from "@/components/ui/badge";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { Clock, Calendar } from "lucide-react";
+import { ArticleDetailSidebar } from "@/components/sections/article-detail-sidebar";
+import { ArticleShareStrip } from "@/components/sections/article-share-strip";
+import { Calendar } from "lucide-react";
 import { formatDate } from "@/lib/utils/formatters";
-import readingTime from "reading-time";
+import { cn } from "@/lib/utils";
 import type { Locale } from "@/lib/i18n";
-import { articleLinkedBookDisplay, mapArticleForCard } from "@/lib/i18n/article-linked-book";
 import { articleSeoMetadata } from "@/lib/seo/metadata";
 import { youtubeEmbedUrl, youtubeThumbnail } from "@/lib/media/youtube";
 import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-shell";
 import { isMediaChannel } from "@/lib/media/youtube";
 import { mediaHubHref, mediaNavLabel } from "@/lib/nav/site-nav";
 import { adminArticleEditPath, adminArticleViewPath } from "@/lib/admin/public-urls";
+import { ArticleDetailHero } from "@/components/sections/article-detail-hero";
 import { ArticleContent } from "@/lib/markdown/article-content";
 import { ArticleCommentsSection } from "@/components/sections/article-comments-section";
+import { articleLinkedBookDisplay } from "@/lib/i18n/article-linked-book";
+import { resolveArticleDisplayImage } from "@/lib/articles/resolve-display-image";
+import { absoluteUrl } from "@/lib/seo/site";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -49,20 +50,35 @@ const channelNames: Record<string, { ar: string; en: string; path: string }> = {
   "novel-story": { ar: "رواية فحكاية", en: "Novel & Story", path: "novel-story" },
 };
 
+function stripHtml(html: string | null | undefined): string {
+  return html?.replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").trim() ?? "";
+}
+
 export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   const { slug } = await params;
   const locale = (await getLocale()) as Locale;
 
-  const [article, related] = await Promise.all([
-    ArticleService.getBySlug(slug).catch(() => null),
-    ArticleService.getRelated(slug, 3).catch(() => []),
-  ]);
-
+  const article = await ArticleService.getBySlug(slug).catch(() => null);
   if (!article) notFound();
 
-  const linkedBook = articleLinkedBookDisplay(article.products?.[0], locale);
-  const heroImageUrl = linkedBook?.imageUrl ?? article.imageUrl?.split(',')[0] ?? article.imageUrl;
-  const relatedArticles = related.map((art) => mapArticleForCard(art, locale));
+  const sidebarResult = await ArticleService.list({
+    channel: article.channel ?? undefined,
+    page: 1,
+    limit: 10,
+    sort: "newest",
+    mediaOnly: isMediaChannel(article.channel),
+  }).catch(() => ({ articles: [] }));
+
+  const sidebarArticles = sidebarResult.articles
+    .filter((a) => a.slug !== article.slug)
+    .slice(0, 6)
+    .map((a) => ({
+      slug: a.slug,
+      title: a.title,
+      imageUrl: a.imageUrl,
+      excerpt: a.excerpt,
+      products: a.products?.map((p) => ({ imageUrl: p.imageUrl })),
+    }));
 
   const channelInfo = article.channel ? channelNames[article.channel] : null;
   const channelLabel = channelInfo
@@ -71,15 +87,26 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
       : channelInfo.en
     : null;
 
-  const rt = article.content ? readingTime(article.content) : null;
-  const readingTimeMin = rt ? Math.ceil(rt.minutes) : null;
+  const intro = stripHtml(article.excerpt);
+  const isMedia = isMediaChannel(article.channel);
+  const articleUrl = absoluteUrl(`/${locale}/articles/${article.slug}`);
+
+  const linkedBook = articleLinkedBookDisplay(article.products?.[0], locale);
+  const heroCoverUrl =
+    resolveArticleDisplayImage({
+      imageUrl: linkedBook?.imageUrl ?? article.imageUrl,
+      bookImageUrls: article.products?.map((p) => p.imageUrl),
+      excerpt: article.excerpt,
+      content: article.content,
+    }) ?? null;
+  const heroCoverAlt = linkedBook?.name ?? article.title;
 
   const jsonLd: Record<string, unknown>[] = [
     {
       "@context": "https://schema.org",
       "@type": "Article",
       headline: article.title,
-      image: article.imageUrl?.split(',')[0] ?? article.imageUrl,
+      image: article.imageUrl?.split(",")[0] ?? article.imageUrl,
       datePublished: article.date?.toISOString(),
       description: article.excerpt,
     },
@@ -97,8 +124,6 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
     });
   }
 
-  const isMedia = isMediaChannel(article.channel);
-
   return (
     <>
       <script
@@ -112,41 +137,31 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         adminViewHref={adminArticleViewPath(locale, article.id, article.channel)}
         publicHref={`/${locale}/articles/${article.slug}`}
         title={article.title}
+        imageUrl={heroCoverUrl ?? article.imageUrl}
+        sharePublicUrl={articleUrl}
       >
-      <div className="min-h-screen bg-[var(--brand-gray-50)] pb-24">
-        {/* Hero Image */}
-        {heroImageUrl && (
-          <div className="relative h-64 w-full overflow-hidden bg-[var(--brand-gray-200)] md:h-96">
-            <Image
-              src={heroImageUrl}
-              alt={linkedBook ? linkedBook.name : article.title}
-              fill
-              className={linkedBook ? "object-contain bg-[var(--brand-gray-100)]" : "object-cover"}
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50" />
-          </div>
-        )}
+        <div className="min-h-screen bg-white pb-20" style={{direction: "rtl"}}>
+          <ArticleDetailHero
+            locale={locale}
+            title={article.title}
+            coverUrl={heroCoverUrl}
+            coverAlt={heroCoverAlt}
+          />
 
-        <div className="container-platform py-8">
-          <div className="mx-auto max-w-3xl">
-            {/* Breadcrumb */}
-            <nav className="mb-4 flex items-center gap-2 text-sm text-[var(--brand-gray-500)]">
+          <div className="container-platform py-8 md:py-10">
+            <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-[var(--brand-gray-500)]">
               <Link href={`/${locale}`} className="hover:text-[var(--brand-red)]">
                 {locale === "ar" ? "الرئيسية" : "Home"}
               </Link>
               {channelInfo && (
                 <>
-                  <span>/</span>
+                  <span aria-hidden="true">/</span>
                   {isMedia ? (
                     <>
-                      <Link
-                        href={mediaHubHref(locale)}
-                        className="hover:text-[var(--brand-red)]"
-                      >
+                      <Link href={mediaHubHref(locale)} className="hover:text-[var(--brand-red)]">
                         {mediaNavLabel(locale)}
                       </Link>
-                      <span>/</span>
+                      <span aria-hidden="true">/</span>
                       <Link
                         href={`/${locale}/media/${channelInfo.path}`}
                         className="hover:text-[var(--brand-red)]"
@@ -164,106 +179,77 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
                   )}
                 </>
               )}
-              <span>/</span>
-              <span className="text-[var(--brand-gray-700)] truncate max-w-[200px]">
-                {article.title}
-              </span>
             </nav>
 
-            {/* Channel badge */}
-            {channelLabel && (
-              <Badge variant="default" className="mb-3">
-                {channelLabel}
-              </Badge>
-            )}
+            <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_280px] xl:grid-cols-[minmax(0,1fr)_300px] xl:gap-12">
+              <main className="min-w-0">
+                {(intro || article.date) && (
+                  <header className="mb-8">
+                    {intro && (
+                      <p className="text-base leading-relaxed text-[var(--brand-gray-700)] md:text-lg">
+                        {intro}
+                      </p>
+                    )}
 
-            {/* Title */}
-            <h1 className="font-display text-display-sm font-black text-[var(--brand-gray-900)] text-balance leading-tight">
-              {article.title}
-            </h1>
+                    {article.date && (
+                      <p
+                        className={cn(
+                          "flex items-center gap-1.5 text-sm text-[var(--brand-gray-500)]",
+                          intro && "mt-4",
+                        )}
+                      >
+                        <Calendar className="h-4 w-4" aria-hidden="true" />
+                        {formatDate(article.date, locale)}
+                        {(article.authorFirstName ?? article.authorLastName) && (
+                          <>
+                            <span className="mx-1">·</span>
+                            {[article.authorFirstName, article.authorLastName].filter(Boolean).join(" ")}
+                          </>
+                        )}
+                      </p>
+                    )}
+                  </header>
+                )}
 
-            {/* Meta */}
-            <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-[var(--brand-gray-500)]">
-              {article.date && (
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" aria-hidden="true" />
-                  {formatDate(article.date, locale)}
-                </span>
-              )}
-              {readingTimeMin && (
-                <span className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" aria-hidden="true" />
-                  {readingTimeMin} {locale === "ar" ? "دقيقة قراءة" : "min read"}
-                </span>
-              )}
-              {(article.authorFirstName ?? article.authorLastName) && (
-                <span>
-                  {locale === "ar" ? "بقلم: " : "By: "}
-                  {[article.authorFirstName, article.authorLastName].filter(Boolean).join(" ")}
-                </span>
-              )}
-            </div>
+                {article.videoId && (
+                  <div className="mb-8">
+                    <YoutubeEmbed videoId={article.videoId} title={article.title} />
+                  </div>
+                )}
 
-            {/* Divider */}
-            <hr className="my-6 border-[var(--brand-gray-200)]" />
+                {article.content ? (
+                  <ArticleContent content={article.content} />
+                ) : intro ? null : (
+                  <p className="text-base leading-relaxed text-[var(--brand-gray-700)]">{intro}</p>
+                )}
 
-            {article.videoId && (
-              <div className="mb-8">
-                <YoutubeEmbed videoId={article.videoId} title={article.title} />
-              </div>
-            )}
-
-            {article.products && article.products.length > 0 && (
-              <RelatedBooksSection locale={locale} books={article.products} />
-            )}
-
-            {/* Article content */}
-            {article.content ? (
-              <ArticleContent content={article.content} />
-            ) : article.excerpt ? (
-              <p className="text-[var(--brand-gray-700)] leading-relaxed text-lg">
-                {article.excerpt}
-              </p>
-            ) : null}
-
-            {/* Comments Section */}
-            <ArticleCommentsSection
-              articleId={article.id}
-              locale={locale}
-              initialComments={article.comments.map((comment) => ({
-                id: comment.id,
-                authorName: comment.authorName,
-                content: comment.content,
-                commentDate: comment.commentDate,
-              }))}
-            />
-          </div>
-
-          {/* Related Articles */}
-          {relatedArticles.length > 0 && (
-            <section className="mt-16" aria-labelledby="related-heading">
-              <div className="mx-auto max-w-5xl">
-                <SectionHeading
-                  id="related-heading"
-                  title={locale === "ar" ? "مقالات ذات صلة" : "Related Articles"}
-                  className="mb-6"
+                <ArticleShareStrip
+                  locale={locale}
+                  url={articleUrl}
+                  title={article.title}
+                  imageUrl={heroCoverUrl ?? article.imageUrl}
                 />
-                <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-3">
-                  {relatedArticles.map((art) => (
-                    <ArticleCard
-                      key={art.id}
-                      {...art}
-                      date={art.date ?? undefined}
-                      channel={art.channel ?? undefined}
-                      locale={locale}
-                    />
-                  ))}
-                </div>
-              </div>
-            </section>
-          )}
+
+                {article.products && article.products.length > 0 && (
+                  <RelatedBooksSection locale={locale} books={article.products} />
+                )}
+
+                <ArticleCommentsSection
+                  articleId={article.id}
+                  locale={locale}
+                  initialComments={article.comments.map((comment) => ({
+                    id: comment.id,
+                    authorName: comment.authorName,
+                    content: comment.content,
+                    commentDate: comment.commentDate,
+                  }))}
+                />
+              </main>
+
+              <ArticleDetailSidebar locale={locale} articles={sidebarArticles} className="lg:sticky lg:top-24" />
+            </div>
+          </div>
         </div>
-      </div>
       </AdminEntityPublicShell>
     </>
   );

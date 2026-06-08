@@ -91,7 +91,7 @@ export function getContactContent(locale: Locale): ContactContent {
     channels: {
       email: "info@booksplatform.net",
       secondaryEmail: "atefmazhar@yahoo.com",
-      phone: "+20 2 33460619",
+      phone: "+201020070309",
       mobile: "+20 100 577 2608",
       officeHours: isAr
         ? "متاح من 10:00 صباحاً إلى 7:00 مساءً"

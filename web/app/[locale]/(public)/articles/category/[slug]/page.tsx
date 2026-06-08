@@ -4,6 +4,7 @@ import { getLocale } from "next-intl/server";
 import { ArticleService } from "@/server/services/article.service";
 import { ArticleChannelPage } from "@/components/sections/article-channel-page";
 import type { Locale } from "@/lib/i18n";
+import { PAGINATION } from "@/lib/utils/constants";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -25,7 +26,9 @@ export default async function ArticleCategoryPage({ params, searchParams }: Prop
   const locale = (await getLocale()) as Locale;
   const page = Math.max(1, parseInt(sp.page ?? "1", 10));
 
-  const result = await ArticleService.listByCategory(slug, page, 12).catch(() => null);
+  const result = await ArticleService.listByCategory(slug, page, PAGINATION.DEFAULT_PAGE_SIZE).catch(
+    () => null,
+  );
   if (!result) notFound();
 
   const { category, articles, pagination } = result;

@@ -8,6 +8,7 @@ import { absoluteUrl } from "@/lib/seo/site";
 import { Button } from "@/components/ui/button";
 import { AdminStatusBadge } from "@/components/admin/admin-table";
 import { BookMarketingDialog } from "./book-marketing-dialog";
+import { EntityShareDialog } from "@/components/share/entity-share-dialog";
 import { BookDeleteButton } from "./book-delete-button";
 import { AdminTimestamps } from "@/components/admin/admin-timestamps";
 import {
@@ -186,6 +187,12 @@ export default async function AdminBookViewPage({ params }: Props) {
             bookTitle={title}
             publicUrl={publicUrl}
             imageUrl={book.imageUrl}
+          />
+          <EntityShareDialog
+            title={title}
+            publicUrl={publicUrl}
+            imageUrl={book.imageUrl}
+            variant="admin"
           />
           <BookDeleteButton bookId={id} bookTitle={title} locale={locale} />
         </div>

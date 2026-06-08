@@ -7,7 +7,7 @@ import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
 import { adminToast } from "@/lib/admin/admin-toast";
 import { createBook, updateBook, type BookEditData } from "./actions";
 import { adminFieldClass } from "@/components/admin/admin-form-field";
-import { AdminMarkdownHint } from "@/components/admin/admin-markdown-hint";
+import { AdminRichTextHint } from "@/components/admin/admin-rich-text-hint";
 import { AdminEntityCombobox, type EntityOption } from "@/components/admin/admin-entity-combobox";
 import { CreateAuthorDialog } from "@/components/admin/create-author-dialog";
 import { CreatePublisherDialog } from "@/components/admin/create-publisher-dialog";
@@ -576,7 +576,7 @@ export function BookEditForm({
           />
 
           <Field className="lg:col-span-2">
-            <AdminMarkdownHint />
+            <AdminRichTextHint />
           </Field>
 
           <AdminBilingualField
@@ -584,13 +584,12 @@ export function BookEditForm({
             enValue={form.description}
             onArChange={(v) => set("descriptionAr", v)}
             onEnChange={(v) => set("description", v)}
-            labels={{ ar: "ملخص الكتاب (Markdown) — عربي", en: "ملخص الكتاب (Markdown) — إنجليزي" }}
+            labels={{ ar: "ملخص الكتاب — عربي", en: "ملخص الكتاب — إنجليزي" }}
             inputClassName={fieldCls}
-            arPlaceholder={"## فكرة الكتاب\n\n**كلمة مفتاحية** مهمة في السياق…"}
-            enPlaceholder={"## About this book\n\n**Keyword** highlighted in context…"}
-            multiline
-            rows={12}
-            enMonospace
+            arPlaceholder="اكتب ملخص الكتاب…"
+            enPlaceholder="Write the book summary…"
+            richText={{ image: false }}
+            editorMinHeight={320}
             layout="half"
           />
 
@@ -618,7 +617,7 @@ export function BookEditForm({
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand-red)] px-5 py-2 text-sm font-semibold text-[var(--admin-text)] transition-colors hover:bg-[var(--brand-red)]/90 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand-red)] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-red)]/90 disabled:opacity-60"
           >
             {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             {isCreate ? "إنشاء الكتاب" : "حفظ التغييرات"}

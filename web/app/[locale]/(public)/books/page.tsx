@@ -15,6 +15,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { SearchX } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+import { PAGINATION } from "@/lib/utils/constants";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as Locale;
@@ -57,7 +58,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
   const [{ books, pagination }, featuredResult, categories] = await Promise.all([
     BookService.list({
       page,
-      limit: 16,
+      limit: PAGINATION.DEFAULT_PAGE_SIZE,
       category: params.category,
       language: params.language,
       publisher: params.publisher,
@@ -66,7 +67,14 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
       search: params.q,
     }).catch(() => ({
       books: [],
-      pagination: { page: 1, limit: 16, total: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false },
+      pagination: {
+        page: 1,
+        limit: PAGINATION.DEFAULT_PAGE_SIZE,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
     })),
     BookService.list({ limit: 8, featured: true, sort: "newest" }).catch(() => ({ books: [] })),
     BookService.getCategories().catch(() => []),

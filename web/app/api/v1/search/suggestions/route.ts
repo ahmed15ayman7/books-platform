@@ -1,6 +1,13 @@
 import { type NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
+import { notDeleted } from "@/lib/admin/audit-fields";
+import {
+  ARTICLE_SEARCH_FIELDS,
+  BOOK_SEARCH_FIELDS,
+  PUBLISHER_SEARCH_FIELDS,
+  buildTextSearchOr,
+} from "@/lib/search/text-search-fields";
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,22 +18,23 @@ export async function GET(request: NextRequest) {
       return apiSuccess([]);
     }
 
-    const condition = { contains: q, mode: "insensitive" as const };
-
-    const [books, publishers] = await Promise.all([
+    const [books, articles, publishers] = await Promise.all([
       db.product.findMany({
-        where: { published: true, OR: [{ nameEn: condition }, { nameAr: condition }] },
+        where: { published: true, ...notDeleted, ...buildTextSearchOr(q, BOOK_SEARCH_FIELDS) },
         take: limit,
         select: { slug: true, nameEn: true, nameAr: true },
+      }),
+      db.article.findMany({
+        where: { status: "publish", ...notDeleted, ...buildTextSearchOr(q, ARTICLE_SEARCH_FIELDS) },
+        take: Math.min(3, limit),
+        orderBy: { date: "desc" },
+        select: { slug: true, title: true, titleEn: true, channel: true },
       }),
       db.publisher.findMany({
         where: {
           status: "publish",
-          OR: [
-            { title: condition },
-            { name: condition },
-            { nameAr: condition },
-          ],
+          ...notDeleted,
+          ...buildTextSearchOr(q, PUBLISHER_SEARCH_FIELDS),
         },
         take: 3,
         select: { slug: true, title: true, name: true, nameAr: true },
@@ -39,6 +47,13 @@ export async function GET(request: NextRequest) {
         label: b.nameAr ?? b.nameEn,
         labelEn: b.nameEn,
         slug: b.slug,
+      })),
+      ...articles.map((a) => ({
+        type: "article",
+        label: a.title,
+        labelEn: a.titleEn ?? a.title,
+        slug: a.slug,
+        channel: a.channel,
       })),
       ...publishers.map((p) => ({
         type: "publisher",

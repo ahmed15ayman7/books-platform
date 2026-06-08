@@ -12,6 +12,7 @@ import { AdminTimestamps } from "@/components/admin/admin-timestamps";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
+import { AdminRichTextHint } from "@/components/admin/admin-rich-text-hint";
 import { adminPublisherViewPath } from "@/lib/admin/public-urls";
 import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
 import { adminToast } from "@/lib/admin/admin-toast";
@@ -209,15 +210,16 @@ export function PublisherEditForm({ locale, id }: PublisherEditFormProps) {
         </AdminCard>
 
         <AdminCard title="الوصف">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <AdminRichTextHint />
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <AdminBilingualField
               arValue={form.contentAr}
               enValue={form.content}
               onArChange={(v) => set("contentAr")(v)}
               onEnChange={(v) => set("content")(v)}
               labels={{ ar: "الوصف (عربي)", en: "الوصف (إنجليزي)" }}
-              multiline
-              rows={4}
+              richText={{ image: false }}
+              editorMinHeight={200}
               layout="full"
             />
           </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { PAGINATION } from "@/lib/utils/constants";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminPagination } from "@/components/admin/admin-table";
@@ -26,7 +27,7 @@ export default function AdminContactPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/v1/admin/contact-messages?page=${page}&limit=20`, {
+      const res = await fetch(`/api/v1/admin/contact-messages?page=${page}&limit=${PAGINATION.DEFAULT_PAGE_SIZE}`, {
         headers: adminAuthHeaders(),
       });
       const data = await res.json() as {

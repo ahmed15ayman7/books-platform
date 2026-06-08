@@ -6,6 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useBilingualAutoTranslate } from "@/hooks/use-bilingual-auto-translate";
+import { AdminMarkdownEditor } from "@/components/admin/admin-markdown-editor";
+import type { MarkdownEditorFeatures } from "@/components/admin/admin-markdown-editor-types";
 
 interface BilingualFieldLabels {
   ar: string;
@@ -30,6 +32,8 @@ interface AdminBilingualFieldProps {
   enMonospace?: boolean;
   /** Hide shared toolbar when stacking multiple bilingual groups */
   showToolbar?: boolean;
+  richText?: boolean | MarkdownEditorFeatures;
+  editorMinHeight?: number;
 }
 
 function FieldShell({
@@ -147,6 +151,8 @@ export function AdminBilingualField({
   rows = 4,
   enMonospace = false,
   showToolbar = true,
+  richText,
+  editorMinHeight = 280,
 }: AdminBilingualFieldProps) {
   const {
     translating,
@@ -163,10 +169,6 @@ export function AdminBilingualField({
     onEnChange,
   });
 
-  const InputComponent = multiline ? Textarea : Input;
-  const arExtra = multiline ? { rows } : {};
-  const enExtra = multiline ? { rows } : {};
-
   const toolbar = showToolbar ? (
     <AdminBilingualToolbar
       translating={translating}
@@ -179,40 +181,91 @@ export function AdminBilingualField({
     />
   ) : null;
 
+  const arId = `bilingual-ar-${labels.ar}`;
+  const enId = `bilingual-en-${labels.en}`;
+
+  function renderArField() {
+    if (richText) {
+      return (
+        <AdminMarkdownEditor
+          id={arId}
+          value={arValue}
+          onChange={handleArChange}
+          dir="rtl"
+          placeholder={arPlaceholder}
+          minHeight={editorMinHeight}
+          features={richText}
+          className={inputClassName}
+        />
+      );
+    }
+
+    const InputComponent = multiline ? Textarea : Input;
+    const arExtra = multiline ? { rows } : {};
+
+    return (
+      <InputComponent
+        id={arId}
+        className={cn(inputClassName, multiline && "min-h-[100px] resize-y")}
+        value={arValue}
+        onChange={(e) => handleArChange(e.target.value)}
+        placeholder={arPlaceholder}
+        {...arExtra}
+      />
+    );
+  }
+
+  function renderEnField() {
+    if (richText) {
+      return (
+        <AdminMarkdownEditor
+          id={enId}
+          value={enValue}
+          onChange={handleEnChange}
+          dir="ltr"
+          placeholder={enPlaceholder}
+          minHeight={editorMinHeight}
+          features={richText}
+          className={inputClassName}
+        />
+      );
+    }
+
+    const InputComponent = multiline ? Textarea : Input;
+    const enExtra = multiline ? { rows } : {};
+
+    return (
+      <InputComponent
+        id={enId}
+        className={cn(
+          inputClassName,
+          multiline && "min-h-[100px] resize-y",
+          enMonospace && "font-mono text-[13px]",
+        )}
+        value={enValue}
+        onChange={(e) => handleEnChange(e.target.value)}
+        placeholder={enPlaceholder}
+        dir="ltr"
+        {...enExtra}
+      />
+    );
+  }
+
   if (layout === "half") {
     return (
       <>
         {toolbar}
         <FieldShell layout="half">
-          <FieldLabel htmlFor={`bilingual-ar-${labels.ar}`} required={arRequired}>
+          <FieldLabel htmlFor={arId} required={arRequired}>
             {labels.ar}
           </FieldLabel>
-          <InputComponent
-            id={`bilingual-ar-${labels.ar}`}
-            className={cn(inputClassName, multiline && "min-h-[80px] resize-y")}
-            value={arValue}
-            onChange={(e) => handleArChange(e.target.value)}
-            placeholder={arPlaceholder}
-            {...arExtra}
-          />
+          {renderArField()}
         </FieldShell>
         <FieldShell layout="half">
-          <FieldLabel htmlFor={`bilingual-en-${labels.en}`} required={enRequired}>
+          <FieldLabel htmlFor={enId} required={enRequired}>
             {labels.en}
           </FieldLabel>
-          <InputComponent
-            id={`bilingual-en-${labels.en}`}
-            className={cn(
-              inputClassName,
-              multiline && "min-h-[80px] resize-y",
-              enMonospace && "font-mono text-[13px]",
-            )}
-            value={enValue}
-            onChange={(e) => handleEnChange(e.target.value)}
-            placeholder={enPlaceholder}
-            dir="ltr"
-            {...enExtra}
-          />
+          {renderEnField()}
         </FieldShell>
       </>
     );
@@ -222,35 +275,16 @@ export function AdminBilingualField({
     <>
       {toolbar}
       <FieldShell layout="full">
-        <FieldLabel htmlFor={`bilingual-ar-${labels.ar}`} required={arRequired}>
+        <FieldLabel htmlFor={arId} required={arRequired}>
           {labels.ar}
         </FieldLabel>
-        <InputComponent
-          id={`bilingual-ar-${labels.ar}`}
-          className={cn(inputClassName, multiline && "min-h-[100px] resize-y")}
-          value={arValue}
-          onChange={(e) => handleArChange(e.target.value)}
-          placeholder={arPlaceholder}
-          {...arExtra}
-        />
+        {renderArField()}
       </FieldShell>
       <FieldShell layout="full">
-        <FieldLabel htmlFor={`bilingual-en-${labels.en}`} required={enRequired}>
+        <FieldLabel htmlFor={enId} required={enRequired}>
           {labels.en}
         </FieldLabel>
-        <InputComponent
-          id={`bilingual-en-${labels.en}`}
-          className={cn(
-            inputClassName,
-            multiline && "min-h-[100px] resize-y",
-            enMonospace && "font-mono text-[13px]",
-          )}
-          value={enValue}
-          onChange={(e) => handleEnChange(e.target.value)}
-          placeholder={enPlaceholder}
-          dir="ltr"
-          {...enExtra}
-        />
+        {renderEnField()}
       </FieldShell>
     </>
   );

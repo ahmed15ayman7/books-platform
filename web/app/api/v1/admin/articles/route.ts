@@ -1,6 +1,7 @@
 import { type NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { apiPaginated, apiCreated, ApiErrors } from "@/lib/api-client/response";
+import { PAGINATION } from "@/lib/utils/constants";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { buildOrderBy, parseSortParam } from "@/lib/admin/list-query";
@@ -12,6 +13,7 @@ import {
 } from "@/lib/admin/article-payload";
 import { MEDIA_CHANNELS } from "@/lib/media/youtube";
 import { nextArticleOriginalId } from "@/lib/admin/legacy-ids";
+import { ARTICLE_SEARCH_FIELDS, buildTextSearchOr } from "@/lib/search/text-search-fields";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth(request, "ADMIN", PERMISSIONS.articles.view);
@@ -20,7 +22,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
-    const limit = Math.min(50, parseInt(searchParams.get("limit") ?? "20", 10));
+    const limit = Math.min(PAGINATION.MAX_PAGE_SIZE, parseInt(searchParams.get("limit") ?? String(PAGINATION.DEFAULT_PAGE_SIZE), 10));
     const search = searchParams.get("search") ?? undefined;
     const status = searchParams.get("status") ?? undefined;
     const channel = searchParams.get("channel") ?? undefined;
@@ -35,9 +37,7 @@ export async function GET(request: NextRequest) {
       ...(channel && channel !== "all" ? { channel } : {}),
       ...(mediaOnly ? { channel: { in: [...MEDIA_CHANNELS] } } : {}),
       ...(hasVideo ? { videoId: { not: null } } : {}),
-      ...(search
-        ? { OR: [{ title: { contains: search, mode: "insensitive" as const } }] }
-        : {}),
+      ...(search && buildTextSearchOr(search, ARTICLE_SEARCH_FIELDS)),
     };
 
     const articleSortFields = ["updatedAt", "createdAt", "title", "date"] as const;

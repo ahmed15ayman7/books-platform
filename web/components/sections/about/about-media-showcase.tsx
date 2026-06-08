@@ -20,6 +20,7 @@ interface AboutMediaShowcaseProps {
   title: string;
   lead: string;
   videos: VideoItem[];
+  textSize?: "default" | "lg";
 }
 
 export function AboutMediaShowcase({
@@ -28,19 +29,21 @@ export function AboutMediaShowcase({
   title,
   lead,
   videos,
+  textSize = "default",
 }: AboutMediaShowcaseProps) {
   const withVideo = videos.filter((v) => v.videoId);
   const isAr = locale === "ar";
+  const isLarge = textSize === "lg";
 
   return (
-    <SectionBlock id="media" eyebrow={eyebrow} title={title} lead={lead} staggerChildren={false}>
+    <SectionBlock id="media" eyebrow={eyebrow} title={title} lead={lead} textSize={textSize} staggerChildren={false}>
       {withVideo.length === 0 ? (
         <FadeIn>
           <div className="rounded-xl border border-dashed border-[var(--brand-gray-300)] bg-white p-8 text-center">
-            <p className="text-[var(--brand-gray-600)]">
+            <p className={isLarge ? "text-lg text-[var(--brand-gray-600)] md:text-xl" : "text-[var(--brand-gray-600)]"}>
               {isAr ? "تابع أحدث الفيديوهات على قنوات الميديا." : "Follow the latest videos on our media channels."}
             </p>
-            <Button asChild className="mt-4" variant="outline">
+            <Button asChild className="mt-4" variant="outline" size={isLarge ? "lg" : "default"}>
               <Link href={`/${locale}/media`}>
                 {isAr ? "تصفّح القناة" : "Browse channel"}
               </Link>

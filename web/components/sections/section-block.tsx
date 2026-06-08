@@ -13,6 +13,7 @@ interface SectionBlockProps {
   title?: string;
   lead?: string;
   variant?: "transparent" | "card" | "dark";
+  textSize?: "default" | "lg";
   children?: ReactNode;
   className?: string;
   animate?: boolean;
@@ -25,17 +26,21 @@ export function SectionBlock({
   title,
   lead,
   variant = "transparent",
+  textSize = "default",
   children,
   className,
   animate = true,
 }: SectionBlockProps) {
+  const isLarge = textSize === "lg";
+
   const inner = (
     <>
       {eyebrow && (
         <FadeIn delay={0}>
           <p
             className={cn(
-              "mb-2 text-xs font-bold uppercase tracking-widest text-[var(--brand-red)]",
+              "mb-2 font-bold uppercase tracking-widest text-[var(--brand-red)]",
+              isLarge ? "text-sm" : "text-xs",
             )}
           >
             {eyebrow}
@@ -47,7 +52,8 @@ export function SectionBlock({
           text={title}
           as="h2"
           className={cn(
-            "font-display text-display-xs font-bold md:text-display-sm block",
+            "font-display font-bold block",
+            isLarge ? "text-display-sm md:text-display-md" : "text-display-xs md:text-display-sm",
             variant === "dark" ? "text-white" : "text-[var(--brand-gray-900)]",
           )}
           delay={0.08}
@@ -57,7 +63,8 @@ export function SectionBlock({
         <FadeIn delay={0.16}>
           <p
             className={cn(
-              "mt-4 max-w-3xl text-base leading-relaxed md:text-lg",
+              "mt-4 max-w-3xl leading-relaxed",
+              isLarge ? "text-lg md:text-xl" : "text-base md:text-lg",
               variant === "dark" ? "text-[var(--brand-gray-300)]" : "text-[var(--brand-gray-700)]",
             )}
           >
@@ -83,12 +90,37 @@ export function SectionBlock({
         )}
       >
         {eyebrow && (
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-[var(--brand-red)]">{eyebrow}</p>
+          <p
+            className={cn(
+              "mb-2 font-bold uppercase tracking-widest text-[var(--brand-red)]",
+              isLarge ? "text-sm" : "text-xs",
+            )}
+          >
+            {eyebrow}
+          </p>
         )}
         {title && (
-          <h2 className={cn("font-display text-display-xs font-bold md:text-display-sm", variant === "dark" ? "text-white" : "text-[var(--brand-gray-900)]")}>{title}</h2>
+          <h2
+            className={cn(
+              "font-display font-bold",
+              isLarge ? "text-display-sm md:text-display-md" : "text-display-xs md:text-display-sm",
+              variant === "dark" ? "text-white" : "text-[var(--brand-gray-900)]",
+            )}
+          >
+            {title}
+          </h2>
         )}
-        {lead && <p className={cn("mt-4 max-w-3xl text-base leading-relaxed md:text-lg", variant === "dark" ? "text-[var(--brand-gray-300)]" : "text-[var(--brand-gray-700)]")}>{lead}</p>}
+        {lead && (
+          <p
+            className={cn(
+              "mt-4 max-w-3xl leading-relaxed",
+              isLarge ? "text-lg md:text-xl" : "text-base md:text-lg",
+              variant === "dark" ? "text-[var(--brand-gray-300)]" : "text-[var(--brand-gray-700)]",
+            )}
+          >
+            {lead}
+          </p>
+        )}
         {children && <div className={cn(title || lead ? "mt-6" : "")}>{children}</div>}
       </section>
     );

@@ -13,7 +13,6 @@ import { SearchSectionFilters } from "@/components/sections/global-search/search
 import type { Locale } from "@/lib/i18n";
 import type { GlobalSearchResult, SearchSectionType } from "@/lib/search/search-types";
 import { parseSearchSectionType } from "@/lib/search/search-types";
-import { modKeyLabel } from "@/lib/search/shortcut-labels";
 
 interface CategoryOption {
   id: string;
@@ -178,8 +177,8 @@ export function GlobalSearchPageClient({
             </h1>
             <p className="mt-2 text-sm text-white/75 md:text-base">
               {isAr
-                ? "كتب، مقالات، فيديوهات، ناشرون، ومؤلفون — في مكان واحد"
-                : "Books, articles, videos, publishers, and authors — in one place"}
+                ? "ابحث في العناوين والأوصاف والمحتوى — كتب، مقالات، فيديوهات، ناشرون، ومؤلفون"
+                : "Search titles, descriptions, and content — books, articles, videos, publishers, and authors"}
             </p>
 
             <form onSubmit={handleSubmit} className="relative mt-8 flex items-center gap-2 justify-center">
@@ -218,15 +217,15 @@ export function GlobalSearchPageClient({
                     <X className="h-4 w-4" />
                   </button>
                 )}
-                <div
+                {/* <div
                   className={`absolute top-1/2 hidden -translate-y-1/2 items-center gap-1 text-[10px] text-[var(--brand-gray-500)] sm:flex ${
                     isAr ? "start-4" : "end-4"
                   }`}
                 >
                   <kbd className="rounded border border-[var(--brand-gray-200)] bg-[var(--brand-gray-50)] px-1.5 py-0.5">
-                    {modKeyLabel()}K
+                    {searchShortcutKeyLabel()}
                   </kbd>
-                </div>
+                </div> */}
               </div>
                 <button
                   type="submit"

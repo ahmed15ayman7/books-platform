@@ -330,13 +330,13 @@
   }
 
   .prose-brand {
-    max-width: 65ch;
+    max-width: 99%;
     line-height: 1.8;
   }
 
   .prose-brand h2,
   .prose-brand h3 {
-    color: var(--brand-gray-900);
+    color: var(--brand-red);
     font-weight: 700;
   }
 

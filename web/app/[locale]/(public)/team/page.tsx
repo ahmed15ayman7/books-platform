@@ -6,6 +6,7 @@ import { TeamCollageHero } from "@/components/sections/team-collage-hero";
 import { TeamQuoteBlock } from "@/components/sections/team-quote-block";
 import { TeamDepartments } from "@/components/sections/team-departments";
 import { CtaBand } from "@/components/sections/cta-band";
+import { TeamDesignCredit } from "@/components/sections/team-design-credit";
 import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
 import { getTeamContent } from "@/lib/content/team";
 import type { Locale } from "@/lib/i18n";
@@ -79,6 +80,8 @@ export default async function TeamPage() {
             secondaryHref={`/${locale}/about`}
             secondaryLabel={isAr ? "من نحن" : "About Us"}
           />
+
+          <TeamDesignCredit locale={locale} />
         </AnimatedContentSections>
       </div>
     </div>

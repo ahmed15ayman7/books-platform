@@ -1,5 +1,7 @@
 "use client";
 
+import { PAGINATION } from "@/lib/utils/constants";
+
 import { useCallback, useEffect, useState } from "react";
 import { Plus, Pencil, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -67,7 +69,7 @@ export default function AdminAmbassadorsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const q = new URLSearchParams({ page: String(page), limit: "20" });
+      const q = new URLSearchParams({ page: String(page), limit: String(PAGINATION.DEFAULT_PAGE_SIZE) });
       if (search.trim()) q.set("search", search.trim());
       appendListParams(q, { sort, status });
       const res = await fetch(`/api/v1/admin/ambassadors?${q}`, { headers: adminAuthHeaders() });
@@ -291,7 +293,7 @@ export default function AdminAmbassadorsPage() {
             emptyMessage="لا يوجد سفراء بعد"
             renderCard={renderCard}
           />
-          <AdminPagination page={page} totalPages={totalPages} onPage={setPage} total={total} pageSize={20} />
+          <AdminPagination page={page} totalPages={totalPages} onPage={setPage} total={total} pageSize={PAGINATION.DEFAULT_PAGE_SIZE} />
         </div>
       </div>
     </div>

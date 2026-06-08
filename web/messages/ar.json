@@ -201,5 +201,17 @@
     "about": "من نحن",
     "team": "فريق العمل",
     "contact": "اتصل بنا"
+  },
+  "consent": {
+    "cookieTitle": "موافقة ملفات تعريف الارتباط",
+    "cookieMessage": "نستخدم ملفات تعريف الارتباط لحفظ تفضيلاتك — يساعدك على الوصول لكتبك ومقالاتك المفضلة أسرع.",
+    "cookieAccept": "موافق",
+    "cookieLater": "لاحقاً",
+    "cookiePrivacy": "سياسة الخصوصية",
+    "notificationTitle": "تفعيل الإشعارات",
+    "notificationMessage": "فعّل الإشعارات لتصلك الكتب والمقالات الجديدة.",
+    "notificationEnable": "تفعيل",
+    "notificationLater": "لاحقاً",
+    "designCredit": "تم تصميم الموقع من خلال شركة real.com.eg"
   }
 }

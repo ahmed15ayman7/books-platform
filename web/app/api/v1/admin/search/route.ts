@@ -4,6 +4,13 @@ import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { notDeleted } from "@/lib/admin/audit-fields";
 import { MEDIA_CHANNELS } from "@/lib/media/youtube";
+import {
+  ARTICLE_SEARCH_FIELDS,
+  AUTHOR_SEARCH_FIELDS,
+  BOOK_SEARCH_FIELDS,
+  PUBLISHER_SEARCH_FIELDS,
+  buildTextSearchOr,
+} from "@/lib/search/text-search-fields";
 
 const TAKE = 6;
 
@@ -23,15 +30,13 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const textSearch = buildTextSearchOr(q, ARTICLE_SEARCH_FIELDS);
+
     const [books, articles, media, publishers, authors] = await Promise.all([
       db.product.findMany({
         where: {
           ...notDeleted,
-          OR: [
-            { nameEn: { contains: q, mode: "insensitive" } },
-            { nameAr: { contains: q, mode: "insensitive" } },
-            { slug: { contains: q, mode: "insensitive" } },
-          ],
+          ...buildTextSearchOr(q, BOOK_SEARCH_FIELDS),
         },
         take: TAKE,
         orderBy: { updatedAt: "desc" },
@@ -47,11 +52,7 @@ export async function GET(request: NextRequest) {
         where: {
           ...notDeleted,
           channel: { notIn: [...MEDIA_CHANNELS] },
-          OR: [
-            { title: { contains: q, mode: "insensitive" } },
-            { titleEn: { contains: q, mode: "insensitive" } },
-            { slug: { contains: q, mode: "insensitive" } },
-          ],
+          ...textSearch,
         },
         take: TAKE,
         orderBy: { updatedAt: "desc" },
@@ -68,11 +69,7 @@ export async function GET(request: NextRequest) {
         where: {
           ...notDeleted,
           channel: { in: [...MEDIA_CHANNELS] },
-          OR: [
-            { title: { contains: q, mode: "insensitive" } },
-            { titleEn: { contains: q, mode: "insensitive" } },
-            { slug: { contains: q, mode: "insensitive" } },
-          ],
+          ...textSearch,
         },
         take: TAKE,
         orderBy: { updatedAt: "desc" },
@@ -89,12 +86,7 @@ export async function GET(request: NextRequest) {
       db.publisher.findMany({
         where: {
           ...notDeleted,
-          OR: [
-            { title: { contains: q, mode: "insensitive" } },
-            { name: { contains: q, mode: "insensitive" } },
-            { nameAr: { contains: q, mode: "insensitive" } },
-            { slug: { contains: q, mode: "insensitive" } },
-          ],
+          ...buildTextSearchOr(q, PUBLISHER_SEARCH_FIELDS),
         },
         take: TAKE,
         orderBy: { updatedAt: "desc" },
@@ -110,11 +102,7 @@ export async function GET(request: NextRequest) {
       db.author.findMany({
         where: {
           spamFlag: null,
-          OR: [
-            { name: { contains: q, mode: "insensitive" } },
-            { nameAr: { contains: q, mode: "insensitive" } },
-            { slug: { contains: q, mode: "insensitive" } },
-          ],
+          ...buildTextSearchOr(q, AUTHOR_SEARCH_FIELDS),
         },
         take: TAKE,
         orderBy: { updatedAt: "desc" },

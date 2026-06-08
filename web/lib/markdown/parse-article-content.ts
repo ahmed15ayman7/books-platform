@@ -1,7 +1,10 @@
 import { isImageUrl } from "./is-image-url";
+import { normalizeImageSrc } from "./normalize-image-url";
+import { normalizeArticleSource, linkLabelFromUrl, resolveLinkLabel } from "./normalize-article-source";
+import { isArticleImageUrl } from "./article-media-url";
 
 export type ArticleContentBlock =
-  | { type: "heading"; level: 1 | 2 | 3; text: string }
+  | { type: "heading"; level: 1 | 2 | 3 | 4 | 5 | 6; text: string }
   | { type: "paragraph"; text: string }
   | { type: "list"; items: string[] }
   | { type: "image"; src: string; alt: string; caption?: string }
@@ -9,10 +12,30 @@ export type ArticleContentBlock =
 
 const MD_IMAGE = /^!\[([^\]]*)\]\(([^)]+)\)\s*$/;
 const MD_LINK = /^\[([^\]]*)\]\(([^)]+)\)\s*$/;
-const MD_HEADING = /^(#{1,3})\s+(.+)$/;
+const MD_HEADING = /^(#{1,6})\s+(.+)$/;
+
+const MAX_HTML_TRANSFORM_CHARS = 500_000;
+
+function stripHtmlFallback(html: string): string {
+  return html
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>\s*<p[^>]*>/gi, "\n\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/\r\n/g, "\n")
+    .trim();
+}
 
 /** Normalize WordPress/HTML snippets into markdown-friendly text before parsing. */
 export function htmlToArticleSource(html: string): string {
+  if (html.length > MAX_HTML_TRANSFORM_CHARS) {
+    return stripHtmlFallback(html);
+  }
+
   let out = html;
 
   out = out.replace(/<img[^>]+src=["']([^"']+)["'][^>]*\/?>/gi, (_, src: string) =>
@@ -34,7 +57,9 @@ export function htmlToArticleSource(html: string): string {
   out = out.replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, (_, t: string) => `\n\n# ${stripInnerHtml(t)}\n\n`);
   out = out.replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, (_, t: string) => `\n\n## ${stripInnerHtml(t)}\n\n`);
   out = out.replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi, (_, t: string) => `\n\n### ${stripInnerHtml(t)}\n\n`);
-  out = out.replace(/<h[4-6][^>]*>([\s\S]*?)<\/h[4-6]>/gi, (_, t: string) => `\n\n### ${stripInnerHtml(t)}\n\n`);
+  out = out.replace(/<h4[^>]*>([\s\S]*?)<\/h4>/gi, (_, t: string) => `\n\n#### ${stripInnerHtml(t)}\n\n`);
+  out = out.replace(/<h5[^>]*>([\s\S]*?)<\/h5>/gi, (_, t: string) => `\n\n##### ${stripInnerHtml(t)}\n\n`);
+  out = out.replace(/<h6[^>]*>([\s\S]*?)<\/h6>/gi, (_, t: string) => `\n\n###### ${stripInnerHtml(t)}\n\n`);
 
   out = out.replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, (_, t: string) => `**${stripInnerHtml(t)}**`);
   out = out.replace(/<b[^>]*>([\s\S]*?)<\/b>/gi, (_, t: string) => `**${stripInnerHtml(t)}**`);
@@ -72,36 +97,65 @@ function stripInnerHtml(html: string): string {
   return html.replace(/<[^>]+>/g, "").trim();
 }
 
+function isHorizontalRule(line: string): boolean {
+  const t = line.trim();
+  return /^(\*\s*){3,}$|^(-\s*){3,}$|^_{3,}$|^\*{3,}$|^-{3,}$/.test(t.replace(/\s/g, ""));
+}
+
+function toImageBlock(src: string, alt: string, caption?: string): ArticleContentBlock {
+  return {
+    type: "image",
+    src: normalizeImageSrc(src) ?? src.trim(),
+    alt: alt || "صورة",
+    caption,
+  };
+}
+
 function parseLineBlock(line: string): ArticleContentBlock | null {
   const trimmed = line.trim();
   if (!trimmed) return null;
 
+  if (isHorizontalRule(trimmed)) return null;
+
   const mdImage = MD_IMAGE.exec(trimmed);
   if (mdImage) {
-    return { type: "image", src: mdImage[2]!.trim(), alt: mdImage[1]!.trim() || "صورة" };
+    const alt = mdImage[1]!.trim();
+    const raw = mdImage[2]!.trim();
+    if (isArticleImageUrl(raw)) {
+      return toImageBlock(raw, alt, alt || undefined);
+    }
+    const label = alt || linkLabelFromUrl(raw);
+    return { type: "paragraph", text: `[${resolveLinkLabel(label, raw)}](${raw})` };
   }
 
   const mdLink = MD_LINK.exec(trimmed);
   if (mdLink) {
     const label = mdLink[1]!.trim();
     const href = mdLink[2]!.trim();
-    if (isImageUrl(href)) {
-      return { type: "image", src: href, alt: label || "صورة", caption: label || undefined };
+    if (isArticleImageUrl(href)) {
+      return toImageBlock(href, label, label || undefined);
     }
-    return { type: "paragraph", text: `[${label || href}](${href})` };
+    return {
+      type: "paragraph",
+      text: `[${resolveLinkLabel(label, href)}](${href})`,
+    };
   }
 
-  if (isImageUrl(trimmed)) {
-    return { type: "image", src: trimmed, alt: "صورة" };
+  if (/!\[[^\]]*\]\([^)]+\)/.test(trimmed)) {
+    return { type: "paragraph", text: trimmed };
+  }
+
+  if (isArticleImageUrl(trimmed)) {
+    return toImageBlock(trimmed, "صورة");
   }
 
   const heading = MD_HEADING.exec(trimmed);
   if (heading) {
-    const level = heading[1]!.length as 1 | 2 | 3;
+    const level = Math.min(heading[1]!.length, 6) as 1 | 2 | 3 | 4 | 5 | 6;
     return { type: "heading", level, text: heading[2]!.trim() };
   }
 
-  if (/^[-*]\s+/.test(trimmed)) {
+  if (/^[-*]\s+/.test(trimmed) && !isHorizontalRule(trimmed)) {
     return { type: "list", items: [trimmed.replace(/^[-*]\s+/, "")] };
   }
 
@@ -113,7 +167,7 @@ function parseLineBlock(line: string): ArticleContentBlock | null {
 }
 
 export function parseArticleContent(raw: string): ArticleContentBlock[] {
-  const normalized = raw.replace(/\r\n/g, "\n").trim();
+  const normalized = normalizeArticleSource(raw.replace(/\r\n/g, "\n").trim());
   if (!normalized) return [];
 
   const looksLikeHtml = /<[a-z][\s\S]*>/i.test(normalized);
@@ -126,7 +180,9 @@ export function parseArticleContent(raw: string): ArticleContentBlock[] {
     const lines = chunk.split("\n").map((l) => l.trim()).filter(Boolean);
     if (lines.length === 0) continue;
 
-    const allList = lines.every((l) => /^[-*]\s+/.test(l) || /^\d+\.\s+/.test(l));
+    const allList = lines.every(
+      (l) => !isHorizontalRule(l) && (/^[-*]\s+/.test(l) || /^\d+\.\s+/.test(l)),
+    );
     if (allList) {
       blocks.push({
         type: "list",

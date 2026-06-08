@@ -15,11 +15,13 @@ import {
   CardMediaImage,
   CardMediaPlaceholder,
 } from "@/components/ui/card-media";
+import { PublisherCountryFilter } from "@/components/sections/publisher-country-filter";
 import { BooksPagination } from "@/components/sections/books-pagination";
 import { Input } from "@/components/ui/input";
 import { Globe } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+import { PAGINATION } from "@/lib/utils/constants";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as Locale;
@@ -49,12 +51,19 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
     await Promise.all([
     PublisherService.list({
       page,
-      limit: 20,
+      limit: PAGINATION.DEFAULT_PAGE_SIZE,
       country: sp.country,
       search: sp.search,
     }).catch(() => ({
       publishers: [],
-      pagination: { page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPrevPage: false },
+      pagination: {
+        page: 1,
+        limit: PAGINATION.DEFAULT_PAGE_SIZE,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
     })),
     PublisherService.getAllCountries().catch(() => []),
     PublisherService.getSponsored(4).catch(() => []),
@@ -135,34 +144,12 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
           </form>
         </div>
 
-        {/* Country chips */}
-        {countries.length > 0 && (
-          <div className="mb-6 flex flex-wrap gap-2">
-            <Link
-              href={`/${locale}/publishers`}
-              className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                !sp.country
-                  ? "border-[var(--brand-red)] bg-[var(--brand-red)] text-white"
-                  : "border-[var(--brand-gray-300)] text-[var(--brand-gray-600)] hover:border-[var(--brand-red)] hover:text-[var(--brand-red)]"
-              }`}
-            >
-              {locale === "ar" ? "الكل" : "All"}
-            </Link>
-            {countries.slice(0, 15).map((country) => (
-              <Link
-                key={country.id}
-                href={`/${locale}/publishers?country=${country.slug}`}
-                className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                  sp.country === country.slug
-                    ? "border-[var(--brand-red)] bg-[var(--brand-red)] text-white"
-                    : "border-[var(--brand-gray-300)] text-[var(--brand-gray-600)] hover:border-[var(--brand-red)] hover:text-[var(--brand-red)]"
-                }`}
-              >
-                {locale === "ar" && country.nameAr ? country.nameAr : country.name}
-              </Link>
-            ))}
-          </div>
-        )}
+        <PublisherCountryFilter
+          locale={locale}
+          countries={countries}
+          activeCountry={sp.country}
+          searchQuery={sp.search}
+        />
 
         {/* Publishers Grid */}
         {publishers.length === 0 ? (

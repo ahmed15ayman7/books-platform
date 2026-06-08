@@ -125,7 +125,7 @@ export function BookCard({
           )}
           <h3
             className={cn(
-              "font-semibold text-[var(--brand-gray-900)] line-clamp-2 text-balance group-hover:text-[var(--brand-red)] transition-colors duration-200",
+              "font-semibold text-[var(--brand-gray-900)] line-clamp-2  group-hover:text-[var(--brand-red)] transition-colors duration-200",
               compact ? "text-sm" : "text-base"
             )}
           >

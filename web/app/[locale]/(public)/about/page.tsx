@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getLocale } from "next-intl/server";
-import { AboutHeroSplit } from "@/components/sections/about/about-hero-split";
+import { CatalogCollageHero } from "@/components/sections/catalog-collage-hero";
 import { AboutStorySplit } from "@/components/sections/about/about-story-split";
 import { AboutGalleryStrip } from "@/components/sections/about/about-gallery-strip";
 import { AboutValuesGrid } from "@/components/sections/about/about-values-grid";
@@ -12,7 +13,9 @@ import { AboutMediaShowcase } from "@/components/sections/about/about-media-show
 import { AboutTeamPreview } from "@/components/sections/about/about-team-preview";
 import { AboutCta } from "@/components/sections/about/about-cta";
 import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
+import { Button } from "@/components/ui/button";
 import { getAboutContent } from "@/lib/content/about";
+import { pickLocale } from "@/lib/content/types";
 import { TEAM_MEMBERS } from "@/lib/content/team";
 import { ArticleService } from "@/server/services/article.service";
 import type { Locale } from "@/lib/i18n";
@@ -41,6 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AboutPage() {
   const locale = (await getLocale()) as Locale;
   const content = getAboutContent(locale);
+  const isAr = locale === "ar";
 
   const latestMedia = await ArticleService.getLatestMedia(3).catch(() => []);
 
@@ -48,18 +52,41 @@ export default async function AboutPage() {
     content.teamPreview.memberSlugs.includes(m.slug),
   );
 
+  const heroCovers = content.hero.images.map((img) => ({
+    src: img.src,
+    alt: pickLocale(img.alt, locale),
+  }));
+
   return (
     <div className="min-h-screen bg-[var(--brand-gray-50)]">
-      <AboutHeroSplit
+      <CatalogCollageHero
         locale={locale}
         title={content.hero.title}
         subtitle={content.hero.subtitle}
-        image={content.hero.image}
-        primaryHref={`/${locale}/books`}
-        primaryLabel={content.cta.primary}
-        secondaryHref={`/${locale}/services`}
-        secondaryLabel={locale === "ar" ? "خدماتنا" : "Our Services"}
-      />
+        covers={heroCovers}
+        variant="translated"
+        coverMode="photo"
+        breadcrumbs={[
+          { label: isAr ? "الرئيسية" : "Home", href: `/${locale}` },
+          { label: content.hero.title },
+        ]}
+      >
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Button asChild size="lg">
+            <Link href={`/${locale}/books`}>{content.cta.primary}</Link>
+          </Button>
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="border-white/30 text-white hover:bg-white hover:text-[var(--brand-red)]"
+          >
+            <Link href={`/${locale}/services`}>
+              {isAr ? "خدماتنا" : "Our Services"}
+            </Link>
+          </Button>
+        </div>
+      </CatalogCollageHero>
 
       <div className="container-platform py-14 md:py-16">
         <AnimatedContentSections>
@@ -81,8 +108,8 @@ export default async function AboutPage() {
           />
 
           <AboutGalleryStrip
-            eyebrow={locale === "ar" ? "معرض" : "Gallery"}
-            title={locale === "ar" ? "رحلة المعرفة" : "Knowledge Journey"}
+            eyebrow={isAr ? "معرض" : "Gallery"}
+            title={isAr ? "رحلة المعرفة" : "Knowledge Journey"}
             items={content.storyGallery}
             locale={locale}
           />

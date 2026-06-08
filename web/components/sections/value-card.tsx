@@ -12,9 +12,19 @@ interface ValueCardProps {
   className?: string;
   imageUrl?: string;
   imageAlt?: string;
+  size?: "default" | "lg";
 }
 
-export function ValueCard({ icon: Icon, title, body, className, imageUrl, imageAlt }: ValueCardProps) {
+export function ValueCard({
+  icon: Icon,
+  title,
+  body,
+  className,
+  imageUrl,
+  imageAlt,
+  size = "default",
+}: ValueCardProps) {
+  const isLarge = size === "lg";
   return (
     <AnimatedCard>
       <article
@@ -33,8 +43,22 @@ export function ValueCard({ icon: Icon, title, body, className, imageUrl, imageA
             <Icon className="h-6 w-6" aria-hidden="true" />
           </div>
         </IconPulse>
-        <h3 className="mt-4 font-bold text-[var(--brand-gray-900)]">{title}</h3>
-        <p className="mt-2 text-sm leading-relaxed text-[var(--brand-gray-600)] md:text-base">{body}</p>
+        <h3
+          className={cn(
+            "mt-4 font-bold text-[var(--brand-gray-900)]",
+            isLarge && "text-xl md:text-2xl",
+          )}
+        >
+          {title}
+        </h3>
+        <p
+          className={cn(
+            "mt-2 leading-relaxed text-[var(--brand-gray-600)]",
+            isLarge ? "text-lg md:text-xl" : "text-sm md:text-base",
+          )}
+        >
+          {body}
+        </p>
       </article>
     </AnimatedCard>
   );

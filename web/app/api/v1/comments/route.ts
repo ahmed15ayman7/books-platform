@@ -2,6 +2,7 @@ import { type NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { createCommentSchema } from "@/lib/validation/comment.schema";
 import { apiSuccess, apiCreated, ApiErrors } from "@/lib/api-client/response";
+import { PAGINATION } from "@/lib/utils/constants";
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,7 +10,10 @@ export async function GET(request: NextRequest) {
     const productId = searchParams.get("productId") ?? undefined;
     const articleId = searchParams.get("articleId") ?? undefined;
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
-    const limit = Math.min(50, parseInt(searchParams.get("limit") ?? "20", 10));
+    const limit = Math.min(
+      PAGINATION.MAX_PAGE_SIZE,
+      parseInt(searchParams.get("limit") ?? String(PAGINATION.DEFAULT_PAGE_SIZE), 10),
+    );
 
     if (!productId && !articleId) {
       return ApiErrors.badRequest("productId or articleId required");

@@ -68,11 +68,11 @@ function HeroSlideContent({
       </div>
 
       <div className="container-platform relative z-10 flex h-full flex-col items-center justify-center px-4 pb-16 pt-8 text-center md:pb-20">
-        <h1 className="max-w-4xl font-display text-2xl font-bold leading-snug text-white drop-shadow-lg sm:text-3xl md:text-4xl lg:text-[2.75rem] text-balance">
+        <h1 className="max-w-4xl font-display text-2xl font-bold leading-snug text-white drop-shadow-lg sm:text-3xl md:text-4xl lg:text-[2.75rem]">
           {title}
         </h1>
         {subtitle && (
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/90 md:text-lg text-balance">
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/90 md:text-lg">
             {subtitle}
           </p>
         )}

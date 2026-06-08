@@ -16,6 +16,8 @@ import {
   publicBookUrl,
 } from "@/lib/admin/public-urls";
 import { redirect } from "next/navigation";
+import { EntityMarketingDialog } from "@/components/share/entity-marketing-dialog";
+import { EntityShareDialog } from "@/components/share/entity-share-dialog";
 
 interface Props {
   params: Promise<{ id: string; locale: string }>;
@@ -96,13 +98,27 @@ export default async function AdminArticleViewPage({ params }: Props) {
         </>
       }
       actions={
-        <AdminEntityDeleteButton
-          apiPath={`/api/v1/admin/articles/${id}`}
-          entityTitle={article.title}
-          redirectHref={`/${locale}/admin/articles`}
-          confirmTitle="تأكيد حذف المقال"
-          entityLabel="المقال"
-        />
+        <>
+          <EntityMarketingDialog
+            entityType="article"
+            title={article.title}
+            publicUrl={publicUrl}
+            imageUrl={article.imageUrl}
+          />
+          <EntityShareDialog
+            title={article.title}
+            publicUrl={publicUrl}
+            imageUrl={article.imageUrl}
+            variant="admin"
+          />
+          <AdminEntityDeleteButton
+            apiPath={`/api/v1/admin/articles/${id}`}
+            entityTitle={article.title}
+            redirectHref={`/${locale}/admin/articles`}
+            confirmTitle="تأكيد حذف المقال"
+            entityLabel="المقال"
+          />
+        </>
       }
     >
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
