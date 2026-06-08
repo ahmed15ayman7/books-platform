@@ -32,6 +32,7 @@ const articleListSelect = {
   authorFirstName: true,
   authorLastName: true,
   isFeatured: true,
+  createdAt: true,
   articleCategory: {
     select: { name: true, nameAr: true, slug: true },
   },
@@ -91,6 +92,7 @@ export const ArticleService = {
       return {
         ...rest,
         readingTimeMinutes: rt ? Math.ceil(rt.minutes) : null,
+        
       };
     });
 
