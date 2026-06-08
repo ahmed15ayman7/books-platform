@@ -73,6 +73,6 @@ export const SOCIAL_LINKS = [
   { href: "https://web.facebook.com/profile.php?id=61590493419291", label: "Facebook", Icon: IconFacebook },
   { href: "https://www.instagram.com/booksplatform.ai", label: "Instagram", Icon: IconInstagram },
   { href: "https://t.me/booksplatform", label: "Telegram", Icon: IconTelegram },
-  { href: "https://youtube.com", label: "YouTube", Icon: IconYoutube },
+  { href: "https://www.youtube.com/@Podcast.BooksPlatform", label: "YouTube", Icon: IconYoutube },
   { href: "https://linkedin.com", label: "LinkedIn", Icon: IconLinkedin },
 ] as const;
