@@ -22,7 +22,7 @@ export const ABOUT_IMAGES = {
   auth: "/about/auth.webp",
   authorDefault: "/about/author-default.webp",
   servicesHero: "/about/hero.webp",
-  servicesBibliography: "/about/vision.webp",
+  servicesBibliography: "/about/intro.webp",
   aboutHero1: "/about/gallery-1.webp",
   aboutHero2: "/about/gallery-2.webp",
   aboutHero3: "/about/gallery-3.webp",
