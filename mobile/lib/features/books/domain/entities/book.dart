@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/enums/translation_status.dart';
 import '../enums/purchase_option.dart';
+import 'book_author_ref.dart';
+import 'book_category_ref.dart';
+import 'book_tag_ref.dart';
 
 class Book extends Equatable {
   const Book({
@@ -32,6 +35,19 @@ class Book extends Equatable {
     this.averageRating,
     this.ratingsCount,
     this.descriptionEn,
+    this.publisherNameEn = '',
+    this.publisherNameAr = '',
+    this.publisherAddress,
+    this.publisherWebsiteUrl,
+    this.languageCode,
+    this.editionAr,
+    this.publicationYear,
+    this.dimensions,
+    this.notes,
+    this.primaryCategory,
+    this.categories = const [],
+    this.authors = const [],
+    this.tags = const [],
   });
 
   final String id;
@@ -60,6 +76,29 @@ class Book extends Equatable {
   final double? averageRating;
   final int? ratingsCount;
   final String? descriptionEn;
+  final String publisherNameEn;
+  final String publisherNameAr;
+  final String? publisherAddress;
+  final String? publisherWebsiteUrl;
+  final String? languageCode;
+  final String? editionAr;
+  final int? publicationYear;
+  final String? dimensions;
+  final String? notes;
+  final BookCategoryRef? primaryCategory;
+  final List<BookCategoryRef> categories;
+  final List<BookAuthorRef> authors;
+  final List<BookTagRef> tags;
+
+  String categoryDisplayName(String locale) {
+    if (primaryCategory != null) {
+      return primaryCategory!.displayName(locale);
+    }
+    if (categories.isNotEmpty) {
+      return categories.first.displayName(locale);
+    }
+    return '';
+  }
 
   @override
   List<Object?> get props => [id, titleAr, titleEn, status, price, categorySlug, isNew, slug];

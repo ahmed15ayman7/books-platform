@@ -45,7 +45,7 @@ class BookDetailInfoSection extends StatelessWidget {
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Text(
-                _categoryName(book.categorySlug),
+                _categoryLabel(),
                 style: GoogleFonts.tajawal(
                   fontSize: 12.sp,
                   fontWeight: FontWeight.w700,
@@ -65,8 +65,6 @@ class BookDetailInfoSection extends StatelessWidget {
           ],
         ),
         SizedBox(height: 16.h),
-        BookDetailBiblioTable(book: book, locale: locale),
-        SizedBox(height: 20.h),
         Text(
           'book_detail.description'.tr(),
           style: GoogleFonts.cairo(
@@ -100,6 +98,8 @@ class BookDetailInfoSection extends StatelessWidget {
             ),
           ),
         ),
+        SizedBox(height: 20.h),
+        BookDetailBiblioTable(book: book, locale: locale),
         SizedBox(height: 18.h),
         SizedBox(
           width: double.infinity,
@@ -146,7 +146,13 @@ class BookDetailInfoSection extends StatelessWidget {
     );
   }
 
-  String _categoryName(String slug) => switch (slug) {
+  String _categoryLabel() {
+    final fromApi = book.categoryDisplayName(locale);
+    if (fromApi.isNotEmpty) return fromApi;
+    return _categoryNameFromSlug(book.categorySlug);
+  }
+
+  String _categoryNameFromSlug(String slug) => switch (slug) {
         'ideas-and-policies' => 'categories.ideas_and_policies'.tr(),
         'social-studies' => 'categories.social_studies'.tr(),
         'philosophies-and-cultures' =>
