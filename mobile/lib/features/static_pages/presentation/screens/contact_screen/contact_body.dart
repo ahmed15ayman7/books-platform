@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
 
+import 'package:booksplatform/core/constants/social_icon_assets.dart';
+import 'package:booksplatform/core/constants/social_links.dart';
+import 'package:booksplatform/core/di/injection_container.dart';
+import 'package:booksplatform/core/helpers/url_launcher_helper.dart';
 import 'package:booksplatform/core/theme/app_colors.dart';
 import 'package:booksplatform/features/static_pages/presentation/widgets/info_page_hero.dart';
 
@@ -42,12 +46,36 @@ const _sendAnotherLabel = (ar: 'إرسال رسالة أخرى', en: 'Send anoth
 
 // Social network items
 const _socials = [
-  (label: 'X', icon: Icons.close_rounded),
-  (label: 'f', icon: Icons.facebook_outlined),
-  (label: '📷', icon: Icons.camera_alt_outlined),
-  (label: '✈', icon: Icons.send_rounded),
-  (label: '▶', icon: Icons.smart_display_outlined),
-  (label: 'in', icon: Icons.business_center_outlined),
+  (
+    assetPath: SocialIconAssets.x,
+    url: SocialLinks.x,
+    semanticsLabel: 'X',
+  ),
+  (
+    assetPath: SocialIconAssets.facebook,
+    url: SocialLinks.facebook,
+    semanticsLabel: 'Facebook',
+  ),
+  (
+    assetPath: SocialIconAssets.instagram,
+    url: SocialLinks.instagram,
+    semanticsLabel: 'Instagram',
+  ),
+  (
+    assetPath: SocialIconAssets.telegram,
+    url: SocialLinks.telegram,
+    semanticsLabel: 'Telegram',
+  ),
+  (
+    assetPath: SocialIconAssets.youtube,
+    url: SocialLinks.youtube,
+    semanticsLabel: 'YouTube',
+  ),
+  (
+    assetPath: SocialIconAssets.linkedIn,
+    url: SocialLinks.linkedIn,
+    semanticsLabel: 'LinkedIn',
+  ),
 ];
 
 // ── Widget ─────────────────────────────────────────────────────────────────
@@ -104,7 +132,8 @@ class ContactBody extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.85), size: 34.r),
                 SizedBox(height: 10.h),
                 GestureDetector(
-                  onTap: () => launchUrl(Uri.parse(_phoneDialUri)),
+                  onTap: () => getIt<UrlLauncherHelper>()
+                      .launchExternalUrl(_phoneDialUri),
                   child: Text(
                     _phone,
                     textDirection: TextDirection.ltr,
@@ -134,21 +163,24 @@ class ContactBody extends StatelessWidget {
                       .map((em) => Padding(
                             padding: EdgeInsets.only(bottom: 11.h),
                             child: GestureDetector(
-                              onTap: () =>
-                                  launchUrl(Uri.parse('mailto:$em')),
+                              onTap: () => getIt<UrlLauncherHelper>()
+                                  .launchExternalUrl('mailto:$em'),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(Icons.mail_outline_rounded,
                                       color: AppColors.primary, size: 17.r),
                                   SizedBox(width: 9.w),
-                                  Text(
-                                    em,
-                                    textDirection: TextDirection.ltr,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 13.5.sp,
-                                      color: Colors.white
-                                          .withValues(alpha: 0.9),
+                                  Flexible(
+                                    child: Text(
+                                      em,
+                                      textDirection: TextDirection.ltr,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 13.5.sp,
+                                        color: Colors.white
+                                            .withValues(alpha: 0.9),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -166,10 +198,11 @@ class ContactBody extends StatelessWidget {
         Padding(
           padding: EdgeInsetsDirectional.fromSTEB(16.w, 20.h, 16.w, 0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
                 localizedText(_followLabel, lang),
+                textAlign: TextAlign.center,
                 style: GoogleFonts.cairo(
                   fontSize: 13.sp,
                   fontWeight: FontWeight.w700,
@@ -177,22 +210,20 @@ class ContactBody extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 11.h),
-              Wrap(
-                spacing: 10.w,
-                runSpacing: 10.h,
-                children: _socials
-                    .map((s) => Container(
-                          width: 44.r,
-                          height: 44.r,
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            border: Border.all(color: AppColors.divider),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(s.icon,
-                              color: AppColors.textPrimary, size: 20.r),
-                        ))
-                    .toList(),
+              SizedBox(
+                width: double.infinity,
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 10.w,
+                  runSpacing: 10.h,
+                  children: _socials
+                      .map((s) => _SocialIcon(
+                            assetPath: s.assetPath,
+                            url: s.url,
+                            semanticsLabel: s.semanticsLabel,
+                          ))
+                      .toList(),
+                ),
               ),
             ],
           ),
@@ -482,6 +513,62 @@ class _Field extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+// ── Social icon ────────────────────────────────────────────────────────────
+
+class _SocialIcon extends StatelessWidget {
+  const _SocialIcon({
+    required this.assetPath,
+    required this.url,
+    required this.semanticsLabel,
+  });
+
+  final String assetPath;
+  final String? url;
+  final String semanticsLabel;
+
+  bool get _isActive => url != null;
+
+  @override
+  Widget build(BuildContext context) {
+    final child = Opacity(
+      opacity: _isActive ? 1 : 0.45,
+      child: Container(
+        width: 44.r,
+        height: 44.r,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          border: Border.all(color: AppColors.divider),
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: SvgPicture.asset(
+            assetPath,
+            width: 20.r,
+            height: 20.r,
+          ),
+        ),
+      ),
+    );
+
+    return Semantics(
+      label: semanticsLabel,
+      button: _isActive,
+      enabled: _isActive,
+      child: _isActive
+          ? Material(
+              color: Colors.transparent,
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: () =>
+                    getIt<UrlLauncherHelper>().launchExternalUrl(url!),
+                child: child,
+              ),
+            )
+          : child,
     );
   }
 }
