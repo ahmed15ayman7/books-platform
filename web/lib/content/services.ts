@@ -100,84 +100,84 @@ const outputMapBlocks: OutputMapBlock[] = [
     ],
   },
   {
-    key: "specialized",
-    title: { ar: "كتب متخصصة", en: "Specialized Books" },
+    key: "nominated-for-translation",
+    title: { ar: "كتب مرشحة للترجمة", en: "Books nominated for translation" },
     body: {
-      ar: "مكتبة إلكترونية متخصصة في مجالات الفكر والسياسة والاجتماع.",
-      en: "A specialized digital library in the fields of thought, politics, and society.",
+      ar: "قسم مخصص لعرض (أحدث وأهم) الكتب الواردة المنشورة على المنصة من كل الأقسام والتصنيفات ومن جميع اللغات.",
+      en: "A section dedicated to displaying (the latest and most important) incoming books published on the platform from all sections and categories and from all languages.",
     },
   },
   {
-    key: "literary-studies",
-    title: { ar: "أدب، دراسات نقدية", en: "Literature & Critical Studies" },
+    key: "translated-books",
+    title: { ar: "كتب مترجمة", en: "Translated Books" },
     body: {
-      ar: "قسم متخصص يعنى بأهم المراجع والدراسات النقدية في مختلف المجالات الأدبية والفكرية ومن جميع اللغات.",
-      en: "A specialized section covering the most important references and critical studies across literary and intellectual fields, in all languages.",
+      ar: "قسم خاص يقدم فيه أحدث الكتب الاجنبية المترجمة إلى العربية.",
+      en: "A special section that presents the latest foreign books translated into Arabic.",
+    },
+  },
+  {
+    key: "publishers",
+    title: { ar: "ناشرون", en: "Publishers" },
+    body: {
+      ar: "صفحة تعريفية لدور النشر (العربية والأجنبية) وتصنيفها بحسب البلد، وربطها بالكتب المنشورة لها على المنصة، مع موقعها الالكتروني وبريدها الالكتروني.",
+      en: "A page introducing the publishing houses (Arabic and foreign) and classifying them by country, linking them to the books published by them on the platform, along with their website and email address.",
     },
   },
   {
     key: "publish-book",
     title: { ar: "انشر كتابك", en: "Publish Your Book" },
     body: {
-      ar: "يتيح هذا القسم من منصة الكتب العالمية مساحة خاصة للتعرف على إبداعات شباب الكتاب والادباء والباحثين العرب، الذين يريدون نشر أعمالهم الأولى، والمساعدة على ترويجها وعرضها أمام جمهور القرّاء والناشرين والمعنيين بالثقافة والنشر.",
-      en: "This section of Books Platform provides a dedicated space to discover the creative works of young Arab writers, authors, and researchers who wish to publish their first works, helping promote and showcase them before readers, publishers, and those involved in culture and publishing.",
-    },
-  },
-  {
-    key: "authors",
-    title: { ar: "مؤلفون", en: "Authors" },
-    body: {
-      ar: "نافذة تطل على سيرة أهم المؤلفين والمفكرين والمبدعين، وترصد أعمالهم الفكرية والأدبية، وما قيل عنهم في الصحافة العربية والعالمية في مختلف العصور.",
-      en: "A window onto the lives of leading authors, thinkers, and creators; tracking their intellectual and literary works and what has been written about them in Arabic and international press across the ages.",
-    },
-  },
-  {
-    key: "books-sky",
-    title: { ar: "سماء الكتب", en: "Books Sky" },
-    body: {
-      ar: "آفاق معرفية متخصصة ترصد أهم الإصدارات العربية والعالمية، وتتناول كل جديد في عالم النشر.",
-      en: "Specialized knowledge horizons tracking the most important Arabic and international releases, covering everything new in the publishing world.",
+      ar: "يعرض نبذات عن كتب وأعمال المؤلفين والأدباء والكتاب، التي لم تطبع ولم تنشر بعد.. وكذلك عرض الاطروحات الاكاديمية للباحثين.. بهدف ترويجها وتعريف الناشرين بها.. تشجيعاً لشرائح كبيرة من الشباب على التأليف والإبداع.. ويمكن إتاحة خدمة الرفع والتنزيل المجاني للجمهور لمن يرغب من المؤلفين والكتاب.",
+      en: "It presents summaries of books and works by authors, writers, and authors that have not yet been printed or published. It also presents academic theses by researchers, with the aim of promoting them and introducing them to publishers, encouraging large segments of young people to write and create. Free upload and download service can be made available to the public for any authors and writers who wish to do so.",
     },
   },
   {
     key: "world-reads",
-    title: { ar: "العالم يقرأ", en: "The World Reads" },
+    title: { ar: " العالم يقرأ", en: "World Reads" },
     body: {
-      ar: "رصد يومي لأبرز ما تنشره الصحافة العالمية في مجالات الفكر والأدب.",
-      en: "Daily monitoring of the most prominent coverage in international press on thought and literature.",
+      ar: "أخبار ونشرات صحفية يومية عن أهم الكتب الصادرة حديثا.",
+      en: "Daily news and press releases about the most important newly published books.",
     },
   },
   {
-    key: "learning-radar",
-    title: { ar: "رصد التعلم", en: "Learning Radar" },
+    key: "book-harvest",
+    title: { ar: "حصاد الكتب", en: "Book Harvest" },
     body: {
-      ar: "قسم يعنى برصد كل ما هو جديد في مجالات التعليم والتدريب، وتنمية القدرات والمهارات الشخصية والمهنية.",
-      en: "A section dedicated to monitoring everything new in education and training, and personal and professional skills development.",
+      ar: "تقارير دورية متخصصة لاهم الكتب الصادرة في مجالات وتصانيف (الادب – والفكر – والثقافة – والعلوم – والفنون) – لكل تصنيف تقرير منفصل.",
+      en: "Specialized periodic reports on the most important books published in the fields and categories of (literature, thought, culture, science, and arts) - a separate report for each category.",
     },
   },
   {
-    key: "reading-scenes",
-    title: { ar: "مشاهد القراءة", en: "Reading Scenes" },
+    key: "ideas-butter",
+    title: { ar: "زبدة الافكار", en: "Ideas Butter" },
     body: {
-      ar: "جولة بصرية بين أهم الأماكن والمؤسسات الثقافية، والمكتبات العامة والخاصة، التي تعنى بنشر الثقافة والمعرفة حول العالم.",
-      en: "A visual tour of leading cultural venues and institutions, public and private libraries devoted to spreading culture and knowledge worldwide.",
+      ar: "قسم خاص للباحثين والمثقفين يقدم قراءات تحليلية ومعمقة للكتب المهمة الصادرة حديثا.",
+      en: "A special section for researchers and intellectuals offers in-depth analytical readings of important recently published books."
+    }
+  },
+  {
+    key: "see-your-book",
+    title: { ar: "شاهد كتابك", en: "See your book" },
+    body: {
+      ar: "فيديوهات قصيرة عن أهم الكتب الأجنبية والعربية الصادرة حديثا. ويتم ربطه بقناة اليوتيوب والتيك توك ومنصات السوشيال ميديا.",
+      en: "Short videos about the most important recently published foreign and Arabic books. These are linked to YouTube, TikTok, and other social media platforms."
     },
   },
   {
-    key: "book-life",
-    title: { ar: "حياة كتاب", en: "A Book's Life" },
+    key: "book-talks",
+    title: { ar: "حديث الكتب", en: "Book Talks" },
     body: {
-      ar: "مقالات متخصصة تتناول السيرة الذاتية لبعض الكتب، وتاريخ صدورها، وأبرز ما قيل عنها.",
-      en: "Specialized articles exploring the biographies of selected books, their publication history, and the most notable commentary about them.",
-    },
+      ar: "مقاطع صوتية عن الكتب الجديدة – في عرض سريع وموجز في حدود (3 – 5 دقائق).",
+      en: "Audio clips about new books – in a quick and concise presentation within (3-5 minutes)."
+    }
   },
   {
-    key: "novel-story",
-    title: { ar: "رواية في حكاية", en: "Novel in a Story" },
+    key: "novel-within-a-story",
+    title: { ar: "رواية في حكاية", en: "Novel within a story" },
     body: {
-      ar: "فيديوهات قصيرة تتناول ملخصات لأهم الكتب العربية والعالمية، بأسلوب مشوق يعتمد بالأساس على الصورة، وبما يواكب ما يتم تداوله عبر منصات التواصل الاجتماعي والمنصات الرقمية.",
-      en: "Short videos presenting summaries of important Arabic and international books in an engaging, image-led style aligned with trends on social media and digital platforms.",
-    },
+      ar: "فيديوهات مختصر ة للروايات الشهيرة لكبار الأدباء العرب والعالميين – في قالب مبتكر ومشوق بأدوات AI يحكي الرواية باسلوب سينمائي للتشجيع على قراءتها والالمام بمضمونها.",
+      en: "Short videos of famous novels by leading Arab and international writers – in an innovative and exciting format using AI tools that tell the story in a cinematic style to encourage reading and understanding its content."
+    }
   },
 ];
 
@@ -258,8 +258,8 @@ export function getServicesContent(locale: Locale): ServicesPageContent {
   };
 
   const bibliographyBody: BilingualString = {
-    ar: "من أهم المخرجات التي سعت المنصة لتقديمها هي الببليوغرافيا، حيث توفر المنصة قاعدة بيانات ببليوغرافية متكاملة عن الكتب المترجمة من اللغة العربية وإلى عدد من اللغات العالمية، وهي في هذا السياق تهدف لتسهيل عملية الوصول للمعلومات الببليوغرافية، كما تهدف أيضاً إلى تسليط الضوء على حركة الترجمة من العربية وإليها، وتوفير أداة بحثية هامة للباحثين والمترجمين والناشرين، وتتضمن الببليوغرافيا بيانات تفصيلية عن الكتب المترجمة، بما في ذلك بيانات المؤلفين والمترجمين والناشرين، وتاريخ النشر، واللغة الأصلية، واللغة المترجم إليها، وغيرها من البيانات الهامة.",
-    en: "Among the most important outputs the platform has sought to provide is the bibliography. The platform offers an integrated bibliographic database of books translated from Arabic into a number of world languages. In this context, it aims to facilitate access to bibliographic information, shed light on the translation movement to and from Arabic, and provide an important research tool for researchers, translators, and publishers. The bibliography includes detailed data on translated books, including authors, translators, publishers, publication date, original language, target language, and other important data.",
+    ar: "من أهم المخرجات الأساسية لـ”منصة الكتب العالمية” توفير بيانات ببليوغرافية حديثة وكاملة عن الكتب الجديدة والمهمة التي تصدر في العالم مترجمة إلى اللغة العربية، وفي هذا الخصوص يقوم المشروع بتقديم خدمة توفير هذه البيانات الببليوغرافية المتجددة “يوميًّا”.. إلى المكتبات الوطنية ومراكز البحوث والدراسات ودور النشر العربية الكبرى المعنية بحركة الترجمة، ويتم انتقاء نوعية الكتب من بين أحدث الإصدارات التي تُنشر في جميع أنحاء العالم وبكل اللغات؛ طبقاً لمعايير محددة تراعي مجالات الجهة التي تطلب الاستفادة من الخدمة وخصوصياتها.",
+    en: "One of the most important basic outputs of the “Global Books Platform” is providing up-to-date and complete bibliographic data on new and important books published worldwide translated into Arabic. In this regard, the project provides a service to provide this updated bibliographic data “daily” to national libraries, research and studies centers, and major Arab publishing houses concerned with the translation movement. The quality of books is selected from among the latest publications published worldwide and in all languages, according to specific criteria that take into account the fields and specificities of the entity requesting to benefit from the service.",
   };
 
   const closing: BilingualString = {
