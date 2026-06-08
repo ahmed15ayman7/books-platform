@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/branding_logo_plate.dart';
 import '../../domain/entities/hero_slide.dart';
 
 class HomeHeroCarouselWidget extends StatefulWidget {
@@ -146,98 +147,103 @@ class _HeroSlidePage extends StatelessWidget {
         ? slide.subtitleAr
         : (slide.subtitleEn ?? slide.subtitleAr);
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        CachedNetworkImage(
-          imageUrl: slide.imageUrl,
-          fit: BoxFit.cover,
-          placeholder: (_, _) => ColoredBox(color: AppColors.secondary),
-          errorWidget: (_, _, _) => ColoredBox(color: AppColors.secondary),
-        ),
-        if (slide.foregroundImageUrl != null)
-          CachedNetworkImage(
-            imageUrl: slide.foregroundImageUrl!,
-            fit: BoxFit.contain,
-            alignment: Alignment.center,
-            placeholder: (_, _) => const SizedBox.shrink(),
-            errorWidget: (_, _, _) => const SizedBox.shrink(),
-          ),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: AlignmentDirectional.topCenter,
-              end: AlignmentDirectional.bottomCenter,
-              colors: [
-                Colors.black.withValues(alpha: 0.25),
-                Colors.black.withValues(alpha: 0.45),
-                Colors.black.withValues(alpha: 0.85),
-              ],
+    return CachedNetworkImage(
+      imageUrl: slide.imageUrl,
+      fit: BoxFit.cover,
+      placeholder: (_, _) => BrandingLogoPlate(
+        logoWidth: kHeroCarouselBrandingLogoWidth.w,
+      ),
+      errorWidget: (_, _, _) => BrandingLogoPlate(
+        logoWidth: kHeroCarouselBrandingLogoWidth.w,
+      ),
+      imageBuilder: (context, imageProvider) => Stack(
+        fit: StackFit.expand,
+        children: [
+          Image(image: imageProvider, fit: BoxFit.cover),
+          if (slide.foregroundImageUrl != null)
+            CachedNetworkImage(
+              imageUrl: slide.foregroundImageUrl!,
+              fit: BoxFit.contain,
+              alignment: Alignment.center,
+              placeholder: (_, _) => const SizedBox.shrink(),
+              errorWidget: (_, _, _) => const SizedBox.shrink(),
+            ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: AlignmentDirectional.topCenter,
+                end: AlignmentDirectional.bottomCenter,
+                colors: [
+                  Colors.black.withValues(alpha: 0.25),
+                  Colors.black.withValues(alpha: 0.45),
+                  Colors.black.withValues(alpha: 0.85),
+                ],
+              ),
             ),
           ),
-        ),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: AlignmentDirectional.centerStart,
-              end: AlignmentDirectional.centerEnd,
-              colors: [
-                Colors.black.withValues(alpha: 0.6),
-                Colors.transparent,
-                Colors.black.withValues(alpha: 0.3),
-              ],
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: AlignmentDirectional.centerStart,
+                end: AlignmentDirectional.centerEnd,
+                colors: [
+                  Colors.black.withValues(alpha: 0.6),
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.3),
+                ],
+              ),
             ),
           ),
-        ),
-        Padding(
-          padding: EdgeInsetsDirectional.fromSTEB(
-            20.w,
-            16.h,
-            20.w,
-            reserveDotSpace ? 36.h : 16.h,
-          ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.cairo(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    height: 1.4,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black.withValues(alpha: 0.4),
-                        blurRadius: 10,
-                      ),
-                    ],
-                  ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (subtitle != null && subtitle.isNotEmpty) ...[
-                  SizedBox(height: 8.h),
+          Padding(
+            padding: EdgeInsetsDirectional.fromSTEB(
+              20.w,
+              16.h,
+              20.w,
+              reserveDotSpace ? 36.h : 16.h,
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   Text(
-                    subtitle,
+                    title,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.cairo(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white.withValues(alpha: 0.9),
-                      height: 1.5,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      height: 1.4,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withValues(alpha: 0.4),
+                          blurRadius: 10,
+                        ),
+                      ],
                     ),
-                    maxLines: 2,
+                    maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  if (subtitle != null && subtitle.isNotEmpty) ...[
+                    SizedBox(height: 8.h),
+                    Text(
+                      subtitle,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.cairo(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withValues(alpha: 0.9),
+                        height: 1.5,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

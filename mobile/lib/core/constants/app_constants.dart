@@ -30,4 +30,5 @@ const String kNotifOptInKey = 'notif_opt_in';
 
 // Branding assets
 const String kBrandingLogoAsset = 'assets/branding/logo.webp';
+const double kHeroCarouselBrandingLogoWidth = 140.0;
 const String kBrandingAppIconAsset = 'assets/branding/app_icon_1024.png';
