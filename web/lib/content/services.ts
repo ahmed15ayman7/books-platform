@@ -119,8 +119,8 @@ const outputMapBlocks: OutputMapBlock[] = [
     key: "publish-book",
     title: { ar: "انشر كتابك", en: "Publish Your Book" },
     body: {
-      ar: "خدمة تتيح لكل من لديه فكرة أو عمل إبداعي رائد أن يتقدم بطلبه لنشر عمله، وسوف تخضع كافة الطلبات للتقييم من قبل لجان متخصصة، لضمان جودة المحتوى المقدم، بما يتناسب مع المعايير الفكرية والأدبية للمنصة، وبما يخدم رسالتها في نشر المعرفة والفكر.",
-      en: "A service allowing anyone with a pioneering idea or creative work to apply to publish it. All submissions are evaluated by specialized committees to ensure content quality meets the platform's intellectual and literary standards and serves its mission of disseminating knowledge and thought.",
+      ar: "يتيح هذا القسم من منصة الكتب العالمية مساحة خاصة للتعرف على إبداعات شباب الكتاب والادباء والباحثين العرب، الذين يريدون نشر أعمالهم الأولى، والمساعدة على ترويجها وعرضها أمام جمهور القرّاء والناشرين والمعنيين بالثقافة والنشر.",
+      en: "This section of Books Platform provides a dedicated space to discover the creative works of young Arab writers, authors, and researchers who wish to publish their first works, helping promote and showcase them before readers, publishers, and those involved in culture and publishing.",
     },
   },
   {
