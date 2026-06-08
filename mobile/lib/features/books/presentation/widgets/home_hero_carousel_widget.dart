@@ -104,10 +104,12 @@ class _HomeHeroCarouselWidgetState extends State<HomeHeroCarouselWidget> {
               controller: _pageController,
               onPageChanged: _onPageChanged,
               itemCount: widget.slides.length,
-              itemBuilder: (_, index) => _HeroSlidePage(
-                slide: widget.slides[index],
-                locale: widget.locale,
-                reserveDotSpace: showDots,
+              itemBuilder: (_, index) => SizedBox.expand(
+                child: _HeroSlidePage(
+                  slide: widget.slides[index],
+                  locale: widget.locale,
+                  reserveDotSpace: showDots,
+                ),
               ),
             ),
             if (showDots)
@@ -146,36 +148,11 @@ class _HeroSlidePage extends StatelessWidget {
         ? slide.subtitleAr
         : (slide.subtitleEn ?? slide.subtitleAr);
 
-    if (slide.isLocalAsset) {
-      return _HeroSlideStack(
-        slide: slide,
-        title: title,
-        subtitle: subtitle,
-        reserveDotSpace: reserveDotSpace,
-        background: ColoredBox(
-          color: AppColors.secondary,
-          child: Center(
-            child: Image.asset(
-              slide.imageUrl,
-              width: kHeroCarouselBrandingLogoWidth.w,
-            ),
-          ),
-        ),
-      );
-    }
-
-    return CachedNetworkImage(
-      imageUrl: slide.imageUrl,
-      fit: BoxFit.cover,
-      placeholder: (_, _) => const ColoredBox(color: AppColors.shimmerBase),
-      errorWidget: (_, _, _) => const ColoredBox(color: AppColors.shimmerBase),
-      imageBuilder: (context, imageProvider) => _HeroSlideStack(
-        slide: slide,
-        title: title,
-        subtitle: subtitle,
-        reserveDotSpace: reserveDotSpace,
-        background: Image(image: imageProvider, fit: BoxFit.cover),
-      ),
+    return _HeroSlideStack(
+      slide: slide,
+      title: title,
+      subtitle: subtitle,
+      reserveDotSpace: reserveDotSpace,
     );
   }
 }
@@ -186,52 +163,56 @@ class _HeroSlideStack extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.reserveDotSpace,
-    required this.background,
   });
 
   final HeroSlide slide;
   final String title;
   final String? subtitle;
   final bool reserveDotSpace;
-  final Widget background;
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       fit: StackFit.expand,
       children: [
-        background,
+        Positioned.fill(child: _HeroSlideBackground(slide: slide)),
         if (slide.foregroundImageUrl != null)
-          CachedNetworkImage(
-            imageUrl: slide.foregroundImageUrl!,
-            fit: BoxFit.contain,
-            alignment: Alignment.center,
-            placeholder: (_, _) => const SizedBox.shrink(),
-            errorWidget: (_, _, _) => const SizedBox.shrink(),
+          Positioned.fill(
+            child: CachedNetworkImage(
+              imageUrl: slide.foregroundImageUrl!,
+              fit: BoxFit.contain,
+              alignment: Alignment.center,
+              placeholder: (_, _) => const SizedBox.shrink(),
+              errorWidget: (_, _, _) => const SizedBox.shrink(),
+            ),
           ),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: AlignmentDirectional.topCenter,
-              end: AlignmentDirectional.bottomCenter,
-              colors: [
-                Colors.black.withValues(alpha: 0.25),
-                Colors.black.withValues(alpha: 0.45),
-                Colors.black.withValues(alpha: 0.85),
-              ],
+        Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: AlignmentDirectional.topCenter,
+                end: AlignmentDirectional.bottomCenter,
+                colors: [
+                  Colors.black.withValues(alpha: 0.25),
+                  Colors.black.withValues(alpha: 0.45),
+                  Colors.black.withValues(alpha: 0.85),
+                ],
+              ),
             ),
           ),
         ),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: AlignmentDirectional.centerStart,
-              end: AlignmentDirectional.centerEnd,
-              colors: [
-                Colors.black.withValues(alpha: 0.6),
-                Colors.transparent,
-                Colors.black.withValues(alpha: 0.3),
-              ],
+        Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: AlignmentDirectional.centerStart,
+                end: AlignmentDirectional.centerEnd,
+                colors: [
+                  Colors.black.withValues(alpha: 0.6),
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.3),
+                ],
+              ),
             ),
           ),
         ),
@@ -286,6 +267,43 @@ class _HeroSlideStack extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _HeroSlideBackground extends StatelessWidget {
+  const _HeroSlideBackground({required this.slide});
+
+  final HeroSlide slide;
+
+  @override
+  Widget build(BuildContext context) {
+    if (slide.isLocalAsset) {
+      return ColoredBox(
+        color: AppColors.secondary,
+        child: Center(
+          child: Image.asset(
+            slide.imageUrl,
+            width: kHeroCarouselBrandingLogoWidth.w,
+          ),
+        ),
+      );
+    }
+
+    if (slide.imageUrl.isEmpty) {
+      return const ColoredBox(color: AppColors.shimmerBase);
+    }
+
+    return Image.network(
+      slide.imageUrl,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      loadingBuilder: (context, child, progress) {
+        if (progress == null) return child;
+        return const ColoredBox(color: AppColors.shimmerBase);
+      },
+      errorBuilder: (_, _, _) => const ColoredBox(color: AppColors.shimmerBase),
     );
   }
 }
