@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../domain/entities/category.dart';
 import '../../cubit/home_content_cubit/home_content_state.dart';
-import '../../widgets/featured_book_hero_widget.dart';
+import '../../widgets/home_hero_carousel_widget.dart';
 import 'home_books_carousel_section.dart';
 import 'home_categories_section.dart';
 import 'home_newsletter_strip.dart';
@@ -39,15 +39,11 @@ class HomeBody extends StatelessWidget {
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          if (state.featured.isNotEmpty)
+          if (state.heroSlides.isNotEmpty)
             SliverToBoxAdapter(
-              child: FeaturedBookHeroWidget(
-                book: state.featured.first,
+              child: HomeHeroCarouselWidget(
+                slides: state.heroSlides,
                 locale: locale,
-                onTap: () => onBookTap(
-                  state.featured.first.slug,
-                  state.featured.first.titleAr,
-                ),
               ),
             ),
           if (state.categories.isNotEmpty)

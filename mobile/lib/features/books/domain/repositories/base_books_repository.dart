@@ -7,11 +7,12 @@ import '../entities/book.dart';
 import '../entities/book_stats.dart';
 import '../entities/category.dart';
 import '../entities/category_section.dart';
+import '../entities/hero_slide.dart';
 import '../entities/publisher_summary.dart';
 import '../entities/sort_order.dart';
 
 abstract class BooksRepository {
-  Future<Either<Failure, List<Book>>> getFeaturedBooks();
+  Future<Either<Failure, List<HeroSlide>>> getHeroSlides();
 
   Future<Either<Failure, PaginatedResponse<Book>>> getBooks({
     String? categorySlug,

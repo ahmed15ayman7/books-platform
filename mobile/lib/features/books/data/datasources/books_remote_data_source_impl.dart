@@ -9,12 +9,14 @@ import '../../domain/entities/book.dart';
 import '../../domain/entities/book_stats.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/category_section.dart';
+import '../../domain/entities/hero_slide.dart';
 import '../../domain/entities/publisher_summary.dart';
 import '../../domain/entities/sort_order.dart';
 import '../models/book_model.dart';
 import '../models/book_stats_model.dart';
 import '../models/category_model.dart';
 import '../models/category_section_model.dart';
+import '../models/hero_slide_model.dart';
 
 @lazySingleton
 class BooksRemoteDataSourceImpl {
@@ -22,17 +24,14 @@ class BooksRemoteDataSourceImpl {
 
   final ApiManager _api;
 
-  Future<Either<Failure, List<Book>>> getFeaturedBooks() => _api.get(
-        path: '/books',
-        queryParameters: {
-          'status': 'TRANSLATED',
-          'sort': 'newest',
-          'limit': 10,
+  Future<Either<Failure, List<HeroSlide>>> getHeroSlides() => _api.get(
+        path: '/hero-slides',
+        fromJson: (json) {
+          final list = (json as Map<String, dynamic>)['data'] as List<dynamic>;
+          return list
+              .map((e) => HeroSlideModel.fromJson(e as Map<String, dynamic>).toEntity())
+              .toList();
         },
-        fromJson: (json) => PaginatedResponse<BookModel>.fromJson(
-          json,
-          fromJsonT: BookModel.fromJson,
-        ).data.map((m) => m.toEntity()).toList(),
       );
 
   Future<Either<Failure, PaginatedResponse<Book>>> getBooks({

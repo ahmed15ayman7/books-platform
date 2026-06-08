@@ -8,6 +8,7 @@ import 'package:booksplatform/core/network/api_manager.dart';
 import 'package:booksplatform/features/books/data/datasources/books_remote_data_source_impl.dart';
 import 'package:booksplatform/features/books/domain/entities/book.dart';
 import 'package:booksplatform/features/books/domain/entities/book_stats.dart';
+import 'package:booksplatform/features/books/domain/entities/hero_slide.dart';
 
 class MockApiManager extends Mock implements ApiManager {}
 
@@ -144,33 +145,49 @@ void main() {
       expect(capturedParams?.containsKey('status'), false);
     });
 
-    test('getFeaturedBooks sends translationStatus=TRANSLATED (not status)', () async {
-      final paginatedJson = {
-        'data': [],
-        'pagination': {
-          'page': 1,
-          'limit': 10,
-          'total': 0,
-          'totalPages': 0,
-          'hasNextPage': false,
-        }
+    test('getHeroSlides calls /hero-slides and maps HeroSlide entities', () async {
+      const envelopeJson = {
+        'success': true,
+        'data': [
+          {
+            'id': 'slide-1',
+            'titleAr': 'عنوان',
+            'titleEn': 'Title',
+            'subtitleAr': null,
+            'subtitleEn': null,
+            'imageUrl': 'https://example.com/slide.jpg',
+            'foregroundImageUrl': null,
+            'linkUrl': null,
+            'position': 0,
+          },
+        ],
       };
 
-      Map<String, dynamic>? capturedParams;
-      when(() => mockApiManager.get<List<Book>>(
+      String? capturedPath;
+      when(() => mockApiManager.get<List<HeroSlide>>(
             path: any(named: 'path'),
             queryParameters: any(named: 'queryParameters'),
             fromJson: any(named: 'fromJson'),
           )).thenAnswer((inv) async {
-        capturedParams = inv.namedArguments[#queryParameters]
-            as Map<String, dynamic>?;
+        capturedPath = inv.namedArguments[#path] as String?;
         final fromJson = inv.namedArguments[#fromJson] as Function;
-        return Right(fromJson(paginatedJson) as List<Book>);
+        return Right(fromJson(envelopeJson) as List<HeroSlide>);
       });
 
-      await dataSource.getFeaturedBooks();
-      expect(capturedParams?['translationStatus'], 'TRANSLATED');
-      expect(capturedParams?.containsKey('status'), false);
+      final result = await dataSource.getHeroSlides();
+
+      expect(capturedPath, '/hero-slides');
+      expect(result.isRight(), true);
+      result.fold(
+        (_) => fail('expected Right'),
+        (slides) {
+          expect(slides, hasLength(1));
+          expect(slides.first.id, 'slide-1');
+          expect(slides.first.titleAr, 'عنوان');
+          expect(slides.first.titleEn, 'Title');
+          expect(slides.first.imageUrl, 'https://example.com/slide.jpg');
+        },
+      );
     });
   });
 }

@@ -17,20 +17,19 @@ class HomeContentCubit extends Cubit<HomeContentState> {
     emit(const HomeContentLoading());
 
     // Fire all requests concurrently before first await.
-    final featuredFuture = _repo.getFeaturedBooks();
+    final heroSlidesFuture = _repo.getHeroSlides();
     final newlyReleasedFuture = _repo.getNewlyReleasedBooks();
     final translatedFuture = _repo.getTranslatedBooks();
     final categorySectionsFuture = _repo.getCategorySections();
     final publishersFuture = _repo.getTopPublishers();
 
-    final featuredResult = await featuredFuture;
+    final heroSlidesResult = await heroSlidesFuture;
     final newlyReleasedResult = await newlyReleasedFuture;
     final translatedResult = await translatedFuture;
     final categorySectionsResult = await categorySectionsFuture;
     final publishersResult = await publishersFuture;
 
     for (final r in [
-      featuredResult,
       newlyReleasedResult,
       translatedResult,
       categorySectionsResult,
@@ -45,7 +44,7 @@ class HomeContentCubit extends Cubit<HomeContentState> {
     final categorySections = categorySectionsResult.getOrElse(() => []);
 
     emit(HomeContentSuccess(
-      featured: featuredResult.getOrElse(() => []),
+      heroSlides: heroSlidesResult.fold((_) => [], (slides) => slides),
       categories: categorySections.map((s) => s.category).toList(),
       freshBooks: newlyReleasedResult.getOrElse(() => []),
       translatedBooks: translatedResult.fold((_) => [], (p) => p.data),

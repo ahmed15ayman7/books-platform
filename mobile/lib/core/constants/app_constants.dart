@@ -6,6 +6,7 @@ const String kAppName = 'BooksPlatform';
 const Duration kAnimationDuration = Duration(milliseconds: 300);
 const Duration kSplashDuration = Duration(milliseconds: 2500);
 const Duration kSplashFadeDuration = Duration(milliseconds: 1000);
+const Duration kHeroCarouselAutoAdvanceDuration = Duration(seconds: 7);
 
 const int kDefaultPageSize = 20;
 

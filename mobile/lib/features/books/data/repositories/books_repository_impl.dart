@@ -8,6 +8,7 @@ import '../../domain/entities/book.dart';
 import '../../domain/entities/book_stats.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/category_section.dart';
+import '../../domain/entities/hero_slide.dart';
 import '../../domain/entities/publisher_summary.dart';
 import '../../domain/entities/sort_order.dart';
 import '../../domain/repositories/base_books_repository.dart';
@@ -20,8 +21,8 @@ class BooksRepositoryImpl implements BooksRepository {
   final BooksRemoteDataSourceImpl _remote;
 
   @override
-  Future<Either<Failure, List<Book>>> getFeaturedBooks() =>
-      _remote.getFeaturedBooks();
+  Future<Either<Failure, List<HeroSlide>>> getHeroSlides() =>
+      _remote.getHeroSlides();
 
   @override
   Future<Either<Failure, PaginatedResponse<Book>>> getBooks({
