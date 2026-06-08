@@ -11,6 +11,7 @@ class HeroSlide extends Equatable {
     this.foregroundImageUrl,
     this.linkUrl,
     required this.position,
+    this.isLocalAsset = false,
   });
 
   final String id;
@@ -22,6 +23,7 @@ class HeroSlide extends Equatable {
   final String? foregroundImageUrl;
   final String? linkUrl;
   final int position;
+  final bool isLocalAsset;
 
   @override
   List<Object?> get props => [id];

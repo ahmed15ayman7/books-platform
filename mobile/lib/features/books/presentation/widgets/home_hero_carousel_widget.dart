@@ -7,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/branding_logo_plate.dart';
 import '../../domain/entities/hero_slide.dart';
 
 class HomeHeroCarouselWidget extends StatefulWidget {
@@ -147,53 +146,96 @@ class _HeroSlidePage extends StatelessWidget {
         ? slide.subtitleAr
         : (slide.subtitleEn ?? slide.subtitleAr);
 
+    if (slide.isLocalAsset) {
+      return _HeroSlideStack(
+        slide: slide,
+        title: title,
+        subtitle: subtitle,
+        reserveDotSpace: reserveDotSpace,
+        background: ColoredBox(
+          color: AppColors.secondary,
+          child: Center(
+            child: Image.asset(
+              slide.imageUrl,
+              width: kHeroCarouselBrandingLogoWidth.w,
+            ),
+          ),
+        ),
+      );
+    }
+
     return CachedNetworkImage(
       imageUrl: slide.imageUrl,
       fit: BoxFit.cover,
-      placeholder: (_, _) => BrandingLogoPlate(
-        logoWidth: kHeroCarouselBrandingLogoWidth.w,
+      placeholder: (_, _) => const ColoredBox(color: AppColors.shimmerBase),
+      errorWidget: (_, _, _) => const ColoredBox(color: AppColors.shimmerBase),
+      imageBuilder: (context, imageProvider) => _HeroSlideStack(
+        slide: slide,
+        title: title,
+        subtitle: subtitle,
+        reserveDotSpace: reserveDotSpace,
+        background: Image(image: imageProvider, fit: BoxFit.cover),
       ),
-      errorWidget: (_, _, _) => BrandingLogoPlate(
-        logoWidth: kHeroCarouselBrandingLogoWidth.w,
-      ),
-      imageBuilder: (context, imageProvider) => Stack(
-        fit: StackFit.expand,
-        children: [
-          Image(image: imageProvider, fit: BoxFit.cover),
-          if (slide.foregroundImageUrl != null)
-            CachedNetworkImage(
-              imageUrl: slide.foregroundImageUrl!,
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              placeholder: (_, _) => const SizedBox.shrink(),
-              errorWidget: (_, _, _) => const SizedBox.shrink(),
-            ),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: AlignmentDirectional.topCenter,
-                end: AlignmentDirectional.bottomCenter,
-                colors: [
-                  Colors.black.withValues(alpha: 0.25),
-                  Colors.black.withValues(alpha: 0.45),
-                  Colors.black.withValues(alpha: 0.85),
-                ],
-              ),
+    );
+  }
+}
+
+class _HeroSlideStack extends StatelessWidget {
+  const _HeroSlideStack({
+    required this.slide,
+    required this.title,
+    required this.subtitle,
+    required this.reserveDotSpace,
+    required this.background,
+  });
+
+  final HeroSlide slide;
+  final String title;
+  final String? subtitle;
+  final bool reserveDotSpace;
+  final Widget background;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        background,
+        if (slide.foregroundImageUrl != null)
+          CachedNetworkImage(
+            imageUrl: slide.foregroundImageUrl!,
+            fit: BoxFit.contain,
+            alignment: Alignment.center,
+            placeholder: (_, _) => const SizedBox.shrink(),
+            errorWidget: (_, _, _) => const SizedBox.shrink(),
+          ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: AlignmentDirectional.topCenter,
+              end: AlignmentDirectional.bottomCenter,
+              colors: [
+                Colors.black.withValues(alpha: 0.25),
+                Colors.black.withValues(alpha: 0.45),
+                Colors.black.withValues(alpha: 0.85),
+              ],
             ),
           ),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: AlignmentDirectional.centerStart,
-                end: AlignmentDirectional.centerEnd,
-                colors: [
-                  Colors.black.withValues(alpha: 0.6),
-                  Colors.transparent,
-                  Colors.black.withValues(alpha: 0.3),
-                ],
-              ),
+        ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: AlignmentDirectional.centerStart,
+              end: AlignmentDirectional.centerEnd,
+              colors: [
+                Colors.black.withValues(alpha: 0.6),
+                Colors.transparent,
+                Colors.black.withValues(alpha: 0.3),
+              ],
             ),
           ),
+        ),
+        if (title.isNotEmpty)
           Padding(
             padding: EdgeInsetsDirectional.fromSTEB(
               20.w,
@@ -223,10 +265,11 @@ class _HeroSlidePage extends StatelessWidget {
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (subtitle != null && subtitle.isNotEmpty) ...[
+                  if (subtitle case final resolvedSubtitle?
+                      when resolvedSubtitle.isNotEmpty) ...[
                     SizedBox(height: 8.h),
                     Text(
-                      subtitle,
+                      resolvedSubtitle,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.cairo(
                         fontSize: 13.sp,
@@ -242,8 +285,7 @@ class _HeroSlidePage extends StatelessWidget {
               ),
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../../core/network/failure_messages.dart' as core;
+import '../../../domain/entities/branding_hero_slide.dart';
 import '../../../domain/repositories/base_books_repository.dart';
 import 'home_content_state.dart';
 
@@ -44,7 +45,9 @@ class HomeContentCubit extends Cubit<HomeContentState> {
     final categorySections = categorySectionsResult.getOrElse(() => []);
 
     emit(HomeContentSuccess(
-      heroSlides: heroSlidesResult.fold((_) => [], (slides) => slides),
+      heroSlides: withBrandingHeroSlide(
+        heroSlidesResult.fold((_) => [], (slides) => slides),
+      ),
       categories: categorySections.map((s) => s.category).toList(),
       freshBooks: newlyReleasedResult.getOrElse(() => []),
       translatedBooks: translatedResult.fold((_) => [], (p) => p.data),
