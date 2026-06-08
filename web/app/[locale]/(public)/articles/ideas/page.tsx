@@ -24,6 +24,7 @@ export default async function IdeasPage({ searchParams }: Props) {
     channel: "ideas",
     page,
     limit: PAGINATION.DEFAULT_PAGE_SIZE,
+    sort: "newest",
   }).catch(() => ({
     articles: [],
     pagination: {

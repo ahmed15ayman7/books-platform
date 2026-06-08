@@ -50,8 +50,8 @@ export function ArticleChannelPage({
   heroBgClass = "bg-[var(--brand-black)]",
 }: ArticleChannelPageProps) {
   const mappedArticles = articles.map((article) => mapArticleForCard(article, locale));
-  const featured = mappedArticles.find((a) => a.isFeatured) ?? mappedArticles[0];
-  const rest = mappedArticles.filter((a) => a.id !== featured?.id);
+  const featured = mappedArticles[0];
+  const rest = mappedArticles.slice(1);
 
   return (
     <div className="min-h-screen bg-[var(--brand-gray-50)]">

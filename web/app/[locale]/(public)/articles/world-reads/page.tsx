@@ -24,6 +24,7 @@ export default async function WorldReadsPage({ searchParams }: Props) {
     channel: "world-reads",
     page,
     limit: PAGINATION.DEFAULT_PAGE_SIZE,
+    sort: "newest",
   }).catch(() => ({
     articles: [],
     pagination: {

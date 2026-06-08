@@ -23,6 +23,7 @@ export default async function HarvestPage({ searchParams }: Props) {
     channel: "harvest",
     page,
     limit: PAGINATION.DEFAULT_PAGE_SIZE,
+    sort: "newest",
   }).catch(() => ({
     articles: [],
     pagination: {
