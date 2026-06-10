@@ -13,6 +13,7 @@ import { ScaleIn, StaggerContainer, StaggerItem, FadeIn, BlurIn } from "@/compon
 
 interface Article {
   id: string;
+  createdAt: Date;
   slug: string;
   title: string;
   excerpt?: string | null;
@@ -50,8 +51,8 @@ export function ArticleChannelPage({
   heroBgClass = "bg-[var(--brand-black)]",
 }: ArticleChannelPageProps) {
   const mappedArticles = articles.map((article) => mapArticleForCard(article, locale));
-  const featured = mappedArticles.find((a) => a.isFeatured) ?? mappedArticles[0];
-  const rest = mappedArticles.filter((a) => a.id !== featured?.id);
+  const featured = mappedArticles[0];
+  const rest = mappedArticles.slice(1);
 
   return (
     <div className="min-h-screen bg-[var(--brand-gray-50)]">
@@ -78,7 +79,7 @@ export function ArticleChannelPage({
               <ScaleIn className="mb-8">
                 <ArticleCard
                   {...featured}
-                  date={featured.date ?? undefined}
+                  date={featured.date ?? featured.createdAt}
                   channel={featured.channel ?? undefined}
                   locale={locale}
                   featured
@@ -93,7 +94,7 @@ export function ArticleChannelPage({
                     <BlurIn>
                       <ArticleCard
                         {...article}
-                        date={article.date ?? undefined}
+                        date={article.date ?? article.createdAt}
                         channel={article.channel ?? undefined}
                         locale={locale}
                       />

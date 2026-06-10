@@ -32,6 +32,7 @@ const articleListSelect = {
   authorFirstName: true,
   authorLastName: true,
   isFeatured: true,
+  createdAt: true,
   articleCategory: {
     select: { name: true, nameAr: true, slug: true },
   },
@@ -79,7 +80,7 @@ export const ArticleService = {
         where,
         skip,
         take: limit,
-        orderBy: sort === "newest" ? { date: "desc" } : { date: "asc" },
+        orderBy: sort === "newest" ? { createdAt: "desc" } : { date: "asc" },
         select: articleListSelect,
       }),
       db.article.count({ where }),
@@ -91,6 +92,7 @@ export const ArticleService = {
       return {
         ...rest,
         readingTimeMinutes: rt ? Math.ceil(rt.minutes) : null,
+        
       };
     });
 

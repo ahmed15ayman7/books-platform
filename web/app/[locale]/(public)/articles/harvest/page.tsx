@@ -22,12 +22,13 @@ export default async function HarvestPage({ searchParams }: Props) {
   const { articles, pagination } = await ArticleService.list({
     channel: "harvest",
     page,
-    limit: PAGINATION.DEFAULT_PAGE_SIZE,
+    limit: PAGINATION.DEFAULT_PAGE_SIZE + 1,
+    sort: "newest",
   }).catch(() => ({
     articles: [],
     pagination: {
       page: 1,
-      limit: PAGINATION.DEFAULT_PAGE_SIZE,
+      limit: PAGINATION.DEFAULT_PAGE_SIZE + 1,
       total: 0,
       totalPages: 0,
       hasNextPage: false,
