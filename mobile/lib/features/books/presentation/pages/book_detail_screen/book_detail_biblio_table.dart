@@ -149,6 +149,87 @@ class BookDetailBiblioTable extends StatelessWidget {
       );
     }
 
+    final pubYear = book.publicationYear ?? (book.year > 0 ? book.year : null);
+    if (pubYear != null) {
+      addEntry(
+        'book_detail.publication_year'.tr(),
+        Text(
+          pubYear.toString(),
+          style: GoogleFonts.tajawal(
+            fontSize: 13.5.sp,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+          textAlign: TextAlign.end,
+        ),
+      );
+    }
+
+    final editionLabel = resolveBookEdition(
+      edition: book.edition.isNotEmpty ? book.edition : null,
+      editionAr: book.editionAr,
+      isAr: ar,
+    );
+    if (editionLabel != null && editionLabel.isNotEmpty) {
+      addEntry(
+        'book_detail.edition'.tr(),
+        Text(
+          editionLabel,
+          style: GoogleFonts.tajawal(
+            fontSize: 13.5.sp,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+          textAlign: TextAlign.end,
+        ),
+      );
+    }
+
+    if (book.pages > 0) {
+      addEntry(
+        'book_detail.pages'.tr(),
+        Text(
+          '${book.pages} ${'book_detail.pages_suffix'.tr()}',
+          style: GoogleFonts.tajawal(
+            fontSize: 13.5.sp,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+          textAlign: TextAlign.end,
+        ),
+      );
+    }
+
+    if (book.isbn.isNotEmpty) {
+      addEntry(
+        'book_detail.isbn'.tr(),
+        Text(
+          book.isbn,
+          style: GoogleFonts.tajawal(
+            fontSize: 13.5.sp,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+          textAlign: TextAlign.end,
+        ),
+      );
+    }
+
+    if (book.dimensions != null && book.dimensions!.isNotEmpty) {
+      addEntry(
+        'book_detail.dimensions'.tr(),
+        Text(
+          book.dimensions!,
+          style: GoogleFonts.tajawal(
+            fontSize: 13.5.sp,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+          textAlign: TextAlign.end,
+        ),
+      );
+    }
+
     if (book.primaryCategory != null) {
       addEntry(
         'book_detail.primary_category'.tr(),

@@ -120,6 +120,7 @@
     "country": "Country",
     "primary_category": "Primary Category",
     "additional_categories": "Also In",
+    "isbn": "ISBN",
     "publication_year": "Published",
     "original_language": "Language",
     "pages": "Pages",
