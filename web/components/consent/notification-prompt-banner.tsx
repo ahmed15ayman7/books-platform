@@ -55,6 +55,9 @@ export function NotificationPromptBanner() {
       className={`fixed inset-x-0 z-[65] border border-[var(--brand-gray-200)] bg-[var(--brand-black)]/95 p-4 text-white shadow-lg backdrop-blur-md ${
         cookieBannerVisible ? "bottom-24 sm:bottom-28" : "bottom-4"
       }`}
+      style={{
+        bottom: cookieBannerVisible ? "89px":undefined,
+      }}
       role="dialog"
       aria-live="polite"
       aria-label={t("notificationTitle")}
