@@ -2,7 +2,7 @@ import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
-import bcrypt from "bcryptjs";
+
 
 const connectionString = process.env["DATABASE_URL"];
 if (!connectionString) {
@@ -17,25 +17,25 @@ async function main() {
   console.log("🌱 Seeding database...");
 
   // Create default admin user
-  const adminPassword = await bcrypt.hash("Admin@123456", 12);
-  const admin = await prisma.user.upsert({
-    where: { email: "admin@booksplatform.net" },
-    update: {
-      isSuperAdmin: true,
-      role: "ADMIN",
-      isActive: true,
-    },
-    create: {
-      email: "admin@booksplatform.net",
-      passwordHash: adminPassword,
-      fullName: "مدير المنصة",
-      role: "ADMIN",
-      isSuperAdmin: true,
-      permissions: [],
-      isActive: true,
-    },
-  });
-  console.log("✅ Admin user created:", admin.email);
+  // const adminPassword = await bcrypt.hash("@123456", 12);
+  // const admin = await prisma.user.upsert({
+  //   where: { email: "" },
+  //   update: {
+  //     isSuperAdmin: true,
+  //     role: "ADMIN",
+  //     isActive: true,
+  //   },
+  //   create: {
+  //     email: "user@example.com",
+  //     passwordHash: adminPassword,
+  //     fullName: "مدير المنصة",
+  //     role: "ADMIN",
+  //     isSuperAdmin: true,
+  //     permissions: [],
+  //     isActive: true,
+  //   },
+  // });
+  // console.log("✅ Admin user created:", admin.email);
 
   // Default settings
   const defaultSettings = [

@@ -11,6 +11,6 @@ export const E2E_SLUG_PREFIX = "e2e-";
 export const E2E_FIXTURE_PREFIX = "e2e-fixture-";
 
 export const ADMIN_EMAIL =
-  process.env["E2E_ADMIN_EMAIL"] ?? "admin@booksplatform.net";
+  process.env["E2E_ADMIN_EMAIL"] ?? "user@example.com";
 export const ADMIN_PASSWORD =
-  process.env["E2E_ADMIN_PASSWORD"] ?? "Admin@123456";
+  process.env["E2E_ADMIN_PASSWORD"] ?? "@123456";
