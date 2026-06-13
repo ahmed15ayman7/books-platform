@@ -134,11 +134,6 @@ web/
 
 ## Default Admin Credentials (Dev Only)
 
-```
-Email:    admin@booksplatform.net
-Password: Admin@123456
-```
-
 **⚠️ Change these before any production deployment.**
 
 ---
