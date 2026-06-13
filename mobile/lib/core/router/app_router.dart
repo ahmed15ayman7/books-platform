@@ -26,8 +26,6 @@ import '../../features/publishers/presentation/pages/publisher_detail_screen/pub
 import '../../features/publishers/presentation/pages/publishers_screen/publishers_screen.dart';
 import '../../features/books/presentation/pages/recommended_books_screen/recommended_books_screen.dart';
 import '../../features/books/presentation/pages/translated_books_screen/translated_books_screen.dart';
-import '../../features/notifications/presentation/cubit/notification_settings_cubit.dart';
-import '../../features/notifications/presentation/screens/notification_settings_screen/notification_settings_screen.dart';
 import '../../features/ratings/presentation/cubit/comments_cubit.dart';
 import '../../features/ratings/presentation/cubit/ratings_cubit.dart';
 import '../../features/search/presentation/cubit/search_cubit.dart';
@@ -218,15 +216,6 @@ class AppRouter {
             child: const RecommendedBooksScreen(),
           ),
         );
-
-      // case AppRoutes.notificationSettings:
-      //   return MaterialPageRoute(
-      //     settings: settings,
-      //     builder: (_) => BlocProvider(
-      //       create: (_) => getIt<NotificationSettingsCubit>(),
-      //       child: const NotificationSettingsScreen(),
-      //     ),
-      //   );
 
       case AppRoutes.aboutUs:
         return MaterialPageRoute(

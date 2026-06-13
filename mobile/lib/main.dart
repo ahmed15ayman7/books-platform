@@ -13,19 +13,6 @@ import 'features/cart/presentation/cubit/cart_cubit.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ⚠️  BLOCKED (T093): Firebase config files not yet provided.
-  // Requires google-services.json at android/app/ and GoogleService-Info.plist
-  // at ios/Runner/. App will not compile with Firebase until these are added.
-  // Uncomment after providing Firebase config files:
-  //
-  // try {
-  //   await Firebase.initializeApp(
-  //     options: DefaultFirebaseOptions.currentPlatform,
-  //   );
-  // } catch (_) {
-  //   // Degrade gracefully — Firebase features unavailable until T093 resolved.
-  // }
-
   await EasyLocalization.ensureInitialized();
   await initializeDateFormatting('en');
   await initializeDateFormatting('ar');
@@ -33,9 +20,6 @@ Future<void> main() async {
   // Eagerly resolve CartCubit so getIt<CartCubit>() is safe to call synchronously
   // from _CartButton.build() before the first frame renders.
   getIt<CartCubit>();
-
-  // Uncomment after T093 is resolved:
-  // getIt<FcmService>().initialize();
 
   runApp(
     EasyLocalization(
