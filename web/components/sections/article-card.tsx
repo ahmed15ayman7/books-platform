@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { BookOpen, Clock, Play } from "lucide-react";
+import { localeHref } from "@/lib/i18n/href";
 import { youtubeThumbnail } from "@/lib/media/youtube";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -79,7 +80,7 @@ export function ArticleCard({
         )}
       >
         <Link
-          href={`/${locale}/articles/${slug}`}
+          href={localeHref(locale, `/articles/${slug}`)}
           className={cn(
             "block shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]",
             featured && "w-full md:w-64 md:max-w-[16rem]",
@@ -120,7 +121,7 @@ export function ArticleCard({
             </Badge>
           )}
           <Link
-            href={`/${locale}/articles/${slug}`}
+            href={localeHref(locale, `/articles/${slug}`)}
             className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] rounded-sm"
           >
             <h3
@@ -134,7 +135,7 @@ export function ArticleCard({
           </Link>
           {linkedBook && (
             <Link
-              href={`/${locale}/books/${linkedBook.slug}`}
+              href={localeHref(locale, `/books/${linkedBook.slug}`)}
               className="flex items-center gap-1.5 text-xs text-[var(--brand-gray-500)] hover:text-[var(--brand-red)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] rounded-sm"
             >
               <BookOpen className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />

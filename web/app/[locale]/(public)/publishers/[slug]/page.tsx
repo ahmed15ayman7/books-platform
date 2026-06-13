@@ -20,6 +20,8 @@ import { buildPageMetadata } from "@/lib/seo/metadata";
 import { PAGINATION } from "@/lib/utils/constants";
 import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-shell";
 import { adminPublisherEditPath, adminPublisherViewPath } from "@/lib/admin/public-urls";
+import { absoluteUrl, stripLocale } from "@/lib/seo/site";
+import { JsonLd, publisherOrganizationJsonLd, breadcrumbJsonLd } from "@/components/seo/json-ld";
 
 interface PublisherPageProps {
   params: Promise<{ slug: string; locale: string }>;
@@ -75,8 +77,25 @@ export default async function PublisherDetailPage({
     publisher.sponsored?.isActive && publisher.sponsored.endsAt > new Date(),
   );
 
+  const publisherUrl = absoluteUrl(stripLocale(`/${locale}/publishers/${publisher.slug}`));
+  const orgSchema = publisherOrganizationJsonLd({
+    name: displayName,
+    url: publisherUrl,
+    description: displayDescription,
+    logo: publisher.imageUrl,
+    websiteUrl: publisher.websiteUrl,
+  });
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: isAr ? "الرئيسية" : "Home", path: "/" },
+    { name: isAr ? "الناشرون" : "Publishers", path: "/publishers" },
+    { name: displayName, path: `/publishers/${publisher.slug}` },
+  ]);
+
   return (
-    <AdminEntityPublicShell
+    <>
+      <JsonLd data={orgSchema} />
+      <JsonLd data={breadcrumbs} />
+      <AdminEntityPublicShell
       entityType="publisher"
       entityId={publisher.id}
       editHref={adminPublisherEditPath(locale, publisher.id)}
@@ -151,5 +170,6 @@ export default async function PublisherDetailPage({
         </div>
       </div>
     </AdminEntityPublicShell>
+    </>
   );
 }

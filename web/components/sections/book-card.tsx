@@ -15,6 +15,8 @@ import {
   localizedBookShortDesc,
   type BookLocalizedFields,
 } from "@/lib/i18n/book-locale";
+import { localeHref } from "@/lib/i18n/href";
+import type { Locale } from "@/lib/i18n/config";
 
 interface BookCardProps extends BookLocalizedFields {
   slug: string;
@@ -89,7 +91,7 @@ export function BookCard({
       className={cn("h-full will-change-transform", className)}
     >
       <Link
-        href={`/${locale}/books/${slug}`}
+        href={localeHref(locale as Locale, `/books/${slug}`)}
         className="group relative flex flex-col overflow-hidden surface-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] h-full"
       >
         <CardMedia>

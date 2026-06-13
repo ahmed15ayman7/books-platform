@@ -22,7 +22,9 @@ import {
 } from "@/lib/i18n/book-locale";
 import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
 import { bookSeoMetadata } from "@/lib/seo/metadata";
-import { absoluteUrl } from "@/lib/seo/site";
+import { absoluteUrl, stripLocale } from "@/lib/seo/site";
+import { JsonLd, bookJsonLd, breadcrumbJsonLd } from "@/components/seo/json-ld";
+import { localeHref } from "@/lib/i18n/href";
 
 interface BookPageProps {
   params: Promise<{ slug: string; locale: string }>;
@@ -89,38 +91,46 @@ export default async function BookDetailPage({ params }: BookPageProps) {
       | "translationStatus.PARTIAL",
   );
 
-  const publicBookUrl = absoluteUrl(`/${locale}/books/${book.slug}`);
+  const publicBookUrl = absoluteUrl(stripLocale(`/${locale}/books/${book.slug}`));
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Book",
+  const authorNames = (book.authors ?? []).map((a: { name: string; nameAr?: string | null }) =>
+    locale === "ar" && a.nameAr ? a.nameAr : a.name,
+  );
+
+  const bookSchema = bookJsonLd({
     name: displayName,
-    isbn: book.isbn,
-    inLanguage: book.language,
-    publisher: book.publisher
-      ? { "@type": "Organization", name: localizedPublisherName(book.publisher, locale) }
-      : undefined,
+    url: publicBookUrl,
+    description: description ?? leadText,
     image: book.imageUrl,
-    description: description?.slice(0, 500),
-  };
+    isbn: book.isbn,
+    language: book.language,
+    publisherName: book.publisher ? localizedPublisherName(book.publisher, locale) : null,
+    authors: authorNames,
+    ratingValue: avgRating,
+    ratingCount: ratings.length > 0 ? ratings.length : undefined,
+  });
+
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: locale === "ar" ? "الرئيسية" : "Home", path: "/" },
+    { name: locale === "ar" ? "الكتب" : "Books", path: "/books" },
+    { name: displayName, path: `/books/${book.slug}` },
+  ]);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={bookSchema} />
+      <JsonLd data={breadcrumbs} />
       <div className="min-h-screen bg-[var(--brand-gray-50)]">
         <nav
           className="bg-white border-b border-[var(--brand-gray-200)] py-3"
           aria-label={locale === "ar" ? "مسار التنقل" : "Breadcrumb"}
         >
           <div className="container-platform flex items-center gap-2 text-sm text-[var(--brand-gray-500)]">
-            <Link href={`/${locale}`} className="hover:text-[var(--brand-red)]">
+            <Link href={localeHref(locale, "/")} className="hover:text-[var(--brand-red)]">
               {locale === "ar" ? "الرئيسية" : "Home"}
             </Link>
             <span>/</span>
-            <Link href={`/${locale}/books`} className="hover:text-[var(--brand-red)]">
+            <Link href={localeHref(locale, "/books")} className="hover:text-[var(--brand-red)]">
               {t("title")}
             </Link>
             <span>/</span>

@@ -5,6 +5,7 @@ import { ArticleService } from "@/server/services/article.service";
 import { ArticleChannelPage } from "@/components/sections/article-channel-page";
 import type { Locale } from "@/lib/i18n";
 import { PAGINATION } from "@/lib/utils/constants";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -17,7 +18,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const result = await ArticleService.listByCategory(slug).catch(() => null);
   if (!result) return { title: "Category Not Found" };
   const name = locale === "ar" && result.category.nameAr ? result.category.nameAr : result.category.name;
-  return { title: `${name} — ${locale === "ar" ? "مقالات" : "Articles"}` };
+  return buildPageMetadata({
+    locale,
+    path: `/${locale}/articles/category/${slug}`,
+    title: `${name} — ${locale === "ar" ? "مقالات" : "Articles"}`,
+    description:
+      locale === "ar"
+        ? `مقالات تصنيف ${name} على منصة الكتب العالمية`
+        : `Articles in the ${name} category on Books Platform`,
+    keywords: [name, locale === "ar" ? "مقالات" : "articles"],
+  });
 }
 
 export default async function ArticleCategoryPage({ params, searchParams }: Props) {

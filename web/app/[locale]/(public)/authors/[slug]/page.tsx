@@ -19,6 +19,8 @@ import {
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-shell";
 import { adminAuthorEditPath, adminAuthorViewPath } from "@/lib/admin/public-urls";
+import { absoluteUrl, stripLocale } from "@/lib/seo/site";
+import { JsonLd, personJsonLd, breadcrumbJsonLd } from "@/components/seo/json-ld";
 
 interface AuthorPageProps {
   params: Promise<{ slug: string; locale: string }>;
@@ -76,8 +78,23 @@ export default async function AuthorDetailPage({
   const bio = localizedAuthorBio(author, locale);
   const coverImage = books[0]?.imageUrl ?? null;
 
+  const authorUrl = absoluteUrl(stripLocale(`/${locale}/authors/${author.slug}`));
+  const personSchema = personJsonLd({
+    name: displayName,
+    url: authorUrl,
+    description: bio,
+    sameAs: alternateName ? [] : undefined,
+  });
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: isAr ? "الرئيسية" : "Home", path: "/" },
+    { name: displayName, path: `/authors/${author.slug}` },
+  ]);
+
   return (
-    <AdminEntityPublicShell
+    <>
+      <JsonLd data={personSchema} />
+      <JsonLd data={breadcrumbs} />
+      <AdminEntityPublicShell
       entityType="author"
       entityId={author.id}
       editHref={adminAuthorEditPath(locale, author.id)}
@@ -140,5 +157,6 @@ export default async function AuthorDetailPage({
         </div>
       </div>
     </AdminEntityPublicShell>
+    </>
   );
 }

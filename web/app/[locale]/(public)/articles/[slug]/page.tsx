@@ -22,7 +22,9 @@ import { ArticleContent } from "@/lib/markdown/article-content";
 import { ArticleCommentsSection } from "@/components/sections/article-comments-section";
 import { articleLinkedBookDisplay } from "@/lib/i18n/article-linked-book";
 import { resolveArticleDisplayImage } from "@/lib/articles/resolve-display-image";
-import { absoluteUrl } from "@/lib/seo/site";
+import { absoluteUrl, stripLocale, resolveMediaUrl } from "@/lib/seo/site";
+import { JsonLd, articleJsonLd, breadcrumbJsonLd } from "@/components/seo/json-ld";
+import { localeHref } from "@/lib/i18n/href";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -39,6 +41,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     excerpt: article.excerpt,
     imageUrl: article.imageUrl,
     date: article.date,
+    updatedAt: article.updatedAt,
   });
 }
 
@@ -89,7 +92,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
 
   const intro = stripHtml(article.excerpt);
   const isMedia = isMediaChannel(article.channel);
-  const articleUrl = absoluteUrl(`/${locale}/articles/${article.slug}`);
+  const articleUrl = absoluteUrl(stripLocale(`/${locale}/articles/${article.slug}`));
 
   const linkedBook = articleLinkedBookDisplay(article.products?.[0], locale);
   const heroCoverUrl =
@@ -101,35 +104,50 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
     }) ?? null;
   const heroCoverAlt = linkedBook?.name ?? article.title;
 
-  const jsonLd: Record<string, unknown>[] = [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      headline: article.title,
-      image: article.imageUrl?.split(",")[0] ?? article.imageUrl,
-      datePublished: article.date?.toISOString(),
-      description: article.excerpt,
-    },
-  ];
+  const channelSection = channelInfo
+    ? (locale === "ar" ? channelInfo.ar : channelInfo.en)
+    : undefined;
 
-  if (article.videoId) {
-    jsonLd.push({
-      "@context": "https://schema.org",
-      "@type": "VideoObject",
-      name: article.title,
-      description: article.excerpt ?? article.title,
-      thumbnailUrl: youtubeThumbnail(article.videoId),
-      embedUrl: youtubeEmbedUrl(article.videoId),
-      uploadDate: article.date?.toISOString(),
-    });
-  }
+  const articleSchema = articleJsonLd({
+    headline: article.title,
+    url: articleUrl,
+    datePublished: article.date?.toISOString() ?? null,
+    dateModified: article.updatedAt?.toISOString() ?? article.date?.toISOString() ?? null,
+    description: article.excerpt,
+    image: heroCoverUrl ?? article.imageUrl,
+    authorName: article.authorFirstName
+      ? [article.authorFirstName, article.authorLastName].filter(Boolean).join(" ")
+      : null,
+    publisherName: locale === "ar" ? "منصة الكتب العالمية" : "Books Platform",
+    publisherLogo: resolveMediaUrl("/logo.webp"),
+    articleSection: channelSection,
+  });
+
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: locale === "ar" ? "الرئيسية" : "Home", path: "/" },
+    ...(channelInfo
+      ? [{ name: channelSection!, path: `/articles/${channelInfo.path}` }]
+      : []),
+    { name: article.title, path: `/articles/${article.slug}` },
+  ]);
+
+  const videoSchema = article.videoId
+    ? {
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        name: article.title,
+        description: article.excerpt ?? article.title,
+        thumbnailUrl: youtubeThumbnail(article.videoId),
+        embedUrl: youtubeEmbedUrl(article.videoId),
+        uploadDate: article.date?.toISOString(),
+      }
+    : null;
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd.length === 1 ? jsonLd[0] : jsonLd) }}
-      />
+      <JsonLd data={articleSchema} />
+      <JsonLd data={breadcrumbs} />
+      {videoSchema && <JsonLd data={videoSchema} />}
       <AdminEntityPublicShell
         entityType={isMedia ? "media" : "article"}
         entityId={article.id}
@@ -150,7 +168,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
 
           <div className="container-platform py-8 md:py-10">
             <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-[var(--brand-gray-500)]">
-              <Link href={`/${locale}`} className="hover:text-[var(--brand-red)]">
+              <Link href={localeHref(locale, "/")} className="hover:text-[var(--brand-red)]">
                 {locale === "ar" ? "الرئيسية" : "Home"}
               </Link>
               {channelInfo && (
