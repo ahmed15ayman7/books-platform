@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ImageUploadField } from "@/components/forms/image-upload-field";
 import { cn } from "@/lib/utils";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
@@ -40,6 +41,7 @@ interface BookEditFormProps {
   bookId?: string;
   locale: string;
   bookSlug?: string;
+  bookOriginalId?: number;
   initial: BookEditData;
   publishers: Publisher[];
   categories: Category[];
@@ -144,6 +146,7 @@ export function BookEditForm({
   bookId,
   locale,
   bookSlug,
+  bookOriginalId,
   initial,
   publishers,
   categories,
@@ -336,11 +339,20 @@ export function BookEditForm({
         </Field>
 
         <Field className="sm:col-span-2">
-          <FieldLabel htmlFor="imageUrl">رابط صورة الغلاف</FieldLabel>
-          <Input id="imageUrl" type="url" className={fieldCls} value={form.imageUrl} onChange={(e) => set("imageUrl", e.target.value)} placeholder="https://..." dir="ltr" />
-          {form.imageUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={form.imageUrl} alt="cover preview" className="mt-2 h-32 w-auto rounded-lg border border-[var(--admin-border-strong)] object-contain" />
+          <ImageUploadField
+            label="صورة الغلاف"
+            folder="products"
+            field="image_url"
+            originalId={bookOriginalId}
+            value={form.imageUrl}
+            onChange={(url) => set("imageUrl", url)}
+            headers={adminAuthHeaders()}
+            disabled={isCreate}
+          />
+          {isCreate && (
+            <p className="mt-1 text-[11px] text-[var(--admin-text-subtle)]">
+              احفظ الكتاب أولاً لتتمكن من رفع الصورة
+            </p>
           )}
         </Field>
       </SectionCard>

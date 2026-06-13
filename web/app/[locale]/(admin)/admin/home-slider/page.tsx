@@ -9,6 +9,7 @@ import { AdminBilingualField } from "@/components/admin/admin-bilingual-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ImageUploadField } from "@/components/forms/image-upload-field";
 import { adminAuthHeaders } from "@/lib/admin/auth-client";
 import { formatAdminDateTime } from "@/lib/admin/format-dates";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
@@ -196,8 +197,31 @@ export default function AdminHomeSliderPage() {
                 rows={2}
               />
             </div>
-            <AdminInput label="رابط صورة الخلفية *" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} required />
-            <AdminInput label="رابط صورة الكتاب (أمامية)" value={form.foregroundImageUrl} onChange={(e) => setForm({ ...form, foregroundImageUrl: e.target.value })} />
+            <ImageUploadField
+              label="صورة الخلفية *"
+              folder="hero"
+              field="image_url"
+              entityId={editingId ?? undefined}
+              value={form.imageUrl}
+              onChange={(url) => setForm((p) => ({ ...p, imageUrl: url }))}
+              headers={adminAuthHeaders()}
+              disabled={!editingId}
+            />
+            {!editingId && (
+              <p className="text-xs text-[var(--admin-text-muted)]">
+                احفظ الشريحة أولاً لرفع الصورة
+              </p>
+            )}
+            <ImageUploadField
+              label="صورة الكتاب (أمامية)"
+              folder="hero"
+              field="foreground_image_url"
+              entityId={editingId ?? undefined}
+              value={form.foregroundImageUrl}
+              onChange={(url) => setForm((p) => ({ ...p, foregroundImageUrl: url }))}
+              headers={adminAuthHeaders()}
+              disabled={!editingId}
+            />
             <AdminInput label="رابط عند النقر" value={form.linkUrl} onChange={(e) => setForm({ ...form, linkUrl: e.target.value })} />
             <div className="flex gap-4">
               <div className="flex-1">

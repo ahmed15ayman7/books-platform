@@ -23,6 +23,7 @@ import { ArticleLivePreview } from "@/components/admin/article-live-preview";
 import { AdminRichTextHint } from "@/components/admin/admin-rich-text-hint";
 import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
 import { adminToast } from "@/lib/admin/admin-toast";
+import { ImageUploadField } from "@/components/forms/image-upload-field";
 
 interface ArticleForm {
   title: string;
@@ -83,6 +84,7 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
   const draft = useFormDraft(formDraftId.adminArticle(id), form, setForm, { ready: !loading });
   const [saving, setSaving] = useState(false);
   const [timestamps, setTimestamps] = useState<{ createdAt?: string; updatedAt?: string }>({});
+  const [originalId, setOriginalId] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     if (isNew) {
@@ -129,6 +131,7 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
           youtubeUrl: String(d.youtubeUrl ?? ""),
           date: d.date ? (new Date(d.date as string).toISOString().split("T")[0] ?? "") : empty.date,
         });
+        setOriginalId(typeof d.originalId === "number" ? d.originalId : null);
         const products = (d.products ?? []) as BookPickerItem[];
         setProductIds(d.productIds ?? products.map((p) => p.id));
         setSelectedBooks(products);
@@ -238,7 +241,21 @@ export function ArticleEditForm({ locale, id, initialBookId }: ArticleEditFormPr
             <AdminInput label="تاريخ النشر" type="date" value={form.date} onChange={set("date")} />
           </div>
           <div className="mt-4">
-            <AdminInput label="رابط صورة المقال" value={form.imageUrl} onChange={set("imageUrl")} placeholder="https://..." />
+            <ImageUploadField
+              label="صورة المقال"
+              folder="articles"
+              field="image_url"
+              originalId={originalId}
+              value={form.imageUrl}
+              onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))}
+              headers={adminAuthHeaders()}
+              disabled={isNew}
+            />
+            {isNew && (
+              <p className="mt-1 text-xs text-[var(--admin-text-muted)]">
+                احفظ المقال أولاً لتتمكن من رفع الصورة
+              </p>
+            )}
           </div>
           {(isMediaChannel(form.channel) || form.youtubeUrl) && (
             <div className="mt-4">
