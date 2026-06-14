@@ -46,7 +46,10 @@ class AppBarWidget extends StatelessWidget {
         boxShadow: AppShadows.soft,
       ),
       padding: EdgeInsetsDirectional.fromSTEB(
-        16.w, topPadding + 8.h, 16.w, 12.h,
+        16.w,
+        topPadding + 8.h,
+        16.w,
+        12.h,
       ),
       child: Row(
         children: [
@@ -106,7 +109,7 @@ class _BrandLogo extends StatelessWidget {
           child: Image.asset(
             kBrandingAppIconAsset,
             width: 34.r,
-            height: 34.r,
+            height: 40.r,
             fit: BoxFit.cover,
           ),
         ),
@@ -330,7 +333,10 @@ class _CartButton extends StatelessWidget {
                   top: -3,
                   end: -3,
                   child: Container(
-                    constraints: BoxConstraints(minWidth: 17.r, minHeight: 17.r),
+                    constraints: BoxConstraints(
+                      minWidth: 17.r,
+                      minHeight: 17.r,
+                    ),
                     padding: EdgeInsets.symmetric(horizontal: 3.w),
                     decoration: BoxDecoration(
                       color: AppColors.primary,

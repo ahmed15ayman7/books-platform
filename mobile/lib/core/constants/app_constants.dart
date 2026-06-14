@@ -29,4 +29,5 @@ const String kCartKey = 'cart_items';
 
 // Branding assets
 const String kBrandingLogoAsset = 'assets/branding/logo.webp';
-const String kBrandingAppIconAsset = 'assets/branding/app_icon_1024.png';
+const String kBrandingAppIconAsset =
+    'assets/branding/app_icon_removed_bg_1024.png';
