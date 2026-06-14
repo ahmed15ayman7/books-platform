@@ -22,7 +22,7 @@ class AppMarkdownBody extends StatelessWidget {
       data: data,
       shrinkWrap: shrinkWrap,
       styleSheet: _styleSheet(),
-      onTapLink: (_, href, __) async {
+      onTapLink: (text, href, title) async {
         if (href == null) return;
         final uri = Uri.tryParse(href);
         if (uri != null && await canLaunchUrl(uri)) {

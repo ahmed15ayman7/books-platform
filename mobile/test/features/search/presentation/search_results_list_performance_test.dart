@@ -3,7 +3,6 @@ import 'package:booksplatform/features/articles/domain/entities/article.dart';
 import 'package:booksplatform/features/books/domain/entities/book.dart';
 import 'package:booksplatform/features/publishers/domain/entities/publisher.dart';
 import 'package:booksplatform/features/search/domain/entities/search_response.dart';
-import 'package:booksplatform/features/search/domain/entities/search_result.dart';
 import 'package:booksplatform/features/search/domain/entities/search_section_type.dart';
 import 'package:booksplatform/features/search/presentation/cubit/search_state.dart';
 import 'package:flutter/material.dart';
