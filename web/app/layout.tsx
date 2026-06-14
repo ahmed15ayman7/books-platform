@@ -1,10 +1,4 @@
-// Root layout — redirects to [locale] layout
-// The actual layout is in app/[locale]/layout.tsx
-import type { Metadata } from "next";
-import { buildRootMetadata } from "@/lib/seo/metadata";
-
-export const metadata: Metadata = buildRootMetadata();
-
+// Root layout — passes through to [locale]/layout.tsx which owns all <html> and metadata.
 export default function RootLayout({
   children,
 }: {

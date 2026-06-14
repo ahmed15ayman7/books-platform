@@ -56,23 +56,30 @@ export function buildSiteIcons(): NonNullable<Metadata["icons"]> {
   };
 }
 
-/** Root layout metadata — metadataBase + defaults for all pages. */
-export function buildRootMetadata(): Metadata {
+/** Root layout metadata — metadataBase + locale-aware defaults. */
+export function buildRootMetadata(locale: Locale = "ar"): Metadata {
   const base = getSiteUrl();
   const defaultOg = resolveMediaUrl(getDefaultOgImagePath());
   const googleVerification = process.env["NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION"]?.trim();
+  const isAr = locale === "ar";
+  const siteName = isAr ? siteConfig.nameAr : siteConfig.nameEn;
+  const altName = isAr ? siteConfig.nameEn : siteConfig.nameAr;
+  const tagline = isAr ? siteConfig.taglineAr : siteConfig.taglineEn;
+  const ogLocale = localeOpenGraphLocale(locale);
+  const altOgLocale = alternateOpenGraphLocales(locale);
+  const canonicalBase = isAr ? base : `${base}/en`;
 
   return {
     metadataBase: new URL(base),
     title: {
-      template: `%s | ${siteConfig.nameAr}`,
-      default: `${siteConfig.nameAr} — ${siteConfig.nameEn}`,
+      template: `%s | ${siteName}`,
+      default: `${siteName} — ${altName}`,
     },
-    description: siteConfig.taglineAr,
-    applicationName: siteConfig.nameAr,
+    description: tagline,
+    applicationName: siteName,
     authors: [{ name: siteConfig.nameEn, url: base }],
     creator: siteConfig.nameEn,
-    publisher: siteConfig.nameAr,
+    publisher: siteName,
     category: "books",
     icons: buildSiteIcons(),
     manifest: "/manifest.webmanifest",
@@ -81,26 +88,26 @@ export function buildRootMetadata(): Metadata {
       : {}),
     openGraph: {
       type: "website",
-      url: base,
-      siteName: siteConfig.nameAr,
-      title: siteConfig.nameAr,
-      description: siteConfig.taglineAr,
-      locale: "ar_AR",
-      alternateLocale: ["en_US"],
+      url: canonicalBase,
+      siteName,
+      title: siteName,
+      description: tagline,
+      locale: ogLocale,
+      alternateLocale: altOgLocale,
       images: [
         {
           url: defaultOg,
           width: 1200,
           height: 630,
-          alt: siteConfig.nameAr,
+          alt: siteName,
           type: "image/png",
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: siteConfig.nameAr,
-      description: siteConfig.taglineAr,
+      title: siteName,
+      description: tagline,
       images: [defaultOg],
       ...(siteConfig.twitterHandle
         ? { site: siteConfig.twitterHandle, creator: siteConfig.twitterHandle }
@@ -118,7 +125,7 @@ export function buildRootMetadata(): Metadata {
       },
     },
     alternates: {
-      canonical: base,
+      canonical: canonicalBase,
       languages: {
         ar: base,
         en: `${base}/en`,
@@ -155,7 +162,7 @@ export function buildPageMetadata(input: PageSeoInput): Metadata {
   const ogType = isArticle ? "article" : "website";
 
   return {
-    title: fullTitle,
+    title: { absolute: fullTitle },
     description,
     keywords: input.keywords,
     alternates: {
