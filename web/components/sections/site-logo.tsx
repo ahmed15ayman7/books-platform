@@ -1,7 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { localeHref } from "@/lib/i18n/href";
-import type { Locale } from "@/lib/i18n/config";
 
 interface SiteLogoProps {
   locale: string;
@@ -11,7 +9,7 @@ interface SiteLogoProps {
 export function SiteLogo({ locale, className }: SiteLogoProps) {
   return (
     <Link
-      href={localeHref(locale as Locale, "/")}
+      href={`/${locale}`}
       className={`inline-flex flex-shrink-0 items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--brand-black)] rounded-sm ${className ?? ""}`}
       aria-label="منصة الكتب العالمية — Books Platform"
     >

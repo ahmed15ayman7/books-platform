@@ -4,8 +4,6 @@ import {
   type BookCategoryLabelAr,
 } from "./book-categories";
 import { normalizeArabic } from "@/lib/i18n/normalize-arabic";
-import { localeHref } from "@/lib/i18n/href";
-import type { Locale } from "@/lib/i18n/config";
 
 export interface NavCategory {
   id: string;
@@ -42,7 +40,7 @@ export function bookCategoryLabel(labelAr: BookCategoryLabelAr, locale: string):
 }
 
 export function buildBookCategoryLinks(locale: string, categories: NavCategory[]): NavLink[] {
-  const l = locale as Locale;
+  const base = `/${locale}`;
   const byNorm = new Map(
     categories.map((c) => [normalizeArabic(c.nameAr ?? c.name), c]),
   );
@@ -50,46 +48,47 @@ export function buildBookCategoryLinks(locale: string, categories: NavCategory[]
   return BOOK_CATEGORY_LABELS_AR.map((labelAr) => {
     const cat = byNorm.get(normalizeArabic(labelAr));
     return {
-      href: cat ? localeHref(l, `/books/category/${cat.slug}`) : localeHref(l, "/books"),
+      href: cat ? `${base}/books/category/${cat.slug}` : `${base}/books`,
       label: bookCategoryLabel(labelAr, locale),
     };
   });
 }
 
 export function buildReadingChannelLinks(locale: string): NavLink[] {
-  const l = locale as Locale;
+  const base = `/${locale}`;
   const isAr = locale === "ar";
   return READING_CHANNELS.map((ch) => ({
-    href: localeHref(l, `/articles/${ch.slug}`),
+    href: `${base}/articles/${ch.slug}`,
     label: isAr ? ch.labelAr : ch.labelEn,
   }));
 }
 
 export function buildMediaChannelLinks(locale: string): NavLink[] {
-  const l = locale as Locale;
+  const base = `/${locale}`;
   const isAr = locale === "ar";
   return [
+    // { href: `${base}/media`, label: isAr ? "كل الفيديوهات" : "All Videos" },
     ...MEDIA_CHANNELS.map((ch) => ({
-      href: localeHref(l, `/media/${ch.slug}`),
+      href: `${base}/media/${ch.slug}`,
       label: isAr ? ch.labelAr : ch.labelEn,
     })),
   ];
 }
 
 export function mediaHubHref(locale: string): string {
-  return localeHref(locale as Locale, "/media");
+  return `/${locale}/media`;
 }
 
 export function buildTopLevelBookLinks(locale: string): NavLink[] {
-  const l = locale as Locale;
   const isAr = locale === "ar";
+  const base = `/${locale}`;
   return [
     {
-      href: localeHref(l, "/books/nominated-for-translation"),
+      href: `${base}/books/nominated-for-translation`,
       label: isAr ? "كتب مرشحة للترجمة" : "For Translation",
     },
     {
-      href: localeHref(l, "/books/translated"),
+      href: `${base}/books/translated`,
       label: isAr ? "كتب مترجمة" : "Translated Books",
     },
   ];

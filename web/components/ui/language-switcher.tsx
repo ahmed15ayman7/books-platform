@@ -10,10 +10,11 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   const pathname = usePathname();
 
   function switchLocale(newLocale: string) {
-    // pathname is always returned without the locale prefix by next-intl's usePathname
-    // so we just build the target path directly.
-    const targetPath = newLocale === "en" ? `/en${pathname}` : pathname;
-    router.push(targetPath);
+    // Replace the current locale prefix in the path
+    const segments = pathname.split("/");
+    segments[1] = newLocale;
+    const newPath = segments.join("/") || "/";
+    router.push(newPath);
   }
 
   return (

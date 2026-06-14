@@ -74,29 +74,9 @@ export function alternateOpenGraphLocales(locale: Locale | string): string[] {
   return locale === "ar" ? ["en_US"] : ["ar_AR"];
 }
 
-/**
- * Strip the locale prefix from a path.
- * "/ar/books/slug" → "/books/slug"
- * "/en/books/slug" → "/books/slug"
- * "/books/slug"    → "/books/slug"
- */
-export function stripLocale(path: string): string {
-  const withSlash = path.startsWith("/") ? path : `/${path}`;
-  return withSlash.replace(/^\/(ar|en)(\/|$)/, "/").replace(/^\/$/, "") || "/";
-}
-
-/**
- * Return clean canonical (no /ar prefix) and /en-prefixed URLs for a
- * locale-neutral path (already stripped of any locale prefix).
- *
- * Arabic = clean: booksplatform.net/books/slug
- * English = prefixed: booksplatform.net/en/books/slug
- */
 export function localizedPaths(path: string): { ar: string; en: string } {
-  // Normalise: strip any existing locale prefix first
-  const neutral = stripLocale(path);
-  return {
-    ar: neutral === "/" ? "/" : neutral,
-    en: neutral === "/" ? "/en" : `/en${neutral}`,
-  };
+  const withSlash = path.startsWith("/") ? path : `/${path}`;
+  const ar = withSlash.replace(/^\/(ar|en)/, "/ar");
+  const en = withSlash.replace(/^\/(ar|en)/, "/en");
+  return { ar, en };
 }

@@ -15,7 +15,6 @@ import {
   localizedPaths,
   resolveMediaUrl,
   siteConfig,
-  stripLocale,
 } from "@/lib/seo/site";
 
 export {
@@ -31,7 +30,7 @@ export interface PageSeoInput {
   title: string;
   description: string;
   imageUrl?: string | null;
-  type?: "website" | "article" | "book";
+  type?: "website" | "article";
   noIndex?: boolean;
   keywords?: string[];
   publishedTime?: string | Date | null;
@@ -56,58 +55,47 @@ export function buildSiteIcons(): NonNullable<Metadata["icons"]> {
   };
 }
 
-/** Root layout metadata — metadataBase + locale-aware defaults. */
-export function buildRootMetadata(locale: Locale = "ar"): Metadata {
+/** Root layout metadata — metadataBase + defaults for all pages. */
+export function buildRootMetadata(): Metadata {
   const base = getSiteUrl();
   const defaultOg = resolveMediaUrl(getDefaultOgImagePath());
-  const googleVerification = process.env["NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION"]?.trim();
-  const isAr = locale === "ar";
-  const siteName = isAr ? siteConfig.nameAr : siteConfig.nameEn;
-  const altName = isAr ? siteConfig.nameEn : siteConfig.nameAr;
-  const tagline = isAr ? siteConfig.taglineAr : siteConfig.taglineEn;
-  const ogLocale = localeOpenGraphLocale(locale);
-  const altOgLocale = alternateOpenGraphLocales(locale);
-  const canonicalBase = isAr ? base : `${base}/en`;
 
   return {
     metadataBase: new URL(base),
     title: {
-      template: `%s | ${siteName}`,
-      default: `${siteName} — ${altName}`,
+      template: `%s | ${siteConfig.nameAr}`,
+      default: `${siteConfig.nameAr} — ${siteConfig.nameEn}`,
     },
-    description: tagline,
-    applicationName: siteName,
+    description: siteConfig.taglineAr,
+    applicationName: siteConfig.nameAr,
     authors: [{ name: siteConfig.nameEn, url: base }],
     creator: siteConfig.nameEn,
-    publisher: siteName,
+    publisher: siteConfig.nameAr,
     category: "books",
     icons: buildSiteIcons(),
     manifest: "/manifest.webmanifest",
-    ...(googleVerification
-      ? { verification: { google: googleVerification } }
-      : {}),
     openGraph: {
       type: "website",
-      url: canonicalBase,
-      siteName,
-      title: siteName,
-      description: tagline,
-      locale: ogLocale,
-      alternateLocale: altOgLocale,
+      url: base,
+      siteName: siteConfig.nameAr,
+      title: siteConfig.nameAr,
+      description: siteConfig.taglineAr,
+      locale: "ar_AR",
+      alternateLocale: ["en_US"],
       images: [
         {
           url: defaultOg,
           width: 1200,
           height: 630,
-          alt: siteName,
+          alt: siteConfig.nameAr,
           type: "image/png",
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: siteName,
-      description: tagline,
+      title: siteConfig.nameAr,
+      description: siteConfig.taglineAr,
       images: [defaultOg],
       ...(siteConfig.twitterHandle
         ? { site: siteConfig.twitterHandle, creator: siteConfig.twitterHandle }
@@ -125,24 +113,19 @@ export function buildRootMetadata(locale: Locale = "ar"): Metadata {
       },
     },
     alternates: {
-      canonical: canonicalBase,
+      canonical: base,
       languages: {
-        ar: base,
+        ar: `${base}/ar`,
         en: `${base}/en`,
-        "x-default": base,
+        "x-default": `${base}/ar`,
       },
     },
   };
 }
 
 export function buildPageMetadata(input: PageSeoInput): Metadata {
-  // Normalise path: strip any locale prefix to get the canonical neutral path
-  const neutral = stripLocale(input.path);
-  // Arabic canonical is the clean (no-prefix) URL; English gets /en prefix
-  const canonicalPath = input.locale === "en"
-    ? `/en${neutral === "/" ? "" : neutral}`
-    : (neutral === "/" ? "" : neutral);
-  const canonical = absoluteUrl(canonicalPath || "/");
+  const path = input.path.startsWith("/") ? input.path : `/${input.path}`;
+  const canonical = absoluteUrl(path);
   const siteName = getSiteName(input.locale);
   const fullTitle =
     input.title.includes(siteName) ||
@@ -151,7 +134,7 @@ export function buildPageMetadata(input: PageSeoInput): Metadata {
       ? input.title
       : `${input.title} | ${siteName}`;
 
-  const { ar, en } = localizedPaths(neutral);
+  const { ar, en } = localizedPaths(path);
   const ogImage = resolveMediaUrl(input.imageUrl);
   const description = input.description.slice(0, 320);
   const ogDescription = input.description.slice(0, 200);
@@ -159,10 +142,9 @@ export function buildPageMetadata(input: PageSeoInput): Metadata {
   const modified = toIsoDate(input.modifiedTime);
 
   const isArticle = input.type === "article";
-  const ogType = isArticle ? "article" : "website";
 
   return {
-    title: { absolute: fullTitle },
+    title: fullTitle,
     description,
     keywords: input.keywords,
     alternates: {
@@ -174,7 +156,7 @@ export function buildPageMetadata(input: PageSeoInput): Metadata {
       },
     },
     openGraph: {
-      type: ogType,
+      type: isArticle ? "article" : "website",
       locale: localeOpenGraphLocale(input.locale),
       alternateLocale: alternateOpenGraphLocales(input.locale),
       url: canonical,
@@ -260,7 +242,6 @@ export function articleSeoMetadata(
     excerpt?: string | null;
     imageUrl?: string | null;
     date?: Date | string | null;
-    updatedAt?: Date | string | null;
   }
 ): Metadata {
   return buildPageMetadata({
@@ -275,7 +256,6 @@ export function articleSeoMetadata(
     imageUrl: article.imageUrl,
     type: "article",
     publishedTime: article.date,
-    modifiedTime: article.updatedAt ?? article.date,
     keywords: [article.title, locale === "ar" ? "مقالات" : "articles"],
   });
 }

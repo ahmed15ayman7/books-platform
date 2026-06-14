@@ -6,12 +6,11 @@ import {
   buildMediaChannelLinks,
   buildReadingChannelLinks,
 } from "@/lib/nav/site-nav";
-import { localeHref } from "@/lib/i18n/href";
-import type { Locale } from "@/lib/i18n/config";
 
 export async function Footer() {
-  const locale = await getLocale() as Locale;
+  const locale = await getLocale();
   const isAr = locale === "ar";
+  const base = `/${locale}`;
 
   const bookCategories = await BookService.getNavCategories().catch(() => []);
   const categoryLinks = buildBookCategoryLinks(locale, bookCategories);
@@ -24,11 +23,11 @@ export async function Footer() {
       links: [
         ...categoryLinks,
         {
-          href: localeHref(locale, "/books/nominated-for-translation"),
+          href: `${base}/books/nominated-for-translation`,
           label: isAr ? "مرشحة للترجمة" : "For Translation",
         },
-        { href: localeHref(locale, "/books/translated"), label: isAr ? "كتب مترجمة" : "Translated Books" },
-        { href: localeHref(locale, "/publish"), label: isAr ? "انشر كتابك" : "Publish Your Book" },
+        { href: `${base}/books/translated`, label: isAr ? "كتب مترجمة" : "Translated Books" },
+        { href: `${base}/publish`, label: isAr ? "انشر كتابك" : "Publish Your Book" },
       ],
     },
     {
@@ -42,18 +41,18 @@ export async function Footer() {
     {
       title: isAr ? "المنصة" : "Platform",
       links: [
-        { href: localeHref(locale, "/about"), label: isAr ? "من نحن" : "About Us" },
-        { href: localeHref(locale, "/services"), label: isAr ? "خدماتنا" : "Our Services" },
-        { href: localeHref(locale, "/team"), label: isAr ? "فريق العمل" : "Our Team" },
-        { href: localeHref(locale, "/publishers"), label: isAr ? "الناشرون" : "Publishers" },
+        { href: `${base}/about`, label: isAr ? "من نحن" : "About Us" },
+        { href: `${base}/services`, label: isAr ? "خدماتنا" : "Our Services" },
+        { href: `${base}/team`, label: isAr ? "فريق العمل" : "Our Team" },
+        { href: `${base}/publishers`, label: isAr ? "الناشرون" : "Publishers" },
       ],
     },
     {
       title: isAr ? "الدعم" : "Support",
       links: [
-        { href: localeHref(locale, "/contact"), label: isAr ? "اتصل بنا" : "Contact Us" },
-        { href: localeHref(locale, "/privacy"), label: isAr ? "سياسة الخصوصية" : "Privacy Policy" },
-        { href: localeHref(locale, "/terms"), label: isAr ? "الشروط والأحكام" : "Terms & Conditions" },
+        { href: `${base}/contact`, label: isAr ? "اتصل بنا" : "Contact Us" },
+        { href: `${base}/privacy`, label: isAr ? "سياسة الخصوصية" : "Privacy Policy" },
+        { href: `${base}/terms`, label: isAr ? "الشروط والأحكام" : "Terms & Conditions" },
       ],
     },
   ];

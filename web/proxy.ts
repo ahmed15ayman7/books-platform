@@ -8,18 +8,16 @@ import { accessTokenCookieOptions } from "@/lib/auth/access-token-cookie";
 const intlMiddleware = createMiddleware({
   locales,
   defaultLocale,
-  localePrefix: "as-needed",
+  localePrefix: "always",
   localeDetection: true,
 });
 
-// With as-needed prefix, Arabic paths have no locale segment (/admin, /author…)
-// while English paths retain it (/en/admin, /en/author…).
-const ADMIN_PATTERN = /^(?:\/en)?\/admin(?:\/|$)/;
-const ADMIN_LOGIN_PATTERN = /^(?:\/en)?\/admin\/login\/?$/;
-const AMBASSADOR_PATTERN = /^(?:\/en)?\/ambassador(?:\/|$)/;
-const AMBASSADOR_LOGIN_PATTERN = /^(?:\/en)?\/ambassador\/login\/?$/;
-const AUTHOR_PATTERN = /^(?:\/en)?\/author(?:\/|$)/;
-const AUTH_PATTERN = /^(?:\/en)?\/auth(?:\/|$)/;
+const ADMIN_PATTERN = /^\/[a-z]{2}\/admin(?:\/|$)/;
+const ADMIN_LOGIN_PATTERN = /^\/[a-z]{2}\/admin\/login\/?$/;
+const AMBASSADOR_PATTERN = /^\/[a-z]{2}\/ambassador(?:\/|$)/;
+const AMBASSADOR_LOGIN_PATTERN = /^\/[a-z]{2}\/ambassador\/login\/?$/;
+const AUTHOR_PATTERN = /^\/[a-z]{2}\/author(?:\/|$)/;
+const AUTH_PATTERN = /^\/[a-z]{2}\/auth(?:\/|$)/;
 
 type AuthPayload = Awaited<ReturnType<typeof verifyAccessToken>>;
 
@@ -84,9 +82,7 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // With as-needed, Arabic URLs have no prefix; English start with /en
-  const firstSegment = pathname.split("/")[1] ?? "";
-  const locale = firstSegment === "en" ? "en" : "ar";
+  const locale = pathname.split("/")[1] ?? "ar";
   let refreshedToken: string | null = null;
 
   const needsAuth =
@@ -100,17 +96,15 @@ export default async function proxy(request: NextRequest) {
     if (auth.refreshed && auth.token) refreshedToken = auth.token;
   }
 
-  const localePrefix = locale === "en" ? "/en" : "";
-
   if (ADMIN_PATTERN.test(pathname) && !ADMIN_LOGIN_PATTERN.test(pathname)) {
     if (!auth?.payload || !roleAllowed(auth.payload, ["ADMIN"])) {
-      return NextResponse.redirect(new URL(`${localePrefix}/admin/login`, request.url));
+      return NextResponse.redirect(new URL(`/${locale}/admin/login`, request.url));
     }
   }
 
   if (AMBASSADOR_PATTERN.test(pathname) && !AMBASSADOR_LOGIN_PATTERN.test(pathname)) {
     if (!auth?.payload || !roleAllowed(auth.payload, ["AMBASSADOR", "ADMIN"])) {
-      return NextResponse.redirect(new URL(`${localePrefix}/ambassador/login`, request.url));
+      return NextResponse.redirect(new URL(`/${locale}/ambassador/login`, request.url));
     }
   }
 
@@ -118,7 +112,7 @@ export default async function proxy(request: NextRequest) {
     if (!auth?.payload || !roleAllowed(auth.payload, ["AUTHOR", "ADMIN"])) {
       const redirect = encodeURIComponent(pathname + request.nextUrl.search);
       return NextResponse.redirect(
-        new URL(`${localePrefix}/auth/login?redirect=${redirect}`, request.url),
+        new URL(`/${locale}/auth/login?redirect=${redirect}`, request.url),
       );
     }
   }

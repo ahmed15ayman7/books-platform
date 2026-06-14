@@ -23,14 +23,7 @@ const inter = Inter({
   display: "swap",
 });
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
-  const { locale } = await params;
-  return buildRootMetadata(locale as Locale);
-}
+export const metadata: Metadata = buildRootMetadata();
 
 interface LocaleLayoutProps {
   children: React.ReactNode;

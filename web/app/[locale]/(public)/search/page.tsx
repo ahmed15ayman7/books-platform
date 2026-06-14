@@ -20,7 +20,6 @@ export async function generateMetadata(): Promise<Metadata> {
         ? "ابحث في الكتب والمقالات والميديا والناشرين والمؤلفين"
         : "Search books, articles, media, publishers, and authors",
     keywords: locale === "ar" ? ["بحث", "كتب", "مقالات"] : ["search", "books", "articles"],
-    noIndex: true,
   });
 }
 
