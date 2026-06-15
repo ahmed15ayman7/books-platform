@@ -85,8 +85,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     children: [
                       Text(
                         isLast
-                            ? (locale == 'ar' ? 'ابدأ الآن' : 'Get Started')
-                            : (locale == 'ar' ? 'التالي' : 'Next'),
+                            ? 'onboarding.get_started'.tr()
+                            : 'common.next'.tr(),
                       ),
                       SizedBox(width: 8.w),
                       Icon(
@@ -135,7 +135,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                       SizedBox(width: 8.w),
                       Text(
-                        locale == 'ar' ? 'منصة الكتب' : 'Books',
+                        'brand.name'.tr(),
                         style: GoogleFonts.cairo(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w800,
@@ -148,7 +148,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     TextButton(
                       onPressed: _finish,
                       child: Text(
-                        locale == 'ar' ? 'تخطّي' : 'Skip',
+                        'onboarding.skip'.tr(),
                         style: GoogleFonts.cairo(
                           fontSize: 13.5.sp,
                           fontWeight: FontWeight.w700,

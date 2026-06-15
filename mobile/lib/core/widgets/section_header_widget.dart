@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -38,7 +39,7 @@ class SectionHeaderWidget extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    seeAllLabel ?? 'عرض الكل',
+                    seeAllLabel ?? 'common.see_all'.tr(),
                     style: GoogleFonts.cairo(
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w700,

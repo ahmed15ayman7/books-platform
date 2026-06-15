@@ -126,7 +126,7 @@ class HomePublisherPill extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  '${publisher.countryFlag} ${publisher.bookCount} ${locale == 'ar' ? 'كتاب' : 'books'}',
+                  '${publisher.countryFlag} ${publisher.bookCount} ${'common.books'.tr()}',
                   style: GoogleFonts.inter(
                     fontSize: 11.sp,
                     color: AppColors.textSecondary,

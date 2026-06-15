@@ -25,39 +25,38 @@ class BottomNavWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final ar = currentLocale == 'ar';
 
     final tabs = [
       _TabItem(
         tab: BottomNavTab.home,
         icon: Icons.home_outlined,
         activeIcon: Icons.home_rounded,
-        label: ar ? 'الرئيسية' : 'Home',
+        label: 'nav.home'.tr(),
       ),
       _TabItem(
         tab: BottomNavTab.books,
         icon: Icons.menu_book_outlined,
         activeIcon: Icons.menu_book_rounded,
-        label: ar ? 'الكتب' : 'Books',
+        label: 'nav.books'.tr(),
       ),
       _TabItem(
         tab: BottomNavTab.articles,
         icon: Icons.article_outlined,
         activeIcon: Icons.article_rounded,
-        label: ar ? 'المقالات' : 'Articles',
+        label: 'nav.articles'.tr(),
       ),
       null, // FAB slot
       _TabItem(
         tab: BottomNavTab.wishlist,
         icon: Icons.favorite_border_rounded,
         activeIcon: Icons.favorite_rounded,
-        label: ar ? 'المفضلة' : 'Wishlist',
+        label: 'nav.wishlist'.tr(),
       ),
       _TabItem(
         tab: BottomNavTab.media,
         icon: Icons.play_circle_outline_rounded,
         activeIcon: Icons.play_circle_rounded,
-        label: ar ? 'الميديا' : 'Media',
+        label: 'nav.media'.tr(),
       ),
       _TabItem(
         tab: BottomNavTab.publishers,

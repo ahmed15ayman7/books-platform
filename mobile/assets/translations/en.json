@@ -49,6 +49,11 @@
   },
 
   "nav": {
+    "home": "Home",
+    "books": "Books",
+    "articles": "Articles",
+    "media": "Media",
+    "wishlist": "Wishlist",
     "publishers": "Publisher"
   },
 
@@ -91,7 +96,8 @@
     "status": {
       "all": "All",
       "nominated": "Nominated",
-      "translated": "Translated"
+      "translated": "Translated",
+      "not_translated": "Not Translated"
     }
   },
 
@@ -104,7 +110,8 @@
     "newsletter_email_hint": "Your email",
     "newsletter_subscribe": "Subscribe",
     "no_translated_books": "No translated books yet",
-    "no_translated_books_subtitle": "We're working on adding more translated books soon"
+    "no_translated_books_subtitle": "We're working on adding more translated books soon",
+    "book_of_week": "Book of the week"
   },
 
   "book_detail": {
@@ -131,7 +138,8 @@
     "keywords": "Keywords",
     "notes": "Notes",
     "read_more": "Read more",
-    "show_less": "Show less"
+    "show_less": "Show less",
+    "view_details": "Read details"
   },
 
   "publishers": {
@@ -153,7 +161,8 @@
     "min": "min",
     "related": "Related Articles",
     "see_more": "Read more",
-    "see_less": "Read less"
+    "see_less": "Read less",
+    "section_empty_subtitle": "No articles in this section yet. Check back soon."
   },
 
   "article_detail": {
@@ -305,6 +314,25 @@
   "ai_disclosure": "This content was generated with the assistance of artificial intelligence.",
   "watch_on_youtube": "Watch on YouTube",
 
+  "brand": {
+    "name": "Books",
+    "tagline": "PLATFORM"
+  },
+
+  "onboarding": {
+    "get_started": "Get Started",
+    "skip": "Skip"
+  },
+
+  "contact": {
+    "name_required": "Name is required",
+    "message_required": "Message is required"
+  },
+
+  "services": {
+    "target_audience": "Target audience"
+  },
+
   "see_all": "See All",
 
   "media": {
@@ -313,5 +341,13 @@
     "novel_story": "Novel & Story",
     "all": "All",
     "empty": "No content yet"
+  },
+
+  "errors": {
+    "no_internet": "No internet connection",
+    "session_expired": "Session expired, please sign in again",
+    "storage_error": "Local storage error",
+    "something_went_wrong": "Something went wrong, please try again",
+    "unexpected": "Unexpected error"
   }
 }

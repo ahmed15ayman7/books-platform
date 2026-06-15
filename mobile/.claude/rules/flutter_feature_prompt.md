@@ -621,15 +621,15 @@ import 'package:flutter/foundation.dart';
 import 'failure.dart';
 
 String failureToMessage(Failure failure) => switch (failure) {
-      NetworkFailure()        => 'No internet connection.',
-      UnauthorizedFailure()   => 'Session expired. Please sign in again.',
-      CacheFailure()          => 'Local storage error.',
+      NetworkFailure()        => 'No internet connection',
+      UnauthorizedFailure()   => 'Session expired. Please sign in again',
+      CacheFailure()          => 'Local storage error',
       ValidationFailure(message: final m) => m,
       ServerFailure(statusCode: final code, message: final m) =>
         kReleaseMode ? 'Something went wrong. Please try again.' : '[$code] $m',
       UnexpectedFailure(message: final m) =>
-        kReleaseMode ? 'Unexpected error.' : (m.isEmpty ? 'Unexpected error.' : m),
-      Failure() => 'Unexpected error.',
+        kReleaseMode ? 'Unexpected error' : (m.isEmpty ? 'Unexpected error' : m),
+      Failure() => 'Unexpected error',
     };
 ```
 

@@ -33,18 +33,17 @@ class _ContactScreenState extends State<ContactScreen> {
     super.dispose();
   }
 
-  void _submit(String lang) {
+  void _submit() {
     final errors = <String, String>{};
     if (_nameCtrl.text.trim().isEmpty) {
-      errors['name'] = lang == 'ar' ? 'الاسم مطلوب' : 'Name is required';
+      errors['name'] = 'contact.name_required'.tr();
     }
     final emailRx = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
     if (!emailRx.hasMatch(_emailCtrl.text.trim())) {
-      errors['email'] =
-          lang == 'ar' ? 'أدخل بريدًا إلكترونيًا صحيحًا' : 'Enter a valid email';
+      errors['email'] = 'validation.email'.tr();
     }
     if (_messageCtrl.text.trim().isEmpty) {
-      errors['message'] = lang == 'ar' ? 'الرسالة مطلوبة' : 'Message is required';
+      errors['message'] = 'contact.message_required'.tr();
     }
     if (errors.isNotEmpty) {
       setState(() => _errors = errors);
@@ -97,7 +96,7 @@ class _ContactScreenState extends State<ContactScreen> {
                   errors: _errors,
                   isLoading: _phase == _Phase.loading,
                   isSuccess: _phase == _Phase.success,
-                  onSubmit: () => _submit(lang),
+                  onSubmit: _submit,
                   onReset: _reset,
                 ),
               ),

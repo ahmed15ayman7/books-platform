@@ -129,9 +129,7 @@ class ArticlesBody extends StatelessWidget {
                 child: EmptyStateWidget(
                   icon: Icons.article_outlined,
                   title: 'articles.empty'.tr(),
-                  subtitle: ar
-                      ? 'لم تُنشر مقالات في هذا القسم بعد. عُد قريباً.'
-                      : 'No articles in this section yet. Check back soon.',
+                  subtitle: 'articles.section_empty_subtitle'.tr(),
                 ),
               ),
             )

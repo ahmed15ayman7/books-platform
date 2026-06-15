@@ -105,7 +105,6 @@ class PublisherDetailBookCard extends StatelessWidget {
                   TranslationStatusBadge(
                     status: book.status,
                     small: true,
-                    locale: locale,
                   ),
                 ],
               ),

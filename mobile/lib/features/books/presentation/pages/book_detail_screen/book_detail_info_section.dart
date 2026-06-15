@@ -35,7 +35,7 @@ class BookDetailInfoSection extends StatelessWidget {
       children: [
         Row(
           children: [
-            TranslationStatusBadge(status: book.status, locale: locale),
+            TranslationStatusBadge(status: book.status),
             SizedBox(width: 8.w),
             Container(
               padding: EdgeInsetsDirectional.fromSTEB(11.w, 3.h, 11.w, 3.h),

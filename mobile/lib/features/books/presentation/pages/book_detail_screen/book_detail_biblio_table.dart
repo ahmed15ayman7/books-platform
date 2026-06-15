@@ -275,7 +275,7 @@ class BookDetailBiblioTable extends StatelessWidget {
 
     addEntry(
       'book_detail.translation_status'.tr(),
-      TranslationStatusBadge(status: book.status, locale: locale),
+      TranslationStatusBadge(status: book.status),
     );
 
     return [

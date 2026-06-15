@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -481,9 +482,7 @@ class ServicesBody extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        lang == 'ar'
-                                            ? 'الجهات المستهدفة'
-                                            : 'Target audience',
+                                        'services.target_audience'.tr(),
                                         style: GoogleFonts.cairo(
                                           fontSize: 11.5.sp,
                                           fontWeight: FontWeight.w700,

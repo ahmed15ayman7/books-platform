@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,19 +11,16 @@ class TranslationStatusBadge extends StatelessWidget {
     super.key,
     required this.status,
     this.small = false,
-    this.locale = 'ar',
   });
 
   final TranslationStatus status;
   final bool small;
-  final String locale;
 
   @override
   Widget build(BuildContext context) {
     final config = _config(status);
     if (config == null) return const SizedBox.shrink();
 
-    final ar = locale == 'ar';
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: small ? 7.w : 10.w,
@@ -33,7 +31,7 @@ class TranslationStatusBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
-        ar ? config.labelAr : config.labelEn,
+        config.label,
         style: GoogleFonts.tajawal(
           fontSize: small ? 10.sp : 11.5.sp,
           fontWeight: FontWeight.w700,
@@ -47,23 +45,19 @@ class TranslationStatusBadge extends StatelessWidget {
   _StatusConfig? _config(TranslationStatus s) => switch (s) {
         TranslationStatus.translated => _StatusConfig(
             backgroundColor: AppColors.success,
-            labelAr: 'مترجم',
-            labelEn: 'Translated',
+            label: 'books.status.translated'.tr(),
           ),
         TranslationStatus.nominated => _StatusConfig(
             backgroundColor: AppColors.warning,
-            labelAr: 'مرشح للترجمة',
-            labelEn: 'Nominated',
+            label: 'books.status.nominated'.tr(),
           ),
         TranslationStatus.notTranslated => _StatusConfig(
             backgroundColor: AppColors.textHint,
-            labelAr: 'غير مترجم',
-            labelEn: 'Not Translated',
+            label: 'books.status.not_translated'.tr(),
           ),
         TranslationStatus.newBook => _StatusConfig(
             backgroundColor: AppColors.primary,
-            labelAr: 'جديد',
-            labelEn: 'New',
+            label: 'common.new_badge'.tr(),
           ),
       };
 }
@@ -71,10 +65,8 @@ class TranslationStatusBadge extends StatelessWidget {
 class _StatusConfig {
   const _StatusConfig({
     required this.backgroundColor,
-    required this.labelAr,
-    required this.labelEn,
+    required this.label,
   });
   final Color backgroundColor;
-  final String labelAr;
-  final String labelEn;
+  final String label;
 }

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -61,7 +62,7 @@ class AppBarWidget extends StatelessWidget {
                   SizedBox(width: 10.w),
                 ],
                 if (variant == AppBarVariant.home)
-                  _BrandLogo(locale: currentLocale)
+                  const _BrandLogo()
                 else
                   Expanded(
                     child: _TitleBlock(title: title, subtitle: subtitle),
@@ -96,8 +97,7 @@ class AppBarWidget extends StatelessWidget {
 
 // ── Brand logo (home variant) ─────────────────────────────────────────────
 class _BrandLogo extends StatelessWidget {
-  const _BrandLogo({required this.locale});
-  final String locale;
+  const _BrandLogo();
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +119,7 @@ class _BrandLogo extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              locale == 'ar' ? 'منصة الكتب' : 'Books',
+              'brand.name'.tr(),
               style: GoogleFonts.cairo(
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w800,
@@ -128,7 +128,7 @@ class _BrandLogo extends StatelessWidget {
               ),
             ),
             Text(
-              locale == 'ar' ? 'العالمية' : 'PLATFORM',
+              'brand.tagline'.tr(),
               style: GoogleFonts.inter(
                 fontSize: 8.sp,
                 fontWeight: FontWeight.w700,

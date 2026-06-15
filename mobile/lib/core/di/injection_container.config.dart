@@ -233,10 +233,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i776.CatalogCubit(gh<_i407.BooksRepository>()),
     );
     gh.factory<_i765.HomeContentCubit>(
-      () => _i765.HomeContentCubit(
-        gh<_i407.BooksRepository>(),
-        gh<_i460.SharedPreferences>(),
-      ),
+      () => _i765.HomeContentCubit(gh<_i407.BooksRepository>()),
     );
     gh.lazySingleton<_i1067.SearchRepository>(
       () => _i163.SearchRepositoryImpl(gh<_i407.SearchRemoteDataSource>()),

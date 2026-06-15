@@ -125,7 +125,6 @@ class BookCardWidget extends StatelessWidget {
                   TranslationStatusBadge(
                     status: book.status,
                     small: true,
-                    locale: locale,
                   ),
                 ],
               ),

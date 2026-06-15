@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -77,7 +78,7 @@ class FeaturedBookHeroWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            locale == 'ar' ? 'كتاب الأسبوع' : 'Book of the week',
+                            'home.book_of_week'.tr(),
                             style: GoogleFonts.cairo(
                               fontSize: 11.sp,
                               fontWeight: FontWeight.w700,
@@ -104,10 +105,7 @@ class FeaturedBookHeroWidget extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           SizedBox(height: 9.h),
-                          TranslationStatusBadge(
-                            status: book.status,
-                            locale: locale,
-                          ),
+                          TranslationStatusBadge(status: book.status),
                         ],
                       ),
                       // "Read details" glass button
@@ -129,7 +127,7 @@ class FeaturedBookHeroWidget extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                locale == 'ar' ? 'عرض التفاصيل' : 'Read details',
+                                'book_detail.view_details'.tr(),
                                 style: GoogleFonts.cairo(
                                   fontSize: 13.5.sp,
                                   fontWeight: FontWeight.w700,

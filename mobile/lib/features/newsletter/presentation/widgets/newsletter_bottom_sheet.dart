@@ -122,13 +122,13 @@ class _NewsletterSheetContentState extends State<_NewsletterSheetContent> {
               Row(
                 children: [
                   _LocaleChip(
-                    label: 'العربية',
+                    label: 'arabic'.tr(),
                     selected: _selectedLocale == 'ar',
                     onTap: () => setState(() => _selectedLocale = 'ar'),
                   ),
                   SizedBox(width: 8.w),
                   _LocaleChip(
-                    label: 'English',
+                    label: 'english'.tr(),
                     selected: _selectedLocale == 'en',
                     onTap: () => setState(() => _selectedLocale = 'en'),
                   ),

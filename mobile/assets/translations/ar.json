@@ -49,6 +49,11 @@
   },
 
   "nav": {
+    "home": "الرئيسية",
+    "books": "الكتب",
+    "articles": "المقالات",
+    "media": "الميديا",
+    "wishlist": "المفضلة",
     "publishers": "الناشرون"
   },
 
@@ -91,7 +96,8 @@
     "status": {
       "all": "الكل",
       "nominated": "مرشح للترجمة",
-      "translated": "مترجم"
+      "translated": "مترجم",
+      "not_translated": "غير مترجم"
     }
   },
 
@@ -104,7 +110,8 @@
     "newsletter_email_hint": "بريدك الإلكتروني",
     "newsletter_subscribe": "اشترك",
     "no_translated_books": "لا توجد كتب مترجمة حالياً",
-    "no_translated_books_subtitle": "نعمل على إضافة المزيد من الكتب المترجمة قريباً"
+    "no_translated_books_subtitle": "نعمل على إضافة المزيد من الكتب المترجمة قريباً",
+    "book_of_week": "كتاب الأسبوع"
   },
 
   "book_detail": {
@@ -131,7 +138,8 @@
     "keywords": "الكلمات المفتاحية",
     "notes": "ملاحظات",
     "read_more": "قراءة المزيد",
-    "show_less": "عرض أقل"
+    "show_less": "عرض أقل",
+    "view_details": "عرض التفاصيل"
   },
 
   "publishers": {
@@ -153,7 +161,8 @@
     "min": "min",
     "related": "مقالات ذات صلة",
     "see_more": "اقرأ المزيد",
-    "see_less": "اقرأ أقل"
+    "see_less": "اقرأ أقل",
+    "section_empty_subtitle": "لم تُنشر مقالات في هذا القسم بعد. عُد قريباً."
   },
 
   "article_detail": {
@@ -305,6 +314,25 @@
   "ai_disclosure": "تم إنتاج هذا المحتوى بمساعدة الذكاء الاصطناعي.",
   "watch_on_youtube": "شاهد على يوتيوب",
 
+  "brand": {
+    "name": "منصة الكتب",
+    "tagline": "العالمية"
+  },
+
+  "onboarding": {
+    "get_started": "ابدأ الآن",
+    "skip": "تخطّي"
+  },
+
+  "contact": {
+    "name_required": "الاسم مطلوب",
+    "message_required": "الرسالة مطلوبة"
+  },
+
+  "services": {
+    "target_audience": "الجهات المستهدفة"
+  },
+
   "see_all": "عرض الكل",
 
   "media": {
@@ -313,5 +341,13 @@
     "novel_story": "رواية وقصة",
     "all": "الكل",
     "empty": "لا محتوى بعد"
+  },
+
+  "errors": {
+    "no_internet": "لا يوجد اتصال بالإنترنت",
+    "session_expired": "انتهت الجلسة، يرجى تسجيل الدخول مجدداً",
+    "storage_error": "خطأ في التخزين المحلي",
+    "something_went_wrong": "حدث خطأ ما، يرجى المحاولة مرة أخرى",
+    "unexpected": "خطأ غير متوقع"
   }
 }
