@@ -64,7 +64,7 @@ export function FooterAnimatedGrid({ columns, locale }: FooterAnimatedGridProps)
                 <FooterColumnBlock key={col.title} column={col} />
               ))}
             </div>
-            <FooterAppBadges locale={locale} />
+            {/* <FooterAppBadges locale={locale} /> */}
           </div>
         </StaggerItem>
       </StaggerContainer>
