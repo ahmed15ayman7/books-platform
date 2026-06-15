@@ -836,3 +836,4 @@ in this codebase:
 | No `SafeArea` on a screen | Content renders behind notch or home indicator on real devices | `SafeArea` at Scaffold body level |
 | Putting screen-specific components in `widgets/` | `widgets/` means shared across 2+ screens; non-shared components there mislead readers into thinking they are reusable | Put them in `pages/<screen_name>_screen/` next to the screen (see §1.1) |
 | Creating a `states/` subfolder inside a screen folder | "states" already means cubit sealed classes in this codebase — naming collision causes confusion | Keep flat inside the screen folder; name by visual concern (`home_shimmer.dart`, `home_body.dart`) |
+| Hardcoding strings in a single-language app | Adding a second language later requires touching every screen to externalize the strings | Use `.tr()` with a JSON key in every screen from day one; adding a language then only requires a new JSON file |

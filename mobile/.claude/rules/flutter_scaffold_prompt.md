@@ -383,17 +383,22 @@ These three widgets live in `lib/core/widgets/` and are used by every feature's
 
 **Localization:**
 
-- `assets/translations/ar.json` and `assets/translations/en.json`
-  Translation key–value JSON files. Keys are dot-separated namespaced strings
-  (e.g. `home.title`, `auth.loginButton`). Both files live under `assets/translations/`
-  and must be declared in `pubspec.yaml` under `flutter.assets` as the directory entry:
+- Translation JSON files live in `assets/translations/`, one file per supported language
+  (e.g. `en.json`, `ar.json`). `en.json` always exists — it is the source language where
+  all keys are first written and the fallback when a key is missing in another language.
+  Additional language files are added only when that language is actively supported —
+  never create them speculatively.
+  Keys are dot-separated namespaced strings (e.g. `home.title`, `auth.loginButton`).
+  Declare the directory in `pubspec.yaml`:
   ```yaml
   flutter:
     assets:
       - assets/translations/
   ```
   Start each file with `{}` — features populate keys as they are built.
-  Never hardcode user-visible strings in screens or widgets; always use a translation key.
+  Never hardcode user-visible strings in screens or widgets, even in a single-language app —
+  always use a translation key. Adding a new language requires only adding a new JSON file;
+  no code changes are needed.
 
 - Reading a translated string in a widget:
   ```dart
@@ -461,9 +466,9 @@ These three widgets live in `lib/core/widgets/` and are used by every feature's
     5. await configureDependencies()
     6. runApp(
          EasyLocalization(
-           supportedLocales: const [Locale('ar'), Locale('en')],
+           supportedLocales: const [Locale('en')], // add Locale('ar') etc. as languages are added
            path: 'assets/translations',
-           fallbackLocale: const Locale('ar'),
+           fallbackLocale: const Locale('en'),
            child: const MyApp(),
          ),
        )
