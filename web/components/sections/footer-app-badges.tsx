@@ -21,9 +21,9 @@ function StoreBadge({
     <Image
       src={src}
       alt={label}
-      width={135}
+      width={150}
       height={40}
-      className="h-10 w-auto transition-opacity hover:opacity-85"
+      className=" transition-opacity hover:opacity-85"
     />
   );
 
