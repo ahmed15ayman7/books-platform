@@ -60,9 +60,9 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        arabic: ["var(--font-arabic)", "Tajawal", "IBM Plex Sans Arabic", "sans-serif"],
+        arabic: ["var(--font-arabic)", "Tahoma", "Arial", "sans-serif"],
         latin: ["var(--font-latin)", "Inter", "sans-serif"],
-        display: ["var(--font-display)", "Cairo", "sans-serif"],
+        display: ["var(--font-arabic)", "Tahoma", "Arial", "sans-serif"],
         sans: ["var(--font-arabic)", "var(--font-latin)", "system-ui", "sans-serif"],
       },
       fontSize: {
