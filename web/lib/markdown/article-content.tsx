@@ -173,16 +173,16 @@ export function ArticleContent({ content, className }: ArticleContentProps) {
             return (
               <p
                 key={index}
-                className="text-base leading-[1.9] text-[var(--brand-gray-800)] md:text-lg"
+                className="text-lg leading-[1.9] text-[var(--brand-gray-800)] md:text-xl"
               >
                 {inlineFormat(block.text)}
               </p>
             );
           case "list":
             return (
-              <ul key={index} className="my-3 list-disc space-y-2 ps-6 md:text-lg">
+              <ul key={index} className="my-3 list-disc space-y-2 ps-6 md:text-xl">
                 {block.items.map((item, i) => (
-                  <li key={i} className="text-base leading-relaxed text-[var(--brand-gray-700)] md:text-lg">
+                  <li key={i} className="text-lg leading-relaxed text-[var(--brand-gray-700)] md:text-xl">
                     {inlineFormat(item)}
                   </li>
                 ))}
