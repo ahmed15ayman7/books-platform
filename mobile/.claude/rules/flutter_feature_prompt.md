@@ -744,6 +744,8 @@ Do not add args classes to `app_router.dart` or inside any feature folder.
 
 If the backend returns raw JSON with no wrapper, skip this section entirely —
 do not create `api_envelope.dart` and call `fromJson` directly on the response.
+If the decision is not yet confirmed at build time, add a single marker comment in
+`api_manager.dart` — do not create a skeleton file.
 
 When the envelope exists, `unwrapServiceResult` in `lib/core/network/api_envelope.dart`
 extracts `data` so that `fromJson` only sees the inner object and never knows the envelope exists:
@@ -837,3 +839,4 @@ in this codebase:
 | Putting screen-specific components in `widgets/` | `widgets/` means shared across 2+ screens; non-shared components there mislead readers into thinking they are reusable | Put them in `pages/<screen_name>_screen/` next to the screen (see §1.1) |
 | Creating a `states/` subfolder inside a screen folder | "states" already means cubit sealed classes in this codebase — naming collision causes confusion | Keep flat inside the screen folder; name by visual concern (`home_shimmer.dart`, `home_body.dart`) |
 | Hardcoding strings in a single-language app | Adding a second language later requires touching every screen to externalize the strings | Use `.tr()` with a JSON key in every screen from day one; adding a language then only requires a new JSON file |
+| Creating a commented skeleton file for a conditionally-needed artifact | Can be mistaken for "already implemented"; must be actively deleted if the condition never triggers; a dead file's comments are less reliably seen than a note in a file that is always read | Place a single marker comment in the nearest high-traffic file in the same layer |

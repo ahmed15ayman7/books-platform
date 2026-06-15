@@ -338,6 +338,9 @@ These three widgets live in `lib/core/widgets/` and are used by every feature's
   top-level response is not a JSON object or `data` is null.
   For void endpoints (logout, delete) bypass entirely: `fromJson: (_) => unit`.
   See feature guide §11 for usage patterns.
+  **Foundation phase — envelope pattern not yet confirmed:** do not create a skeleton file.
+  Add a single marker comment in `api_manager.dart` instead:
+  `// If backend wraps responses in { "success": true, "data": {...} }, create api_envelope.dart — see feature guide §11.`
 
 **Routing:**
 
