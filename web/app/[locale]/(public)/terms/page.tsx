@@ -4,7 +4,7 @@ import { ContentPageShell } from "@/components/sections/content-page-shell";
 import { LegalProseLayout } from "@/components/sections/legal-prose-layout";
 import { getTermsHero, getTermsLastUpdated, getTermsSections } from "@/lib/content/terms";
 import { ABOUT_IMAGES } from "@/lib/content/image-assets";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const hero = getTermsHero(locale);
   return buildPageMetadata({
     locale,
-    path: `/${locale}/terms`,
+    path: localeHref(locale, "/terms"),
     title: locale === "ar" ? "الشروط والأحكام | منصة الكتب العالمية" : "Terms & Conditions | Books Platform",
     description: hero.subtitle,
     keywords: locale === "ar" ? ["شروط", "أحكام"] : ["terms", "conditions"],
@@ -37,7 +37,7 @@ export default async function TermsPage() {
         backgroundImage: ABOUT_IMAGES.legal,
         backgroundImageAlt: hero.title,
         breadcrumbs: [
-          { label: isAr ? "الرئيسية" : "Home", href: `/${locale}` },
+          { label: isAr ? "الرئيسية" : "Home", href: localeHref(locale, "/") },
           { label: hero.title },
         ],
       }}

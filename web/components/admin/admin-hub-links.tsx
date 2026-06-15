@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { Trash2, FilePenLine } from "lucide-react";
@@ -35,8 +36,8 @@ export function AdminHubLinks({ className }: { className?: string }) {
 
   if (!showTrash && !showDrafts) return null;
 
-  const trashHref = `/${locale}/admin/trash`;
-  const draftsHref = `/${locale}/admin/drafts`;
+  const trashHref = localeHref(locale, "/admin/trash");
+  const draftsHref = localeHref(locale, "/admin/drafts");
 
   return (
     <div className={cn("flex items-center gap-1", className)}>

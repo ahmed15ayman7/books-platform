@@ -13,7 +13,7 @@ import {
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export interface PublisherCountryOption {
@@ -250,7 +250,7 @@ export function PublisherCountryFilter({
     [hiddenCountries, query],
   );
 
-  const baseHref = `/${locale}/publishers`;
+  const baseHref = localeHref(locale, "/publishers");
 
   const buildCountryHref = useCallback(
     (slug?: string) => {

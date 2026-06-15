@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import Image from "next/image";
 import { db } from "@/lib/db";
@@ -69,7 +70,7 @@ export default async function AdminArticleViewPage({ params }: Props) {
   if (!article) notFound();
 
   if (isMediaChannel(article.channel)) {
-    redirect(`/${locale}/admin/media/${id}`);
+    redirect(localeHref(locale, `/admin/media/${id}`));
   }
 
   const publicUrl = absoluteUrl(publicArticleUrl(locale, article.slug));
@@ -78,7 +79,7 @@ export default async function AdminArticleViewPage({ params }: Props) {
   return (
     <AdminDetailShell
       locale={locale}
-      backHref={`/${locale}/admin/articles`}
+      backHref={localeHref(locale, "/admin/articles")}
       backLabel="العودة للمقالات"
       title={article.title}
       subtitle={article.titleEn ?? undefined}
@@ -114,7 +115,7 @@ export default async function AdminArticleViewPage({ params }: Props) {
           <AdminEntityDeleteButton
             apiPath={`/api/v1/admin/articles/${id}`}
             entityTitle={article.title}
-            redirectHref={`/${locale}/admin/articles`}
+            redirectHref={localeHref(locale, "/admin/articles")}
             confirmTitle="تأكيد حذف المقال"
             entityLabel="المقال"
           />

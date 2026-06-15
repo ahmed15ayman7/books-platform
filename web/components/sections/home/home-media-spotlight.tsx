@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Bookmark, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { youtubeThumbnail } from "@/lib/media/youtube";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import { AnimatedSection, FadeIn } from "@/components/motion";
 
 export interface HomeMediaVideo {
@@ -67,7 +67,7 @@ function MediaChannelBlock({
         dir="ltr"
       >
         <Link
-          href={`/${locale}/articles/${featured.slug}`}
+          href={localeHref(locale, `/articles/${featured.slug}`)}
           className="group relative block aspect-video overflow-hidden bg-[var(--brand-gray-200)]"
         >
           <Image
@@ -156,7 +156,7 @@ export function HomeMediaSpotlight({ locale, title, channels }: HomeMediaSpotlig
 
         <FadeIn delay={0.15} className="mt-5 text-center">
           <Link
-            href={`/${locale}/media`}
+            href={localeHref(locale, "/media")}
             className="text-sm font-semibold text-[var(--brand-red)] hover:underline"
           >
             {isAr ? "كل إبداعات الميديا ←" : "All media →"}

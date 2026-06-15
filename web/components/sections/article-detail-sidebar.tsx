@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import { resolveArticleDisplayImage } from "@/lib/articles/resolve-display-image";
 import { cn } from "@/lib/utils";
 
@@ -42,7 +42,7 @@ export function ArticleDetailSidebar({ locale, articles, className }: ArticleDet
     e.preventDefault();
     const q = query.trim();
     if (!q) return;
-    router.push(`/${locale}/search?q=${encodeURIComponent(q)}`);
+    router.push(localeHref(locale, `/search?q=${encodeURIComponent(q)}`));
   }
 
   return (
@@ -79,7 +79,7 @@ export function ArticleDetailSidebar({ locale, articles, className }: ArticleDet
               return (
                 <li key={item.slug}>
                   <Link
-                    href={`/${locale}/articles/${item.slug}`}
+                    href={localeHref(locale, `/articles/${item.slug}`)}
                     className="group flex gap-3 transition-opacity hover:opacity-85"
                   >
                     <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded border border-[var(--brand-gray-200)] bg-[var(--brand-gray-100)]">

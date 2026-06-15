@@ -10,7 +10,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Globe2 } from "lucide-react";
 import { localizedBookName } from "@/lib/i18n/book-locale";
 import { publicBookUrl } from "@/lib/admin/public-urls";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { PAGINATION } from "@/lib/utils/constants";
 
@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as Locale;
   return buildPageMetadata({
     locale,
-    path: `/${locale}/books/nominated-for-translation`,
+    path: localeHref(locale, "/books/nominated-for-translation"),
     title: locale === "ar" ? "كتب مرشحة للترجمة" : "Books Nominated for Translation",
     description:
       locale === "ar"
@@ -80,15 +80,15 @@ export default async function NominatedForTranslationPage({ searchParams }: Prop
         covers={covers}
         variant="nominated"
         breadcrumbs={[
-          { label: locale === "ar" ? "الرئيسية" : "Home", href: `/${locale}` },
-          { label: locale === "ar" ? "الكتب" : "Books", href: `/${locale}/books` },
+          { label: locale === "ar" ? "الرئيسية" : "Home", href: localeHref(locale, "/") },
+          { label: locale === "ar" ? "الكتب" : "Books", href: localeHref(locale, "/books") },
           { label: t("nominatedTitle") },
         ]}
       >
         <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/20 px-4 py-1.5 text-sm text-amber-100">
           <Globe2 className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span>{locale === "ar" ? "هل تريد ترجمة كتاب؟" : "Want to translate a book?"}</span>
-          <Link href={`/${locale}/publish`} className="font-bold underline hover:no-underline">
+          <Link href={localeHref(locale, "/publish")} className="font-bold underline hover:no-underline">
             {locale === "ar" ? "انشر كتابك" : "Publish Your Book"}
           </Link>
         </div>
@@ -120,7 +120,7 @@ export default async function NominatedForTranslationPage({ searchParams }: Prop
               : "Discover books already translated to Arabic"}
           </p>
           <Link
-            href={`/${locale}/books/translated`}
+            href={localeHref(locale, "/books/translated")}
             className="inline-flex items-center gap-2 rounded-md bg-[var(--brand-red)] px-6 py-2 text-sm font-semibold text-white hover:bg-[var(--brand-red-hover)]"
           >
             {locale === "ar" ? "الكتب المترجمة ←" : "Translated Books →"}

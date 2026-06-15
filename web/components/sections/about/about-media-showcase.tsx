@@ -4,7 +4,7 @@ import Link from "next/link";
 import { SectionBlock } from "@/components/sections/section-block";
 import { MediaVideoCard } from "@/components/sections/media-video-card";
 import { Button } from "@/components/ui/button";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import { StaggerContainer, StaggerItem, FadeIn } from "@/components/motion";
 
 interface VideoItem {
@@ -44,7 +44,7 @@ export function AboutMediaShowcase({
               {isAr ? "تابع أحدث الفيديوهات على قنوات الميديا." : "Follow the latest videos on our media channels."}
             </p>
             <Button asChild className="mt-4" variant="outline" size={isLarge ? "lg" : "default"}>
-              <Link href={`/${locale}/media`}>
+              <Link href={localeHref(locale, "/media")}>
                 {isAr ? "تصفّح القناة" : "Browse channel"}
               </Link>
             </Button>

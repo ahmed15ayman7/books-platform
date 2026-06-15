@@ -7,7 +7,7 @@ import { BookCard } from "@/components/sections/book-card";
 import { BooksPagination } from "@/components/sections/books-pagination";
 import { localizedBookName } from "@/lib/i18n/book-locale";
 import { publicBookUrl } from "@/lib/admin/public-urls";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { PAGINATION } from "@/lib/utils/constants";
 
@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as Locale;
   return buildPageMetadata({
     locale,
-    path: `/${locale}/books/translated`,
+    path: localeHref(locale, "/books/translated"),
     title: locale === "ar" ? "الكتب المترجمة" : "Translated Books",
     description:
       locale === "ar"
@@ -76,8 +76,8 @@ export default async function TranslatedBooksPage({ searchParams }: Props) {
         covers={covers}
         variant="translated"
         breadcrumbs={[
-          { label: locale === "ar" ? "الرئيسية" : "Home", href: `/${locale}` },
-          { label: locale === "ar" ? "الكتب" : "Books", href: `/${locale}/books` },
+          { label: locale === "ar" ? "الرئيسية" : "Home", href: localeHref(locale, "/") },
+          { label: locale === "ar" ? "الكتب" : "Books", href: localeHref(locale, "/books") },
           { label: t("translatedTitle") },
         ]}
       />
@@ -107,7 +107,7 @@ export default async function TranslatedBooksPage({ searchParams }: Props) {
               : "Discover books waiting to be translated"}
           </p>
           <Link
-            href={`/${locale}/books/nominated-for-translation`}
+            href={localeHref(locale, "/books/nominated-for-translation")}
             className="inline-flex items-center gap-2 rounded-md border border-[var(--brand-red)] px-6 py-2 text-sm font-semibold text-[var(--brand-red)] hover:bg-[var(--brand-red-soft)]"
           >
             {locale === "ar" ? "كتب مرشحة للترجمة" : "Books Recommended for Translation"}

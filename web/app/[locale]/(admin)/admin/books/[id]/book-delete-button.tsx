@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { localeHref } from "@/lib/i18n/href";
 import { useRouter } from "next/navigation";
 import { Trash2, Loader2, AlertTriangle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -54,7 +55,7 @@ export function BookDeleteButton({
         if (isBooksPage) {
           router.refresh();
         } else {
-          router.push(`/${locale}/admin/books`);
+          router.push(localeHref(locale, "/admin/books"));
         }
         onDeleted?.();
       } catch {

@@ -6,14 +6,14 @@ import { PageHero } from "@/components/sections/page-hero";
 import { PublishBookForm } from "@/components/forms/publish-book-form";
 import { BookCard } from "@/components/sections/book-card";
 import { CheckCircle, ArrowRight, Eye } from "lucide-react";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as Locale;
   return buildPageMetadata({
     locale,
-    path: `/${locale}/publish`,
+    path: localeHref(locale, "/publish"),
     title: locale === "ar" ? "انشر كتابك" : "Publish Your Book",
     description:
       locale === "ar"
@@ -48,7 +48,7 @@ export default async function PublishPage() {
         align="center"
         size="lg"
         breadcrumbs={[
-          { label: isAr ? "الرئيسية" : "Home", href: `/${locale}` },
+          { label: isAr ? "الرئيسية" : "Home", href: localeHref(locale, "/") },
           { label: t("title") },
         ]}
       >

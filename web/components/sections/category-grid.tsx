@@ -15,7 +15,7 @@ import {
   ScrollText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 
 export interface CategoryItem {
   id: string;
@@ -72,13 +72,12 @@ export function CategoryGrid({
   showSpecialLinks = false,
 }: CategoryGridProps) {
   const isAr = locale === "ar";
-  const base = `/${locale}/books`;
   const displayCategories = categories.slice(0, 10);
 
   const allItems = [
     ...displayCategories.map((cat) => ({
       key: cat.id,
-      href: `${base}/category/${cat.slug}`,
+      href: localeHref(locale, `/books/category/${cat.slug}`),
       Icon: iconForCategorySlug(cat.slug),
       label: isAr && cat.nameAr ? cat.nameAr : cat.name,
     })),
@@ -86,13 +85,13 @@ export function CategoryGrid({
       ? [
           {
             key: "translated",
-            href: `${base}/translated`,
+            href: localeHref(locale, "/books/translated"),
             Icon: Languages,
             label: isAr ? "كتب مترجمة" : "Translated",
           },
           {
             key: "nominated",
-            href: `${base}/nominated-for-translation`,
+            href: localeHref(locale, "/books/nominated-for-translation"),
             Icon: Globe2,
             label: isAr ? "مرشحة للترجمة" : "For Translation",
           },

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 import { EmblaShowcase } from "@/components/ui/embla-showcase";
@@ -49,7 +50,7 @@ export function BooksFeaturedCarousel({ books, locale }: BooksFeaturedCarouselPr
     return (
       <Link
         key={book.id}
-        href={`/${locale}/books/${book.slug}`}
+        href={localeHref(locale, `/books/${book.slug}`)}
         className="group mx-1 flex min-h-[200px] overflow-hidden surface-card book-card-hover md:min-h-[220px]"
       >
         <div className="relative w-[38%] min-w-[120px] shrink-0 bg-[var(--brand-gray-100)] sm:w-[32%]">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -22,14 +23,15 @@ interface MobileNavTriggerProps {
 export function MobileNavTrigger({ locale, bookCategories = [] }: MobileNavTriggerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const isAr = locale === "ar";
-  const base = `/${locale}`;
 
   const categoryLinks = buildBookCategoryLinks(locale, bookCategories);
   const readingLinks = buildReadingChannelLinks(locale);
   const mediaLinks = buildMediaChannelLinks(locale);
 
+  const homeHref = localeHref(locale, "/");
+
   const navGroups = [
-    { label: isAr ? "الرئيسية" : "Home", href: base, items: null as null },
+    { label: isAr ? "الرئيسية" : "Home", href: homeHref, items: null as null },
     {
       label: bookCategoriesNavLabel(locale),
       href: null,
@@ -37,19 +39,19 @@ export function MobileNavTrigger({ locale, bookCategories = [] }: MobileNavTrigg
     },
     {
       label: isAr ? "كتب مرشحة للترجمة" : "For Translation",
-      href: `${base}/books/nominated-for-translation`,
+      href: localeHref(locale, "/books/nominated-for-translation"),
       items: null,
     },
     {
       label: isAr ? "كتب مترجمة" : "Translated Books",
-      href: `${base}/books/translated`,
+      href: localeHref(locale, "/books/translated"),
       items: null,
     },
     { label: readingsNavLabel(locale), href: null, items: readingLinks },
     { label: mediaNavLabel(locale), href: null, items: mediaLinks },
-    { label: isAr ? "الناشرون" : "Publishers", href: `${base}/publishers`, items: null },
-    { label: isAr ? "انشر كتابك" : "Publish", href: `${base}/publish`, items: null, isAccent: true },
-    { label: isAr ? "من نحن" : "About", href: `${base}/about`, items: null },
+    { label: isAr ? "الناشرون" : "Publishers", href: localeHref(locale, "/publishers"), items: null },
+    { label: isAr ? "انشر كتابك" : "Publish", href: localeHref(locale, "/publish"), items: null, isAccent: true },
+    { label: isAr ? "من نحن" : "About", href: localeHref(locale, "/about"), items: null },
   ];
 
   return (

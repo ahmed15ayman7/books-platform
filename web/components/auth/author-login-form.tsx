@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { BookOpen, Eye, EyeOff } from "lucide-react";
@@ -26,7 +27,7 @@ export default function AuthorLoginPage({ locale }: AuthorLoginPageProps) {
   const searchParams = useSearchParams();
   const redirect = sanitizeRedirectUrl(
     searchParams.get("redirect"),
-    `/${locale}/author/submissions`,
+    localeHref(locale, "/author/submissions"),
   );
 
   const [email, setEmail] = useState("");
@@ -91,7 +92,7 @@ export default function AuthorLoginPage({ locale }: AuthorLoginPageProps) {
     }
   }
 
-  const registerHref = `/${locale}/auth/register?redirect=${encodeURIComponent(redirect)}`;
+  const registerHref = localeHref(locale, `/auth/register?redirect=${encodeURIComponent(redirect)}`);
 
   return (
     <div className="w-full max-w-sm">

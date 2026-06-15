@@ -1,4 +1,5 @@
 import type { Locale } from "@/lib/i18n/config";
+import { stripLocale } from "@/lib/i18n/href";
 
 const FALLBACK_URL = "https://booksplatform.net";
 
@@ -75,8 +76,8 @@ export function alternateOpenGraphLocales(locale: Locale | string): string[] {
 }
 
 export function localizedPaths(path: string): { ar: string; en: string } {
-  const withSlash = path.startsWith("/") ? path : `/${path}`;
-  const ar = withSlash.replace(/^\/(ar|en)/, "/ar");
-  const en = withSlash.replace(/^\/(ar|en)/, "/en");
+  const clean = stripLocale(path.startsWith("/") ? path : `/${path}`);
+  const ar = clean;
+  const en = clean === "/" ? "/en" : `/en${clean}`;
   return { ar, en };
 }

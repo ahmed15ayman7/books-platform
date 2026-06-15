@@ -5,7 +5,7 @@ import { SectionBlock } from "@/components/sections/section-block";
 import { TeamAvatar } from "@/components/sections/team-avatar";
 import { Button } from "@/components/ui/button";
 import type { TeamMemberData } from "@/lib/content/team";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import { pickLocale } from "@/lib/content/types";
 import {
   StaggerContainer,
@@ -60,7 +60,7 @@ export function AboutTeamPreview({ locale, eyebrow, title, members }: AboutTeamP
       <FadeIn delay={0.3} className="mt-8 text-center">
         <HoverLift className="inline-block">
           <Button asChild variant="outline">
-            <Link href={`/${locale}/team`}>{isAr ? "عرض الكل" : "View all"}</Link>
+            <Link href={localeHref(locale, "/team")}>{isAr ? "عرض الكل" : "View all"}</Link>
           </Button>
         </HoverLift>
       </FadeIn>

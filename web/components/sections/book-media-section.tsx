@@ -5,7 +5,7 @@ import Link from "next/link";
 import { YoutubeEmbed } from "@/components/sections/youtube-embed";
 import { MediaVideoCard } from "@/components/sections/media-video-card";
 import { SectionHeading } from "@/components/ui/section-heading";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 
 export interface BookMediaItem {
   slug: string;
@@ -60,7 +60,7 @@ export function BookMediaSection({ locale, videos }: BookMediaSectionProps) {
       </div>
       <p className="mt-4 text-center">
         <Link
-          href={`/${locale}/media`}
+          href={localeHref(locale, "/media")}
           className="text-sm font-medium text-[var(--brand-red)] hover:underline"
         >
           {isAr ? "المزيد في إبداعات الميديا" : "More in Media"}

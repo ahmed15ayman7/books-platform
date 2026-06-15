@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Plus, Pencil, Shield, UserX, History } from "lucide-react";
@@ -246,7 +247,7 @@ export default function AdminUsersPage() {
 
   const rowActions = (row: AdminUserRow) => (
     <div className="flex items-center gap-1">
-      <Link href={`/${locale}/admin/users/${row.id}`}>
+      <Link href={localeHref(locale, `/admin/users/${row.id}`)}>
         <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="سجل الدخول">
           <History className="h-4 w-4" />
         </Button>

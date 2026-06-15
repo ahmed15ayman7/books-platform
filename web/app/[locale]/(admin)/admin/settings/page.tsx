@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { localeHref } from "@/lib/i18n/href";
 import { useParams, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
@@ -48,7 +49,7 @@ export default function AdminSettingsPage() {
         {visibleTabs.map((t) => (
           <Link
             key={t.id}
-            href={`/${locale}/admin/settings?tab=${t.id}`}
+            href={localeHref(locale, `/admin/settings?tab=${t.id}`)}
             className={cn(
               "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
               activeTab === t.id

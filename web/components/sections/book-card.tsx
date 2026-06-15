@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { localeHref } from "@/lib/i18n/href";
 import { motion } from "framer-motion";
 import { BookOpen } from "lucide-react";
 import { Badge, BadgeProps } from "@/components/ui/badge";
@@ -89,7 +90,7 @@ export function BookCard({
       className={cn("h-full will-change-transform", className)}
     >
       <Link
-        href={`/${locale}/books/${slug}`}
+        href={localeHref(locale, `/books/${slug}`)}
         className="group relative flex flex-col overflow-hidden surface-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)] h-full"
       >
         <CardMedia>

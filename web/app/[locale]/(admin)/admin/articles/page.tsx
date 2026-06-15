@@ -1,6 +1,7 @@
 "use client";
 
 import { PAGINATION } from "@/lib/utils/constants";
+import { localeHref } from "@/lib/i18n/href";
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
@@ -187,7 +188,7 @@ export default function AdminArticlesPage() {
               onSubmit={() => void load()}
               placeholder="بحث بالعنوان..."
             />
-            <Link href={`/${locale}/admin/articles/new`}>
+            <Link href={localeHref(locale, "/admin/articles/new")}>
               <Button size="sm" className="gap-1.5">
                 <Plus className="h-4 w-4" />
                 إضافة مقال

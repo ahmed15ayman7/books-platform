@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -55,7 +56,7 @@ export default function AdminUserDetailPage() {
   return (
     <div className="text-[var(--admin-text)]">
       <Link
-        href={`/${locale}/admin/users`}
+        href={localeHref(locale, "/admin/users")}
         className="mb-6 inline-flex items-center gap-2 text-sm text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)]"
       >
         <ArrowLeft className="h-4 w-4" />

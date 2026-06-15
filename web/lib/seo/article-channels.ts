@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { localeHref } from "@/lib/i18n/href";
 import type { Locale } from "@/lib/i18n/config";
 import { isMediaChannel } from "@/lib/media/youtube";
 import { buildPageMetadata } from "./metadata";
@@ -44,7 +45,7 @@ export function articleChannelMetadata(locale: Locale, channel: string): Metadat
   const basePath = isMediaChannel(channel) ? "media" : "articles";
   return buildPageMetadata({
     locale,
-    path: `/${locale}/${basePath}/${channel}`,
+    path: localeHref(locale, `/${basePath}/${channel}`),
     title: locale === "ar" ? c.titleAr : c.titleEn,
     description: locale === "ar" ? c.descAr : c.descEn,
     type: "website",

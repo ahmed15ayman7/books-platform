@@ -15,7 +15,7 @@ import { BookCard } from "@/components/sections/book-card";
 import { ArticleCard } from "@/components/sections/article-card";
 import { PublisherCard } from "@/components/sections/publisher-card";
 import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import type { GlobalSearchResult, SearchSectionType } from "@/lib/search/search-types";
 import { cn } from "@/lib/utils";
 
@@ -48,7 +48,7 @@ function AuthorSearchCard({
 }) {
   return (
     <Link
-      href={`/${locale}/authors/${slug}`}
+      href={localeHref(locale, `/authors/${slug}`)}
       className="group flex h-full flex-col items-center justify-center gap-3 rounded-2xl border border-[var(--brand-gray-200)] bg-white p-6 text-center transition-all hover:border-[var(--brand-red)] hover:shadow-md"
     >
       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--brand-red-soft)] text-[var(--brand-red)]">

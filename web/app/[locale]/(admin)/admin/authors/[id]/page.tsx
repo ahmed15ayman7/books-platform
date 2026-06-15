@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { notDeleted } from "@/lib/admin/audit-fields";
@@ -51,7 +52,7 @@ export default async function AdminAuthorViewPage({ params }: Props) {
   return (
     <AdminDetailShell
       locale={locale}
-      backHref={`/${locale}/admin/authors`}
+      backHref={localeHref(locale, "/admin/authors")}
       backLabel="العودة للمؤلفين"
       title={title}
       subtitle={author.name !== title ? author.name : undefined}
@@ -62,7 +63,7 @@ export default async function AdminAuthorViewPage({ params }: Props) {
         <AdminEntityDeleteButton
           apiPath={`/api/v1/admin/authors/${id}`}
           entityTitle={title}
-          redirectHref={`/${locale}/admin/authors`}
+          redirectHref={localeHref(locale, "/admin/authors")}
           confirmTitle="تأكيد حذف المؤلف"
           entityLabel="المؤلف"
         />

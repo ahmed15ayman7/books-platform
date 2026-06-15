@@ -2,6 +2,7 @@
 
 import { useLocale } from "next-intl";
 import { useRouter, usePathname } from "next/navigation";
+import { localeHref, stripLocale } from "@/lib/i18n/href";
 import { cn } from "@/lib/utils";
 
 export function LanguageSwitcher({ className }: { className?: string }) {
@@ -10,11 +11,8 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   const pathname = usePathname();
 
   function switchLocale(newLocale: string) {
-    // Replace the current locale prefix in the path
-    const segments = pathname.split("/");
-    segments[1] = newLocale;
-    const newPath = segments.join("/") || "/";
-    router.push(newPath);
+    const cleanPath = stripLocale(pathname);
+    router.push(localeHref(newLocale, cleanPath));
   }
 
   return (

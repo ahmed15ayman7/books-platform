@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ContentPageShell } from "@/components/sections/content-page-shell";
 import { EditorialSplit } from "@/components/sections/editorial-split";
 import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import { PAGINATION } from "@/lib/utils/constants";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const name = cat ? (locale === "ar" && cat.nameAr ? cat.nameAr : cat.name) : slug;
   return buildPageMetadata({
     locale: locale as Locale,
-    path: `/${locale}/books/category/${slug}`,
+    path: localeHref(locale, `/books/category/${slug}`),
     title: name,
     description:
       locale === "ar"
@@ -80,8 +80,8 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             ? "تصفّح الإصدارات في هذا التصنيف"
             : "Browse titles in this category",
         breadcrumbs: [
-          { label: locale === "ar" ? "الرئيسية" : "Home", href: `/${locale}` },
-          { label: locale === "ar" ? "الكتب" : "Books", href: `/${locale}/books` },
+          { label: locale === "ar" ? "الرئيسية" : "Home", href: localeHref(locale, "/") },
+          { label: locale === "ar" ? "الكتب" : "Books", href: localeHref(locale, "/books") },
           { label: categoryName },
         ],
       }}
@@ -130,7 +130,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
               {relatedCategories.map((cat) => (
                 <Link
                   key={cat.id}
-                  href={`/${locale}/books/category/${cat.slug}`}
+                  href={localeHref(locale, `/books/category/${cat.slug}`)}
                   className="rounded-full border border-[var(--brand-gray-200)] bg-white px-4 py-1.5 text-sm text-[var(--brand-gray-700)] transition-colors hover:border-[var(--brand-red)] hover:text-[var(--brand-red)]"
                 >
                   {locale === "ar" && cat.nameAr ? cat.nameAr : cat.name}

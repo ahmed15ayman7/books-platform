@@ -8,7 +8,7 @@ import { ServicesPlatformList } from "@/components/sections/services/services-pl
 import { ServicesProductsCards } from "@/components/sections/services/services-products-cards";
 import { ABOUT_IMAGES } from "@/lib/content/image-assets";
 import { getServicesContent } from "@/lib/content/services";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const content = getServicesContent(locale);
   return buildPageMetadata({
     locale,
-    path: `/${locale}/services`,
+    path: localeHref(locale, "/services"),
     title: locale === "ar" ? "خدماتنا | منصة الكتب العالمية" : "Our Services | Books Platform",
     description: content.platformServices.intro.slice(0, 155),
     keywords: locale === "ar" ? ["خدمات", "ببليوغرافيا"] : ["services", "bibliography"],

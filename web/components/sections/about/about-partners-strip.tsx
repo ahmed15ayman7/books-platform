@@ -3,7 +3,7 @@ import { SectionBlock } from "@/components/sections/section-block";
 import { SafeImage } from "@/components/ui/safe-image";
 import { PublisherService } from "@/server/services/publisher.service";
 import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 
 interface AboutPartnersStripProps {
   locale: Locale;
@@ -32,13 +32,13 @@ export async function AboutPartnersStrip({
     sponsored.length > 0
       ? sponsored.map((pub) => ({
           key: pub.slug,
-          href: `/${locale}/publishers/${pub.slug}`,
+          href: localeHref(locale, `/publishers/${pub.slug}`),
           name: localizedPublisherName(pub, locale),
           imageUrl: pub.imageUrl,
         }))
       : PLACEHOLDER_NAMES.map((p, i) => ({
           key: `placeholder-${i}`,
-          href: `/${locale}/publishers`,
+          href: localeHref(locale, "/publishers"),
           name: isAr ? p.ar : p.en,
           imageUrl: null as string | null,
         }));

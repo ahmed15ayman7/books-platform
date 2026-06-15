@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { localeHref } from "@/lib/i18n/href";
 import { ChevronLeft } from "lucide-react";
 import { db } from "@/lib/db";
 import { BookEditForm } from "../[id]/edit/book-edit-form";
@@ -67,7 +68,7 @@ export default async function AdminBookNewPage({ params }: Props) {
       <div className="mb-6 flex flex-col gap-4 border-b border-[var(--admin-border)] pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-4">
           <Link
-            href={`/${locale}/admin/books`}
+            href={localeHref(locale, "/admin/books")}
             className="flex shrink-0 items-center gap-1.5 text-sm text-[var(--admin-text-muted)] transition-colors hover:text-[var(--admin-accent)]"
           >
             <ChevronLeft className="h-4 w-4" />

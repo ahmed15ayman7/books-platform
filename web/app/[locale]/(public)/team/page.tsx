@@ -9,7 +9,7 @@ import { CtaBand } from "@/components/sections/cta-band";
 import { TeamDesignCredit } from "@/components/sections/team-design-credit";
 import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
 import { getTeamContent } from "@/lib/content/team";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return buildPageMetadata({
     locale,
-    path: `/${locale}/team`,
+    path: localeHref(locale, "/team"),
     title:
       locale === "ar"
         ? "فريق العمل | منصة الكتب العالمية"
@@ -44,7 +44,7 @@ export default async function TeamPage() {
         subtitle={content.hero.subtitle}
         members={content.members}
         breadcrumbs={[
-          { label: isAr ? "الرئيسية" : "Home", href: `/${locale}` },
+          { label: isAr ? "الرئيسية" : "Home", href: localeHref(locale, "/") },
           { label: content.hero.title },
         ]}
       />
@@ -70,14 +70,14 @@ export default async function TeamPage() {
 
           <TeamQuoteBlock
             quote={content.quote}
-            ctaHref={`/${locale}/contact`}
+            ctaHref={localeHref(locale, "/contact")}
             ctaLabel={content.cta}
           />
 
           <CtaBand
-            primaryHref={`/${locale}/contact`}
+            primaryHref={localeHref(locale, "/contact")}
             primaryLabel={content.cta}
-            secondaryHref={`/${locale}/about`}
+            secondaryHref={localeHref(locale, "/about")}
             secondaryLabel={isAr ? "من نحن" : "About Us"}
           />
 

@@ -3,7 +3,7 @@ import { getLocale } from "next-intl/server";
 import { ArticleService } from "@/server/services/article.service";
 import { MediaChannelPage } from "@/components/sections/media-channel-page";
 import { mediaNavLabel } from "@/lib/nav/site-nav";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { PAGINATION } from "@/lib/utils/constants";
 
@@ -11,7 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as Locale;
   return buildPageMetadata({
     locale,
-    path: `/${locale}/media`,
+    path: localeHref(locale, "/media"),
     title: locale === "ar" ? "إبداعات الميديا" : "Media Creations",
     description:
       locale === "ar"

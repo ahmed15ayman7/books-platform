@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -124,7 +125,7 @@ export function AuthorEditForm({ locale, id }: AuthorEditFormProps) {
   return (
     <div className="text-[var(--admin-text)]">
       <Link
-        href={viewHref ?? `/${locale}/admin/authors`}
+        href={viewHref ?? localeHref(locale, "/admin/authors")}
         className="mb-5 inline-flex items-center gap-2 text-sm text-[var(--admin-text-muted)] hover:text-[var(--admin-accent)] transition-colors"
       >
         <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
@@ -195,7 +196,7 @@ export function AuthorEditForm({ locale, id }: AuthorEditFormProps) {
               </Button>
             </Link>
           )}
-          <Link href={`/${locale}/admin/authors`}>
+          <Link href={localeHref(locale, "/admin/authors")}>
             <Button variant="outline" type="button">
               إلغاء
             </Button>

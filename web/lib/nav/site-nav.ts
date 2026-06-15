@@ -3,6 +3,7 @@ import {
   BOOK_CATEGORY_LABELS_EN,
   type BookCategoryLabelAr,
 } from "./book-categories";
+import { localeHref } from "@/lib/i18n/href";
 import { normalizeArabic } from "@/lib/i18n/normalize-arabic";
 
 export interface NavCategory {
@@ -40,7 +41,6 @@ export function bookCategoryLabel(labelAr: BookCategoryLabelAr, locale: string):
 }
 
 export function buildBookCategoryLinks(locale: string, categories: NavCategory[]): NavLink[] {
-  const base = `/${locale}`;
   const byNorm = new Map(
     categories.map((c) => [normalizeArabic(c.nameAr ?? c.name), c]),
   );
@@ -48,47 +48,45 @@ export function buildBookCategoryLinks(locale: string, categories: NavCategory[]
   return BOOK_CATEGORY_LABELS_AR.map((labelAr) => {
     const cat = byNorm.get(normalizeArabic(labelAr));
     return {
-      href: cat ? `${base}/books/category/${cat.slug}` : `${base}/books`,
+      href: cat
+        ? localeHref(locale, `/books/category/${cat.slug}`)
+        : localeHref(locale, "/books"),
       label: bookCategoryLabel(labelAr, locale),
     };
   });
 }
 
 export function buildReadingChannelLinks(locale: string): NavLink[] {
-  const base = `/${locale}`;
   const isAr = locale === "ar";
   return READING_CHANNELS.map((ch) => ({
-    href: `${base}/articles/${ch.slug}`,
+    href: localeHref(locale, `/articles/${ch.slug}`),
     label: isAr ? ch.labelAr : ch.labelEn,
   }));
 }
 
 export function buildMediaChannelLinks(locale: string): NavLink[] {
-  const base = `/${locale}`;
   const isAr = locale === "ar";
   return [
-    // { href: `${base}/media`, label: isAr ? "كل الفيديوهات" : "All Videos" },
     ...MEDIA_CHANNELS.map((ch) => ({
-      href: `${base}/media/${ch.slug}`,
+      href: localeHref(locale, `/media/${ch.slug}`),
       label: isAr ? ch.labelAr : ch.labelEn,
     })),
   ];
 }
 
 export function mediaHubHref(locale: string): string {
-  return `/${locale}/media`;
+  return localeHref(locale, "/media");
 }
 
 export function buildTopLevelBookLinks(locale: string): NavLink[] {
   const isAr = locale === "ar";
-  const base = `/${locale}`;
   return [
     {
-      href: `${base}/books/nominated-for-translation`,
+      href: localeHref(locale, "/books/nominated-for-translation"),
       label: isAr ? "كتب مرشحة للترجمة" : "For Translation",
     },
     {
-      href: `${base}/books/translated`,
+      href: localeHref(locale, "/books/translated"),
       label: isAr ? "كتب مترجمة" : "Translated Books",
     },
   ];

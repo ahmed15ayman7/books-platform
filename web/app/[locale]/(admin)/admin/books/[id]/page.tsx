@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Pencil, ExternalLink, Mail, Globe, MapPin } from "lucide-react";
@@ -133,12 +134,12 @@ export default async function AdminBookViewPage({ params }: Props) {
   });
 
   const title = book.nameAr ?? book.nameEn;
-  const publicUrl = absoluteUrl(`/${locale}/books/${book.slug}`);
+  const publicUrl = absoluteUrl(localeHref(locale, `/books/${book.slug}`));
 
   return (
     <div className="text-[var(--admin-text)]">
       <Link
-        href={`/${locale}/admin/books`}
+        href={localeHref(locale, "/admin/books")}
         className="mb-6 inline-flex items-center gap-2 text-sm text-[var(--admin-text-muted)] transition-colors hover:text-[var(--admin-accent)]"
       >
         <ArrowLeft className="h-4 w-4" />
@@ -177,7 +178,7 @@ export default async function AdminBookViewPage({ params }: Props) {
         </div>
 
         <div className="flex shrink-0 flex-wrap gap-2">
-          <Link href={`/${locale}/admin/books/${id}/edit`}>
+          <Link href={localeHref(locale, `/admin/books/${id}/edit`)}>
             <Button className="gap-2">
               <Pencil className="h-4 w-4" />
               تعديل
@@ -516,7 +517,7 @@ export default async function AdminBookViewPage({ params }: Props) {
                   المقالات المرتبطة ({linkedArticles.length})
                 </h2>
                 <Link
-                  href={`/${locale}/admin/articles/new?bookId=${id}`}
+                  href={localeHref(locale, `/admin/articles/new?bookId=${id}`)}
                   className="text-xs text-[var(--brand-red)] hover:underline"
                 >
                   + مقال جديد

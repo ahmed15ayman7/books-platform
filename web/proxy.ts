@@ -2,22 +2,23 @@ import createMiddleware from "next-intl/middleware";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { locales, defaultLocale } from "@/lib/i18n/config";
+import { getLocaleFromPathname, localeHref } from "@/lib/i18n/href";
 import { verifyAccessToken } from "@/lib/auth/jwt";
 import { accessTokenCookieOptions } from "@/lib/auth/access-token-cookie";
 
 const intlMiddleware = createMiddleware({
   locales,
   defaultLocale,
-  localePrefix: "always",
+  localePrefix: "as-needed",
   localeDetection: true,
 });
 
-const ADMIN_PATTERN = /^\/[a-z]{2}\/admin(?:\/|$)/;
-const ADMIN_LOGIN_PATTERN = /^\/[a-z]{2}\/admin\/login\/?$/;
-const AMBASSADOR_PATTERN = /^\/[a-z]{2}\/ambassador(?:\/|$)/;
-const AMBASSADOR_LOGIN_PATTERN = /^\/[a-z]{2}\/ambassador\/login\/?$/;
-const AUTHOR_PATTERN = /^\/[a-z]{2}\/author(?:\/|$)/;
-const AUTH_PATTERN = /^\/[a-z]{2}\/auth(?:\/|$)/;
+const ADMIN_PATTERN = /^(?:\/(?:en|ar))?\/admin(?:\/|$)/;
+const ADMIN_LOGIN_PATTERN = /^(?:\/(?:en|ar))?\/admin\/login\/?$/;
+const AMBASSADOR_PATTERN = /^(?:\/(?:en|ar))?\/ambassador(?:\/|$)/;
+const AMBASSADOR_LOGIN_PATTERN = /^(?:\/(?:en|ar))?\/ambassador\/login\/?$/;
+const AUTHOR_PATTERN = /^(?:\/(?:en|ar))?\/author(?:\/|$)/;
+const AUTH_PATTERN = /^(?:\/(?:en|ar))?\/auth(?:\/|$)/;
 
 type AuthPayload = Awaited<ReturnType<typeof verifyAccessToken>>;
 
@@ -82,7 +83,7 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const locale = pathname.split("/")[1] ?? "ar";
+  const locale = getLocaleFromPathname(pathname);
   let refreshedToken: string | null = null;
 
   const needsAuth =
@@ -98,13 +99,13 @@ export default async function proxy(request: NextRequest) {
 
   if (ADMIN_PATTERN.test(pathname) && !ADMIN_LOGIN_PATTERN.test(pathname)) {
     if (!auth?.payload || !roleAllowed(auth.payload, ["ADMIN"])) {
-      return NextResponse.redirect(new URL(`/${locale}/admin/login`, request.url));
+      return NextResponse.redirect(new URL(localeHref(locale, "/admin/login"), request.url));
     }
   }
 
   if (AMBASSADOR_PATTERN.test(pathname) && !AMBASSADOR_LOGIN_PATTERN.test(pathname)) {
     if (!auth?.payload || !roleAllowed(auth.payload, ["AMBASSADOR", "ADMIN"])) {
-      return NextResponse.redirect(new URL(`/${locale}/ambassador/login`, request.url));
+      return NextResponse.redirect(new URL(localeHref(locale, "/ambassador/login"), request.url));
     }
   }
 
@@ -112,7 +113,7 @@ export default async function proxy(request: NextRequest) {
     if (!auth?.payload || !roleAllowed(auth.payload, ["AUTHOR", "ADMIN"])) {
       const redirect = encodeURIComponent(pathname + request.nextUrl.search);
       return NextResponse.redirect(
-        new URL(`/${locale}/auth/login?redirect=${redirect}`, request.url),
+        new URL(`${localeHref(locale, "/auth/login")}?redirect=${redirect}`, request.url),
       );
     }
   }

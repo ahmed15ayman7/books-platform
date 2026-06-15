@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { localeHref } from "@/lib/i18n/href";
 import { useParams } from "next/navigation";
 
 interface ErrorProps {
@@ -30,7 +31,7 @@ export default function Error({ error, reset }: ErrorProps) {
           {isAr ? "إعادة المحاولة" : "Try Again"}
         </button>
         <Link
-          href={`/${locale}`}
+          href={localeHref(locale, "/")}
           className="rounded-md border border-[var(--brand-gray-300)] px-6 py-2.5 text-sm font-semibold text-[var(--brand-gray-700)]"
         >
           {isAr ? "الرئيسية" : "Home"}

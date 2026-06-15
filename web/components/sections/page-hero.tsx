@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import {
   FadeIn,
   RevealText,
@@ -56,7 +56,7 @@ export function PageHero({
   const crumbs: BreadcrumbItem[] =
     breadcrumbs && breadcrumbs.length > 0
       ? breadcrumbs
-      : [{ label: homeLabel, href: `/${locale}` }];
+      : [{ label: homeLabel, href: localeHref(locale, "/") }];
 
   return (
     <div

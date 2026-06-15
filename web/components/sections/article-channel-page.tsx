@@ -4,7 +4,7 @@ import { PageHero } from "@/components/sections/page-hero";
 import { ArticleCard } from "./article-card";
 import { BooksPagination } from "./books-pagination";
 import { EmptyState } from "@/components/ui/empty-state";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import {
   mapArticleForCard,
   type ArticleLinkedProduct,
@@ -62,8 +62,8 @@ export function ArticleChannelPage({
         subtitle={subtitle}
         bgClassName={heroBgClass}
         breadcrumbs={[
-          { label: locale === "ar" ? "الرئيسية" : "Home", href: `/${locale}` },
-          { label: locale === "ar" ? "المقالات" : "Articles", href: `/${locale}/articles/harvest` },
+          { label: locale === "ar" ? "الرئيسية" : "Home", href: localeHref(locale, "/") },
+          { label: locale === "ar" ? "المقالات" : "Articles", href: localeHref(locale, "/articles/harvest") },
           { label: breadcrumbLabel },
         ]}
       />

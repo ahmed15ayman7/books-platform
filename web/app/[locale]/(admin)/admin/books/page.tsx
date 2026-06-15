@@ -1,6 +1,7 @@
 "use client";
 
 import { PAGINATION } from "@/lib/utils/constants";
+import { localeHref } from "@/lib/i18n/href";
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
@@ -109,7 +110,7 @@ export default function AdminBooksPage() {
 
   const bookActions = (row: AdminBook) => (
     <div className="flex items-center gap-1">
-      <Link href={`/${locale}/admin/books/${row.id}`} aria-label="عرض">
+      <Link href={localeHref(locale, `/admin/books/${row.id}`)} aria-label="عرض">
         <Button
           size="icon"
           variant="ghost"
@@ -118,7 +119,7 @@ export default function AdminBooksPage() {
           <Eye className="h-4 w-4" />
         </Button>
       </Link>
-      <Link href={`/${locale}/admin/books/${row.id}/edit`} aria-label="تعديل">
+      <Link href={localeHref(locale, `/admin/books/${row.id}/edit`)} aria-label="تعديل">
         <Button
           size="icon"
           variant="ghost"
@@ -235,7 +236,7 @@ export default function AdminBooksPage() {
               onSubmit={() => void loadBooks()}
               placeholder="بحث بالعنوان..."
             />
-            <Link href={`/${locale}/admin/books/new`}>
+            <Link href={localeHref(locale, "/admin/books/new")}>
               <Button size="sm" className="gap-1.5">
                 <Plus className="h-4 w-4" />
                 إضافة كتاب

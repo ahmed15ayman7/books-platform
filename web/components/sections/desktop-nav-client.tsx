@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { localeHref } from "@/lib/i18n/href";
 import { usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -24,7 +25,7 @@ interface DesktopNavClientProps {
 export function DesktopNavClient({ locale, bookCategories = [] }: DesktopNavClientProps) {
   const pathname = usePathname();
   const isAr = locale === "ar";
-  const base = `/${locale}`;
+  const homeHref = localeHref(locale, "/");
 
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -52,7 +53,7 @@ export function DesktopNavClient({ locale, bookCategories = [] }: DesktopNavClie
   ];
 
   function isActive(href: string) {
-    if (href === base) return pathname === base || pathname === `${base}/`;
+    if (href === homeHref) return pathname === homeHref || pathname === `${homeHref}/`;
     return pathname.startsWith(href);
   }
 
@@ -70,7 +71,7 @@ export function DesktopNavClient({ locale, bookCategories = [] }: DesktopNavClie
       role="navigation"
       aria-label={isAr ? "التنقل الرئيسي" : "Main navigation"}
     >
-      <NavLink href={base} active={isActive(base)}>
+      <NavLink href={homeHref} active={isActive(homeHref)}>
         {isAr ? "الرئيسية" : "Home"}
       </NavLink>
 
@@ -82,7 +83,7 @@ export function DesktopNavClient({ locale, bookCategories = [] }: DesktopNavClie
         onBlurCapture={scheduleClose}
       >
         <NavLink
-          href={`${base}/books`}
+          href={localeHref(locale, "/books")}
           hasDropdown
           active={pathname.includes("/books/category")}
           isOpen={openMenu === "books"}
@@ -99,13 +100,13 @@ export function DesktopNavClient({ locale, bookCategories = [] }: DesktopNavClie
       </div>
 
       <NavLink
-        href={`${base}/books/nominated-for-translation`}
+        href={localeHref(locale, "/books/nominated-for-translation")}
         active={pathname.includes("nominated-for-translation")}
       >
         {isAr ? "كتب مرشحة للترجمة" : "For Translation"}
       </NavLink>
 
-      <NavLink href={`${base}/books/translated`} active={pathname.includes("/books/translated")}>
+      <NavLink href={localeHref(locale, "/books/translated")} active={pathname.includes("/books/translated")}>
         {isAr ? "كتب مترجمة" : "Translated"}
       </NavLink>
 
@@ -117,7 +118,7 @@ export function DesktopNavClient({ locale, bookCategories = [] }: DesktopNavClie
         onBlurCapture={scheduleClose}
       >
         <NavLink
-          href={readingChannels[0]?.href ?? `${base}/articles/world-reads`}
+          href={readingChannels[0]?.href ?? localeHref(locale, "/articles/world-reads")}
           hasDropdown
           active={readingsActive}
           isOpen={openMenu === "readings"}
@@ -157,12 +158,12 @@ export function DesktopNavClient({ locale, bookCategories = [] }: DesktopNavClie
         )}
       </div>
 
-      <NavLink href={`${base}/publishers`} active={pathname.includes("/publishers")}>
+      <NavLink href={localeHref(locale, "/publishers")} active={pathname.includes("/publishers")}>
         {isAr ? "ناشرون" : "Publishers"}
       </NavLink>
 
       <NavLink
-        href={`${base}/publish`}
+        href={localeHref(locale, "/publish")}
         active={pathname.includes("/publish")}
         accent
         className="nav-publish-pill"

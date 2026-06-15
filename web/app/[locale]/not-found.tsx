@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { localeHref } from "@/lib/i18n/href";
 import { getLocale } from "next-intl/server";
 import { NotFoundIllustration } from "@/components/not-found-illustration";
 
@@ -23,13 +24,13 @@ export default async function NotFound() {
       </p>
       <div className="flex flex-wrap justify-center gap-3">
         <Link
-          href={`/${locale}`}
+          href={localeHref(locale, "/")}
           className="rounded-lg bg-[var(--brand-red)] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--brand-red-hover)]"
         >
           {isAr ? "الصفحة الرئيسية" : "Go Home"}
         </Link>
         <Link
-          href={`/${locale}/books`}
+          href={localeHref(locale, "/books")}
           className="rounded-lg border border-[var(--brand-gray-700)] bg-[var(--brand-gray-900)] px-6 py-2.5 text-sm font-semibold text-[var(--brand-gray-200)] transition-colors hover:border-[var(--brand-red)] hover:text-white"
         >
           {isAr ? "تصفح الكتب" : "Browse Books"}

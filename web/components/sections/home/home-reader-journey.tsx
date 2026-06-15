@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { BookOpen, Languages, PenTool, Search } from "lucide-react";
 import { SectionHeading } from "@/components/ui/section-heading";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import {
   AnimatedSection,
   FadeIn,
@@ -36,7 +36,7 @@ export function HomeReaderJourney({ locale, title, steps }: HomeReaderJourneyPro
               <StaggerItem key={step.key} className="min-w-[200px] snap-start md:min-w-0">
                 <AnimatedCard>
                   <Link
-                    href={`/${locale}/${HREFS[i]}`}
+                    href={localeHref(locale, `/${HREFS[i]}`)}
                     className="block rounded-xl border border-[var(--brand-gray-200)] bg-[var(--brand-gray-50)] p-5 h-full"
                   >
                     <IconPulse>

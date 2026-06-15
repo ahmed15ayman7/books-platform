@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { localeHref } from "@/lib/i18n/href";
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -6,5 +7,5 @@ interface Props {
 
 export default async function NovelStoryRedirect({ params }: Props) {
   const { locale } = await params;
-  redirect(`/${locale}/media/novel-story`);
+  redirect(localeHref(locale, "/media/novel-story"));
 }

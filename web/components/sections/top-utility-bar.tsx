@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { localeHref } from "@/lib/i18n/href";
 import { getLocale } from "next-intl/server";
 import { SocialIconCircle } from "@/components/ui/social-icon-circle";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
@@ -11,16 +12,16 @@ export async function TopUtilityBar() {
   const utilityLinks =
     locale === "ar"
       ? [
-          { href: `/${locale}/about`, label: "من نحن" },
-          { href: `/${locale}/services`, label: "خدماتنا" },
-          { href: `/${locale}/team`, label: "فريق العمل" },
-          { href: `/${locale}/contact`, label: "اتصل بنا" },
+          { href: localeHref(locale, "/about"), label: "من نحن" },
+          { href: localeHref(locale, "/services"), label: "خدماتنا" },
+          { href: localeHref(locale, "/team"), label: "فريق العمل" },
+          { href: localeHref(locale, "/contact"), label: "اتصل بنا" },
         ]
       : [
-          { href: `/${locale}/about`, label: "About Us" },
-          { href: `/${locale}/services`, label: "Our Services" },
-          { href: `/${locale}/team`, label: "Our Team" },
-          { href: `/${locale}/contact`, label: "Contact Us" },
+          { href: localeHref(locale, "/about"), label: "About Us" },
+          { href: localeHref(locale, "/services"), label: "Our Services" },
+          { href: localeHref(locale, "/team"), label: "Our Team" },
+          { href: localeHref(locale, "/contact"), label: "Contact Us" },
         ];
 
   return (

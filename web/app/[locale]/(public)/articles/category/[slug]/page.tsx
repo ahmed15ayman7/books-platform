@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { ArticleService } from "@/server/services/article.service";
 import { ArticleChannelPage } from "@/components/sections/article-channel-page";
-import type { Locale } from "@/lib/i18n";
+import { localeHref, type Locale } from "@/lib/i18n";
 import { PAGINATION } from "@/lib/utils/constants";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const name = locale === "ar" && result.category.nameAr ? result.category.nameAr : result.category.name;
   return buildPageMetadata({
     locale,
-    path: `/${locale}/articles/category/${slug}`,
+    path: localeHref(locale, `/articles/category/${slug}`),
     title: `${name} — ${locale === "ar" ? "مقالات" : "Articles"}`,
     description:
       locale === "ar"

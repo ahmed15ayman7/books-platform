@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,7 @@ export function CookieConsentBanner() {
         <p className="max-w-2xl text-sm leading-relaxed text-[var(--brand-gray-700)]">
           {t("cookieMessage")}{" "}
           <Link
-            href={`/${locale}/privacy`}
+            href={localeHref(locale, "/privacy")}
             className="font-medium text-[var(--brand-red)] hover:underline"
           >
             {t("cookiePrivacy")}
