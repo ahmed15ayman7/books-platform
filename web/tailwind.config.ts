@@ -60,9 +60,9 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        arabic: ["var(--font-arabic)", "Tahoma", "Arial", "sans-serif"],
+        arabic: ["var(--font-arabic)", "Arial", "Helvetica Neue", "Helvetica", "sans-serif"],
         latin: ["var(--font-latin)", "Inter", "sans-serif"],
-        display: ["var(--font-arabic)", "Tahoma", "Arial", "sans-serif"],
+        display: ["var(--font-arabic)", "Arial", "Helvetica Neue", "Helvetica", "sans-serif"],
         sans: ["var(--font-arabic)", "var(--font-latin)", "system-ui", "sans-serif"],
       },
       fontSize: {
