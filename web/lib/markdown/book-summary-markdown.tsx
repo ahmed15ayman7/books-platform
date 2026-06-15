@@ -78,7 +78,7 @@ export function BookSummaryMarkdown({ content, className }: BookSummaryMarkdownP
     const allList = lines.every((l) => /^[-*]\s/.test(l.trim()));
     if (allList) {
       nodes.push(
-        <ul key={key++} className="my-3 list-disc space-y-1.5 ps-5 text-lg leading-relaxed">
+        <ul key={key++} className="my-3 list-disc space-y-1.5 ps-5 text-base leading-relaxed">
           {lines.map((line, i) => (
             <li key={i} className="text-[var(--brand-gray-700)]">
               {inlineFormat(line.trim().replace(/^[-*]\s/, ""))}
@@ -98,7 +98,7 @@ export function BookSummaryMarkdown({ content, className }: BookSummaryMarkdownP
           nodes.push(
             <h3
               key={key++}
-              className="mt-4 mb-2 text-xl font-bold text-[var(--brand-red)] first:mt-0"
+              className="mt-4 mb-2 text-lg font-bold text-[var(--brand-red)] first:mt-0"
             >
               {inner}
             </h3>,
@@ -108,7 +108,7 @@ export function BookSummaryMarkdown({ content, className }: BookSummaryMarkdownP
           nodes.push(
             <h4
               key={key++}
-              className="mt-4 mb-2 text-xl font-bold text-[var(--brand-red)] first:mt-0"
+              className="mt-4 mb-2 text-lg font-bold text-[var(--brand-red)] first:mt-0"
             >
               {inner}
             </h4>,
@@ -118,7 +118,7 @@ export function BookSummaryMarkdown({ content, className }: BookSummaryMarkdownP
           nodes.push(
             <h5
               key={key++}
-              className="mt-3 mb-1.5 text-lg font-bold text-[var(--brand-gray-900)]"
+              className="mt-3 mb-1.5 text-base font-bold text-[var(--brand-gray-900)]"
             >
               {inner}
             </h5>,
@@ -127,13 +127,13 @@ export function BookSummaryMarkdown({ content, className }: BookSummaryMarkdownP
         case "li":
           nodes.push(
             <ul key={key++} className="my-2 list-disc ps-5">
-              <li className="text-lg leading-relaxed text-[var(--brand-gray-700)]">{inner}</li>
+              <li className="text-base leading-relaxed text-[var(--brand-gray-700)]">{inner}</li>
             </ul>,
           );
           break;
         default:
           nodes.push(
-            <p key={key++} className="text-lg leading-relaxed text-[var(--brand-gray-700)]">
+            <p key={key++} className="text-base leading-relaxed text-[var(--brand-gray-700)]">
               {inner}
             </p>,
           );

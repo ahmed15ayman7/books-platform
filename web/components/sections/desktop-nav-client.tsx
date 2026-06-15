@@ -195,7 +195,7 @@ function NavLink({
       href={href}
       className={cn(
         className,
-        "relative flex items-center gap-1 whitespace-nowrap rounded-xl px-2.5 py-2 text-lg font-medium transition-all duration-[var(--motion-base)] md:px-3.5 hover:bg-white/8",
+        "relative flex items-center gap-1 whitespace-nowrap rounded-xl px-2.5 py-2 text-base font-medium transition-all duration-[var(--motion-base)] md:px-3.5 hover:bg-white/8",
         accent
           ? "font-semibold bg-[var(--brand-red)] text-white hover:bg-[var(--brand-red-hover)] shadow-sm  active:scale-[0.98]"
           : "hover:text-white",
@@ -247,7 +247,7 @@ function DropdownMenu({
           key={item.href}
           href={item.href}
           role="menuitem"
-          className="mx-1 block rounded-xl px-4 py-2.5 text-lg transition-all duration-[var(--motion-base)] hover:bg-[var(--brand-red)] hover:text-white"
+          className="mx-1 block rounded-xl px-4 py-2.5 text-base transition-all duration-[var(--motion-base)] hover:bg-[var(--brand-red)] hover:text-white"
           style={{ color: "rgba(255,255,255,0.92)" }}
         >
           {item.label}

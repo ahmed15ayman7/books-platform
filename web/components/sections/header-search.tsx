@@ -26,7 +26,7 @@ export function HeaderSearch() {
             aria-hidden="true"
           />
           <span
-            className={`block w-full truncate text-lg text-[var(--brand-gray-400)] ${
+            className={`block w-full truncate text-base text-[var(--brand-gray-400)] ${
               isAr ? "pe-10 ps-4 text-right" : "ps-10 pe-4 text-left"
             }`}
           >
@@ -38,7 +38,7 @@ export function HeaderSearch() {
             {searchShortcutKeyLabel()}
           </kbd>
         </span>
-        <span className="flex shrink-0 items-center justify-center rounded-e-2xl bg-[var(--brand-red)] px-5 text-lg font-semibold text-white transition-all duration-[var(--motion-base)] group-hover:bg-[var(--brand-red-hover)]">
+        <span className="flex shrink-0 items-center justify-center rounded-e-2xl bg-[var(--brand-red)] px-5 text-base font-semibold text-white transition-all duration-[var(--motion-base)] group-hover:bg-[var(--brand-red-hover)]">
           {isAr ? "بحث" : "Search"}
         </span>
       </div>

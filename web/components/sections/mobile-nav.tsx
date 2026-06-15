@@ -107,7 +107,7 @@ export function MobileNavTrigger({ locale, bookCategories = [] }: MobileNavTrigg
                     href={group.href!}
                     onClick={() => setIsOpen(false)}
                     className={cn(
-                      "block rounded-md px-3 py-2.5 text-lg font-medium",
+                      "block rounded-md px-3 py-2.5 text-base font-medium",
                       "transition-colors hover:bg-[var(--brand-red-soft)] hover:text-[var(--brand-red)]",
                       group.isAccent
                         ? "mx-2 rounded-lg bg-white px-4 py-3 font-semibold text-[var(--brand-red)] shadow-sm hover:bg-[var(--brand-gray-100)]"
@@ -140,7 +140,7 @@ function MobileNavGroup({
     <div>
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center justify-between rounded-md px-3 py-2.5 text-lg font-medium text-[var(--brand-gray-700)] hover:bg-[var(--brand-red-soft)] hover:text-[var(--brand-red)]"
+        className="flex w-full items-center justify-between rounded-md px-3 py-2.5 text-base font-medium text-[var(--brand-gray-700)] hover:bg-[var(--brand-red-soft)] hover:text-[var(--brand-red)]"
         aria-expanded={expanded}
       >
         {label}
@@ -157,7 +157,7 @@ function MobileNavGroup({
               key={item.href}
               href={item.href}
               onClick={onClose}
-              className="block rounded-md px-3 py-2 text-lg text-[var(--brand-gray-600)] hover:text-[var(--brand-red)]"
+              className="block rounded-md px-3 py-2 text-base text-[var(--brand-gray-600)] hover:text-[var(--brand-red)]"
             >
               {item.label}
             </Link>

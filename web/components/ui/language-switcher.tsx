@@ -23,7 +23,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "flex items-center gap-0.5 rounded-full bg-white/10 p-0.5 text-base",
+        "flex items-center gap-0.5 rounded-full bg-white/10 p-0.5 text-sm",
         className
       )}
       role="navigation"
@@ -33,7 +33,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         type="button"
         onClick={() => switchLocale("en")}
         className={cn(
-          "rounded-full px-2.5 py-1 text-base font-semibold transition-all duration-[var(--motion-base)]",
+          "rounded-full px-2.5 py-1 text-sm font-semibold transition-all duration-[var(--motion-base)]",
           locale === "en"
             ? "bg-[var(--brand-red)] text-white"
             : "text-white/70 hover:text-white"
@@ -47,7 +47,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         type="button"
         onClick={() => switchLocale("ar")}
         className={cn(
-          "rounded-full px-2.5 py-1 text-base font-semibold transition-all duration-[var(--motion-base)]",
+          "rounded-full px-2.5 py-1 text-sm font-semibold transition-all duration-[var(--motion-base)]",
           locale === "ar"
             ? "bg-[var(--brand-red)] text-white"
             : "text-white/70 hover:text-white"
