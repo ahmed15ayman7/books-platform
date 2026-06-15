@@ -1,5 +1,6 @@
 import { absoluteUrl, resolveMediaUrl, siteConfig } from "@/lib/seo/site";
 import { seoCanonicalPath } from "@/lib/i18n/href";
+import { markdownToPlainText } from "@/lib/markdown/markdown-to-plain-text";
 
 export function JsonLd({ data }: { data: Record<string, unknown> }) {
   return (
@@ -87,7 +88,7 @@ export function bookJsonLd(
     ...(book.isbn ? { isbn: book.isbn } : {}),
     ...(book.language ? { inLanguage: book.language } : {}),
     ...(book.imageUrl ? { image: resolveMediaUrl(book.imageUrl) } : {}),
-    ...(desc ? { description: desc.slice(0, 500) } : {}),
+    ...(desc ? { description: markdownToPlainText(desc).slice(0, 500) } : {}),
     ...(publisherName
       ? { publisher: { "@type": "Organization", name: publisherName } }
       : {}),
@@ -126,7 +127,7 @@ export function articleJsonLd(
     url,
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     ...(article.imageUrl ? { image: resolveMediaUrl(article.imageUrl) } : {}),
-    ...(desc ? { description: desc.slice(0, 300) } : {}),
+    ...(desc ? { description: markdownToPlainText(desc).slice(0, 300) } : {}),
     ...(published ? { datePublished: published } : {}),
     ...(modified ? { dateModified: modified } : {}),
     ...(article.authorName
@@ -185,7 +186,7 @@ export function organizationEntityJsonLd(
     "@type": "Organization",
     name,
     url: absoluteUrl(seoCanonicalPath(locale, `/publishers/${publisher.slug}`)),
-    ...(desc ? { description: desc.slice(0, 300) } : {}),
+    ...(desc ? { description: markdownToPlainText(desc).slice(0, 300) } : {}),
     ...(publisher.imageUrl ? { logo: resolveMediaUrl(publisher.imageUrl) } : {}),
   };
 }

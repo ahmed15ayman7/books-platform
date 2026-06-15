@@ -22,6 +22,8 @@ import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-s
 import { adminPublisherEditPath, adminPublisherViewPath } from "@/lib/admin/public-urls";
 import { JsonLd, organizationEntityJsonLd, breadcrumbJsonLd } from "@/components/seo/json-ld";
 import { seoCanonicalPath } from "@/lib/i18n/href";
+import { ArticleContent } from "@/lib/markdown/article-content";
+import { markdownToPlainText } from "@/lib/markdown/markdown-to-plain-text";
 
 interface PublisherPageProps {
   params: Promise<{ slug: string; locale: string }>;
@@ -34,11 +36,13 @@ export async function generateMetadata({ params }: PublisherPageProps): Promise<
   if (!publisher) return { title: "Publisher Not Found" };
   const displayName = localizedPublisherName(publisher, locale as Locale);
   const displayDesc = localizedPublisherDescription(publisher, locale as Locale);
+  const plainDesc = displayDesc ? markdownToPlainText(displayDesc) : null;
   return buildPageMetadata({
     locale: locale as Locale,
     path: `/${locale}/publishers/${slug}`,
     title: displayName,
-    description: displayDesc ?? (locale === "ar" ? `ناشر ${displayName}` : `Publisher ${displayName}`),
+    description:
+      plainDesc ?? (locale === "ar" ? `ناشر ${displayName}` : `Publisher ${displayName}`),
     imageUrl: publisher.imageUrl,
     keywords: [displayName, locale === "ar" ? "ناشرون" : "publishers"],
   });
@@ -132,9 +136,7 @@ export default async function PublisherDetailPage({
                 imagePosition="left"
                 locale={locale}
               >
-                <p className="whitespace-pre-wrap text-base leading-relaxed text-[var(--brand-gray-700)]">
-                  {displayDescription}
-                </p>
+                <ArticleContent content={displayDescription} />
               </EditorialSplit>
             )}
 
