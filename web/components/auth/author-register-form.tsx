@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { BookOpen } from "lucide-react";
@@ -25,7 +24,7 @@ export default function AuthorRegisterForm({ locale }: AuthorRegisterFormProps) 
   const searchParams = useSearchParams();
   const redirect = sanitizeRedirectUrl(
     searchParams.get("redirect"),
-    localeHref(locale, "/author/submissions"),
+    `/${locale}/author/submissions`,
   );
 
   const [fullName, setFullName] = useState("");
@@ -76,7 +75,7 @@ export default function AuthorRegisterForm({ locale }: AuthorRegisterFormProps) 
     }
   }
 
-  const loginHref = localeHref(locale, `/auth/login?redirect=${encodeURIComponent(redirect)}`);
+  const loginHref = `/${locale}/auth/login?redirect=${encodeURIComponent(redirect)}`;
 
   return (
     <div className="w-full max-w-sm">

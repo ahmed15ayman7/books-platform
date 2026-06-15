@@ -10,7 +10,7 @@ import { ArticleShareStrip } from "@/components/sections/article-share-strip";
 import { Calendar } from "lucide-react";
 import { formatDate } from "@/lib/utils/formatters";
 import { cn } from "@/lib/utils";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import { articleSeoMetadata } from "@/lib/seo/metadata";
 import { youtubeEmbedUrl, youtubeThumbnail } from "@/lib/media/youtube";
 import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-shell";
@@ -89,7 +89,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
 
   const intro = stripHtml(article.excerpt);
   const isMedia = isMediaChannel(article.channel);
-  const articleUrl = absoluteUrl(localeHref(locale, `/articles/${article.slug}`));
+  const articleUrl = absoluteUrl(`/${locale}/articles/${article.slug}`);
 
   const linkedBook = articleLinkedBookDisplay(article.products?.[0], locale);
   const heroCoverUrl =
@@ -135,7 +135,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         entityId={article.id}
         editHref={adminArticleEditPath(locale, article.id, article.channel)}
         adminViewHref={adminArticleViewPath(locale, article.id, article.channel)}
-        publicHref={localeHref(locale, `/articles/${article.slug}`)}
+        publicHref={`/${locale}/articles/${article.slug}`}
         title={article.title}
         imageUrl={heroCoverUrl ?? article.imageUrl}
         sharePublicUrl={articleUrl}
@@ -150,7 +150,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
 
           <div className="container-platform py-8 md:py-10">
             <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-[var(--brand-gray-500)]">
-              <Link href={localeHref(locale, "/")} className="hover:text-[var(--brand-red)]">
+              <Link href={`/${locale}`} className="hover:text-[var(--brand-red)]">
                 {locale === "ar" ? "الرئيسية" : "Home"}
               </Link>
               {channelInfo && (
@@ -163,7 +163,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
                       </Link>
                       <span aria-hidden="true">/</span>
                       <Link
-                        href={localeHref(locale, `/media/${channelInfo.path}`)}
+                        href={`/${locale}/media/${channelInfo.path}`}
                         className="hover:text-[var(--brand-red)]"
                       >
                         {channelLabel}
@@ -171,7 +171,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
                     </>
                   ) : (
                     <Link
-                      href={localeHref(locale, `/articles/${channelInfo.path}`)}
+                      href={`/${locale}/articles/${channelInfo.path}`}
                       className="hover:text-[var(--brand-red)]"
                     >
                       {channelLabel}

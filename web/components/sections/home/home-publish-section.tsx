@@ -9,7 +9,7 @@ import { carouselAutoplayReverse } from "@/lib/carousel/autoplay";
 import { useEmblaAutoplay } from "@/hooks/use-embla-autoplay";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import {
   localizedBookName,
   localizedBookShortDesc,
@@ -118,7 +118,7 @@ function LatestBooksSpotlight({
             {books.map((book) => (
               <div key={book.id} className="min-w-0 shrink-0 grow-0 basis-full">
                 <Link
-                  href={localeHref(locale, `/books/${book.slug}`)}
+                  href={`/${locale}/books/${book.slug}`}
                   className="group mx-auto block max-w-[220px] sm:max-w-[240px]"
                 >
                   <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-white shadow-md ring-1 ring-[var(--brand-gray-200)] transition-transform duration-300 group-hover:scale-[1.02]">
@@ -143,7 +143,7 @@ function LatestBooksSpotlight({
         </div>
 
         <Link
-          href={localeHref(locale, `/books/${active.slug}`)}
+          href={`/${locale}/books/${active.slug}`}
           className="mt-4 block text-center text-sm font-semibold leading-snug text-[var(--brand-red)] transition-opacity hover:opacity-80 sm:text-base"
         >
           {caption}
@@ -179,7 +179,7 @@ export function HomePublishSection({
   books,
   pageOrder = 0,
 }: HomePublishSectionProps) {
-  const publishHref = localeHref(locale, "/publish");
+  const publishHref = `/${locale}/publish`;
 
   return (
     <AnimatedSection

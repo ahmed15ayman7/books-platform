@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -45,7 +44,7 @@ export function HeroSection() {
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Button asChild size="xl" variant="default">
-              <Link href={localeHref(locale, "/books")}>
+              <Link href={`/${locale}/books`}>
                 <BookOpen className="h-5 w-5" aria-hidden="true" />
                 {t("browseBooks")}
               </Link>
@@ -55,7 +54,7 @@ export function HeroSection() {
               size="xl"
               className="border border-white/20 bg-white/10 text-white hover:bg-white/20"
             >
-              <Link href={localeHref(locale, "/publish")}>
+              <Link href={`/${locale}/publish`}>
                 <PenTool className="h-5 w-5" aria-hidden="true" />
                 {t("publishYourBook")}
               </Link>

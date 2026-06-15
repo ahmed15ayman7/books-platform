@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { localeHref } from "@/lib/i18n/href";
 import { usePathname, useParams } from "next/navigation";
 import Link from "next/link";
 import { Bell, ChevronRight, Home, Search } from "lucide-react";
@@ -47,9 +46,9 @@ function isBookIdSegment(seg: string, prev?: string) {
 function crumbHref(locale: string, crumbs: string[], index: number): string {
   const seg = crumbs[index];
   if (seg === "admin" && index === 0) {
-    return localeHref(locale, "/admin/dashboard");
+    return `/${locale}/admin/dashboard`;
   }
-  return localeHref(locale, `/${crumbs.slice(0, index + 1).join("/")}`);
+  return `/${locale}/${crumbs.slice(0, index + 1).join("/")}`;
 }
 
 function crumbLabel(
@@ -99,7 +98,7 @@ export function AdminTopbar() {
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[var(--admin-border)] bg-[var(--admin-surface)]/95 px-6 backdrop-blur-sm">
       <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1.5 text-sm">
         <Link
-          href={localeHref(locale, "/admin/dashboard")}
+          href={`/${locale}/admin/dashboard`}
           className="flex shrink-0 items-center gap-1 text-[var(--admin-text-subtle)] transition-colors hover:text-[var(--admin-accent)]"
         >
           <Home className="h-3.5 w-3.5" />

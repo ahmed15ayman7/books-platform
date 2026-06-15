@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { localeHref } from "@/lib/i18n/href";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { carouselAutoplayReverse } from "@/lib/carousel/autoplay";
@@ -47,7 +46,7 @@ export function PublishersMarquee({
           return (
             <Link
               key={`${publisher.id}-${i}`}
-              href={localeHref(locale, `/publishers/${publisher.slug}`)}
+              href={`/${locale}/publishers/${publisher.slug}`}
               className={cn(
                 "flex h-16 w-36 shrink-0 items-center justify-center rounded-lg",
                 "border border-[var(--brand-gray-200)] bg-white px-3",

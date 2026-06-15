@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import {
   AnimatedSection,
   RevealLines,
@@ -35,14 +35,14 @@ export function HomeMissionStrip({
           <StaggerItem>
             <HoverLift>
               <Button asChild>
-                <Link href={localeHref(locale, "/books")}>{primaryLabel}</Link>
+                <Link href={`/${locale}/books`}>{primaryLabel}</Link>
               </Button>
             </HoverLift>
           </StaggerItem>
           <StaggerItem>
             <HoverLift>
               <Button asChild variant="outline" className="border-white/30 text-white hover:bg-white hover:text-[var(--brand-red)]">
-                <Link href={localeHref(locale, "/about")}>{secondaryLabel}</Link>
+                <Link href={`/${locale}/about`}>{secondaryLabel}</Link>
               </Button>
             </HoverLift>
           </StaggerItem>

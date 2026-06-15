@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
-import { localeHref } from "@/lib/i18n/href";
 import { db } from "@/lib/db";
-import { absoluteUrl } from "@/lib/seo/site";
+import { getSiteUrl } from "@/lib/seo/site";
 import { AuthorService } from "@/server/services/author.service";
 import { PublisherService } from "@/server/services/publisher.service";
 
@@ -28,16 +27,13 @@ const STATIC_PATHS = [
   "/terms",
 ] as const;
 
-function sitemapUrl(locale: string, path: string): string {
-  return absoluteUrl(localeHref(locale, path || "/"));
-}
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const base = getSiteUrl();
   const now = new Date();
 
   const staticEntries: MetadataRoute.Sitemap = LOCALES.flatMap((locale) =>
     STATIC_PATHS.map((path) => ({
-      url: sitemapUrl(locale, path),
+      url: `${base}/${locale}${path}`,
       lastModified: now,
       changeFrequency: path === "" ? "daily" : "weekly",
       priority: path === "" ? 1 : path === "/books" ? 0.9 : 0.7,
@@ -78,7 +74,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const bookEntries: MetadataRoute.Sitemap = LOCALES.flatMap((locale) =>
     books.map((book) => ({
-      url: sitemapUrl(locale, `/books/${book.slug}`),
+      url: `${base}/${locale}/books/${book.slug}`,
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.8,
@@ -87,7 +83,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const categoryEntries: MetadataRoute.Sitemap = LOCALES.flatMap((locale) =>
     categories.map((cat) => ({
-      url: sitemapUrl(locale, `/books/category/${cat.slug}`),
+      url: `${base}/${locale}/books/category/${cat.slug}`,
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.75,
@@ -96,7 +92,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const articleEntries: MetadataRoute.Sitemap = LOCALES.flatMap((locale) =>
     articles.map((article) => ({
-      url: sitemapUrl(locale, `/articles/${article.slug}`),
+      url: `${base}/${locale}/articles/${article.slug}`,
       lastModified: article.date ?? now,
       changeFrequency: "weekly" as const,
       priority: 0.7,
@@ -105,7 +101,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const authorEntries: MetadataRoute.Sitemap = LOCALES.flatMap((locale) =>
     authors.map((author) => ({
-      url: sitemapUrl(locale, `/authors/${author.slug}`),
+      url: `${base}/${locale}/authors/${author.slug}`,
       lastModified: author.updatedAt ?? now,
       changeFrequency: "weekly" as const,
       priority: 0.7,
@@ -114,7 +110,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const publisherEntries: MetadataRoute.Sitemap = LOCALES.flatMap((locale) =>
     publishers.map((publisher) => ({
-      url: sitemapUrl(locale, `/publishers/${publisher.slug}`),
+      url: `${base}/${locale}/publishers/${publisher.slug}`,
       lastModified: publisher.updatedAt ?? now,
       changeFrequency: "weekly" as const,
       priority: 0.7,

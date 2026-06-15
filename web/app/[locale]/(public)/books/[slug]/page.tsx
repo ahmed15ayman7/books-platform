@@ -11,7 +11,7 @@ import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-s
 import { BookBiblioTable } from "@/components/sections/book-biblio-table";
 import { BookMediaSection } from "@/components/sections/book-media-section";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import { mapArticleForCard } from "@/lib/i18n/article-linked-book";
 import {
   localizedBookAlternateName,
@@ -89,7 +89,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
       | "translationStatus.PARTIAL",
   );
 
-  const publicBookUrl = absoluteUrl(localeHref(locale, `/books/${book.slug}`));
+  const publicBookUrl = absoluteUrl(`/${locale}/books/${book.slug}`);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -116,11 +116,11 @@ export default async function BookDetailPage({ params }: BookPageProps) {
           aria-label={locale === "ar" ? "مسار التنقل" : "Breadcrumb"}
         >
           <div className="container-platform flex items-center gap-2 text-sm text-[var(--brand-gray-500)]">
-            <Link href={localeHref(locale, "/")} className="hover:text-[var(--brand-red)]">
+            <Link href={`/${locale}`} className="hover:text-[var(--brand-red)]">
               {locale === "ar" ? "الرئيسية" : "Home"}
             </Link>
             <span>/</span>
-            <Link href={localeHref(locale, "/books")} className="hover:text-[var(--brand-red)]">
+            <Link href={`/${locale}/books`} className="hover:text-[var(--brand-red)]">
               {t("title")}
             </Link>
             <span>/</span>
@@ -133,9 +133,9 @@ export default async function BookDetailPage({ params }: BookPageProps) {
         <AdminEntityPublicShell
           entityType="book"
           entityId={book.id}
-          editHref={localeHref(locale, `/admin/books/${book.id}/edit`)}
-          adminViewHref={localeHref(locale, `/admin/books/${book.id}`)}
-          publicHref={localeHref(locale, `/books/${book.slug}`)}
+          editHref={`/${locale}/admin/books/${book.id}/edit`}
+          adminViewHref={`/${locale}/admin/books/${book.id}`}
+          publicHref={`/${locale}/books/${book.slug}`}
           title={displayName}
           imageUrl={book.imageUrl}
           sharePublicUrl={publicBookUrl}

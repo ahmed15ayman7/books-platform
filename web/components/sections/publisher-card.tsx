@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { localeHref } from "@/lib/i18n/href";
 import { Building2 } from "lucide-react";
 import {
   CardMedia,
@@ -30,7 +29,7 @@ export function PublisherCard({
   console.log("imageUrl", imageUrl);
   return (
     <Link
-      href={localeHref(locale, `/publishers/${slug}`)}
+      href={`/${locale}/publishers/${slug}`}
       className={cn(
         "group flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--brand-gray-200)] bg-white text-center",
         "transition-all hover:border-[var(--brand-red)] hover:shadow-md",

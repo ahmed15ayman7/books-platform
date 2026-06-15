@@ -9,7 +9,7 @@ import { SocialIconCircle } from "@/components/ui/social-icon-circle";
 import { SOCIAL_LINKS } from "@/components/icons";
 import { getContactContent, getFaqLocalized } from "@/lib/content/contact";
 import { ABOUT_IMAGES } from "@/lib/content/image-assets";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const content = getContactContent(locale);
   return buildPageMetadata({
     locale,
-    path: localeHref(locale, "/contact"),
+    path: `/${locale}/contact`,
     title: locale === "ar" ? "اتصل بنا | منصة الكتب العالمية" : "Contact Us | Books Platform",
     description: content.hero.subtitle,
     keywords: locale === "ar" ? ["اتصل بنا", "تواصل"] : ["contact", "support"],
@@ -38,7 +38,7 @@ export default async function ContactPage() {
         subtitle: content.hero.subtitle,
         variant: "light",
         breadcrumbs: [
-          { label: isAr ? "الرئيسية" : "Home", href: localeHref(locale, "/") },
+          { label: isAr ? "الرئيسية" : "Home", href: `/${locale}` },
           { label: content.hero.title },
         ],
       }}

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { BookMarked, Mic, Newspaper } from "lucide-react";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Button } from "@/components/ui/button";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import {
   AnimatedSection,
   FadeIn,
@@ -37,7 +37,7 @@ export function HomeServicesPreview({
         <FadeIn className="mb-8 flex items-end justify-between gap-4">
           <SectionHeading id="services-preview-heading" title={title} subtitle={subtitle} />
           <Button asChild variant="outline" size="sm">
-            <Link href={localeHref(locale, "/services")}>{cta}</Link>
+            <Link href={`/${locale}/services`}>{cta}</Link>
           </Button>
         </FadeIn>
         <StaggerContainer className="grid gap-4 sm:grid-cols-3">
@@ -47,7 +47,7 @@ export function HomeServicesPreview({
               <StaggerItem key={item.key}>
                 <AnimatedCard>
                   <Link
-                    href={localeHref(locale, "/services")}
+                    href={`/${locale}/services`}
                     className="block rounded-xl border border-[var(--brand-gray-200)] p-5 h-full"
                   >
                     <IconPulse>

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { localeHref } from "@/lib/i18n/href";
 import { getLocale } from "next-intl/server";
 import { ShoppingCart } from "lucide-react";
 import { SocialIconCircle } from "@/components/ui/social-icon-circle";
@@ -20,16 +19,16 @@ export async function SiteHeader() {
   const utilityLinks =
     locale === "ar"
       ? [
-          { href: localeHref(locale, "/about"), label: "من نحن" },
-          { href: localeHref(locale, "/services"), label: "خدماتنا" },
-          { href: localeHref(locale, "/team"), label: "فريق العمل" },
-          { href: localeHref(locale, "/contact"), label: "اتصل بنا" },
+          { href: `/${locale}/about`, label: "من نحن" },
+          { href: `/${locale}/services`, label: "خدماتنا" },
+          { href: `/${locale}/team`, label: "فريق العمل" },
+          { href: `/${locale}/contact`, label: "اتصل بنا" },
         ]
       : [
-          { href: localeHref(locale, "/about"), label: "About" },
-          { href: localeHref(locale, "/services"), label: "Services" },
-          { href: localeHref(locale, "/team"), label: "Team" },
-          { href: localeHref(locale, "/contact"), label: "Contact" },
+          { href: `/${locale}/about`, label: "About" },
+          { href: `/${locale}/services`, label: "Services" },
+          { href: `/${locale}/team`, label: "Team" },
+          { href: `/${locale}/contact`, label: "Contact" },
         ];
 
   return (
@@ -84,7 +83,7 @@ export async function SiteHeader() {
 
           <div className="flex shrink-0 items-center gap-1">
             <Link
-              href={localeHref(locale, "/cart")}
+              href={`/${locale}/cart`}
               className="relative flex h-10 w-10 items-center justify-center rounded-xl text-white transition-all duration-[var(--motion-base)] hover:scale-105 hover:bg-white/10 hover:text-[var(--brand-red)]"
               aria-label={locale === "ar" ? "السلة" : "Cart"}
             >

@@ -1,7 +1,6 @@
 "use client";
 
 import { PAGINATION } from "@/lib/utils/constants";
-import { localeHref } from "@/lib/i18n/href";
 
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
@@ -42,13 +41,13 @@ interface PaginatedResponse {
 function editHref(locale: string, type: DraftType, id: string): string {
   switch (type) {
     case "books":
-      return localeHref(locale, `/admin/books/${id}/edit`);
+      return `/${locale}/admin/books/${id}/edit`;
     case "articles":
-      return localeHref(locale, `/admin/articles/${id}/edit`);
+      return `/${locale}/admin/articles/${id}/edit`;
     case "publishers":
-      return localeHref(locale, `/admin/publishers/${id}/edit`);
+      return `/${locale}/admin/publishers/${id}/edit`;
     case "submissions":
-      return localeHref(locale, "/admin/submissions");
+      return `/${locale}/admin/submissions`;
   }
 }
 

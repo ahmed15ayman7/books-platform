@@ -7,7 +7,7 @@ import { FileText, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { authHeaders, getAuthorSession } from "@/lib/auth/author-client";
 import { formatDate } from "@/lib/utils/formatters";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 
 interface DraftItem {
   id: string;
@@ -64,7 +64,7 @@ export function AuthorSubmissionsClient() {
           )}
         </div>
         <Button asChild>
-          <Link href={localeHref(locale, "/publish")}>
+          <Link href={`/${locale}/publish`}>
             {isAr ? "انشر كتاباً جديداً" : "Publish New Book"}
           </Link>
         </Button>
@@ -77,7 +77,7 @@ export function AuthorSubmissionsClient() {
             {isAr ? "لا توجد مسودات أو طلبات بعد" : "No drafts or submissions yet"}
           </p>
           <Button asChild className="mt-4" variant="outline">
-            <Link href={localeHref(locale, "/publish")}>
+            <Link href={`/${locale}/publish`}>
               {isAr ? "ابدأ الآن" : "Get Started"}
             </Link>
           </Button>
@@ -87,8 +87,8 @@ export function AuthorSubmissionsClient() {
           {drafts.map((draft) => {
             const isDraft = draft.status === "draft";
             const href = isDraft
-              ? localeHref(locale, `/publish?draft=${draft.id}&step=${draft.currentStep}`)
-              : localeHref(locale, "/publish");
+              ? `/${locale}/publish?draft=${draft.id}&step=${draft.currentStep}`
+              : `/${locale}/publish`;
             const statusLabel = isDraft
               ? (isAr ? "مسودة" : "Draft")
               : draft.status === "pending"

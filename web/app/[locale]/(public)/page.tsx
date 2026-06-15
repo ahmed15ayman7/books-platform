@@ -15,7 +15,7 @@ import { PublishersMarquee } from "@/components/sections/publishers-marquee";
 import { PublisherCard } from "@/components/sections/publisher-card";
 import { Button } from "@/components/ui/button";
 import { Library, PenLine, Building2 } from "lucide-react";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
 import {
   AnimatedSection,
@@ -37,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("home");
   return buildPageMetadata({
     locale,
-    path: localeHref(locale, "/"),
+    path: `/${locale}`,
     title:
       locale === "ar"
         ? "منصة الكتب العالمية — نافذة العالم على الكتب"
@@ -99,7 +99,7 @@ export default async function HomePage() {
   const mediaChannels = MEDIA_HOME_CHANNELS.map((ch, index) => ({
     key: ch.key,
     title: locale === "ar" ? ch.ar : ch.en,
-    href: localeHref(locale, `/${ch.path}`),
+    href: `/${locale}/${ch.path}`,
     videos: (mediaChannelResults[index]?.articles ?? [])
       .filter((a) => a.videoId)
       .map((a) => ({
@@ -122,7 +122,7 @@ export default async function HomePage() {
             subtitleEn: t("heroSubtitle"),
             imageUrl: ABOUT_IMAGES.hero,
             foregroundImageUrl: null,
-            linkUrl: localeHref(locale, "/books"),
+            linkUrl: `/${locale}/books`,
           },
         ];
 
@@ -165,7 +165,7 @@ export default async function HomePage() {
   const readingArticleChannels = READING_ARTICLE_CHANNELS.map((ch) => ({
     key: ch.key,
     title: locale === "ar" ? ch.ar : ch.en,
-    href: localeHref(locale, `/${ch.path}`),
+    href: `/${locale}/${ch.path}`,
     articles: shuffleArray(articles[ch.key] ?? [])
       .filter((a) => a.slug && a.title)
       .map((a) => {
@@ -236,7 +236,7 @@ export default async function HomePage() {
                 title={locale === "ar" ? "صدر حديثًا" : "Newly Released"}
               />
               <Button asChild variant="outline" size="sm">
-                <Link href={localeHref(locale, "/books")}>
+                <Link href={`/${locale}/books`}>
                   {locale === "ar" ? "عرض الكل" : "See All"}
                 </Link>
               </Button>
@@ -266,7 +266,7 @@ export default async function HomePage() {
                 title={locale === "ar" && category.nameAr ? category.nameAr : category.name}
               />
               <Button asChild variant="outline" size="sm">
-                <Link href={localeHref(locale, `/books/category/${category.slug}`)}>
+                <Link href={`/${locale}/books/category/${category.slug}`}>
                   {locale === "ar" ? "عرض الكل" : "See All"}
                 </Link>
               </Button>
@@ -291,7 +291,7 @@ export default async function HomePage() {
                 title={locale === "ar" && category.nameAr ? category.nameAr : category.name}
               />
               <Button asChild variant="outline" size="sm">
-                <Link href={localeHref(locale, `/books/category/${category.slug}`)}>
+                <Link href={`/${locale}/books/category/${category.slug}`}>
                   {locale === "ar" ? "عرض الكل" : "See All"}
                 </Link>
               </Button>
@@ -311,7 +311,7 @@ export default async function HomePage() {
                 subtitle={locale === "ar" ? "كتب تستحق أن تصل للقارئ العربي" : "Books worth translating"}
               />
               <Button asChild variant="outline" size="sm">
-                <Link href={localeHref(locale, "/books/nominated-for-translation")}>
+                <Link href={`/${locale}/books/nominated-for-translation`}>
                   {locale === "ar" ? "عرض الكل" : "See All"}
                 </Link>
               </Button>
@@ -331,7 +331,7 @@ export default async function HomePage() {
                 subtitle={locale === "ar" ? "من لغات العالم إلى العربية" : "From world languages to Arabic"}
               />
               <Button asChild variant="outline" size="sm">
-                <Link href={localeHref(locale, "/books/translated")}>
+                <Link href={`/${locale}/books/translated`}>
                   {locale === "ar" ? "عرض الكل" : "See All"}
                 </Link>
               </Button>
@@ -362,7 +362,7 @@ export default async function HomePage() {
                 subtitle={locale === "ar" ? "تصفّح المقالات حسب التصنيف" : "Browse articles by category"}
               />
               <Button asChild variant="outline" size="sm">
-                <Link href={localeHref(locale, "/articles/harvest")}>
+                <Link href={`/${locale}/articles/harvest`}>
                   {locale === "ar" ? "كل المقالات" : "All Articles"}
                 </Link>
               </Button>
@@ -371,7 +371,7 @@ export default async function HomePage() {
               {articleCategories.slice(0, 14).map((cat) => (
                 <StaggerItem key={cat.id}>
                   <Link
-                    href={localeHref(locale, `/articles/category/${cat.slug}`)}
+                    href={`/${locale}/articles/category/${cat.slug}`}
                     className="inline-flex items-center gap-1.5 rounded-full border border-[var(--brand-gray-200)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-gray-700)] transition-all hover:border-[var(--brand-red)] hover:bg-[var(--brand-red-soft)] hover:text-[var(--brand-red)]"
                   >
                     {locale === "ar" && cat.nameAr ? cat.nameAr : cat.name}
@@ -402,7 +402,7 @@ export default async function HomePage() {
                 subtitle={locale === "ar" ? "مجالات المعرفة والترجمات" : "Knowledge domains"}
               />
               <Button asChild variant="outline" size="sm">
-                <Link href={localeHref(locale, "/books")}>
+                <Link href={`/${locale}/books`}>
                   {locale === "ar" ? "كل الكتب" : "All Books"}
                 </Link>
               </Button>
@@ -434,7 +434,7 @@ export default async function HomePage() {
                 size="sm"
                 className="border-white/30 text-white hover:bg-white/10 hover:text-white"
               >
-                <Link href={localeHref(locale, "/publishers")}>
+                <Link href={`/${locale}/publishers`}>
                   {locale === "ar" ? "كل الناشرين" : "All Publishers"}
                 </Link>
               </Button>
@@ -455,7 +455,7 @@ export default async function HomePage() {
                 subtitle={locale === "ar" ? "شركاؤنا من دور النشر حول العالم" : "Our publishing partners worldwide"}
               />
               <Button asChild variant="outline" size="sm">
-                <Link href={localeHref(locale, "/publishers")}>
+                <Link href={`/${locale}/publishers`}>
                   {locale === "ar" ? "كل الناشرين" : "All Publishers"}
                 </Link>
               </Button>
@@ -497,9 +497,9 @@ export default async function HomePage() {
         <div className="container-platform">
           <StaggerContainer className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-3">
             {[
-              { href: localeHref(locale, "/books"),            icon: Library,   label: t("finalCta.browseBooks") },
-              { href: localeHref(locale, "/articles/harvest"), icon: PenLine,   label: t("finalCta.readArticles") },
-              { href: localeHref(locale, "/publishers"),        icon: Building2, label: t("finalCta.meetPublishers") },
+              { href: `/${locale}/books`,            icon: Library,   label: t("finalCta.browseBooks") },
+              { href: `/${locale}/articles/harvest`, icon: PenLine,   label: t("finalCta.readArticles") },
+              { href: `/${locale}/publishers`,        icon: Building2, label: t("finalCta.meetPublishers") },
             ].map(({ href, icon: Icon, label }) => (
               <StaggerItem key={href}>
                 <Link

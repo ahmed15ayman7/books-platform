@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import { ChevronLeft, ExternalLink } from "lucide-react";
 import { db } from "@/lib/db";
@@ -34,7 +33,7 @@ export default async function BookEditPage({ params }: Props) {
 
   if (!book) notFound();
 
-  const publicUrl = absoluteUrl(localeHref(locale, `/books/${book.slug}`));
+  const publicUrl = absoluteUrl(`/${locale}/books/${book.slug}`);
   const linkedAuthorIds = book.authors.map((a) => a.id);
 
   const [publishers, categories, allAuthors] = await Promise.all([
@@ -64,7 +63,7 @@ export default async function BookEditPage({ params }: Props) {
       <div className="mb-6 flex flex-col gap-4 border-b border-[var(--admin-border)] pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-4">
           <Link
-            href={localeHref(locale, `/admin/books/${id}`)}
+            href={`/${locale}/admin/books/${id}`}
             className="flex shrink-0 items-center gap-1.5 text-sm text-[var(--admin-text-muted)] transition-colors hover:text-[var(--admin-accent)]"
           >
             <ChevronLeft className="h-4 w-4" />

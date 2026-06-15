@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import type { BreadcrumbItem } from "@/components/sections/page-hero";
 import { FadeIn, RevealText, StaggerContainer, StaggerItem } from "@/components/motion";
 
@@ -32,7 +32,7 @@ export function PublishersHero({
   const isAr = locale === "ar";
   const homeLabel = isAr ? "الرئيسية" : "Home";
   const crumbs =
-    breadcrumbs.length > 0 ? breadcrumbs : [{ label: homeLabel, href: localeHref(locale, "/") }];
+    breadcrumbs.length > 0 ? breadcrumbs : [{ label: homeLabel, href: `/${locale}` }];
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-[var(--brand-black)] via-[#1a1a1a] to-[var(--brand-red)]/20 py-12 md:py-16">

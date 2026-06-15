@@ -1,5 +1,4 @@
 import { notFound, redirect } from "next/navigation";
-import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import Image from "next/image";
 import { db } from "@/lib/db";
@@ -75,7 +74,7 @@ export default async function AdminMediaViewPage({ params }: Props) {
   return (
     <AdminDetailShell
       locale={locale}
-      backHref={localeHref(locale, "/admin/media")}
+      backHref={`/${locale}/admin/media`}
       backLabel="العودة للميديا"
       title={article.title}
       subtitle={article.titleEn ?? undefined}
@@ -98,7 +97,7 @@ export default async function AdminMediaViewPage({ params }: Props) {
         <AdminEntityDeleteButton
           apiPath={`/api/v1/admin/articles/${id}`}
           entityTitle={article.title}
-          redirectHref={localeHref(locale, "/admin/media")}
+          redirectHref={`/${locale}/admin/media`}
           confirmTitle="تأكيد حذف الفيديو"
           entityLabel="الفيديو"
         />

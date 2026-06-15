@@ -13,7 +13,7 @@ import { BooksCatalogBody } from "@/components/sections/books-catalog-body";
 import { getHomeEditorial } from "@/lib/content/home-editorial";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SearchX } from "lucide-react";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { PAGINATION } from "@/lib/utils/constants";
 
@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as Locale;
   return buildPageMetadata({
     locale,
-    path: localeHref(locale, "/books"),
+    path: `/${locale}/books`,
     title: locale === "ar" ? "الكتب" : "Books",
     description:
       locale === "ar"
@@ -49,7 +49,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
   const locale = (await getLocale()) as Locale;
 
   if (params.author?.trim()) {
-    redirect(localeHref(locale, `/authors/${params.author.trim()}`));
+    redirect(`/${locale}/authors/${params.author.trim()}`);
   }
 
   const t = await getTranslations("books");
@@ -102,7 +102,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
         }
         className="relative overflow-hidden border-b border-[var(--brand-gray-200)] bg-gradient-to-br from-white via-[var(--brand-red-soft)]/25 to-[var(--brand-gray-50)]"
         breadcrumbs={[
-          { label: locale === "ar" ? "الرئيسية" : "Home", href: localeHref(locale, "/") },
+          { label: locale === "ar" ? "الرئيسية" : "Home", href: `/${locale}` },
           { label: locale === "ar" ? "الكتب" : "Books" },
         ]}
       />

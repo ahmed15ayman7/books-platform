@@ -8,7 +8,7 @@ import {
   getPrivacySections,
 } from "@/lib/content/privacy";
 import { ABOUT_IMAGES } from "@/lib/content/image-assets";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return buildPageMetadata({
     locale,
-    path: localeHref(locale, "/privacy"),
+    path: `/${locale}/privacy`,
     title:
       locale === "ar"
         ? "سياسة الخصوصية | منصة الكتب العالمية"
@@ -48,7 +48,7 @@ export default async function PrivacyPage() {
         backgroundImage: ABOUT_IMAGES.legal,
         backgroundImageAlt: hero.title,
         breadcrumbs: [
-          { label: isAr ? "الرئيسية" : "Home", href: localeHref(locale, "/") },
+          { label: isAr ? "الرئيسية" : "Home", href: `/${locale}` },
           { label: hero.title },
         ],
       }}

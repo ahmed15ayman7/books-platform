@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { youtubeThumbnail } from "@/lib/media/youtube";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 
 interface MediaVideoCardProps {
   slug: string;
@@ -65,7 +65,7 @@ export function MediaVideoCard({
   }
 
   return (
-    <Link href={localeHref(locale, `/articles/${slug}`)} className={className}>
+    <Link href={`/${locale}/articles/${slug}`} className={className}>
       {inner}
     </Link>
   );

@@ -1,28 +1,27 @@
-import { localeHref } from "@/lib/i18n/href";
 import { isMediaChannel } from "@/lib/media/youtube";
 
 export function publicBookUrl(locale: string, slug: string): string {
-  return localeHref(locale, `/books/${slug}`);
+  return `/${locale}/books/${slug}`;
 }
 
 export function publicArticleUrl(locale: string, slug: string): string {
-  return localeHref(locale, `/articles/${slug}`);
+  return `/${locale}/articles/${slug}`;
 }
 
 export function publicPublisherUrl(locale: string, slug: string): string {
-  return localeHref(locale, `/publishers/${slug}`);
+  return `/${locale}/publishers/${slug}`;
 }
 
 export function publicAuthorUrl(locale: string, slug: string): string {
-  return localeHref(locale, `/authors/${slug}`);
+  return `/${locale}/authors/${slug}`;
 }
 
 export function adminBookViewPath(locale: string, id: string): string {
-  return localeHref(locale, `/admin/books/${id}`);
+  return `/${locale}/admin/books/${id}`;
 }
 
 export function adminBookEditPath(locale: string, id: string): string {
-  return localeHref(locale, `/admin/books/${id}/edit`);
+  return `/${locale}/admin/books/${id}/edit`;
 }
 
 export function adminArticleViewPath(
@@ -31,9 +30,9 @@ export function adminArticleViewPath(
   channel?: string | null,
 ): string {
   if (isMediaChannel(channel ?? null)) {
-    return localeHref(locale, `/admin/media/${id}`);
+    return `/${locale}/admin/media/${id}`;
   }
-  return localeHref(locale, `/admin/articles/${id}`);
+  return `/${locale}/admin/articles/${id}`;
 }
 
 export function adminArticleEditPath(
@@ -42,33 +41,33 @@ export function adminArticleEditPath(
   channel?: string | null,
 ): string {
   if (isMediaChannel(channel ?? null)) {
-    return localeHref(locale, `/admin/media/${id}/edit`);
+    return `/${locale}/admin/media/${id}/edit`;
   }
-  return localeHref(locale, `/admin/articles/${id}/edit`);
+  return `/${locale}/admin/articles/${id}/edit`;
 }
 
 export function adminMediaViewPath(locale: string, id: string): string {
-  return localeHref(locale, `/admin/media/${id}`);
+  return `/${locale}/admin/media/${id}`;
 }
 
 export function adminMediaEditPath(locale: string, id: string): string {
-  return localeHref(locale, `/admin/media/${id}/edit`);
+  return `/${locale}/admin/media/${id}/edit`;
 }
 
 export function adminPublisherViewPath(locale: string, id: string): string {
-  return localeHref(locale, `/admin/publishers/${id}`);
+  return `/${locale}/admin/publishers/${id}`;
 }
 
 export function adminPublisherEditPath(locale: string, id: string): string {
-  return localeHref(locale, `/admin/publishers/${id}/edit`);
+  return `/${locale}/admin/publishers/${id}/edit`;
 }
 
 export function adminAuthorViewPath(locale: string, id: string): string {
-  return localeHref(locale, `/admin/authors/${id}`);
+  return `/${locale}/admin/authors/${id}`;
 }
 
 export function adminAuthorEditPath(locale: string, id: string): string {
-  return localeHref(locale, `/admin/authors/${id}/edit`);
+  return `/${locale}/admin/authors/${id}/edit`;
 }
 
 export function formatArticleApiResponse(article: {

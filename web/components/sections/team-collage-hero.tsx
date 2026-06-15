@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import { pickLocale } from "@/lib/content/types";
 import type { TeamMemberData } from "@/lib/content/team";
 import type { BreadcrumbItem } from "@/components/sections/page-hero";
@@ -154,7 +154,7 @@ export function TeamCollageHero({
   const isAr = locale === "ar";
   const homeLabel = isAr ? "الرئيسية" : "Home";
   const crumbs =
-    breadcrumbs.length > 0 ? breadcrumbs : [{ label: homeLabel, href: localeHref(locale, "/") }];
+    breadcrumbs.length > 0 ? breadcrumbs : [{ label: homeLabel, href: `/${locale}` }];
 
   const collageItems = buildCollageItems(members);
   const mobileItems = [

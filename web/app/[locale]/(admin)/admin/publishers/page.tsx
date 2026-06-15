@@ -1,7 +1,6 @@
 "use client";
 
 import { PAGINATION } from "@/lib/utils/constants";
-import { localeHref } from "@/lib/i18n/href";
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
@@ -195,7 +194,7 @@ export default function AdminPublishersPage() {
               onSubmit={() => void load()}
               placeholder="بحث بالاسم..."
             />
-            <Link href={localeHref(locale, "/admin/publishers/new")}>
+            <Link href={`/${locale}/admin/publishers/new`}>
               <Button size="sm" className="gap-1.5">
                 <Plus className="h-4 w-4" />
                 إضافة ناشر

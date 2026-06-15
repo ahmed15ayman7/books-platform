@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { localeHref } from "@/lib/i18n/href";
 import { useRouter } from "next/navigation";
 import { Save, Loader2 } from "lucide-react";
 import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
@@ -244,10 +243,10 @@ export function BookEditForm({
           adminToast.success("draft", "الكتاب");
         } else {
           adminToast.success(isCreate ? "create" : "update", "الكتاب", {
-            description: localeHref(locale, `/books/${slug}`),
+            description: `/${locale}/books/${slug}`,
             action: {
               label: "عرض",
-              onClick: () => window.open(localeHref(locale, `/books/${slug}`), "_blank"),
+              onClick: () => window.open(`/${locale}/books/${slug}`, "_blank"),
             },
           });
         }
@@ -262,10 +261,10 @@ export function BookEditForm({
       if (result.id) {
         draft.clearDraft();
         adminToast.success("create", "الكتاب", {
-          description: localeHref(locale, `/books/${result.slug ?? slug}`),
+          description: `/${locale}/books/${result.slug ?? slug}`,
         });
         setTimeout(() => {
-          router.push(localeHref(locale, `/admin/books/${result.id}`));
+          router.push(`/${locale}/admin/books/${result.id}`);
         }, 4000);
       }
     });
@@ -295,7 +294,7 @@ export function BookEditForm({
             الصفحة العامة
           </p>
           <a
-            href={localeHref(locale, `/books/${bookSlug}`)}
+            href={`/${locale}/books/${bookSlug}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 break-all text-sm text-[var(--brand-red)] hover:underline"

@@ -18,7 +18,7 @@ import { getAboutContent } from "@/lib/content/about";
 import { pickLocale } from "@/lib/content/types";
 import { TEAM_MEMBERS } from "@/lib/content/team";
 import { ArticleService } from "@/server/services/article.service";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -28,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return buildPageMetadata({
     locale,
-    path: localeHref(locale, "/about"),
+    path: `/${locale}/about`,
     title:
       locale === "ar"
         ? "من نحن | منصة الكتب العالمية"
@@ -67,13 +67,13 @@ export default async function AboutPage() {
         variant="translated"
         coverMode="photo"
         breadcrumbs={[
-          { label: isAr ? "الرئيسية" : "Home", href: localeHref(locale, "/") },
+          { label: isAr ? "الرئيسية" : "Home", href: `/${locale}` },
           { label: content.hero.title },
         ]}
       >
         <div className="mt-6 flex flex-wrap gap-3">
           <Button asChild size="lg">
-            <Link href={localeHref(locale, "/books")}>{content.cta.primary}</Link>
+            <Link href={`/${locale}/books`}>{content.cta.primary}</Link>
           </Button>
           <Button
             asChild
@@ -81,7 +81,7 @@ export default async function AboutPage() {
             variant="outline"
             className="border-white/30 text-white hover:bg-white hover:text-[var(--brand-red)]"
           >
-            <Link href={localeHref(locale, "/services")}>
+            <Link href={`/${locale}/services`}>
               {isAr ? "خدماتنا" : "Our Services"}
             </Link>
           </Button>
@@ -164,9 +164,9 @@ export default async function AboutPage() {
           <AboutCta
             quote={content.closing.quote}
             tagline={content.closing.tagline}
-            primaryHref={localeHref(locale, "/books")}
+            primaryHref={`/${locale}/books`}
             primaryLabel={content.cta.primary}
-            secondaryHref={localeHref(locale, "/publish")}
+            secondaryHref={`/${locale}/publish`}
             secondaryLabel={content.cta.secondary}
           />
         </AnimatedContentSections>

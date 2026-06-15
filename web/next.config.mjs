@@ -61,18 +61,18 @@ const nextConfig = {
 
   async redirects() {
     return [
-      { source: "/about-us", destination: "/about", permanent: true },
-      { source: "/about-us/:path*", destination: "/about", permanent: true },
-      { source: "/our-service", destination: "/services", permanent: true },
-      { source: "/our-service/:path*", destination: "/services", permanent: true },
-      { source: "/our-team", destination: "/team", permanent: true },
-      { source: "/our-team/:path*", destination: "/team", permanent: true },
-      { source: "/contact-us", destination: "/contact", permanent: true },
-      { source: "/contact-us/:path*", destination: "/contact", permanent: true },
-      { source: "/privacy-policy", destination: "/privacy", permanent: true },
-      { source: "/privacy-policy/:path*", destination: "/privacy", permanent: true },
-      { source: "/terms", destination: "/terms", permanent: true },
-      { source: "/terms/:path*", destination: "/terms", permanent: true },
+      { source: "/about-us", destination: "/ar/about", permanent: true },
+      { source: "/about-us/:path*", destination: "/ar/about", permanent: true },
+      { source: "/our-service", destination: "/ar/services", permanent: true },
+      { source: "/our-service/:path*", destination: "/ar/services", permanent: true },
+      { source: "/our-team", destination: "/ar/team", permanent: true },
+      { source: "/our-team/:path*", destination: "/ar/team", permanent: true },
+      { source: "/contact-us", destination: "/ar/contact", permanent: true },
+      { source: "/contact-us/:path*", destination: "/ar/contact", permanent: true },
+      { source: "/privacy-policy", destination: "/ar/privacy", permanent: true },
+      { source: "/privacy-policy/:path*", destination: "/ar/privacy", permanent: true },
+      { source: "/terms", destination: "/ar/terms", permanent: true },
+      { source: "/terms/:path*", destination: "/ar/terms", permanent: true },
     ];
   },
 };

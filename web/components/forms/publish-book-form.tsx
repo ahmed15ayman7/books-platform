@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
@@ -231,13 +230,13 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
     : ["Author Info", "Book Info", "Review & Submit"];
 
   const publishRedirect = useMemo(() => {
-    const base = localeHref(locale, "/publish");
+    const base = `/${locale}/publish`;
     const q = draftId ? `?draft=${draftId}&step=${step}` : "";
     return `${base}${q}`;
   }, [draftId, locale, step]);
 
-  const registerHref = localeHref(locale, `/auth/register?redirect=${encodeURIComponent(publishRedirect)}`);
-  const loginHref = localeHref(locale, `/auth/login?redirect=${encodeURIComponent(publishRedirect)}`);
+  const registerHref = `/${locale}/auth/register?redirect=${encodeURIComponent(publishRedirect)}`;
+  const loginHref = `/${locale}/auth/login?redirect=${encodeURIComponent(publishRedirect)}`;
   const session = getAuthorSession();
 
   if (status === "success") {
@@ -277,7 +276,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
           {autosaveStatus === "idle" && td("idle")}
         </div>
         {session ? (
-          <Link href={localeHref(locale, "/author/submissions")} className="text-[var(--brand-red)] hover:underline">
+          <Link href={`/${locale}/author/submissions`} className="text-[var(--brand-red)] hover:underline">
             {isAr ? "مسوداتي" : "My drafts"}
           </Link>
         ) : (

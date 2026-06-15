@@ -11,7 +11,7 @@ import { BooksPagination } from "@/components/sections/books-pagination";
 import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
 import { StaggerContainer, StaggerItem } from "@/components/motion";
 import { ABOUT_IMAGES } from "@/lib/content/image-assets";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import {
   localizedPublisherDescription,
   localizedPublisherName,
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PublisherPageProps): Promise<
   const displayDesc = localizedPublisherDescription(publisher, locale as Locale);
   return buildPageMetadata({
     locale: locale as Locale,
-    path: localeHref(locale, `/publishers/${slug}`),
+    path: `/${locale}/publishers/${slug}`,
     title: displayName,
     description: displayDesc ?? (locale === "ar" ? `ناشر ${displayName}` : `Publisher ${displayName}`),
     imageUrl: publisher.imageUrl,
@@ -81,7 +81,7 @@ export default async function PublisherDetailPage({
       entityId={publisher.id}
       editHref={adminPublisherEditPath(locale, publisher.id)}
       adminViewHref={adminPublisherViewPath(locale, publisher.id)}
-      publicHref={localeHref(locale, `/publishers/${publisher.slug}`)}
+      publicHref={`/${locale}/publishers/${publisher.slug}`}
       title={displayName}
     >
       <div className="min-h-screen bg-[var(--brand-gray-50)] pb-24">
@@ -94,8 +94,8 @@ export default async function PublisherDetailPage({
           countries={publisher.countries}
           websiteUrl={publisher.websiteUrl}
           contactEmail={publisher.contactEmail}
-          homeHref={localeHref(locale, "/")}
-          publishersHref={localeHref(locale, "/publishers")}
+          homeHref={`/${locale}`}
+          publishersHref={`/${locale}/publishers`}
         />
 
         <div className="container-platform py-8">
@@ -126,7 +126,7 @@ export default async function PublisherDetailPage({
                 <div className="py-20 text-center text-[var(--brand-gray-500)]">
                   <p>{isAr ? "لا توجد كتب منشورة لهذا الناشر" : "No published books for this publisher"}</p>
                   <Link
-                    href={localeHref(locale, "/publishers")}
+                    href={`/${locale}/publishers`}
                     className="mt-4 inline-block text-sm text-[var(--brand-red)] hover:underline"
                   >
                     {isAr ? "تصفح كل الناشرين" : "Browse all publishers"}

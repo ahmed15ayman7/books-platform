@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/lib/i18n/config";
-import { localeHref } from "@/lib/i18n/href";
 import {
   localizedBookDescription,
   localizedBookName,
@@ -116,9 +115,9 @@ export function buildRootMetadata(): Metadata {
     alternates: {
       canonical: base,
       languages: {
-        ar: base,
+        ar: `${base}/ar`,
         en: `${base}/en`,
-        "x-default": base,
+        "x-default": `${base}/ar`,
       },
     },
   };
@@ -222,7 +221,7 @@ export function bookSeoMetadata(
 
   return buildPageMetadata({
     locale,
-    path: localeHref(locale, `/books/${book.slug}`),
+    path: `/${locale}/books/${book.slug}`,
     title: name,
     description:
       desc ||
@@ -247,7 +246,7 @@ export function articleSeoMetadata(
 ): Metadata {
   return buildPageMetadata({
     locale,
-    path: localeHref(locale, `/articles/${article.slug}`),
+    path: `/${locale}/articles/${article.slug}`,
     title: article.title,
     description:
       article.excerpt?.trim() ||

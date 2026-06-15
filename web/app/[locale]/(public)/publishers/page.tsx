@@ -19,7 +19,7 @@ import { PublisherCountryFilter } from "@/components/sections/publisher-country-
 import { BooksPagination } from "@/components/sections/books-pagination";
 import { Input } from "@/components/ui/input";
 import { Globe } from "lucide-react";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { PAGINATION } from "@/lib/utils/constants";
 
@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as Locale;
   return buildPageMetadata({
     locale,
-    path: localeHref(locale, "/publishers"),
+    path: `/${locale}/publishers`,
     title: locale === "ar" ? "الناشرون" : "Publishers",
     description:
       locale === "ar"
@@ -98,7 +98,7 @@ export default async function PublishersPage({ searchParams }: PublishersPagePro
         }
         logos={heroLogos}
         breadcrumbs={[
-          { label: locale === "ar" ? "الرئيسية" : "Home", href: localeHref(locale, "/") },
+          { label: locale === "ar" ? "الرئيسية" : "Home", href: `/${locale}` },
           { label: t("title") },
         ]}
       />
@@ -200,7 +200,7 @@ function PublisherListingCard({ publisher, locale }: PublisherListingCardProps) 
 
   return (
     <Link
-      href={localeHref(locale, `/publishers/${publisher.slug}`)}
+      href={`/${locale}/publishers/${publisher.slug}`}
       className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-[var(--brand-gray-200)] bg-white text-center transition-all hover:border-[var(--brand-red)] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]"
     >
       {publisher.isSponsored && (

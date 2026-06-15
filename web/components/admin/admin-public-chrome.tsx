@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import { Pencil, ExternalLink, Eye, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -104,7 +103,7 @@ export function AdminFloatingBar() {
 
   const localeMatch = ctx.editHref.match(/^\/([^/]+)\//);
   const locale = localeMatch?.[1] ?? "ar";
-  const dashboardHref = localeHref(locale, "/admin");
+  const dashboardHref = `/${locale}/admin`;
 
   return (
     <div

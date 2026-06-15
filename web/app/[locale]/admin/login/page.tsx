@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { localeHref } from "@/lib/i18n/href";
 import { useParams, useRouter } from "next/navigation";
 import { BookOpen, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -68,7 +67,7 @@ export default function AdminLoginPage() {
           isSuperAdmin: Boolean(data.data.user.isSuperAdmin),
           permissions: data.data.user.permissions ?? [],
         });
-        router.push(localeHref(locale, "/admin/dashboard"));
+        router.push(`/${locale}/admin/dashboard`);
       } else {
         setStatus("error");
         const code = data.error?.code;

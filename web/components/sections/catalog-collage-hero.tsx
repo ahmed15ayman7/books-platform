@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { SafeImage } from "@/components/ui/safe-image";
 import { cn } from "@/lib/utils";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import type { BreadcrumbItem } from "@/components/sections/page-hero";
 import { FadeIn, RevealText, StaggerContainer, StaggerItem } from "@/components/motion";
 
@@ -98,7 +98,7 @@ export function CatalogCollageHero({
   const isAr = locale === "ar";
   const homeLabel = isAr ? "الرئيسية" : "Home";
   const crumbs =
-    breadcrumbs.length > 0 ? breadcrumbs : [{ label: homeLabel, href: localeHref(locale, "/") }];
+    breadcrumbs.length > 0 ? breadcrumbs : [{ label: homeLabel, href: `/${locale}` }];
 
   const accentGradient =
     variant === "nominated"

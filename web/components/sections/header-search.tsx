@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { localeHref } from "@/lib/i18n/href";
 import { useParams } from "next/navigation";
 import { Search } from "lucide-react";
 import { searchShortcutKeyLabel } from "@/lib/search/shortcut-labels";
@@ -10,7 +9,7 @@ export function HeaderSearch() {
   const params = useParams<{ locale?: string }>();
   const locale = params.locale ?? "ar";
   const isAr = locale === "ar";
-  const href = localeHref(locale, "/search");
+  const href = `/${locale}/search`;
 
   return (
     <Link

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { localeHref } from "@/lib/i18n/href";
 import { usePathname, useParams } from "next/navigation";
 import {
   LayoutDashboard,
@@ -99,7 +98,7 @@ export function AdminSidebar() {
   async function handleLogout() {
     clearAdminSession();
     await fetch("/api/v1/auth/logout", { method: "POST" });
-    window.location.href = localeHref(locale, "/admin/login");
+    window.location.href = `/${locale}/admin/login`;
   }
 
   return (
@@ -107,7 +106,7 @@ export function AdminSidebar() {
       {/* Logo */}
       <div className="border-b border-[var(--admin-border)] p-4">
         <Link
-          href={localeHref(locale, "/admin/dashboard")}
+          href={`/${locale}/admin/dashboard`}
           className="flex items-center gap-2.5"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--brand-red)] shadow-[0_0_16px_rgba(177,30,46,0.4)]">
@@ -137,10 +136,10 @@ export function AdminSidebar() {
             </p>
             <div className="space-y-0.5">
               {visibleItems.map((item) => {
-                const href = localeHref(locale, item.href);
+                const href = `/${locale}${item.href}`;
                 const isActive =
                   pathname === href ||
-                  (pathname.startsWith(href + "/") && href !== localeHref(locale, "/admin/dashboard"));
+                  (pathname.startsWith(href + "/") && href !== `/${locale}/admin/dashboard`);
                 return (
                   <Link
                     key={item.href}
@@ -169,7 +168,7 @@ export function AdminSidebar() {
       {/* Bottom */}
       <div className="border-t border-[var(--admin-border)] p-2">
         <Link
-          href={localeHref(locale, "/")}
+          href={`/${locale}`}
           target="_blank"
           className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[var(--admin-text-muted)] hover:bg-[var(--admin-hover)] hover:text-[var(--admin-text)] transition-colors"
         >

@@ -5,7 +5,7 @@ import { EntityShareButton } from "@/components/share/entity-share-button";
 import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BookSummaryMarkdown } from "@/lib/markdown/book-summary-markdown";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 
 /** Fixed cover size for all books on detail page (4:3) */
 export const BOOK_DETAIL_COVER_WIDTH = 360;
@@ -67,7 +67,7 @@ export function BookDetailHero({
     <div className="flex min-w-0 flex-col gap-4">
       <div className="flex flex-wrap gap-2">
         {categories.map((cat) => (
-          <Link key={cat.id} href={localeHref(locale, `/books/category/${cat.slug}`)}>
+          <Link key={cat.id} href={`/${locale}/books/category/${cat.slug}`}>
             <Badge variant="category">{isAr && cat.nameAr ? cat.nameAr : cat.name}</Badge>
           </Link>
         ))}

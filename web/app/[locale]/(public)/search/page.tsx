@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getLocale } from "next-intl/server";
 import { GlobalSearchPageClient } from "@/components/sections/global-search/global-search-page";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import { parseSearchSectionType } from "@/lib/search/search-types";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { ArticleService } from "@/server/services/article.service";
@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as Locale;
   return buildPageMetadata({
     locale,
-    path: localeHref(locale, "/search"),
+    path: `/${locale}/search`,
     title: locale === "ar" ? "بحث" : "Search",
     description:
       locale === "ar"

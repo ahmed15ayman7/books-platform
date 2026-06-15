@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { localeHref } from "@/lib/i18n/href";
 import { useParams, useRouter } from "next/navigation";
 
 export function PublicKeyboardListener() {
@@ -13,7 +12,7 @@ export function PublicKeyboardListener() {
     function onKeyDown(e: KeyboardEvent) {
       if (!e.altKey || e.ctrlKey || e.metaKey || e.key.toLowerCase() !== "k") return;
       e.preventDefault();
-      router.push(localeHref(locale, "/search"));
+      router.push(`/${locale}/search`);
     }
 
     window.addEventListener("keydown", onKeyDown);

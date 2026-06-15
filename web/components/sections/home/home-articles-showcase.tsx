@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Bookmark, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import { AnimatedSection, FadeIn } from "@/components/motion";
 
 export interface HomeArticleItem {
@@ -42,7 +42,7 @@ function ArticleAccordionItem({
   compact?: boolean;
   onImageError: () => void;
 }) {
-  const articleHref = localeHref(locale, `/articles/${article.slug}`);
+  const articleHref = `/${locale}/articles/${article.slug}`;
   const toggleLabel =
     locale === "ar" ? `عرض مقال: ${article.title}` : `Show article: ${article.title}`;
 

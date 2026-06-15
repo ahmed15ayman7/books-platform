@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { localeHref } from "@/lib/i18n/href";
 import { getLocale } from "next-intl/server";
 import { ShoppingCart } from "lucide-react";
 import { MobileNavTrigger } from "@/components/sections/mobile-nav";
@@ -20,7 +19,7 @@ export async function Header() {
 
         <div className="flex flex-shrink-0 items-center gap-1">
           <Link
-            href={localeHref(locale, "/cart")}
+            href={`/${locale}/cart`}
             className="relative flex h-10 w-10 items-center justify-center rounded-lg text-white transition-colors hover:bg-white/10 hover:text-[var(--brand-red)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]"
             aria-label={locale === "ar" ? "السلة" : "Cart"}
           >

@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { localeHref } from "@/lib/i18n/href";
 import Link from "next/link";
 import Image from "next/image";
 import { db } from "@/lib/db";
@@ -55,7 +54,7 @@ export default async function AdminPublisherViewPage({ params }: Props) {
   return (
     <AdminDetailShell
       locale={locale}
-      backHref={localeHref(locale, "/admin/publishers")}
+      backHref={`/${locale}/admin/publishers`}
       backLabel="العودة للناشرين"
       title={title}
       subtitle={publisher.name !== title ? publisher.name : undefined}
@@ -76,7 +75,7 @@ export default async function AdminPublisherViewPage({ params }: Props) {
         <AdminEntityDeleteButton
           apiPath={`/api/v1/admin/publishers/${id}`}
           entityTitle={title}
-          redirectHref={localeHref(locale, "/admin/publishers")}
+          redirectHref={`/${locale}/admin/publishers`}
           confirmTitle="تأكيد حذف الناشر"
           entityLabel="الناشر"
         />

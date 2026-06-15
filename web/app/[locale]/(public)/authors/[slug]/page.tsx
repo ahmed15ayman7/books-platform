@@ -9,7 +9,7 @@ import { BookCard } from "@/components/sections/book-card";
 import { BooksPagination } from "@/components/sections/books-pagination";
 import { AnimatedContentSections } from "@/components/sections/content-page-shell.client";
 import { StaggerContainer, StaggerItem } from "@/components/motion";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import { PAGINATION } from "@/lib/utils/constants";
 import {
   localizedAuthorAlternateName,
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: AuthorPageProps): Promise<Met
 
   return buildPageMetadata({
     locale: locale as Locale,
-    path: localeHref(locale, `/authors/${slug}`),
+    path: `/${locale}/authors/${slug}`,
     title: displayName,
     description:
       bio ??
@@ -82,7 +82,7 @@ export default async function AuthorDetailPage({
       entityId={author.id}
       editHref={adminAuthorEditPath(locale, author.id)}
       adminViewHref={adminAuthorViewPath(locale, author.id)}
-      publicHref={localeHref(locale, `/authors/${author.slug}`)}
+      publicHref={`/${locale}/authors/${author.slug}`}
       title={displayName}
     >
       <div className="min-h-screen bg-[var(--brand-gray-50)] pb-24">
@@ -93,8 +93,8 @@ export default async function AuthorDetailPage({
           bio={bio}
           imageUrl={coverImage}
           slug={author.slug}
-          homeHref={localeHref(locale, "/")}
-          booksHref={localeHref(locale, "/books")}
+          homeHref={`/${locale}`}
+          booksHref={`/${locale}/books`}
         />
 
         <div className="container-platform py-8">
@@ -115,7 +115,7 @@ export default async function AuthorDetailPage({
                 <div className="py-20 text-center text-[var(--brand-gray-500)]">
                   <p>{isAr ? "لا توجد كتب منشورة لهذا المؤلف" : "No published books for this author"}</p>
                   <Link
-                    href={localeHref(locale, "/books")}
+                    href={`/${locale}/books`}
                     className="mt-4 inline-block text-sm text-[var(--brand-red)] hover:underline"
                   >
                     {isAr ? "تصفّح كل الكتب" : "Browse all books"}

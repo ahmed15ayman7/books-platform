@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { localeHref, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
 
 interface Category {
@@ -176,7 +176,7 @@ export function BookBiblioTable({
           {authors.map((author) => (
             <Link
               key={author.id}
-              href={localeHref(locale, `/authors/${author.slug}`)}
+              href={`/${locale}/authors/${author.slug}`}
               className="font-medium text-[var(--brand-red)] hover:underline"
             >
               {isAr && author.nameAr ? author.nameAr : author.name}
@@ -194,7 +194,7 @@ export function BookBiblioTable({
       content: (
         <span className="flex flex-wrap items-center gap-2">
           <Link
-            href={localeHref(locale, `/publishers/${publisher.slug}`)}
+            href={`/${locale}/publishers/${publisher.slug}`}
             className="font-medium text-[var(--brand-red)] hover:underline"
           >
             {localizedPublisherName(publisher, locale)}
@@ -249,7 +249,7 @@ export function BookBiblioTable({
       label: isAr ? "التصنيف الرئيسي" : "Primary Category",
       content: (
         <Link
-          href={localeHref(locale, `/books/category/${primaryCategory.slug}`)}
+          href={`/${locale}/books/category/${primaryCategory.slug}`}
           className="text-[var(--brand-red)] hover:underline font-medium"
         >
           {catName}
@@ -266,7 +266,7 @@ export function BookBiblioTable({
       content: (
         <div className="flex flex-wrap gap-1.5">
           {extraCats.map((cat) => (
-            <Link key={cat.id} href={localeHref(locale, `/books/category/${cat.slug}`)}>
+            <Link key={cat.id} href={`/${locale}/books/category/${cat.slug}`}>
               <Badge variant="category" className="text-xs">
                 {isAr && cat.nameAr ? cat.nameAr : cat.name}
               </Badge>
@@ -420,7 +420,7 @@ export function BookBiblioTable({
             </p>
             <div className="border-t border-[var(--brand-gray-200)] px-5 py-3">
               <Link
-                href={localeHref(locale, `/authors/${author.slug}`)}
+                href={`/${locale}/authors/${author.slug}`}
                 className="text-sm font-medium text-[var(--brand-red)] hover:underline"
               >
                 {isAr ? "عرض كل كتب المؤلف" : "View all books by this author"}
