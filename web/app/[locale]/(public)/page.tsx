@@ -37,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("home");
   return buildPageMetadata({
     locale,
-    path: `/${locale}`,
+    path: "/",  // seoCanonicalPath("ar", "/") → "/" — home gets clean canonical
     title:
       locale === "ar"
         ? "منصة الكتب العالمية — نافذة العالم على الكتب"

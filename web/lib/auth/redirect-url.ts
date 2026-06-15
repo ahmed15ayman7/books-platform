@@ -2,7 +2,7 @@ import { locales } from "@/lib/i18n/config";
 
 const LOCALE_PATTERN = new RegExp(`^/(${locales.join("|")})(/|$)`);
 
-/** Allow only same-site relative paths like /ar/publish?draft=... */
+/** Allow only same-site relative paths: /ar/..., /en/..., or unprefixed /... */
 export function sanitizeRedirectUrl(
   redirect: string | null | undefined,
   fallback: string,
@@ -13,7 +13,12 @@ export function sanitizeRedirectUrl(
   if (!trimmed.startsWith("/")) return fallback;
   if (trimmed.startsWith("//")) return fallback;
   if (trimmed.includes("://")) return fallback;
-  if (!LOCALE_PATTERN.test(trimmed)) return fallback;
 
-  return trimmed;
+  // Allow locale-prefixed paths (/ar/... or /en/...)
+  if (LOCALE_PATTERN.test(trimmed)) return trimmed;
+
+  // Also allow unprefixed same-site paths (aliases served via beforeFiles rewrites)
+  if (/^\/[^/]/.test(trimmed) || trimmed === "/") return trimmed;
+
+  return fallback;
 }

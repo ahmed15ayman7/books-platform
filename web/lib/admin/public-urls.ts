@@ -1,19 +1,20 @@
 import { isMediaChannel } from "@/lib/media/youtube";
+import { localeHref } from "@/lib/i18n/href";
 
 export function publicBookUrl(locale: string, slug: string): string {
-  return `/${locale}/books/${slug}`;
+  return localeHref(locale, `/books/${slug}`);
 }
 
 export function publicArticleUrl(locale: string, slug: string): string {
-  return `/${locale}/articles/${slug}`;
+  return localeHref(locale, `/articles/${slug}`);
 }
 
 export function publicPublisherUrl(locale: string, slug: string): string {
-  return `/${locale}/publishers/${slug}`;
+  return localeHref(locale, `/publishers/${slug}`);
 }
 
 export function publicAuthorUrl(locale: string, slug: string): string {
-  return `/${locale}/authors/${slug}`;
+  return localeHref(locale, `/authors/${slug}`);
 }
 
 export function adminBookViewPath(locale: string, id: string): string {

@@ -1,6 +1,5 @@
 import createMiddleware from "next-intl/middleware";
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { locales, defaultLocale } from "@/lib/i18n/config";
 import { verifyAccessToken } from "@/lib/auth/jwt";
 import { accessTokenCookieOptions } from "@/lib/auth/access-token-cookie";
@@ -12,12 +11,14 @@ const intlMiddleware = createMiddleware({
   localeDetection: true,
 });
 
-const ADMIN_PATTERN = /^\/[a-z]{2}\/admin(?:\/|$)/;
-const ADMIN_LOGIN_PATTERN = /^\/[a-z]{2}\/admin\/login\/?$/;
-const AMBASSADOR_PATTERN = /^\/[a-z]{2}\/ambassador(?:\/|$)/;
-const AMBASSADOR_LOGIN_PATTERN = /^\/[a-z]{2}\/ambassador\/login\/?$/;
-const AUTHOR_PATTERN = /^\/[a-z]{2}\/author(?:\/|$)/;
-const AUTH_PATTERN = /^\/[a-z]{2}\/auth(?:\/|$)/;
+// Match both /ar/admin and /en/admin (locale-prefixed) as well as unprefixed /admin
+// for forward-compatibility with possible alias rewrites.
+const ADMIN_PATTERN = /^(?:\/[a-z]{2})?\/admin(?:\/|$)/;
+const ADMIN_LOGIN_PATTERN = /^(?:\/[a-z]{2})?\/admin\/login\/?$/;
+const AMBASSADOR_PATTERN = /^(?:\/[a-z]{2})?\/ambassador(?:\/|$)/;
+const AMBASSADOR_LOGIN_PATTERN = /^(?:\/[a-z]{2})?\/ambassador\/login\/?$/;
+const AUTHOR_PATTERN = /^(?:\/[a-z]{2})?\/author(?:\/|$)/;
+const AUTH_PATTERN = /^(?:\/[a-z]{2})?\/auth(?:\/|$)/;
 
 type AuthPayload = Awaited<ReturnType<typeof verifyAccessToken>>;
 
@@ -82,7 +83,23 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const locale = pathname.split("/")[1] ?? "ar";
+  // Serve / as Arabic home without a browser redirect.
+  // We pass a fake /ar request to intlMiddleware so it sets the locale header,
+  // then rewrite the response back to / so the browser URL stays clean.
+  if (pathname === "/") {
+    const arUrl = request.nextUrl.clone();
+    arUrl.pathname = "/ar";
+    const fakeArReq = new NextRequest(arUrl.toString(), { headers: request.headers });
+    const intlResp = intlMiddleware(fakeArReq);
+    const rewriteUrl = request.nextUrl.clone();
+    rewriteUrl.pathname = "/ar";
+    const response = NextResponse.rewrite(rewriteUrl);
+    intlResp.headers.forEach((value, key) => response.headers.set(key, value));
+    return response;
+  }
+
+  // locale is the first path segment; fall back to "ar" for unprefixed paths
+  const locale = pathname.split("/")[1] || "ar";
   let refreshedToken: string | null = null;
 
   const needsAuth =

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/lib/i18n/config";
+import { seoCanonicalPath } from "@/lib/i18n/href";
 import {
   localizedBookDescription,
   localizedBookName,
@@ -59,12 +60,15 @@ export function buildSiteIcons(): NonNullable<Metadata["icons"]> {
 export function buildRootMetadata(): Metadata {
   const base = getSiteUrl();
   const defaultOg = resolveMediaUrl(getDefaultOgImagePath());
+  const googleVerification = process.env["NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION"]?.trim();
 
   return {
     metadataBase: new URL(base),
+    // Template is intentionally plain ("%s") because buildPageMetadata already
+    // appends the site name. This prevents triple-stacking on English pages.
     title: {
-      template: `%s | ${siteConfig.nameAr}`,
-      default: `${siteConfig.nameAr} — ${siteConfig.nameEn}`,
+      template: "%s",
+      default: `${siteConfig.nameAr} — ${siteConfig.taglineAr}`,
     },
     description: siteConfig.taglineAr,
     applicationName: siteConfig.nameAr,
@@ -113,19 +117,25 @@ export function buildRootMetadata(): Metadata {
       },
     },
     alternates: {
+      // Home canonical is the bare domain (Arabic default, no /ar prefix)
       canonical: base,
       languages: {
-        ar: `${base}/ar`,
+        ar: base,
         en: `${base}/en`,
-        "x-default": `${base}/ar`,
+        "x-default": base,
       },
     },
+    ...(googleVerification
+      ? { verification: { google: googleVerification } }
+      : {}),
   };
 }
 
 export function buildPageMetadata(input: PageSeoInput): Metadata {
   const path = input.path.startsWith("/") ? input.path : `/${input.path}`;
-  const canonical = absoluteUrl(path);
+  // Use the hybrid canonical strategy: home → /, other Arabic → /ar/..., EN → /en/...
+  const canonicalPath = seoCanonicalPath(input.locale, path);
+  const canonical = absoluteUrl(canonicalPath);
   const siteName = getSiteName(input.locale);
   const fullTitle =
     input.title.includes(siteName) ||
@@ -134,7 +144,7 @@ export function buildPageMetadata(input: PageSeoInput): Metadata {
       ? input.title
       : `${input.title} | ${siteName}`;
 
-  const { ar, en } = localizedPaths(path);
+  const { ar, en, xDefault } = localizedPaths(path);
   const ogImage = resolveMediaUrl(input.imageUrl);
   const description = input.description.slice(0, 320);
   const ogDescription = input.description.slice(0, 200);
@@ -152,7 +162,7 @@ export function buildPageMetadata(input: PageSeoInput): Metadata {
       languages: {
         ar: absoluteUrl(ar),
         en: absoluteUrl(en),
-        "x-default": absoluteUrl(ar),
+        "x-default": absoluteUrl(xDefault),
       },
     },
     openGraph: {
@@ -242,6 +252,7 @@ export function articleSeoMetadata(
     excerpt?: string | null;
     imageUrl?: string | null;
     date?: Date | string | null;
+    modifiedTime?: Date | string | null;
   }
 ): Metadata {
   return buildPageMetadata({
@@ -256,6 +267,7 @@ export function articleSeoMetadata(
     imageUrl: article.imageUrl,
     type: "article",
     publishedTime: article.date,
+    modifiedTime: article.modifiedTime ?? article.date,
     keywords: [article.title, locale === "ar" ? "مقالات" : "articles"],
   });
 }

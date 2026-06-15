@@ -10,11 +10,14 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   const pathname = usePathname();
 
   function switchLocale(newLocale: string) {
-    // Replace the current locale prefix in the path
-    const segments = pathname.split("/");
-    segments[1] = newLocale;
-    const newPath = segments.join("/") || "/";
-    router.push(newPath);
+    // Strip any existing /ar or /en prefix to get the logical path,
+    // then build the target URL for the chosen locale.
+    const withoutLocale = pathname.replace(/^\/(ar|en)(?=\/|$)/, "") || "/";
+    const target =
+      newLocale === "en"
+        ? withoutLocale === "/" ? "/en" : `/en${withoutLocale}`
+        : withoutLocale === "/" ? "/" : `/ar${withoutLocale}`;
+    router.push(target);
   }
 
   return (
