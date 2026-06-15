@@ -58,7 +58,7 @@ Features must never import from other features. Cross-feature navigation uses ar
 |---|---|
 | `constants/` | `AppConstants` (design tokens, keys), `ApiConstants` (env-aware URLs, timeouts), `AppSpacing` (ScreenUtil-backed spacing getters) |
 | `di/` | `injection_container.dart` (getIt + `@InjectableInit`), `register_module.dart` (`@module` for `FlutterSecureStorage`, `GlobalKey<NavigatorState>`, `Dio`) |
-| `helpers/` | `DialogHelper`, `SnackBarHelper`, `BottomSheetHelper` (all `@lazySingleton`, all constructor-injected with `GlobalKey<NavigatorState>`) |
+| `helpers/` | `DialogHelper`, `SnackBarHelper` (`@lazySingleton`, constructor-injected with `GlobalKey<NavigatorState>`); `BottomSheetHelper` (static utility class — takes `BuildContext` at call site, no DI registration) |
 | `network/` | `ApiManager`, `ApiResult` (sealed internal transport — never imported outside `ApiManager`; converted to `Either<Failure, T>` before leaving the network layer), `Failure` hierarchy, `failure_messages.dart`, `DioFactory`, `AuthInterceptor`, `ConnectivityHelper` |
 | `router/` | `AppRouter.generateRoute`, `AppRoutes` (route name constants), `args/` (typed args classes per screen) |
 | `storage/` | `SecureStorageHelper` (`@lazySingleton`, wraps `FlutterSecureStorage`) |

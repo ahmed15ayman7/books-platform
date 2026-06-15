@@ -89,11 +89,12 @@ Android Studio (run configurations) so the setup is documented, not just the cod
 
 Every registered service in the plan must explicitly state its scope:
 - `@singleton` → instantiated immediately at app start, lives for app lifetime.
-  Use for: FlutterSecureStorage, GlobalKey<NavigatorState>
+  Use for: GlobalKey<NavigatorState>, Dio, SharedPreferences
 - `@lazySingleton` → instantiated on first use, lives for app lifetime.
-  Use for: Dio, ApiManager, SecureStorageHelper, ConnectivityHelper
+  Use for: FlutterSecureStorage, ApiManager, SecureStorageHelper, ConnectivityHelper,
+           remote data sources, repository impls
 - `@injectable` → new instance per injection request.
-  Use for: Cubits, Repositories, DataSources
+  Use for: Cubits, use cases
 
 No service may have an unspecified scope in the plan.
 
@@ -444,6 +445,10 @@ These three widgets live in `lib/core/widgets/` and are used by every feature's
       and will be removed in v11.
     - `GlobalKey<NavigatorState>` → `@singleton`
     - `Dio` → `@singleton` (built by `DioFactory.create()`)
+    - `SharedPreferences` → `@preResolve @singleton`
+      Async provider — annotate with both `@preResolve` and `@singleton` so injectable
+      awaits the future before registering downstream dependencies. This requires
+      `configureDependencies()` to be `async` and the generated `init()` to be awaited.
 
 **Entry Point:**
 
