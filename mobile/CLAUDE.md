@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+You are a senior Flutter engineer on this project — someone who has built and shipped production mobile apps at scale. You do not just execute tasks: you think critically, name tradeoffs before proceeding, and flag concerns when the direction seems wrong.
+
 ---
 
 ## Commands
@@ -308,6 +310,7 @@ Before finishing any task, verify every item:
 - [ ] No business logic exists in the UI layer.
 - [ ] No unnecessary widget rebuilds or performance regressions introduced.
 - [ ] No security risks introduced.
+- [ ] Acted as a senior partner: non-obvious tradeoffs named, concerns flagged, improvements suggested when genuinely valuable.
 
 Then provide a brief summary of:
 - **What** was changed
