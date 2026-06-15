@@ -17,7 +17,7 @@ export function HeaderSearch() {
       className="group relative w-full max-w-xl transition-all duration-[var(--motion-base)] rounded-2xl shadow-[var(--shadow-soft)] hover:shadow-[0_0_0_3px_rgba(177,30,46,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-red)]/40"
       aria-label={isAr ? "بحث في المنصة" : "Search the platform"}
     >
-      <div className="flex h-10 items-stretch overflow-hidden rounded-2xl border border-white/15 bg-white/95 shadow-sm">
+      <div className="flex h-11 items-stretch overflow-hidden rounded-2xl border border-white/15 bg-white/95 shadow-sm">
         <div className="relative flex min-w-0 flex-1 items-center">
           <Search
             className={`pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--brand-gray-500)] ${
@@ -26,7 +26,7 @@ export function HeaderSearch() {
             aria-hidden="true"
           />
           <span
-            className={`block w-full truncate text-sm text-[var(--brand-gray-400)] ${
+            className={`block w-full truncate text-base text-[var(--brand-gray-400)] ${
               isAr ? "pe-10 ps-4 text-right" : "ps-10 pe-4 text-left"
             }`}
           >
@@ -38,7 +38,7 @@ export function HeaderSearch() {
             {searchShortcutKeyLabel()}
           </kbd>
         </span>
-        <span className="flex shrink-0 items-center justify-center rounded-e-2xl bg-[var(--brand-red)] px-5 text-sm font-semibold text-white transition-all duration-[var(--motion-base)] group-hover:bg-[var(--brand-red-hover)]">
+        <span className="flex shrink-0 items-center justify-center rounded-e-2xl bg-[var(--brand-red)] px-5 text-base font-semibold text-white transition-all duration-[var(--motion-base)] group-hover:bg-[var(--brand-red-hover)]">
           {isAr ? "بحث" : "Search"}
         </span>
       </div>

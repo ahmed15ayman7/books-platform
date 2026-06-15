@@ -43,7 +43,7 @@ export async function SiteHeader() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-full px-3 py-1 text-xs font-medium text-white/75 transition-all duration-[var(--motion-base)] hover:bg-white/10 hover:text-white"
+                className="rounded-full px-3 py-1.5 text-sm font-medium text-white/75 transition-all duration-[var(--motion-base)] hover:bg-white/10 hover:text-white"
               >
                 {link.label}
               </Link>
@@ -74,7 +74,7 @@ export async function SiteHeader() {
       </div>
 
       <div className="border-b border-white/10 bg-[var(--brand-black)] shadow-[var(--shadow-header)]">
-        <div className="container-platform flex h-[68px] items-center justify-between gap-4 md:h-[72px]">
+        <div className="container-platform flex h-[72px] items-center justify-between gap-4 md:h-[76px]">
           <SiteLogo locale={locale} />
 
           <div className="hidden min-w-0 flex-1 justify-center px-4 lg:flex">
