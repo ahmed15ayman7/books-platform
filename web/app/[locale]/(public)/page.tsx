@@ -32,6 +32,8 @@ import { HomePublishSection } from "@/components/sections/home/home-publish-sect
 import { shuffleArray } from "@/lib/utils/shuffle";
 import { resolveArticleDisplayImage } from "@/lib/articles/resolve-display-image";
 
+export const revalidate = 0;
+
 export async function generateMetadata(): Promise<Metadata> {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("home");
