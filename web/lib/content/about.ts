@@ -246,7 +246,7 @@ const effortItems: BilingualString[] = [
 
 const closing = {
   quote: {
-    ar: " أن يعرّف القارئ العربي بكل كتاب جديد يُنشر في العالم»",
+    ar: " أن يعرف القارئ العربي بكل كتاب جديد يُنشر في العالم»",
     en: "\"To introduce the Arab reader to every new book published around the world.\"",
   },
   tagline: {
