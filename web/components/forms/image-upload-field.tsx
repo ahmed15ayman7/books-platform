@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { Upload, X, ImageIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { headersForMultipartUpload } from "@/lib/http/upload-headers";
 import type { UploadFolder, UploadField } from "@/lib/storage/image-key";
 
 interface UploadResult {
@@ -73,7 +74,7 @@ export function ImageUploadField({
       try {
         const res = await fetch(uploadUrl, {
           method: "POST",
-          headers: headers ?? {},
+          headers: headersForMultipartUpload(headers),
           body: form,
         });
         const data = (await res.json()) as {

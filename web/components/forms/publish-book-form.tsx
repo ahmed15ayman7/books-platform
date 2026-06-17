@@ -9,6 +9,7 @@ import { useTranslations } from "next-intl";
 import {
   draftSubmissionSchema,
   stepRequiredFieldsComplete,
+  canSyncDraftToServer,
   type DraftSubmissionInput,
 } from "@/lib/validation/submission.schema";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ import { cn } from "@/lib/utils";
 import { clearFormDraft, loadLocalFormValues, useFormAutosave } from "@/lib/forms/use-form-autosave";
 import {
   authHeaders,
+  authUploadHeaders,
   clearStoredDraft,
   getAuthorSession,
   getStoredDraftId,
@@ -86,7 +88,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
   const values = watch();
 
   const syncDraft = useCallback(async (formValues: DraftSubmissionInput): Promise<string | null> => {
-    const payload = { ...formValues, currentStep: step };
+    const payload = { ...formValues, currentStep: formValues.currentStep ?? step };
     const headers = authHeaders();
 
     if (draftId) {
@@ -116,7 +118,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
   }, [draftId, step]);
 
   const canSyncToServer = useCallback(
-    (v: DraftSubmissionInput) => stepRequiredFieldsComplete(step, v),
+    (v: DraftSubmissionInput) => canSyncDraftToServer(step, v),
     [step],
   );
 
@@ -308,10 +310,18 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
       </p>
 
       <form
-        onSubmit={handleSubmit(() => {
+        onSubmit={handleSubmit(async () => {
           if (step < 2) {
-            setStep((s) => s + 1);
-            setValue("currentStep", step + 1);
+            const nextStep = step + 1;
+            setValue("currentStep", nextStep);
+            if (step === 0 && stepRequiredFieldsComplete(0, getValues())) {
+              try {
+                await syncDraft({ ...getValues(), currentStep: nextStep });
+              } catch {
+                // autosave will retry; still allow navigation
+              }
+            }
+            setStep(nextStep);
             return;
           }
           void onFinalSubmit();
@@ -398,7 +408,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
                 field="image_url"
                 entityId={draftId ?? undefined}
                 uploadUrl="/api/v1/submissions/uploads/cover"
-                headers={authHeaders()}
+                headers={authUploadHeaders()}
                 extraFields={draftId ? { draftId } : undefined}
                 value={values.coverUrl ?? ""}
                 onChange={(url) => setValue("coverUrl", url)}
