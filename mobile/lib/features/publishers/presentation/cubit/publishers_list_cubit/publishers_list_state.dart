@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../domain/entities/country.dart';
 import '../../../domain/entities/publisher.dart';
 
 sealed class PublishersListState extends Equatable {
@@ -20,15 +21,15 @@ final class PublishersListSuccess extends PublishersListState {
   const PublishersListSuccess({
     required this.publishers,
     required this.countries,
-    this.activeCountry,
+    this.activeCountrySlug,
     this.activeSearch = '',
   });
   final List<Publisher> publishers;
-  final List<String> countries;
-  final String? activeCountry;
+  final List<Country> countries;
+  final String? activeCountrySlug;
   final String activeSearch;
   @override
-  List<Object?> get props => [publishers, countries, activeCountry, activeSearch];
+  List<Object?> get props => [publishers, countries, activeCountrySlug, activeSearch];
 }
 
 final class PublishersListError extends PublishersListState {

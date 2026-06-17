@@ -70,21 +70,26 @@ class _PublishersScreenState extends State<PublishersScreen> {
                     PublishersListSuccess(
                       :final publishers,
                       :final countries,
-                      :final activeCountry,
+                      :final activeCountrySlug,
                     ) =>
                       PublishersBody(
                         key: const ValueKey('success'),
                         publishers: publishers,
                         countries: countries,
-                        activeCountry: activeCountry,
+                        activeCountrySlug: activeCountrySlug,
                         locale: locale,
                         searchController: _searchController,
                         onSearch: (q) =>
                             ctx.read<PublishersListCubit>().search(q),
-                        onCountryTap: (c) =>
+                        onCountryTap: (country) =>
                             ctx.read<PublishersListCubit>().filterByCountry(
-                                  c == activeCountry ? null : c,
+                                  activeCountrySlug == country.slug
+                                      ? null
+                                      : country.slug,
                                 ),
+                        onClearCountry: () => ctx
+                            .read<PublishersListCubit>()
+                            .filterByCountry(null),
                         onPublisherTap: (p) => Navigator.of(ctx).pushNamed(
                           AppRoutes.publisherDetail,
                           arguments: PublisherDetailArgs(

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_shadows.dart';
+import '../../../domain/entities/country.dart';
 import '../../../domain/entities/publisher.dart';
 import 'publishers_country_chip.dart';
 import 'publishers_publisher_card.dart';
@@ -14,19 +15,21 @@ class PublishersBody extends StatelessWidget {
     super.key,
     required this.publishers,
     required this.countries,
-    required this.activeCountry,
+    required this.activeCountrySlug,
     required this.locale,
     required this.onCountryTap,
+    required this.onClearCountry,
     required this.onPublisherTap,
     required this.onRefresh,
     required this.onSearch,
     required this.searchController,
   });
   final List<Publisher> publishers;
-  final List<String> countries;
-  final String? activeCountry;
+  final List<Country> countries;
+  final String? activeCountrySlug;
   final String locale;
-  final ValueChanged<String> onCountryTap;
+  final ValueChanged<Country> onCountryTap;
+  final VoidCallback onClearCountry;
   final ValueChanged<Publisher> onPublisherTap;
   final Future<void> Function() onRefresh;
   final ValueChanged<String> onSearch;
@@ -94,15 +97,15 @@ class PublishersBody extends StatelessWidget {
                 children: [
                   PublishersCountryChip(
                     label: 'publishers.all_countries'.tr(),
-                    active: activeCountry == null,
-                    onTap: () => onCountryTap(''),
+                    active: activeCountrySlug == null,
+                    onTap: onClearCountry,
                   ),
                   ...countries.map(
                     (c) => Padding(
                       padding: EdgeInsetsDirectional.only(start: 8.w),
                       child: PublishersCountryChip(
-                        label: c,
-                        active: activeCountry == c,
+                        label: c.displayName(locale),
+                        active: activeCountrySlug == c.slug,
                         onTap: () => onCountryTap(c),
                       ),
                     ),

@@ -56,6 +56,35 @@ void main() {
         expect(PublisherModel.fromJson(json).toEntity().aboutEn, 'وصف الناشر');
       });
 
+      group('countries object-array shape', () {
+        Map<String, dynamic> countryJson() => _baseJson({
+              'countries': [
+                {'id': 'c1', 'name': 'Egypt', 'nameAr': 'مصر', 'slug': 'egypt'}
+              ],
+            });
+
+        test('countryEn maps from country name', () {
+          expect(
+            PublisherModel.fromJson(countryJson()).toEntity().countryEn,
+            'Egypt',
+          );
+        });
+
+        test('countryAr maps from country nameAr', () {
+          expect(
+            PublisherModel.fromJson(countryJson()).toEntity().countryAr,
+            'مصر',
+          );
+        });
+
+        test('countrySlug maps from country slug', () {
+          expect(
+            PublisherModel.fromJson(countryJson()).toEntity().countrySlug,
+            'egypt',
+          );
+        });
+      });
+
       test('aboutAr reflects contentAr from API', () {
         final json = _baseJson({'contentAr': 'وصف عربي'});
         expect(PublisherModel.fromJson(json).toEntity().aboutAr, 'وصف عربي');

@@ -4,6 +4,7 @@ import 'package:injectable/injectable.dart';
 import '../../../../core/network/api_envelope.dart';
 import '../../../../core/network/api_manager.dart';
 import '../../../../core/network/failure.dart';
+import '../../domain/entities/country.dart';
 import '../../domain/entities/publisher.dart';
 import '../../domain/entities/publisher_book.dart';
 import '../models/publisher_book_model.dart';
@@ -15,8 +16,7 @@ class PublishersRemoteDataSourceImpl {
 
   final ApiManager _api;
 
-  List<String>? _cachedCountries;
-  final Map<String, String> _arToEnCountry = {};
+  List<Country>? _cachedCountries;
 
   Future<Either<Failure, PaginatedResponse<Publisher>>> getPublishers({
     String? country,
@@ -63,23 +63,27 @@ class PublishersRemoteDataSourceImpl {
             },
           );
 
-  Future<Either<Failure, List<String>>> getCountries() async {
+  Future<Either<Failure, List<Country>>> getCountries() async {
     if (_cachedCountries != null) return right(_cachedCountries!);
     final result = await getPublishers(limit: 100);
     return result.fold(
       (f) => left(f),
       (paginated) {
-        _arToEnCountry.clear();
+        final bySlug = <String, Country>{};
         for (final p in paginated.data) {
-          if (p.countryAr.isNotEmpty && p.countrySlug.isNotEmpty) {
-            _arToEnCountry[p.countryAr] = p.countrySlug;
-          }
+          final slug = p.countrySlug;
+          if (slug.isEmpty) continue;
+          bySlug.putIfAbsent(
+            slug,
+            () => Country(
+              slug: slug,
+              nameEn: p.countryEn,
+              nameAr: p.countryAr,
+            ),
+          );
         }
-        final countries = paginated.data
-            .expand((p) => [p.countryAr].where((c) => c.isNotEmpty))
-            .toSet()
-            .toList()
-          ..sort();
+        final countries = bySlug.values.toList()
+          ..sort((a, b) => a.nameEn.compareTo(b.nameEn));
         _cachedCountries = countries;
         return right(countries);
       },
@@ -87,14 +91,11 @@ class PublishersRemoteDataSourceImpl {
   }
 
   Future<Either<Failure, List<Publisher>>> getPublishersLegacy({
-    String? countryName,
+    String? countrySlug,
     String? search,
   }) async {
-    final englishCountry = countryName != null
-        ? (_arToEnCountry[countryName] ?? countryName)
-        : null;
     final result = await getPublishers(
-      country: englishCountry,
+      country: countrySlug,
       search: search,
       limit: 20,
     );
