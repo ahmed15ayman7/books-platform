@@ -1,3 +1,5 @@
+"use client";
+
 import { loadAdminSession } from '@/lib/admin/permissions-client';
 import { redirect, useParams } from 'next/navigation';
 

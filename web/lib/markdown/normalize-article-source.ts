@@ -162,9 +162,17 @@ export function joinSplitMarkdownLinks(text: string): string {
   return out;
 }
 
+/** Convert CommonMark / TipTap hard breaks (trailing \\) into paragraph breaks. */
+export function normalizeMarkdownHardBreaks(text: string): string {
+  return text
+    .replace(/\\[ \t]*\n/g, "\n\n")
+    .replace(/^[ \t]*\\[ \t]*$/gm, "")
+    .replace(/\n{3,}/g, "\n\n");
+}
+
 /** Full WordPress/markdown cleanup before block parsing. */
 export function normalizeArticleSource(raw: string): string {
-  let out = unescapeWordPressEscapes(raw);
+  let out = normalizeMarkdownHardBreaks(unescapeWordPressEscapes(raw));
   out = replaceCaptionShortcodes(out);
   out = joinSplitMarkdownLinks(out);
   out = demoteNonImageMarkdownImages(out);
