@@ -28,6 +28,10 @@ export async function POST(request: NextRequest) {
     return apiSuccess({ translated });
   } catch (error) {
     console.error("[POST /api/v1/admin/translate]", error);
-    return ApiErrors.badRequest("Translation failed");
+    const message =
+      error instanceof Error && error.message.includes("All translation providers failed")
+        ? error.message
+        : "Translation failed";
+    return ApiErrors.badRequest(message);
   }
 }

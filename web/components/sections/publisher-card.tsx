@@ -26,7 +26,6 @@ export function PublisherCard({
   locale,
   className,
 }: PublisherCardProps) {
-  console.log("imageUrl", imageUrl);
   return (
     <Link
       href={`/${locale}/publishers/${slug}`}
