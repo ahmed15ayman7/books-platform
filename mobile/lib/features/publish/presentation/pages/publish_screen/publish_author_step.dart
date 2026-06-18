@@ -28,7 +28,8 @@ class PublishAuthorStep extends StatelessWidget {
           label: 'publish.author_name_label'.tr(),
           hint: 'publish.author_name_hint'.tr(),
           isRequired: true,
-          validator: RegexHelper.requiredValidator,
+          maxLength: 100,
+          validator: (v) => RegexHelper.minLengthValidator(v, 2),
           textInputAction: TextInputAction.next,
         ),
         SizedBox(height: 16.h),
@@ -47,7 +48,14 @@ class PublishAuthorStep extends StatelessWidget {
           label: 'publish.phone_label'.tr(),
           hint: '+20 1XX XXX XXXX',
           keyboardType: TextInputType.phone,
-          validator: RegexHelper.phoneValidator,
+          maxLength: 20,
+          validator: (v) {
+            if (v == null || v.trim().isEmpty) return null;
+            if (v.trim().length > 20) {
+              return 'validation.max_length'.tr(namedArgs: {'max': '20'});
+            }
+            return null;
+          },
           textInputAction: TextInputAction.next,
         ),
         SizedBox(height: 16.h),
