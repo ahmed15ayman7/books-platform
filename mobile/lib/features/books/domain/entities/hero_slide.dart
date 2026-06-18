@@ -24,5 +24,8 @@ class HeroSlide extends Equatable {
   final int position;
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [
+    id, titleAr, titleEn, subtitleAr, subtitleEn,
+    imageUrl, foregroundImageUrl, linkUrl, position,
+  ];
 }

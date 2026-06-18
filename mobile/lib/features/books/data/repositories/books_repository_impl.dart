@@ -31,21 +31,36 @@ class BooksRepositoryImpl implements BooksRepository {
 
   @override
   Future<Either<Failure, List<HeroSlide>>> getHeroSlides() async {
+    final cached = _loadCachedSlides();
+    if (cached.isNotEmpty) return Right(cached);
+
     final result = await _remote.getHeroSlides();
     if (result.isRight()) {
       _cacheSlides(result.getOrElse(() => []));
       return result;
     }
-    final cached = _loadCachedSlides();
-    if (cached.isNotEmpty) return Right(cached);
+
+    final stale = _loadCachedSlides(ignoreExpiry: true);
+    if (stale.isNotEmpty) return Right(stale);
     return result;
   }
 
-  List<HeroSlide> _loadCachedSlides() {
+  @override
+  Future<Either<Failure, List<HeroSlide>>> refreshHeroSlides() async {
+    final result = await _remote.getHeroSlides();
+    if (result.isRight()) {
+      _cacheSlides(result.getOrElse(() => []));
+    }
+    return result;
+  }
+
+  List<HeroSlide> _loadCachedSlides({bool ignoreExpiry = false}) {
     final cachedAt = _prefs.getInt(_kHeroSlidesCachedAtKey);
     if (cachedAt == null) return [];
-    final age = DateTime.now().millisecondsSinceEpoch - cachedAt;
-    if (age > _kHeroCacheTtl.inMilliseconds) return [];
+    if (!ignoreExpiry) {
+      final age = DateTime.now().millisecondsSinceEpoch - cachedAt;
+      if (age > _kHeroCacheTtl.inMilliseconds) return [];
+    }
     final raw = _prefs.getString(_kHeroSlidesCacheKey);
     if (raw == null) return [];
     try {

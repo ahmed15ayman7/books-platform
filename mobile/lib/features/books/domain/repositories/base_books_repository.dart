@@ -14,6 +14,8 @@ import '../entities/sort_order.dart';
 abstract class BooksRepository {
   Future<Either<Failure, List<HeroSlide>>> getHeroSlides();
 
+  Future<Either<Failure, List<HeroSlide>>> refreshHeroSlides();
+
   Future<Either<Failure, PaginatedResponse<Book>>> getBooks({
     String? categorySlug,
     TranslationStatus? status,

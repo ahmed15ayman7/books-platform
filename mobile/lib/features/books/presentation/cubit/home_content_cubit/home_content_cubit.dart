@@ -56,5 +56,29 @@ class HomeContentCubit extends Cubit<HomeContentState> {
       categorySections: categorySections,
       topPublishers: topPublishers,
     ));
+
+    _backgroundRefreshSlides();
+  }
+
+  void _backgroundRefreshSlides() {
+    _repo.refreshHeroSlides().then((result) {
+      if (isClosed) return;
+      result.fold(
+        (_) => null,
+        (fresh) {
+          final current = state;
+          if (current is HomeContentSuccess) {
+            emit(HomeContentSuccess(
+              heroSlides: fresh,
+              categories: current.categories,
+              freshBooks: current.freshBooks,
+              translatedBooks: current.translatedBooks,
+              categorySections: current.categorySections,
+              topPublishers: current.topPublishers,
+            ));
+          }
+        },
+      );
+    });
   }
 }
