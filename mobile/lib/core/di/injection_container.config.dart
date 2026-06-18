@@ -221,7 +221,10 @@ extension GetItInjectableX on _i174.GetIt {
       ),
     );
     gh.lazySingleton<_i407.BooksRepository>(
-      () => _i680.BooksRepositoryImpl(gh<_i481.BooksRemoteDataSourceImpl>()),
+      () => _i680.BooksRepositoryImpl(
+        gh<_i481.BooksRemoteDataSourceImpl>(),
+        gh<_i460.SharedPreferences>(),
+      ),
     );
     gh.factory<_i165.ArticleDetailCubit>(
       () => _i165.ArticleDetailCubit(gh<_i657.ArticlesRepository>()),

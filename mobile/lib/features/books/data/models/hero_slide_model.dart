@@ -23,18 +23,17 @@ class HeroSlideModel {
   final String? linkUrl;
   final int position;
 
-  // Cache implementation — uncomment to re-enable. when needed
-  // factory HeroSlideModel.fromEntity(HeroSlide slide) => HeroSlideModel(
-  //       id: slide.id,
-  //       titleAr: slide.titleAr,
-  //       titleEn: slide.titleEn,
-  //       subtitleAr: slide.subtitleAr,
-  //       subtitleEn: slide.subtitleEn,
-  //       imageUrl: slide.imageUrl,
-  //       foregroundImageUrl: slide.foregroundImageUrl,
-  //       linkUrl: slide.linkUrl,
-  //       position: slide.position,
-  //     );
+  factory HeroSlideModel.fromEntity(HeroSlide slide) => HeroSlideModel(
+    id: slide.id,
+    titleAr: slide.titleAr,
+    titleEn: slide.titleEn,
+    subtitleAr: slide.subtitleAr,
+    subtitleEn: slide.subtitleEn,
+    imageUrl: slide.imageUrl,
+    foregroundImageUrl: slide.foregroundImageUrl,
+    linkUrl: slide.linkUrl,
+    position: slide.position,
+  );
 
   factory HeroSlideModel.fromJson(Map<String, dynamic> json) => HeroSlideModel(
     id: json['id'] as String? ?? '',
@@ -48,18 +47,17 @@ class HeroSlideModel {
     position: (json['position'] as num?)?.toInt() ?? 0,
   );
 
-  // Cache implementation — uncomment to re-enable. when needed
-  // Map<String, dynamic> toJson() => {
-  //       'id': id,
-  //       'titleAr': titleAr,
-  //       if (titleEn != null) 'titleEn': titleEn,
-  //       if (subtitleAr != null) 'subtitleAr': subtitleAr,
-  //       if (subtitleEn != null) 'subtitleEn': subtitleEn,
-  //       'imageUrl': imageUrl,
-  //       if (foregroundImageUrl != null) 'foregroundImageUrl': foregroundImageUrl,
-  //       if (linkUrl != null) 'linkUrl': linkUrl,
-  //       'position': position,
-  //     };
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'titleAr': titleAr,
+    if (titleEn != null) 'titleEn': titleEn,
+    if (subtitleAr != null) 'subtitleAr': subtitleAr,
+    if (subtitleEn != null) 'subtitleEn': subtitleEn,
+    'imageUrl': imageUrl,
+    if (foregroundImageUrl != null) 'foregroundImageUrl': foregroundImageUrl,
+    if (linkUrl != null) 'linkUrl': linkUrl,
+    'position': position,
+  };
 
   HeroSlide toEntity() => HeroSlide(
     id: id,

@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/enums/translation_status.dart';
 import '../../../../core/network/api_envelope.dart';
@@ -13,16 +16,56 @@ import '../../domain/entities/publisher_summary.dart';
 import '../../domain/entities/sort_order.dart';
 import '../../domain/repositories/base_books_repository.dart';
 import '../datasources/books_remote_data_source_impl.dart';
+import '../models/hero_slide_model.dart';
+
+const _kHeroSlidesCacheKey = 'hero_slides_cache';
+const _kHeroSlidesCachedAtKey = 'hero_slides_cached_at';
+const _kHeroCacheTtl = Duration(minutes: 30);
 
 @LazySingleton(as: BooksRepository)
 class BooksRepositoryImpl implements BooksRepository {
-  const BooksRepositoryImpl(this._remote);
+  BooksRepositoryImpl(this._remote, this._prefs);
 
   final BooksRemoteDataSourceImpl _remote;
+  final SharedPreferences _prefs;
 
   @override
-  Future<Either<Failure, List<HeroSlide>>> getHeroSlides() =>
-      _remote.getHeroSlides();
+  Future<Either<Failure, List<HeroSlide>>> getHeroSlides() async {
+    final result = await _remote.getHeroSlides();
+    if (result.isRight()) {
+      _cacheSlides(result.getOrElse(() => []));
+      return result;
+    }
+    final cached = _loadCachedSlides();
+    if (cached.isNotEmpty) return Right(cached);
+    return result;
+  }
+
+  List<HeroSlide> _loadCachedSlides() {
+    final cachedAt = _prefs.getInt(_kHeroSlidesCachedAtKey);
+    if (cachedAt == null) return [];
+    final age = DateTime.now().millisecondsSinceEpoch - cachedAt;
+    if (age > _kHeroCacheTtl.inMilliseconds) return [];
+    final raw = _prefs.getString(_kHeroSlidesCacheKey);
+    if (raw == null) return [];
+    try {
+      final list = jsonDecode(raw) as List<dynamic>;
+      return list
+          .map((e) => HeroSlideModel.fromJson(e as Map<String, dynamic>).toEntity())
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  void _cacheSlides(List<HeroSlide> slides) {
+    if (slides.isEmpty) return;
+    final json = jsonEncode(
+      slides.map((s) => HeroSlideModel.fromEntity(s).toJson()).toList(),
+    );
+    _prefs.setString(_kHeroSlidesCacheKey, json);
+    _prefs.setInt(_kHeroSlidesCachedAtKey, DateTime.now().millisecondsSinceEpoch);
+  }
 
   @override
   Future<Either<Failure, PaginatedResponse<Book>>> getBooks({
