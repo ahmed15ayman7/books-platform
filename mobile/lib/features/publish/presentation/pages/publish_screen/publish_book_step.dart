@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../core/helpers/regex_helper.dart';
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_text_styles.dart';
 import '../../../../../core/widgets/app_text_field.dart';
 
 class PublishBookStep extends StatelessWidget {
@@ -13,6 +14,8 @@ class PublishBookStep extends StatelessWidget {
     required this.titleCtrl,
     required this.summaryCtrl,
     required this.categoryCtrl,
+    required this.onLanguageChanged,
+    this.selectedLanguage,
     this.onPickFile,
     this.onPickCover,
     this.formData = const {},
@@ -21,6 +24,8 @@ class PublishBookStep extends StatelessWidget {
   final TextEditingController titleCtrl;
   final TextEditingController summaryCtrl;
   final TextEditingController categoryCtrl;
+  final String? selectedLanguage;
+  final ValueChanged<String?> onLanguageChanged;
   final VoidCallback? onPickFile;
   final VoidCallback? onPickCover;
   final Map<String, dynamic> formData;
@@ -59,6 +64,38 @@ class PublishBookStep extends StatelessWidget {
           isRequired: true,
           validator: RegexHelper.requiredValidator,
           textInputAction: TextInputAction.done,
+        ),
+        SizedBox(height: 16.h),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Text('publish.language_label'.tr(), style: AppTextStyles.labelLarge),
+                Text(
+                  ' *',
+                  style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
+                ),
+              ],
+            ),
+            SizedBox(height: 7.h),
+            DropdownButtonFormField<String>(
+              initialValue: (selectedLanguage?.isNotEmpty == true) ? selectedLanguage : null,
+              validator: (v) => (v == null || v.isEmpty)
+                  ? 'publish.language_required'.tr()
+                  : null,
+              items: [
+                DropdownMenuItem(value: 'ar', child: Text('publish.language_ar'.tr())),
+                DropdownMenuItem(value: 'en', child: Text('publish.language_en'.tr())),
+                DropdownMenuItem(value: 'fr', child: Text('publish.language_fr'.tr())),
+                DropdownMenuItem(value: 'de', child: Text('publish.language_de'.tr())),
+                DropdownMenuItem(value: 'es', child: Text('publish.language_es'.tr())),
+                DropdownMenuItem(value: 'other', child: Text('publish.language_other'.tr())),
+              ],
+              onChanged: onLanguageChanged,
+            ),
+          ],
         ),
         SizedBox(height: 16.h),
         // PDF upload row

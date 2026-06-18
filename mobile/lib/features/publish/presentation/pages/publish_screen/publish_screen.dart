@@ -180,6 +180,11 @@ class _PublishScreenState extends State<PublishScreen> {
                               titleCtrl: _titleCtrl,
                               summaryCtrl: _summaryCtrl,
                               categoryCtrl: _categoryCtrl,
+                              selectedLanguage:
+                                  formData['bookLanguage'] as String?,
+                              onLanguageChanged: (v) => ctx
+                                  .read<PublishCubit>()
+                                  .updateField('bookLanguage', v ?? ''),
                               onPickFile: () =>
                                   ctx.read<PublishCubit>().pickFile(),
                               onPickCover: () =>

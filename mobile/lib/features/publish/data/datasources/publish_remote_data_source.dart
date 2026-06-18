@@ -39,12 +39,13 @@ class PublishRemoteDataSource {
             json,
             fromData: (d) => d,
           ).data!;
+          final sub = data['submission'] as Map<String, dynamic>? ?? {};
           return Submission(
-            id: data['_id'] as String? ?? data['id'] as String? ?? '',
-            status: data['status'] as String? ?? 'PENDING',
-            isFirstFree: data['isFirstFree'] as bool? ?? false,
+            id: sub['_id'] as String? ?? sub['id'] as String? ?? '',
+            status: sub['status'] as String? ?? 'PENDING',
+            isFirstFree: sub['isFirstFree'] as bool? ?? false,
             requiresPayment: data['requiresPayment'] as bool? ?? false,
-            paymentStatus: data['paymentStatus'] as String?,
+            paymentStatus: sub['paymentStatus'] as String?,
           );
         },
       );

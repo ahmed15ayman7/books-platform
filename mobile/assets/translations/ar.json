@@ -216,7 +216,15 @@
     "success_title": "تم استلام طلبك!",
     "submit_another": "إرسال كتاب آخر",
     "back_to_home": "العودة إلى الرئيسية",
-    "cover_label": "رفع صورة الغلاف (اختياري)"
+    "cover_label": "رفع صورة الغلاف (اختياري)",
+    "language_label": "اللغة",
+    "language_ar": "العربية",
+    "language_en": "الإنجليزية",
+    "language_fr": "الفرنسية",
+    "language_de": "الألمانية",
+    "language_es": "الإسبانية",
+    "language_other": "أخرى",
+    "language_required": "يرجى اختيار لغة الكتاب"
   },
 
   "validation": {

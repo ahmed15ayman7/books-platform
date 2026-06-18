@@ -216,7 +216,15 @@
     "success_title": "Submission Received!",
     "submit_another": "Submit Another Book",
     "back_to_home": "Back to Home",
-    "cover_label": "Upload cover image (optional)"
+    "cover_label": "Upload cover image (optional)",
+    "language_label": "Language",
+    "language_ar": "Arabic",
+    "language_en": "English",
+    "language_fr": "French",
+    "language_de": "German",
+    "language_es": "Spanish",
+    "language_other": "Other",
+    "language_required": "Please select a language"
   },
 
   "validation": {
