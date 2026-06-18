@@ -124,6 +124,26 @@ const _members = [
       en: 'Handles site development and SEO so content reaches the widest possible readership.',
     ),
   ),
+  (
+    initials: 'أ أ',
+    imageUrl: TeamMemberUrls.ahmedAyman,
+    name: (ar: 'أحمد أيمن', en: 'Ahmed Ayman'),
+    role: (ar: 'مطور الموقع', en: 'Web Developer'),
+    bio: (
+      ar: 'مطور الموقع والتطوير التقني والذكاء الاصطناعي.',
+      en: 'Responsible for website development, technical infrastructure, and artificial intelligence.',
+    ),
+  ),
+  (
+    initials: 'ي ع',
+    imageUrl: TeamMemberUrls.youssefEmad,
+    name: (ar: 'يوسف عمادالدين', en: 'Youssef Emad Eldin'),
+    role: (ar: 'مطور تطبيق', en: 'App Developer'),
+    bio: (
+      ar: 'تطوير تطبيق المنصة باستخدام Flutter.',
+      en: 'Developing the platform\'s mobile application using Flutter.',
+    ),
+  ),
 ];
 
 // ── Widget ─────────────────────────────────────────────────────────────────
@@ -185,7 +205,11 @@ class TeamBody extends StatelessWidget {
                     ],
                   ),
                   padding: EdgeInsetsDirectional.fromSTEB(
-                      16.w, 18.h, 16.w, 18.h),
+                    16.w,
+                    18.h,
+                    16.w,
+                    18.h,
+                  ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

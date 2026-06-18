@@ -23,6 +23,7 @@ class AppBarWidget extends StatelessWidget {
     this.onSearch,
     this.onCart,
     this.trailing,
+    this.leading,
     this.currentLocale = 'ar',
     this.onLocaleChanged,
   });
@@ -35,6 +36,7 @@ class AppBarWidget extends StatelessWidget {
   final VoidCallback? onSearch;
   final VoidCallback? onCart;
   final Widget? trailing;
+  final Widget? leading;
   final String currentLocale;
   final ValueChanged<String>? onLocaleChanged;
 
@@ -78,7 +80,6 @@ class AppBarWidget extends StatelessWidget {
                 currentLocale: currentLocale,
                 onChanged: onLocaleChanged,
               ),
-              if (trailing != null) ...[SizedBox(width: 8.w), trailing!],
               if (onSearch != null) ...[
                 SizedBox(width: 8.w),
                 _IconButton(onTap: onSearch!, icon: Icons.search_rounded),
@@ -87,6 +88,7 @@ class AppBarWidget extends StatelessWidget {
                 SizedBox(width: 8.w),
                 _CartButton(onTap: onCart!),
               ],
+              if (trailing != null) ...[SizedBox(width: 8.w), trailing!],
             ],
           ),
         ],

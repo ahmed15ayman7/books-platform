@@ -1,21 +1,25 @@
 /// Team member photo URLs — update here when assets change on the server.
 abstract final class TeamMemberUrls {
   static const atefMazhar =
-      'https://booksplatform.net/wp-content/uploads/atef-mazhar.jpeg';
+      'https://booksplatform.net/_next/image?url=%2Fteam%2Fatef-mazhar.webp&w=256&q=75';
   static const mariamMazhar =
-      'https://booksplatform.net/wp-content/uploads/mariam-mazhar.jpeg';
+      'https://booksplatform.net/_next/image?url=%2Fteam%2Fmariam-mazhar.webp&w=256&q=75';
   static const saraMazhar =
-      'https://booksplatform.net/wp-content/uploads/sara-mazhar.jpeg';
+      'https://booksplatform.net/_next/image?url=%2Fteam%2Fsara-mazhar.webp&w=256&q=75';
   static const mohamedAbouElwafa =
-      'https://booksplatform.net/wp-content/uploads/mohamed-abou-elwafa.jpeg';
+      'https://booksplatform.net/_next/image?url=%2Fteam%2Fmohamed-abou-elwafa.webp&w=256&q=75';
   static const hanyMowafi =
-      'https://booksplatform.net/wp-content/uploads/hany-mawafy.jpeg';
+      'https://booksplatform.net/_next/image?url=%2Fteam%2Fhany-mawafy.webp&w=256&q=75';
   static const zakariaElShal =
-      'https://booksplatform.net/wp-content/uploads/zakaria-elshal-1.jpeg';
+      'https://booksplatform.net/_next/image?url=%2Fteam%2Fzakaria-elshal.webp&w=256&q=75';
   static const abdelrahmanSaeed =
-      'https://booksplatform.net/wp-content/uploads/WhatsApp-Image-2026-05-03-at-10.06.29-PM.jpeg';
+      'https://booksplatform.net/_next/image?url=%2Fteam%2Fabdelrahman-saeed.webp&w=256&q=75';
   static const hatemFarag =
-      'https://booksplatform.net/wp-content/uploads/dr-hatem-farag.jpeg';
+      'https://booksplatform.net/_next/image?url=%2Fteam%2Fhatem-farag.webp&w=256&q=75';
   static const ahmedElShal =
-      'https://booksplatform.net/wp-content/uploads/%D8%A7%D8%AD%D9%85%D8%AF-%D8%A7%D9%84%D8%B4%D8%A7%D9%84.jpeg';
+      'https://booksplatform.net/_next/image?url=%2Fteam%2Fahmed-elshal.webp&w=256&q=75';
+  static const ahmedAyman =
+      'https://booksplatform.net/_next/image?url=%2Fteam%2Fahmed-ayman.jpeg&w=256&q=75';
+  static const youssefEmad =
+      'https://booksplatform.net/_next/image?url=%2Fteam%2Fyoussef-emad.jpeg&w=256&q=75';
 }
