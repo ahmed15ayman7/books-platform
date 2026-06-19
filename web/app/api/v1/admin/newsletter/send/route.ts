@@ -4,7 +4,7 @@ import { z } from "zod";
 import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
 import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
-import { Resend } from "resend";
+import { sendBulk } from "@/lib/email/mailer";
 
 const sendSchema = z.object({
   subject: z.string().min(1).max(300),
@@ -31,36 +31,29 @@ export async function POST(request: NextRequest) {
       return apiSuccess({ sent: 0, message: "No confirmed subscribers" });
     }
 
-    const apiKey = process.env["RESEND_API_KEY"];
-    const fromEmail = process.env["RESEND_FROM_EMAIL"] ?? "newsletter@books-platform.com";
-    const fromName = process.env["RESEND_FROM_NAME"] ?? "Books Platform";
+    const html = body.replace(/\n/g, "<br>");
+    const recipients = subscribers.map((s) => s.email);
 
-    if (!apiKey) {
-      console.warn("[newsletter/send] RESEND_API_KEY not set — email skipped");
+    const { sent, failed } = await sendBulk(
+      recipients,
+      { subject, html, text: body },
+      { type: "newsletter_broadcast" },
+    );
+
+    if (sent === 0 && failed === 0) {
       return apiSuccess({ sent: 0, message: "Email service not configured" });
     }
 
-    const resend = new Resend(apiKey);
-    const emails = subscribers.map((s) => s.email);
-    const batchSize = 50;
-    let sent = 0;
-
-    for (let i = 0; i < emails.length; i += batchSize) {
-      const batch = emails.slice(i, i + batchSize);
-      await resend.emails.send({
-        from: `${fromName} <${fromEmail}>`,
-        to: batch,
-        subject,
-        html: body.replace(/\n/g, "<br>"),
-      });
-      sent += batch.length;
-    }
-
     await db.auditLog.create({
-      data: { userId: auth.payload.userId, action: "SEND_NEWSLETTER", entity: "NewsletterSubscriber", entityId: "broadcast" },
+      data: {
+        userId: auth.payload.userId,
+        action: "SEND_NEWSLETTER",
+        entity: "NewsletterSubscriber",
+        entityId: "broadcast",
+      },
     });
 
-    return apiSuccess({ sent, total: subscribers.length });
+    return apiSuccess({ sent, failed, total: subscribers.length });
   } catch (error) {
     console.error("[POST /api/v1/admin/newsletter/send]", error);
     return ApiErrors.internal();
