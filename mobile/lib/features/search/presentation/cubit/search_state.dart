@@ -12,7 +12,10 @@ sealed class SearchState extends Equatable {
 }
 
 final class SearchInitial extends SearchState {
-  const SearchInitial();
+  const SearchInitial({this.recentSearches = const []});
+  final List<String> recentSearches;
+  @override
+  List<Object?> get props => [recentSearches];
 }
 
 final class SearchLoading extends SearchState {

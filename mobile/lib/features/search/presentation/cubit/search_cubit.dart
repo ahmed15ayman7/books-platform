@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
 import 'package:booksplatform/core/network/failure_messages.dart' as core;
+import 'package:booksplatform/core/storage/search_history_storage.dart';
 
 import '../../domain/entities/search_section_type.dart';
 import '../../domain/entities/search_suggestion.dart';
@@ -12,9 +13,13 @@ import 'search_state.dart';
 
 @injectable
 class SearchCubit extends Cubit<SearchState> {
-  SearchCubit(this._repository) : super(const SearchInitial());
+  SearchCubit(this._repository, this._historyStorage)
+      : super(const SearchInitial()) {
+    _loadHistory();
+  }
 
   final SearchRepository _repository;
+  final SearchHistoryStorage _historyStorage;
 
   Timer? _debounce;
   String _lastQuery = '';
@@ -24,20 +29,19 @@ class SearchCubit extends Cubit<SearchState> {
   static const _minQueryLength = 2;
   static const _debounceMs = 300;
 
+  Future<void> _loadHistory() async {
+    final history = await _historyStorage.getHistory();
+    emit(SearchInitial(recentSearches: history));
+  }
+
   void onQueryChanged(String query, String locale) {
     _locale = locale;
     _debounce?.cancel();
 
     final trimmed = query.trim();
-    if (trimmed.isEmpty) {
+    if (trimmed.isEmpty || trimmed.length < _minQueryLength) {
       _lastQuery = '';
-      emit(const SearchInitial());
-      return;
-    }
-
-    if (trimmed.length < _minQueryLength) {
-      _lastQuery = '';
-      emit(const SearchInitial());
+      _loadHistory();
       return;
     }
 
@@ -46,6 +50,16 @@ class SearchCubit extends Cubit<SearchState> {
       const Duration(milliseconds: _debounceMs),
       () => _search(trimmed, locale: locale, tab: _tab, page: 1),
     );
+  }
+
+  Future<void> removeFromHistory(String query) async {
+    await _historyStorage.removeQuery(query);
+    await _loadHistory();
+  }
+
+  Future<void> clearHistory() async {
+    await _historyStorage.clearAll();
+    emit(const SearchInitial(recentSearches: []));
   }
 
   Future<void> changeTab(SearchSectionType tab) async {
@@ -125,6 +139,9 @@ class SearchCubit extends Cubit<SearchState> {
           emit(SearchEmpty(query));
           return;
         }
+
+        // Fire-and-forget: save successful queries to history
+        _historyStorage.addQuery(query);
 
         emit(
           SearchSuccess(

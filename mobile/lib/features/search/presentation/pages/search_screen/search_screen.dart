@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../../core/helpers/bottom_sheet_helper.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/router/args/article_detail_args.dart';
 import '../../../../../core/router/args/book_detail_args.dart';
@@ -15,6 +16,7 @@ import '../../../domain/entities/search_section_type.dart';
 import '../../../domain/entities/search_suggestion.dart';
 import '../../cubit/search_cubit.dart';
 import '../../cubit/search_state.dart';
+import 'search_history_sheet.dart';
 import 'search_no_results.dart';
 import 'search_recent_chips.dart';
 import 'search_results_list.dart';
@@ -207,11 +209,27 @@ class _SearchScreenState extends State<SearchScreen> {
                   return AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
                     child: switch (state) {
-                      SearchInitial() => KeyedSubtree(
+                      SearchInitial(:final recentSearches) => KeyedSubtree(
                           key: const ValueKey('initial'),
                           child: SearchRecentChips(
-                            locale: locale,
+                            recentSearches: recentSearches,
                             onChipTap: (s) => _fillField(ctx, s),
+                            onRemove: (s) =>
+                                ctx.read<SearchCubit>().removeFromHistory(s),
+                            onClearAll: () =>
+                                ctx.read<SearchCubit>().clearHistory(),
+                            onShowAll: () =>
+                                BottomSheetHelper.showAppBottomSheet(
+                              context: ctx,
+                              isScrollable: true,
+                              maxHeight: 0.6,
+                              child: BlocProvider.value(
+                                value: ctx.read<SearchCubit>(),
+                                child: SearchHistorySheet(
+                                  onChipTap: (s) => _fillField(ctx, s),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       SearchLoading() => const Center(
@@ -288,7 +306,6 @@ class _SearchScreenState extends State<SearchScreen> {
                           key: const ValueKey('empty'),
                           child: SearchNoResults(
                             query: query,
-                            locale: locale,
                             onSuggestion: (s) => _fillField(ctx, s),
                           ),
                         ),

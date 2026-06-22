@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/widgets/full_screen_image_viewer.dart';
 import '../../../domain/entities/article_detail.dart';
 
 class ArticleDetailHeroHeader extends StatelessWidget {
@@ -15,9 +16,26 @@ class ArticleDetailHeroHeader extends StatelessWidget {
   final ArticleDetail article;
   final VoidCallback onBack;
 
+  void _openViewer(BuildContext context) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        barrierColor: Colors.transparent,
+        transitionDuration: const Duration(milliseconds: 220),
+        reverseTransitionDuration: const Duration(milliseconds: 180),
+        pageBuilder: (_, animation, _) => FadeTransition(
+          opacity: animation,
+          child: FullScreenImageViewer(imageUrl: article.imageUrl!),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return GestureDetector(
+      onTap: article.imageUrl != null ? () => _openViewer(context) : null,
+      child: SizedBox(
       height: 230.h,
       child: Stack(
         fit: StackFit.expand,
@@ -119,6 +137,7 @@ class ArticleDetailHeroHeader extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

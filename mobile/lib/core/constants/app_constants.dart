@@ -26,6 +26,7 @@ const String kOnboardingDoneKey = 'onboarding_done';
 // Storage keys (features)
 const String kWishlistKey = 'wishlist_slugs';
 const String kCartKey = 'cart_items';
+const String kSearchHistoryKey = 'search_history';
 
 // Branding assets
 const String kBrandingLogoAsset = 'assets/branding/logo.webp';

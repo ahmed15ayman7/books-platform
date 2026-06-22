@@ -185,7 +185,12 @@
     "tab_books": "Books",
     "tab_articles": "Articles",
     "tab_publishers": "Publishers",
-    "tab_empty": "No {} results for this search"
+    "tab_empty": "No {} results for this search",
+    "clear_all": "Clear all",
+    "show_more": "Show {} more",
+    "fallback_suggestion_1": "Philosophy",
+    "fallback_suggestion_2": "Harvard",
+    "fallback_suggestion_3": "Economics"
   },
 
   "publish": {

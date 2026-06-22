@@ -79,7 +79,10 @@ class ArticleDetailModel {
           (((json['videoId'] as String?) ?? '').isNotEmpty
               ? 'https://www.youtube.com/watch?v=${json['videoId']}'
               : null),
-      imageUrl: _encodeUrl(_parseFirstImageUrl(json['imageUrl'] as String? ?? json['coverImageUrl'] as String?)),
+      imageUrl: _encodeUrl(_parseFirstImageUrl(json['imageUrl'] as String? ?? json['coverImageUrl'] as String?))
+          ?? (((json['videoId'] as String?) ?? '').isNotEmpty
+              ? 'https://img.youtube.com/vi/${json['videoId']}/hqdefault.jpg'
+              : null),
     );
   }
 

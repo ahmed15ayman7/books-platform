@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/book_cover_filled_widget.dart';
 import '../../../domain/entities/book.dart';
+import 'package:booksplatform/core/widgets/full_screen_image_viewer.dart';
 
 class BookDetailHeroCover extends StatelessWidget {
   const BookDetailHeroCover({
@@ -17,9 +18,26 @@ class BookDetailHeroCover extends StatelessWidget {
   final String locale;
   final VoidCallback onBack;
 
+  void _openViewer(BuildContext context) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        barrierColor: Colors.transparent,
+        transitionDuration: const Duration(milliseconds: 220),
+        reverseTransitionDuration: const Duration(milliseconds: 180),
+        pageBuilder: (_, animation, _) => FadeTransition(
+          opacity: animation,
+          child: FullScreenImageViewer(imageUrl: book.imageUrl!),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return GestureDetector(
+      onTap: book.imageUrl != null ? () => _openViewer(context) : null,
+      child: SizedBox(
       height: 300.h,
       child: Stack(
         children: [
@@ -127,6 +145,7 @@ class BookDetailHeroCover extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

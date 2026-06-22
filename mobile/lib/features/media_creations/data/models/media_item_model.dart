@@ -30,14 +30,21 @@ class MediaItemModel {
   factory MediaItemModel.fromJson(Map<String, dynamic> json) {
     final category = json['articleCategory'] as Map<String, dynamic>?;
     final channel = json['channel'] as String? ?? '';
+    final videoId = json['videoId'] as String? ?? '';
+    final rawImageUrl = json['imageUrl'] as String? ?? '';
+    final imageUrl = rawImageUrl.isNotEmpty
+        ? rawImageUrl
+        : (videoId.isNotEmpty
+            ? 'https://img.youtube.com/vi/$videoId/hqdefault.jpg'
+            : '');
     return MediaItemModel(
       id: json['id'] as String? ?? '',
       slug: json['slug'] as String? ?? '',
       title: json['title'] as String? ?? '',
-      imageUrl: json['imageUrl'] as String? ?? '',
+      imageUrl: imageUrl,
       channel: channel,
       date: json['date'] as String? ?? json['createdAt'] as String? ?? '',
-      videoId: json['videoId'] as String? ?? '',
+      videoId: videoId,
       youtubeUrl: json['youtubeUrl'] as String? ?? '',
       channelLabel: category?['name'] as String? ?? channel,
       channelLabelAr: category?['nameAr'] as String? ?? '',

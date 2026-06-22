@@ -75,7 +75,7 @@ class BookDetailInfoSection extends StatelessWidget {
         ),
         SizedBox(height: 8.h),
         Text(
-          book.descriptionAr,
+          locale == 'ar' ? book.descriptionAr : (book.descriptionEn ?? book.descriptionAr),
           style: GoogleFonts.tajawal(
             fontSize: 14.5.sp,
             color: AppColors.textSecondary,

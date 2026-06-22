@@ -17,6 +17,8 @@ import 'package:booksplatform/core/network/api_manager.dart' as _i473;
 import 'package:booksplatform/core/network/connectivity_helper.dart' as _i403;
 import 'package:booksplatform/core/network/dio_factory.dart' as _i339;
 import 'package:booksplatform/core/storage/cart_storage.dart' as _i498;
+import 'package:booksplatform/core/storage/search_history_storage.dart'
+    as _i603;
 import 'package:booksplatform/core/storage/secure_storage_helper.dart' as _i759;
 import 'package:booksplatform/core/storage/wishlist_storage.dart' as _i421;
 import 'package:booksplatform/features/articles/data/datasources/articles_remote_data_source_impl.dart'
@@ -159,6 +161,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i498.CartStorage>(
       () => _i498.CartStorage(gh<_i460.SharedPreferences>()),
     );
+    gh.lazySingleton<_i603.SearchHistoryStorage>(
+      () => _i603.SearchHistoryStorage(gh<_i460.SharedPreferences>()),
+    );
     gh.lazySingleton<_i421.WishlistStorage>(
       () => _i421.WishlistStorage(gh<_i460.SharedPreferences>()),
     );
@@ -255,6 +260,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i556.ArticlesListCubit>(
       () => _i556.ArticlesListCubit(gh<_i657.ArticlesRepository>()),
     );
+    gh.factory<_i1073.SearchCubit>(
+      () => _i1073.SearchCubit(
+        gh<_i1067.SearchRepository>(),
+        gh<_i603.SearchHistoryStorage>(),
+      ),
+    );
     gh.lazySingleton<_i785.NewsletterRepository>(
       () => _i954.NewsletterRepositoryImpl(
         gh<_i684.NewsletterRemoteDataSource>(),
@@ -265,9 +276,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i618.PublisherDetailCubit>(
       () => _i618.PublisherDetailCubit(gh<_i674.PublishersRepository>()),
-    );
-    gh.factory<_i1073.SearchCubit>(
-      () => _i1073.SearchCubit(gh<_i1067.SearchRepository>()),
     );
     gh.factory<_i699.MediaListCubit>(
       () => _i699.MediaListCubit(gh<_i761.MediaRepository>()),

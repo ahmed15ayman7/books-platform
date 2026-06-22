@@ -185,7 +185,12 @@
     "tab_books": "كتب",
     "tab_articles": "مقالات",
     "tab_publishers": "ناشرون",
-    "tab_empty": "لا توجد نتائج {} لهذا البحث"
+    "tab_empty": "لا توجد نتائج {} لهذا البحث",
+    "clear_all": "مسح الكل",
+    "show_more": "عرض {} أخرى",
+    "fallback_suggestion_1": "فلسفة",
+    "fallback_suggestion_2": "هارفارد",
+    "fallback_suggestion_3": "اقتصاد"
   },
 
   "publish": {

@@ -9,16 +9,20 @@ class SearchNoResults extends StatelessWidget {
   const SearchNoResults({
     super.key,
     required this.query,
-    required this.locale,
     required this.onSuggestion,
   });
+
   final String query;
-  final String locale;
   final ValueChanged<String> onSuggestion;
 
   @override
   Widget build(BuildContext context) {
-    final suggestions = ['فلسفة', 'اقتصاد', 'Harvard'];
+    final suggestions = [
+      'search.fallback_suggestion_1'.tr(),
+      'search.fallback_suggestion_2'.tr(),
+      'search.fallback_suggestion_3'.tr(),
+    ];
+
     return Padding(
       padding: EdgeInsetsDirectional.all(32.r),
       child: Column(

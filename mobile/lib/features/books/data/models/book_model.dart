@@ -166,7 +166,7 @@ class BookModel {
       dimensions: json['dimensions'] as String?,
       notes: json['notes'] as String?,
       descriptionAr: json['descriptionAr'] as String? ?? '',
-      descriptionEn: json['descriptionEn'] as String?,
+      descriptionEn: json['description'] as String?,
       purchaseOption: PurchaseOptionX.fromString(json['purchaseOption'] as String?),
       imageUrl: json['imageUrl'] as String? ?? json['coverImageUrl'] as String?,
       referralLink: json['referralLink'] as String?,
