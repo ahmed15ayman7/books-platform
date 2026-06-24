@@ -176,7 +176,8 @@ export function BookEditForm({
   }));
   const publisherOptions = publishersList.map((p) => ({
     id: p.id,
-    name: p.nameAr ?? p.name ?? p.title,
+    name: p.name ?? p.title,
+    nameAr: p.nameAr,
     slug: p.slug,
   }));
   const categoryOptions = categoriesList.map((c) => ({
@@ -522,52 +523,7 @@ export function BookEditForm({
           />
         </Field>
       </SectionCard>
-
-      {/* ── 5. Status & Commerce ─────────────────────────────────── */}
-      <SectionCard title="الحالة والتسعير">
-        <Field>
-          <FieldLabel htmlFor="purchaseOption">خيار الشراء</FieldLabel>
-          <BookSelect
-            id="purchaseOption"
-            value={form.purchaseOption}
-            onValueChange={(v) => set("purchaseOption", v)}
-          >
-            <SelectItem value="NOT_AVAILABLE" className={adminDropdownItemClass}>غير متاح للشراء</SelectItem>
-            <SelectItem value="DIRECT" className={adminDropdownItemClass}>شراء مباشر</SelectItem>
-            <SelectItem value="REFERRAL" className={adminDropdownItemClass}>رابط إحالة</SelectItem>
-          </BookSelect>
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="currency">العملة</FieldLabel>
-          <BookSelect id="currency" value={form.currency} onValueChange={(v) => set("currency", v)}>
-            {["USD","EUR","GBP","SAR","AED","EGP","KWD","BHD","QAR","OMR","JOD"].map((c) => (
-              <SelectItem key={c} value={c} className={adminDropdownItemClass}>
-                {c}
-              </SelectItem>
-            ))}
-          </BookSelect>
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="price">السعر</FieldLabel>
-          <Input id="price" type="number" className={fieldCls} value={form.price} onChange={(e) => set("price", e.target.value)} placeholder="0.00" step="0.01" min="0" dir="ltr" />
-        </Field>
-
-        <Field className="sm:col-span-2">
-          <FieldLabel htmlFor="referralLink">رابط الإحالة / رابط الشراء</FieldLabel>
-          <Input id="referralLink" type="url" className={fieldCls} value={form.referralLink} onChange={(e) => set("referralLink", e.target.value)} placeholder="https://..." dir="ltr" />
-        </Field>
-
-        {/* Checkboxes row */}
-        <div className="sm:col-span-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <CheckboxField id="published" label="منشور" checked={form.published} onChange={(v) => set("published", v)} />
-          <CheckboxField id="featured" label="مميز / Featured" checked={form.featured} onChange={(v) => set("featured", v)} />
-          <CheckboxField id="inStock" label="متوفر في المخزن" checked={form.inStock} onChange={(v) => set("inStock", v)} />
-        </div>
-      </SectionCard>
-
-      {/* ── 6. Descriptions ──────────────────────────────────────── */}
+ {/* ── 5. Descriptions ──────────────────────────────────────── */}
       <div className={sectionCardCls}>
         <div className={sectionHeaderCls}>
           <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--admin-text-muted)]">الأوصاف والمحتوى</h2>
@@ -612,6 +568,51 @@ export function BookEditForm({
         </div>
       </div>
 
+      {/* ── 6. Status & Commerce ─────────────────────────────────── */}
+      <SectionCard title="الحالة والتسعير">
+        <Field>
+          <FieldLabel htmlFor="purchaseOption">خيار الشراء</FieldLabel>
+          <BookSelect
+            id="purchaseOption"
+            value={form.purchaseOption}
+            onValueChange={(v) => set("purchaseOption", v)}
+          >
+            <SelectItem value="NOT_AVAILABLE" className={adminDropdownItemClass}>غير متاح للشراء</SelectItem>
+            <SelectItem value="DIRECT" className={adminDropdownItemClass}>شراء مباشر</SelectItem>
+            <SelectItem value="REFERRAL" className={adminDropdownItemClass}>رابط إحالة</SelectItem>
+          </BookSelect>
+        </Field>
+
+        <Field>
+          <FieldLabel htmlFor="currency">العملة</FieldLabel>
+          <BookSelect id="currency" value={form.currency} onValueChange={(v) => set("currency", v)}>
+            {["USD","EUR","GBP","SAR","AED","EGP","KWD","BHD","QAR","OMR","JOD"].map((c) => (
+              <SelectItem key={c} value={c} className={adminDropdownItemClass}>
+                {c}
+              </SelectItem>
+            ))}
+          </BookSelect>
+        </Field>
+
+        <Field>
+          <FieldLabel htmlFor="price">السعر</FieldLabel>
+          <Input id="price" type="number" className={fieldCls} value={form.price} onChange={(e) => set("price", e.target.value)} placeholder="0.00" step="0.01" min="0" dir="ltr" />
+        </Field>
+
+        <Field className="sm:col-span-2">
+          <FieldLabel htmlFor="referralLink">رابط الإحالة / رابط الشراء</FieldLabel>
+          <Input id="referralLink" type="url" className={fieldCls} value={form.referralLink} onChange={(e) => set("referralLink", e.target.value)} placeholder="https://..." dir="ltr" />
+        </Field>
+
+        {/* Checkboxes row */}
+        <div className="sm:col-span-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <CheckboxField id="published" label="منشور" checked={form.published} onChange={(v) => set("published", v)} />
+          <CheckboxField id="featured" label="مميز / Featured" checked={form.featured} onChange={(v) => set("featured", v)} />
+          <CheckboxField id="inStock" label="متوفر في المخزن" checked={form.inStock} onChange={(v) => set("inStock", v)} />
+        </div>
+      </SectionCard>
+
+     
       {/* ── Save bar ─────────────────────────────────────────────── */}
       <div className="sticky bottom-0 flex items-center justify-between gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-5 py-3 shadow-lg">
         <p className="text-xs text-[var(--admin-text-subtle)]">

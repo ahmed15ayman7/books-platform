@@ -26,7 +26,7 @@ export function autoSlugFromEnglish(
   if (!prev) return currentSlug;
 
   if (currentSlug === slugify(prev)) return next;
-  return currentSlug;
+  return currentSlug.split("-").slice(0,4).join("-");
 }
 
 export const AUTO_SLUG_HINT =
