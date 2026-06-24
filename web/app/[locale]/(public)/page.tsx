@@ -31,7 +31,6 @@ import { HomeArticlesShowcase } from "@/components/sections/home/home-articles-s
 import { HomePublishSection } from "@/components/sections/home/home-publish-section";
 import { shuffleArray } from "@/lib/utils/shuffle";
 import { resolveArticleDisplayImage } from "@/lib/articles/resolve-display-image";
-import { AdminFloatingBar } from "@/components/admin/admin-public-chrome";
 
 export const revalidate = 0;
 
@@ -519,7 +518,6 @@ export default async function HomePage() {
           </StaggerContainer>
         </div>
       </AnimatedSection>
-      <AdminFloatingBar/>
     </div>
   );
 }
