@@ -529,19 +529,7 @@ export function BookEditForm({
           <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--admin-text-muted)]">الأوصاف والمحتوى</h2>
         </div>
         <div className="grid grid-cols-1 gap-5 p-5 lg:grid-cols-2">
-          <AdminBilingualField
-            arValue={form.shortDescAr}
-            enValue={form.shortDesc}
-            onArChange={(v) => set("shortDescAr", v)}
-            onEnChange={(v) => set("shortDesc", v)}
-            labels={{ ar: "مقتطف قصير — عربي", en: "مقتطف قصير — إنجليزي" }}
-            inputClassName={fieldCls}
-            arPlaceholder="جملة أو فقرتان تظهران فوق الملخص في صفحة الكتاب…"
-            enPlaceholder="Short lead text shown above the summary…"
-            multiline
-            rows={4}
-            layout="half"
-          />
+         
 
           <Field className="lg:col-span-2">
             <AdminRichTextHint />
@@ -560,7 +548,19 @@ export function BookEditForm({
             editorMinHeight={320}
             layout="half"
           />
-
+ <AdminBilingualField
+            arValue={form.shortDescAr}
+            enValue={form.shortDesc}
+            onArChange={(v) => set("shortDescAr", v)}
+            onEnChange={(v) => set("shortDesc", v)}
+            labels={{ ar: "مقتطف قصير — عربي", en: "مقتطف قصير — إنجليزي" }}
+            inputClassName={fieldCls}
+            arPlaceholder="جملة أو فقرتان تظهران فوق الملخص في صفحة الكتاب…"
+            enPlaceholder="Short lead text shown above the summary…"
+            multiline
+            rows={4}
+            layout="half"
+          />
           <Field className="lg:col-span-2">
             <FieldLabel htmlFor="notes">ملاحظات داخلية</FieldLabel>
             <Textarea id="notes" className={cn(fieldCls, "min-h-[100px] resize-y")} value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="ملاحظات للفريق الداخلي فقط…" />
