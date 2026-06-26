@@ -82,7 +82,7 @@
     "service_fee": "Service fee",
     "total": "Total",
     "checkout": "Checkout",
-    "checkout_note": "Guest checkout · payment gateway TBD"
+    "checkout_note": "Review your order before confirming"
   },
 
   "books": {

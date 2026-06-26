@@ -9,7 +9,6 @@ import '../../../../../core/router/args/book_detail_args.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/app_loading_indicator.dart';
 import '../../../../../core/widgets/error_state_widget.dart';
-import '../../../../cart/presentation/cubit/cart_cubit.dart';
 import '../../../../wishlist/domain/entities/wishlist_item.dart';
 import '../../../../wishlist/presentation/cubit/wishlist_cubit.dart';
 import '../../../../wishlist/presentation/cubit/wishlist_state.dart';
@@ -88,10 +87,6 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                           } else {
                             getIt<SnackBarHelper>().showSuccess('wishlist_added'.tr());
                           }
-                        },
-                        onAddCart: () {
-                          getIt<CartCubit>().addItem(book);
-                          Navigator.of(ctx).pushNamed(AppRoutes.cart);
                         },
                         onBookTap: (b) => Navigator.of(ctx).pushReplacementNamed(
                           AppRoutes.bookDetail,

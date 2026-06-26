@@ -16,7 +16,6 @@ class BookDetailBody extends StatelessWidget {
     required this.saved,
     required this.onToggleExpand,
     required this.onToggleSave,
-    required this.onAddCart,
     required this.onBookTap,
   });
 
@@ -27,7 +26,6 @@ class BookDetailBody extends StatelessWidget {
   final bool saved;
   final VoidCallback onToggleExpand;
   final VoidCallback onToggleSave;
-  final VoidCallback onAddCart;
   final ValueChanged<Book> onBookTap;
 
   @override
@@ -51,7 +49,6 @@ class BookDetailBody extends StatelessWidget {
               saved: saved,
               onToggleExpand: onToggleExpand,
               onToggleSave: onToggleSave,
-              onAddCart: onAddCart,
             ),
           ),
         ),

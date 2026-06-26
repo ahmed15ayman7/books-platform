@@ -17,7 +17,6 @@ class BookDetailInfoSection extends StatelessWidget {
     required this.saved,
     required this.onToggleExpand,
     required this.onToggleSave,
-    required this.onAddCart,
   });
 
   final Book book;
@@ -26,7 +25,6 @@ class BookDetailInfoSection extends StatelessWidget {
   final bool saved;
   final VoidCallback onToggleExpand;
   final VoidCallback onToggleSave;
-  final VoidCallback onAddCart;
 
   @override
   Widget build(BuildContext context) {
@@ -101,23 +99,6 @@ class BookDetailInfoSection extends StatelessWidget {
         SizedBox(height: 20.h),
         BookDetailBiblioTable(book: book, locale: locale),
         SizedBox(height: 18.h),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: book.price > 0 ? onAddCart : null,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.shopping_bag_outlined),
-                SizedBox(width: 8.w),
-                Text(
-                  '${'book_detail.add_to_cart'.tr()} · \$${book.price.toStringAsFixed(2)}',
-                ),
-              ],
-            ),
-          ),
-        ),
-        SizedBox(height: 10.h),
         SizedBox(
           width: double.infinity,
           child: OutlinedButton(
