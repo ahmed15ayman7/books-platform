@@ -13,12 +13,15 @@
 - Wired TTS into `article_detail_body.dart` (sliver after byline, hidden when `bodyParagraphs.isEmpty`).
 - Wired TTS into `book_detail_info_section.dart` (after the expand/collapse TextButton, before BiblioTable).
 - Added `"tts": { "listen": ..., "voice_not_available": ... }` to both `en.json` and `ar.json`.
-- Debugged and fixed 5 bugs discovered during live testing (see Bugs Found below).
+- Debugged and fixed 5 bugs discovered during live testing (see Bugs Found — Session 1 below).
 - Verified: English TTS works perfectly. Arabic TTS works perfectly on both iOS and Android when an Arabic voice is installed. If not installed, the widget shows a localized "install Arabic voice" message instead of broken audio.
+- **Session 2 (2026-06-28):** Fixed 4 additional bugs found during cross-platform testing (see Bugs Found — Session 2 below).
 - `flutter analyze` → **No issues found**.
 - **NOT YET DONE**: version bump, iOS build, upload, Apple reply.
 
-## Bugs Found
+---
+
+## Bugs Found — Session 1 (initial implementation)
 
 | # | Bug | Severity | Location | Evidence |
 |---|---|---|---|---|
@@ -28,17 +31,30 @@
 | 4 | `pause()` is iOS-only no-op on Android — speech continued when pause button tapped | Medium | `_pause()` | flutter_tts docs confirm Android doesn't support pause |
 | 5 | `setLanguage('ar-SA')` fails silently when Arabic voice not installed — engine falls back to English voice, reads Arabic text phonetically as English gibberish | High | `_initTts()` | User confirmed: English perfect, Arabic "strange English words" |
 
+---
+
+## Bugs Found — Session 2 (cross-platform testing)
+
+| # | Bug | Severity | Root Cause | Fix Applied |
+|---|---|---|---|---|
+| 6 | Android speech speed too fast at all speeds | High | `flutter_tts` Android plugin internally multiplies Flutter rate by `2.0` to normalize platforms. Current code only applied `speed * 0.5` on iOS, so Android received `1.0` raw → engine got `2.0` (double speed). | Removed `Platform.isIOS` guard from `_toTtsRate`. Now always `speed * 0.5` on both platforms. Removed `dart:io` import. |
+| 7 | Arabic voice unavailability message never appeared (iOS + Android) | High | Upfront `setLanguage()` availability check fired on widget init. Modern iOS/Android ship compact built-in Arabic voices that pass the check even without explicit voice download — so `_isAvailable` was always `true`. | Removed `bool? _isAvailable` state machine entirely. Detection is now play-triggered: `setLanguage` is called in `_play()`, failure sets `_hasTtsError = true`. Error card replaces controls and is permanent for the session. |
+| 8 | iOS showed error card even when Arabic voice WAS installed | High | iOS `setLanguage('ar-SA')` uses `.anchored` string matching against installed voice locales. Some iOS voices are indexed as bare `ar` (not `ar-SA`), so the exact locale lookup fails even though Arabic is available. | Added bare-language fallback in `_play()`: if `ar-SA` fails, try `ar` before giving up. |
+| 9 | Speed control had no effect when changed before or during playback | High | Calling `setLanguage` in `_play()` resets internal engine rate state on both iOS and Android, overriding any earlier `setSpeechRate` call from the dropdown. Additionally, iOS `AVSpeechUtterance` bakes rate at creation time — rate cannot change mid-utterance on iOS. | (a) Added `setSpeechRate(_toTtsRate(_speed))` right before `speak()` in `_play()` to always re-apply the current speed. (b) Set `DropdownButton.onChanged = null` while `_isPlaying` to disable speed changes mid-playback — iOS architectural constraint; mid-utterance rate change is impossible on iOS and restarts from beginning on Android. |
+
+---
+
 ## Files Changed
 
 | File | Change | Why |
 |---|---|---|
 | `pubspec.yaml` | Added `flutter_tts: ^4.2.0` | TTS engine |
 | `pubspec.lock` | Updated by `flutter pub get` | Dependency resolution |
-| `lib/core/widgets/tts_player_widget.dart` | **NEW FILE** — full TTS player widget | Shared across articles + books |
+| `lib/core/widgets/tts_player_widget.dart` | **NEW FILE** (session 1) + 4 bug fixes (session 2) | Shared TTS player across articles and books |
 | `lib/features/articles/presentation/pages/article_detail_screen/article_detail_body.dart` | Added TTS sliver + import | Apple reviewer can tap Listen on any article |
 | `lib/features/books/presentation/pages/book_detail_screen/book_detail_info_section.dart` | Added TTS widget + import | Apple reviewer can tap Listen on any book |
-| `assets/translations/en.json` | Added `"tts": { "listen", "voice_not_available" }` | Localized UI strings |
-| `assets/translations/ar.json` | Added `"tts": { "listen", "voice_not_available" }` | Localized UI strings |
+| `assets/translations/en.json` | Added `"tts"` keys; session 2 updated `voice_not_available` to generic (no iOS-specific path) | Localized UI strings |
+| `assets/translations/ar.json` | Added `"tts"` keys; session 2 updated `voice_not_available` to generic | Localized UI strings |
 
 ## Files Audited (no changes)
 
@@ -54,6 +70,8 @@
 |---|---|
 | `GET /articles/--54501` | `content` = Arabic Markdown, 8498 chars, contains `![صورة](url)` inline images — image regex fix was critical |
 | `GET /books/alan-pinkerton-americas-legendary` | `descriptionAr` has `**bold**\n\n...` Markdown; `descriptionEn` key in API is `description` (not `descriptionEn`) — model maps correctly |
+
+---
 
 ## Pending Tasks
 
@@ -82,6 +100,8 @@
 
 **Recommendation:** Go with Option B if Firebase config files are now available — two native features is a much stronger resubmission. If still blocked on Firebase, ship Option A immediately (TTS alone has resolved 4.2.2 for content apps historically).
 
+---
+
 ## Key References
 
 - TTS feature research + all design decisions: `doc/handoffs/010-tts-feature/010-2026-06-28-research-and-plan.md`
@@ -91,13 +111,19 @@
 - Prior submission reply: `doc/handoffs/009-ios-appstore-rejection-fix/002-2026-06-26-resubmit-reply-and-upload.md`
 - iOS release prep guide: `doc/handoffs/008-ios-release-prep/flutter-ios-phase4-deep-dive.md`
 
+---
+
 ## Clarifications & Decisions
 
 | Question | Answer |
 |---|---|
 | Should TTS use pause or stop on button press? | Stop — `pause()` is iOS-only no-op on Android; both platforms behave identically with `stop()` since TTS always restarts from beginning anyway |
-| Is the `flutter_tts` package supported for both iOS and Android? | Yes — but requires native Arabic voice to be installed on device. Widget now checks availability and shows localized install instructions if missing |
+| Is the `flutter_tts` package supported for both iOS and Android? | Yes — but requires native Arabic voice to be installed on device. Widget now checks availability on first play attempt and shows localized install instructions if missing |
 | Should image alt text be kept when stripping Markdown? | No — remove entire image tag. Alt text like "صورة" is meaningless in audio context and sounds like a random word |
+| Should speed control be disabled while audio is playing? | Yes — iOS AVSpeechUtterance bakes rate at creation time; mid-utterance rate change is architecturally impossible on iOS. Android also doesn't support live rate changes without restarting. Dropdown is disabled (`onChanged: null`) while `_isPlaying`. User must pause, change speed, then play again. |
+| Should the voice unavailability message show on widget init or on play attempt? | On play attempt — upfront check is unreliable because compact built-in voices bypass it. Error is permanent for the session once shown. |
+
+---
 
 ## Notes
 
@@ -132,12 +158,14 @@ This was the same rejection as before — build 9 did not include TTS. Build 10 
 
 ---
 
-### TtsPlayerWidget — implementation summary
+### TtsPlayerWidget — final implementation summary (post session 2 fixes)
 
 - **File:** `lib/core/widgets/tts_player_widget.dart`
 - **Constructor:** `TtsPlayerWidget({ required String text, required String languageCode })`
 - **Language codes used:** Articles → always `ar-SA`; Books → `ar-SA` when locale is `ar`, `en-US` when locale is `en` (with `descriptionAr` fallback if `descriptionEn` is null)
 - **Markdown stripping:** `_stripMarkdown()` — images removed entirely, bold/italic unwrapped with `replaceAllMapped`, headings/code/blockquotes stripped, whitespace normalized
-- **Speed:** `_toTtsRate(speed)` — multiplies by 0.5 on iOS so 1× = natural speed (0.5 on iOS scale); passes through on Android
-- **Language availability:** `setLanguage()` return value checked; falls back from `ar-SA` → `ar`; shows `tts.voice_not_available` message if unavailable
-- **No DI changes:** `FlutterTts` instantiated directly in `initState()` — no build_runner run needed
+- **Speed:** `_toTtsRate(speed)` — always `speed * 0.5` on both platforms. `flutter_tts` Android plugin multiplies by `2.0` internally, so `0.5 → 1.0` natural on Android; iOS receives `0.5` directly (AVSpeechUtteranceDefaultSpeechRate). Scale: 1× = audiobook pace, 2× = fast/natural.
+- **Speed control:** Disabled (`onChanged: null`) while `_isPlaying`. iOS architectural constraint — rate is baked per utterance; mid-utterance change is impossible. User pauses → changes speed → plays again.
+- **Language availability:** Detected on first play attempt (not on init). `_play()` calls `setLanguage(languageCode)` → if fails, retries with bare language code (`ar-SA` → `ar`) to handle iOS voice locale indexing quirk → if both fail, sets `_hasTtsError = true`. Error handler also sets it on runtime errors.
+- **Error state:** `_hasTtsError = true` → play controls replaced by info icon + `tts.voice_not_available` message. Permanent for the session.
+- **No DI changes:** `FlutterTts` instantiated directly in `initState()` — no build_runner run needed.
