@@ -19,6 +19,10 @@ import {
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-shell";
 import { adminAuthorEditPath, adminAuthorViewPath } from "@/lib/admin/public-urls";
+import { JsonLd, personJsonLd, breadcrumbJsonLd } from "@/components/seo/json-ld";
+import { seoCanonicalPath } from "@/lib/i18n/href";
+import { ArticleContent } from "@/lib/markdown/article-content";
+import { markdownToPlainText } from "@/lib/markdown/markdown-to-plain-text";
 
 interface AuthorPageProps {
   params: Promise<{ slug: string; locale: string }>;
@@ -32,13 +36,14 @@ export async function generateMetadata({ params }: AuthorPageProps): Promise<Met
 
   const displayName = localizedAuthorName(author, locale as Locale);
   const bio = localizedAuthorBio(author, locale as Locale);
+  const plainBio = bio ? markdownToPlainText(bio) : null;
 
   return buildPageMetadata({
     locale: locale as Locale,
     path: `/${locale}/authors/${slug}`,
     title: displayName,
     description:
-      bio ??
+      plainBio ??
       (locale === "ar" ? `كتب المؤلف ${displayName}` : `Books by ${displayName}`),
     keywords: [displayName, locale === "ar" ? "مؤلفون" : "authors"],
   });
@@ -76,8 +81,26 @@ export default async function AuthorDetailPage({
   const bio = localizedAuthorBio(author, locale);
   const coverImage = books[0]?.imageUrl ?? null;
 
+  const authorLd = personJsonLd(locale, {
+    slug: author.slug,
+    name: author.name,
+    nameAr: author.nameAr,
+    bio: author.bio,
+    bioAr: author.bioAr,
+    imageUrl: coverImage,
+  });
+
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: isAr ? "الرئيسية" : "Home", path: seoCanonicalPath(locale, "/") },
+    { name: isAr ? "المؤلفون" : "Authors", path: seoCanonicalPath(locale, "/books") },
+    { name: displayName, path: seoCanonicalPath(locale, `/authors/${author.slug}`) },
+  ]);
+
   return (
-    <AdminEntityPublicShell
+    <>
+      <JsonLd data={authorLd} />
+      <JsonLd data={breadcrumbs} />
+      <AdminEntityPublicShell
       entityType="author"
       entityId={author.id}
       editHref={adminAuthorEditPath(locale, author.id)}
@@ -93,7 +116,7 @@ export default async function AuthorDetailPage({
           bio={bio}
           imageUrl={coverImage}
           slug={author.slug}
-          homeHref={`/${locale}`}
+          homeHref={locale === "ar" ? "/" : "/en"}
           booksHref={`/${locale}/books`}
         />
 
@@ -101,9 +124,7 @@ export default async function AuthorDetailPage({
           <AnimatedContentSections>
             {bio && (
               <SectionBlock id="bio" title={isAr ? "نبذة" : "Biography"}>
-                <p className="whitespace-pre-wrap text-base leading-relaxed text-[var(--brand-gray-700)]">
-                  {bio}
-                </p>
+                <ArticleContent content={bio} />
               </SectionBlock>
             )}
 
@@ -140,5 +161,6 @@ export default async function AuthorDetailPage({
         </div>
       </div>
     </AdminEntityPublicShell>
+    </>
   );
 }

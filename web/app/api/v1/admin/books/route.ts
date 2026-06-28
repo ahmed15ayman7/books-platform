@@ -16,6 +16,8 @@ import {
   parseAuthorCountFilter,
 } from "@/lib/admin/book-author-count-filter";
 import { BOOK_SEARCH_FIELDS, buildTextSearchOr } from "@/lib/search/text-search-fields";
+import { revalidatePublicBookCaches } from "@/lib/cache/revalidate-public";
+import { nextProductPosition } from "@/lib/admin/product-position";
 
 const createBookSchema = z.object({
   nameEn: z.string().min(1).max(300),
@@ -101,11 +103,13 @@ export async function POST(request: NextRequest) {
 
     const { nextProductOriginalId } = await import("@/lib/admin/legacy-ids");
     const originalId = await nextProductOriginalId();
+    const position = await nextProductPosition();
 
     const book = await db.product.create({
       data: {
         ...parsed.data,
         originalId,
+        position,
         slug: parsed.data.slug,
         ...withCreate(auth.payload.userId),
       },
@@ -114,6 +118,8 @@ export async function POST(request: NextRequest) {
     await db.auditLog.create({
       data: { userId: auth.payload.userId, action: "CREATE_BOOK", entity: "Product", entityId: book.id },
     });
+
+    revalidatePublicBookCaches();
 
     return apiCreated(book);
   } catch (error) {

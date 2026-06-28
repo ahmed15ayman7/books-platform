@@ -94,6 +94,7 @@ export default async function BookEditPage({ params }: Props) {
           bookId={book.id}
           locale={locale}
           bookSlug={book.slug}
+          bookOriginalId={book.originalId}
           initial={{
             nameEn: book.nameEn,
             nameAr: book.nameAr ?? "",

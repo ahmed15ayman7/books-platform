@@ -2,6 +2,8 @@
 
 import { db } from "@/lib/db";
 import { nextProductOriginalId } from "@/lib/admin/legacy-ids";
+import { nextProductPosition } from "@/lib/admin/product-position";
+import { revalidatePublicBookCaches } from "@/lib/cache/revalidate-public";
 import { slugify } from "@/lib/admin/slugify";
 import { revalidatePath } from "next/cache";
 
@@ -78,6 +80,14 @@ export async function updateBook(id: string, data: BookEditData): Promise<BookAc
     const parsedPages = pageCount.trim() !== "" ? parseInt(pageCount, 10) : null;
     const parsedPrice = price.trim() !== "" ? parseFloat(price) : null;
 
+    const existing = await db.product.findFirst({ where: { id } });
+    if (!existing) {
+      return { ok: false, error: "الكتاب غير موجود" };
+    }
+
+    const shouldBoostPosition =
+      data.published && (!existing.published || existing.position === 0);
+
     await db.product.update({
       where: { id },
       data: {
@@ -91,6 +101,7 @@ export async function updateBook(id: string, data: BookEditData): Promise<BookAc
         price: parsedPrice !== null && !isNaN(parsedPrice) ? parsedPrice : null,
         publisherId: publisherId || null,
         primaryCategoryId: primaryCategoryId || null,
+        ...(shouldBoostPosition ? { position: await nextProductPosition() } : {}),
         categories: {
           set: categoryIds.map((cid) => ({ id: cid })),
         },
@@ -100,6 +111,7 @@ export async function updateBook(id: string, data: BookEditData): Promise<BookAc
       },
     });
 
+    revalidatePublicBookCaches();
     revalidatePath(`/`, "layout");
     return { ok: true, id, slug };
   } catch (err) {
@@ -145,6 +157,7 @@ export async function createBook(data: BookEditData): Promise<BookActionResult> 
     const parsedPages = pageCount.trim() !== "" ? parseInt(pageCount, 10) : null;
     const parsedPrice = price.trim() !== "" ? parseFloat(price) : null;
     const originalId = await nextProductOriginalId();
+    const position = await nextProductPosition();
 
     const book = await db.product.create({
       data: {
@@ -152,6 +165,7 @@ export async function createBook(data: BookEditData): Promise<BookActionResult> 
         nameEn,
         slug,
         originalId,
+        position,
         edition: edition.trim() || null,
         editionAr: editionAr.trim() || null,
         publicationYear: parsedYear && !isNaN(parsedYear) ? parsedYear : null,
@@ -168,6 +182,7 @@ export async function createBook(data: BookEditData): Promise<BookActionResult> 
       },
     });
 
+    revalidatePublicBookCaches();
     revalidatePath(`/`, "layout");
     return { ok: true, id: book.id, slug: book.slug };
   } catch (err) {

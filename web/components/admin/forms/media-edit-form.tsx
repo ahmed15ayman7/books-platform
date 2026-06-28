@@ -20,6 +20,7 @@ import { ArticleLivePreview } from "@/components/admin/article-live-preview";
 import { AdminRichTextHint } from "@/components/admin/admin-rich-text-hint";
 import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
 import { adminToast } from "@/lib/admin/admin-toast";
+import { ImageUploadField } from "@/components/forms/image-upload-field";
 
 interface MediaForm {
   title: string;
@@ -75,6 +76,7 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [timestamps, setTimestamps] = useState<{ createdAt?: string; updatedAt?: string }>({});
+  const [originalId, setOriginalId] = useState<number | null>(null);
 
   const previewVideoId = useMemo(() => parseYoutubeUrl(form.youtubeUrl).videoId, [form.youtubeUrl]);
 
@@ -102,6 +104,7 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
           youtubeUrl: String(d.youtubeUrl ?? ""),
           date: d.date ? (new Date(d.date as string).toISOString().split("T")[0] ?? "") : empty.date,
         });
+        setOriginalId(typeof d.originalId === "number" ? d.originalId : null);
         const products = (d.products ?? []) as BookPickerItem[];
         setProductIds(products.map((p) => p.id));
         setSelectedBooks(products);
@@ -245,7 +248,17 @@ export function MediaEditForm({ locale, id }: MediaEditFormProps) {
               <AdminSelect label="القناة" value={form.channel} onChange={set("channel")} options={channelOptions} />
               <AdminSelect label="الحالة" value={form.status} onChange={set("status")} options={statusOptions} />
               <AdminInput label="تاريخ النشر" type="date" value={form.date} onChange={set("date")} />
-              <AdminInput label="صورة الغلاف" value={form.imageUrl} onChange={set("imageUrl")} placeholder="تلقائي من YouTube" />
+              <ImageUploadField
+                label="صورة الغلاف"
+                folder="articles"
+                field="image_url"
+                originalId={originalId}
+                value={form.imageUrl}
+                onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))}
+                headers={adminAuthHeaders()}
+                disabled={isNew}
+                placeholder="تلقائي من YouTube"
+              />
             </div>
             <div className="mt-4">
               <BookMultiPicker

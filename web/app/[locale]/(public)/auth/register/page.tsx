@@ -1,9 +1,12 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getLocale } from "next-intl/server";
 import AuthorRegisterForm from "@/components/auth/author-register-form";
 import { AuthSplitLayout } from "@/components/auth/auth-split-layout";
 import { getAboutContent } from "@/lib/content/about";
 import type { Locale } from "@/lib/i18n";
+
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default async function AuthRegisterPage() {
   const locale = (await getLocale()) as Locale;

@@ -119,7 +119,7 @@ export function GlobalSearchPageClient({
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       pushParams({ q: value.trim() || null, page: null });
-    }, 350);
+    }, 2000);
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -193,7 +193,11 @@ export function GlobalSearchPageClient({
                   ref={inputRef}
                   type="text"
                   value={inputValue}
-                  onChange={(e) => handleInputChange(e.target.value)}
+                  onChange={(e) =>{
+                    e.preventDefault();
+                     handleInputChange(e.target.value)
+                    }
+                    }
                   placeholder={
                     isAr
                       ? "ابحث عن كتاب، مقال، ناشر، مؤلف..."

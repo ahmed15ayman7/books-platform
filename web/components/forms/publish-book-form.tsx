@@ -9,6 +9,7 @@ import { useTranslations } from "next-intl";
 import {
   draftSubmissionSchema,
   stepRequiredFieldsComplete,
+  canSyncDraftToServer,
   type DraftSubmissionInput,
 } from "@/lib/validation/submission.schema";
 import { Button } from "@/components/ui/button";
@@ -23,17 +24,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CheckCircle, ChevronLeft, ChevronRight, Cloud, Upload } from "lucide-react";
+import { CheckCircle, ChevronLeft, ChevronRight, Cloud } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { clearFormDraft, loadLocalFormValues, useFormAutosave } from "@/lib/forms/use-form-autosave";
 import {
   authHeaders,
+  authUploadHeaders,
   clearStoredDraft,
   getAuthorSession,
   getStoredDraftId,
   setStoredDraftId,
   setStoredDraftToken,
 } from "@/lib/auth/author-client";
+import { ImageUploadField } from "@/components/forms/image-upload-field";
 
 interface PublishBookFormProps {
   locale: string;
@@ -85,7 +88,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
   const values = watch();
 
   const syncDraft = useCallback(async (formValues: DraftSubmissionInput): Promise<string | null> => {
-    const payload = { ...formValues, currentStep: step };
+    const payload = { ...formValues, currentStep: formValues.currentStep ?? step };
     const headers = authHeaders();
 
     if (draftId) {
@@ -115,7 +118,7 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
   }, [draftId, step]);
 
   const canSyncToServer = useCallback(
-    (v: DraftSubmissionInput) => stepRequiredFieldsComplete(step, v),
+    (v: DraftSubmissionInput) => canSyncDraftToServer(step, v),
     [step],
   );
 
@@ -307,10 +310,18 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
       </p>
 
       <form
-        onSubmit={handleSubmit(() => {
+        onSubmit={handleSubmit(async () => {
           if (step < 2) {
-            setStep((s) => s + 1);
-            setValue("currentStep", step + 1);
+            const nextStep = step + 1;
+            setValue("currentStep", nextStep);
+            if (step === 0 && stepRequiredFieldsComplete(0, getValues())) {
+              try {
+                await syncDraft({ ...getValues(), currentStep: nextStep });
+              } catch {
+                // autosave will retry; still allow navigation
+              }
+            }
+            setStep(nextStep);
             return;
           }
           void onFinalSubmit();
@@ -390,15 +401,27 @@ export function PublishBookForm({ locale }: PublishBookFormProps) {
                 <Input className={inputClass(!!errors.bookCategory)} {...register("bookCategory")} />
               </FormField>
             </div>
-            <div className="rounded-lg bg-[var(--brand-gray-50)] border border-[var(--brand-gray-200)] p-4">
-              <div className="flex items-center gap-2 text-sm text-[var(--brand-gray-600)]">
-                <Upload className="h-4 w-4 shrink-0 text-[var(--brand-red)]" aria-hidden="true" />
-                <p>
+            <div className="space-y-2">
+              <ImageUploadField
+                label={isAr ? "غلاف الكتاب (اختياري)" : "Book Cover (optional)"}
+                folder="submissions"
+                field="image_url"
+                entityId={draftId ?? undefined}
+                uploadUrl="/api/v1/submissions/uploads/cover"
+                headers={authUploadHeaders()}
+                extraFields={draftId ? { draftId } : undefined}
+                value={values.coverUrl ?? ""}
+                onChange={(url) => setValue("coverUrl", url)}
+                disabled={!draftId}
+                placeholder={isAr ? "اسحب صورة الغلاف أو اضغط للرفع" : "Drag cover image or click to upload"}
+              />
+              {!draftId && (
+                <p className="text-xs text-[var(--brand-gray-500)]">
                   {isAr
-                    ? "بعد الإرسال، سنتواصل معك لرفع ملف الكتاب والغلاف"
-                    : "After submission, we'll contact you to upload your book file and cover"}
+                    ? "أكمل بيانات المؤلف وعنوان الكتاب أولاً ليتم حفظ المسودة"
+                    : "Complete author info and book title first to enable cover upload"}
                 </p>
-              </div>
+              )}
             </div>
             <Controller
               name="allowFreeDownload"

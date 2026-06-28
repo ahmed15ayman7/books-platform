@@ -43,28 +43,33 @@ export default defineConfig({
       testMatch: /auth\.setup\.ts/,
     },
     {
+      name: "public",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: /publish-book-cover\.spec\.ts/,
+    },
+    {
       name: "chromium",
       use: { ...devices["Desktop Chrome"], storageState: authFile },
       dependencies: ["setup"],
-      testIgnore: /auth\.setup\.ts/,
+      testIgnore: [/auth\.setup\.ts/, /publish-book-cover\.spec\.ts/],
     },
     {
       name: "firefox",
       use: { ...devices["Desktop Firefox"], storageState: authFile },
       dependencies: ["setup"],
-      testIgnore: /auth\.setup\.ts/,
+      testIgnore: [/auth\.setup\.ts/, /publish-book-cover\.spec\.ts/],
     },
     {
       name: "webkit",
       use: { ...devices["Desktop Safari"], storageState: authFile },
       dependencies: ["setup"],
-      testIgnore: /auth\.setup\.ts/,
+      testIgnore: [/auth\.setup\.ts/, /publish-book-cover\.spec\.ts/],
     },
     {
       name: "mobile-chrome",
       use: { ...devices["Pixel 5"], storageState: authFile },
       dependencies: ["setup"],
-      testIgnore: /auth\.setup\.ts/,
+      testIgnore: [/auth\.setup\.ts/, /publish-book-cover\.spec\.ts/],
     },
   ],
   webServer: {

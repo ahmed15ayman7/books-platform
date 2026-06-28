@@ -13,6 +13,7 @@ import {
   adminMediaEditPath,
   adminPublisherEditPath,
 } from "@/lib/admin/public-urls";
+import { localeHref } from "@/lib/i18n/href";
 import type { SearchPaletteSection } from "@/components/search/global-search-palette";
 
 export interface GlobalSearchPayload {
@@ -131,16 +132,16 @@ export function mapPublicSearchSections(
   return buildSections(data, labels, (key, item) => {
     switch (key) {
       case "books":
-        return `/${locale}/books/${item.slug}`;
+        return localeHref(locale, `/books/${item.slug}`);
       case "articles":
       case "media":
-        return `/${locale}/articles/${item.slug}`;
+        return localeHref(locale, `/articles/${item.slug}`);
       case "publishers":
-        return `/${locale}/publishers/${item.slug}`;
+        return localeHref(locale, `/publishers/${item.slug}`);
       case "authors":
-        return `/${locale}/authors/${item.slug}`;
+        return localeHref(locale, `/authors/${item.slug}`);
       default:
-        return `/${locale}`;
+        return localeHref(locale, "/");
     }
   });
 }
@@ -171,7 +172,7 @@ export function mapAdminSearchSections(
         case "authors":
           return adminAuthorEditPath(locale, item.id);
         default:
-          return `/${locale}/admin`;
+          return localeHref(locale, "/admin");
       }
     },
   );

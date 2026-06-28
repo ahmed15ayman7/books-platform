@@ -5,6 +5,10 @@ import { Bell } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
+  COOKIE_CONSENT_EVENT,
+  shouldShowCookieConsent,
+} from "@/lib/consent/cookie-consent";
+import {
   requestNotificationPermission,
   saveNotificationPrompt,
   shouldShowNotificationPrompt,
@@ -18,9 +22,14 @@ export function NotificationPromptBanner() {
   const [cookieBannerVisible, setCookieBannerVisible] = useState(false);
 
   useEffect(() => {
-    import("@/lib/consent/cookie-consent").then(({ shouldShowCookieConsent }) => {
-      setCookieBannerVisible(shouldShowCookieConsent());
-    });
+    setCookieBannerVisible(shouldShowCookieConsent());
+
+    function onCookieConsentSaved() {
+      setCookieBannerVisible(false);
+    }
+
+    window.addEventListener(COOKIE_CONSENT_EVENT, onCookieConsentSaved);
+    return () => window.removeEventListener(COOKIE_CONSENT_EVENT, onCookieConsentSaved);
   }, []);
 
   useEffect(() => {
@@ -28,9 +37,7 @@ export function NotificationPromptBanner() {
 
     const timer = window.setTimeout(() => {
       if (shouldShowNotificationPrompt()) {
-        import("@/lib/consent/cookie-consent").then(({ shouldShowCookieConsent }) => {
-          setCookieBannerVisible(shouldShowCookieConsent());
-        });
+        setCookieBannerVisible(shouldShowCookieConsent());
         setVisible(true);
       }
     }, PROMPT_DELAY_MS);
@@ -55,9 +62,6 @@ export function NotificationPromptBanner() {
       className={`fixed inset-x-0 z-[65] border border-[var(--brand-gray-200)] bg-[var(--brand-black)]/95 p-4 text-white shadow-lg backdrop-blur-md ${
         cookieBannerVisible ? "bottom-24 sm:bottom-28" : "bottom-4"
       }`}
-      style={{
-        bottom: cookieBannerVisible ? "89px":undefined,
-      }}
       role="dialog"
       aria-live="polite"
       aria-label={t("notificationTitle")}

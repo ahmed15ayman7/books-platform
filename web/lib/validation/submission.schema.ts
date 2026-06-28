@@ -56,3 +56,14 @@ export function stepRequiredFieldsComplete(
     return val !== undefined && val !== null;
   });
 }
+
+/** Sync once step 0 is done, or when the active step's required fields are filled. */
+export function canSyncDraftToServer(
+  step: number,
+  values: DraftSubmissionInput,
+): boolean {
+  return (
+    stepRequiredFieldsComplete(0, values) ||
+    stepRequiredFieldsComplete(step, values)
+  );
+}
