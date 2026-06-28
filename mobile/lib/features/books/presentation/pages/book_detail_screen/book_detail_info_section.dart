@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/translation_status_badge.dart';
+import '../../../../../core/widgets/tts_player_widget.dart';
 import '../../../domain/entities/book.dart';
 import 'book_detail_biblio_table.dart';
 
@@ -95,6 +96,13 @@ class BookDetailInfoSection extends StatelessWidget {
               color: AppColors.primary,
             ),
           ),
+        ),
+        SizedBox(height: 8.h),
+        TtsPlayerWidget(
+          text: locale == 'ar'
+              ? book.descriptionAr
+              : (book.descriptionEn ?? book.descriptionAr),
+          languageCode: locale == 'ar' ? 'ar-SA' : 'en-US',
         ),
         SizedBox(height: 20.h),
         BookDetailBiblioTable(book: book, locale: locale),

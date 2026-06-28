@@ -363,5 +363,10 @@
     "storage_error": "Local storage error",
     "something_went_wrong": "Something went wrong, please try again",
     "unexpected": "Unexpected error"
+  },
+
+  "tts": {
+    "listen": "Listen",
+    "voice_not_available": "Voice not available — install an Arabic voice in device Settings → Accessibility → Spoken Content."
   }
 }
