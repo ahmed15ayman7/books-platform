@@ -79,8 +79,17 @@ class _TtsPlayerWidgetState extends State<TtsPlayerWidget> {
   }
 
   Future<void> _play() async {
-    final result = await _tts.setLanguage(widget.languageCode);
-    final langOk = result == 1 || result == true;
+    var result = await _tts.setLanguage(widget.languageCode);
+    var langOk = result == 1 || result == true;
+
+    // iOS may index voices under the bare language code (e.g. 'ar') rather than
+    // the full locale ('ar-SA'). Fall back to the bare code before giving up.
+    if (!langOk && widget.languageCode.contains('-')) {
+      final bare = widget.languageCode.split('-').first;
+      result = await _tts.setLanguage(bare);
+      langOk = result == 1 || result == true;
+    }
+
     if (!langOk) {
       if (mounted) setState(() => _hasTtsError = true);
       return;
