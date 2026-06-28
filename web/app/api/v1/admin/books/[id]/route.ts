@@ -6,6 +6,8 @@ import { requireAuth, isErrorResponse } from "@/lib/auth/middleware";
 import { PERMISSIONS } from "@/lib/auth/permissions";
 import { requirePasskeyVerification } from "@/lib/auth/require-passkey";
 import { notDeleted, withSoftDelete, withUpdate } from "@/lib/admin/audit-fields";
+import { nextProductPosition } from "@/lib/admin/product-position";
+import { revalidatePublicBookCaches } from "@/lib/cache/revalidate-public";
 
 interface RouteParams { params: Promise<{ id: string }> }
 
@@ -62,14 +64,24 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const existing = await db.product.findFirst({ where: { id, ...notDeleted } });
     if (!existing) return ApiErrors.notFound("Book");
 
+    const shouldBoostPosition =
+      parsed.data.published === true &&
+      (!existing.published || existing.position === 0);
+
     const updated = await db.product.update({
       where: { id },
-      data: { ...parsed.data, ...withUpdate(auth.payload.userId) },
+      data: {
+        ...parsed.data,
+        ...(shouldBoostPosition ? { position: await nextProductPosition() } : {}),
+        ...withUpdate(auth.payload.userId),
+      },
     });
 
     await db.auditLog.create({
       data: { userId: auth.payload.userId, action: "UPDATE_BOOK", entity: "Product", entityId: id, changes: JSON.parse(JSON.stringify(parsed.data)) as object },
     });
+
+    revalidatePublicBookCaches();
 
     return apiSuccess(updated);
   } catch (error) {
@@ -98,6 +110,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     await db.auditLog.create({
       data: { userId: auth.payload.userId, action: "DELETE_BOOK", entity: "Product", entityId: id },
     });
+
+    revalidatePublicBookCaches();
 
     return apiSuccess({ deleted: true });
   } catch (error) {

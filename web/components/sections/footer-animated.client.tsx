@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { SocialIconCircle } from "@/components/ui/social-icon-circle";
 import { SOCIAL_LINKS } from "@/components/icons";
+import { FooterAppBadges } from "@/components/sections/footer-app-badges";
 import { StaggerContainer, StaggerItem, FadeIn, IconPulse } from "@/components/motion";
 
 interface FooterLink {
@@ -20,33 +21,52 @@ interface FooterAnimatedGridProps {
   locale: string;
 }
 
+function FooterColumnBlock({ column }: { column: FooterColumn }) {
+  return (
+    <div>
+      <h3 className="mb-4 text-lg font-bold uppercase tracking-wider text-[var(--brand-red)]">
+        {column.title}
+      </h3>
+      <ul className="space-y-2" role="list">
+        {column.links.map((link) => (
+          <li key={link.href}>
+            <Link
+              href={link.href}
+              className="text-base font-bold text-white transition-all duration-[var(--motion-base)] hover:translate-x-0.5 hover:text-[var(--brand-red)] hover:underline"
+            >
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function FooterAnimatedGrid({ columns, locale }: FooterAnimatedGridProps) {
   const isAr = locale === "ar";
+  const primaryColumns = columns.slice(0, 2);
+  const secondaryColumns = columns.slice(2);
 
   return (
     <>
-      <StaggerContainer className="grid grid-cols-2 gap-8 md:grid-cols-5">
-        {columns.map((col) => (
+      <StaggerContainer className="grid grid-cols-2 gap-8 md:grid-cols-5 md:items-start">
+        {primaryColumns.map((col) => (
           <StaggerItem key={col.title}>
-            <div>
-              <h3 className="mb-4 text-lg font-bold uppercase tracking-wider text-[var(--brand-red)]">
-                {col.title}
-              </h3>
-              <ul className="space-y-2" role="list">
-                {col.links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-base text-white font-bold transition-all duration-[var(--motion-base)] hover:translate-x-0.5 hover:text-[var(--brand-red)] hover:underline"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <FooterColumnBlock column={col} />
           </StaggerItem>
         ))}
+
+        <StaggerItem className="col-span-2 md:col-span-3">
+          <div className="flex h-full flex-col gap-8">
+            <div className="grid grid-cols-2 gap-8 md:grid-cols-3">
+              {secondaryColumns.map((col) => (
+                <FooterColumnBlock key={col.title} column={col} />
+              ))}
+            </div>
+            <FooterAppBadges locale={locale} />
+          </div>
+        </StaggerItem>
       </StaggerContainer>
 
       <FadeIn delay={0.3}>

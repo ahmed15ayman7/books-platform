@@ -644,14 +644,24 @@ model NewsletterSubscriber {
   email          String    @unique
   status         String    @default("PENDING") // PENDING | CONFIRMED | UNSUBSCRIBED
   confirmToken   String?   @unique @map("confirm_token")
+  manageToken    String?   @unique @map("manage_token") // permanent magic-link token
   confirmedAt    DateTime? @map("confirmed_at")
   unsubscribedAt DateTime? @map("unsubscribed_at")
+  lastDigestAt   DateTime? @map("last_digest_at")
   source         String?
   locale         String    @default("ar")
-  createdAt      DateTime  @default(now()) @map("created_at")
 
+  // Subscriber content preferences (empty = receive one random item)
+  prefProductCategoryIds String[] @default([]) @map("pref_product_category_ids")
+  prefArticleCategoryIds String[] @default([]) @map("pref_article_category_ids")
+  prefPublisherIds       String[] @default([]) @map("pref_publisher_ids")
+  prefAuthorIds          String[] @default([]) @map("pref_author_ids")
+
+  createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
   @@index([status])
+  @@index([manageToken])
   @@map("newsletter_subscribers")
 }
 
@@ -1008,4 +1018,27 @@ model BookView {
   @@index([productId])
   @@index([sessionId])
   @@map("book_views")
+}
+
+// ===================================
+// UPLOADED ASSETS
+// ===================================
+
+model UploadedAsset {
+  id         String   @id @default(cuid())
+  sha256     String   @unique
+  bucketKey  String   @unique @map("bucket_key")
+  url        String
+  mimeType   String   @map("mime_type")
+  sizeBytes  Int      @map("size_bytes")
+  folder     String
+  field      String
+  entityId   String?  @map("entity_id")
+  originalId Int?     @map("original_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([folder])
+  @@index([entityId])
+  @@index([originalId])
+  @@map("uploaded_assets")
 }

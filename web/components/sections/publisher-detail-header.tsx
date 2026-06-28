@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink, Mail, Globe } from "lucide-react";
 import { BlurIn, FadeIn, RevealText } from "@/components/motion";
 import type { Locale } from "@/lib/i18n";
+import { markdownExcerpt } from "@/lib/markdown/markdown-to-plain-text";
 
 interface PublisherDetailHeaderProps {
   locale: Locale;
@@ -98,8 +99,8 @@ export function PublisherDetailHeader({
 
             {displayDescription && (
               <FadeIn delay={0.15}>
-                <p className="mt-3 max-w-2xl text-sm text-[var(--brand-gray-300)] whitespace-pre-wrap line-clamp-4">
-                  {displayDescription}
+                <p className="mt-3 max-w-2xl text-sm text-[var(--brand-gray-300)] line-clamp-4">
+                  {markdownExcerpt(displayDescription, 320)}
                 </p>
               </FadeIn>
             )}

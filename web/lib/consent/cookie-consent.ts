@@ -1,6 +1,5 @@
 export const COOKIE_CONSENT_KEY = "bp-cookie-consent";
 export const COOKIE_CONSENT_EVENT = "cookie-consent-accepted";
-export const CONSENT_REMIND_MS = 7 * 24 * 60 * 60 * 1000;
 
 export type CookieConsentStatus = "accepted" | "dismissed";
 
@@ -23,11 +22,9 @@ function readRecord(): CookieConsentRecord | null {
   }
 }
 
-export function shouldShowCookieConsent(now = Date.now()): boolean {
-  const record = readRecord();
-  if (!record) return true;
-  if (record.status === "accepted") return false;
-  return now - record.at >= CONSENT_REMIND_MS;
+/** Show only until the user accepts or dismisses once. */
+export function shouldShowCookieConsent(): boolean {
+  return readRecord() === null;
 }
 
 export function saveCookieConsent(status: CookieConsentStatus): void {
@@ -36,7 +33,7 @@ export function saveCookieConsent(status: CookieConsentStatus): void {
     COOKIE_CONSENT_KEY,
     JSON.stringify({ status, at: Date.now() } satisfies CookieConsentRecord),
   );
-  if (status === "accepted" && typeof window !== "undefined") {
+  if (typeof window !== "undefined") {
     window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_EVENT));
   }
 }

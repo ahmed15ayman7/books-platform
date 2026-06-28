@@ -51,10 +51,10 @@ export const BookService = {
 
     const orderBy =
       sort === "newest"
-        ? ({ position: "desc" } as const)
+        ? [{ createdAt: "desc" as const }, { position: "desc" as const }]
         : sort === "oldest"
-          ? ({ position: "asc" } as const)
-          : ({ nameEn: "asc" } as const);
+          ? [{ createdAt: "asc" as const }, { position: "asc" as const }]
+          : { nameEn: "asc" as const };
 
     const [books, total] = await Promise.all([
       db.product.findMany({
@@ -318,8 +318,8 @@ export const BookService = {
     const categoryBooks = await Promise.all(
       categories.map((cat) =>
         db.product.findMany({
-          where: { published: true, primaryCategoryId: cat.id },
-          orderBy: { position: "desc" },
+          where: { published: true, primaryCategoryId: cat.id, ...notDeleted },
+          orderBy: [{ createdAt: "desc" }, { position: "desc" }],
           take: 10,
           select: bookSelect,
         }),
@@ -343,8 +343,8 @@ export const BookService = {
   async getFeaturedForHome() {
     const [newlyReleased, sponsoredPublishers] = await Promise.all([
       db.product.findMany({
-        where: { published: true },
-        orderBy: { position: "desc" },
+        where: { published: true, ...notDeleted },
+        orderBy: [{ createdAt: "desc" }, { position: "desc" }],
         take: 12,
         select: {
           id: true,
@@ -402,20 +402,20 @@ export const BookService = {
       await Promise.all([
         this.getCategorySections(),
       db.product.findMany({
-        where: { published: true },
-        orderBy: { position: "desc" },
+        where: { published: true, ...notDeleted },
+        orderBy: [{ createdAt: "desc" }, { position: "desc" }],
         take: 12,
         select: bookSelect,
       }),
       db.product.findMany({
-        where: { published: true, translationStatus: "TRANSLATED" },
-        orderBy: { position: "desc" },
+        where: { published: true, translationStatus: "TRANSLATED", ...notDeleted },
+        orderBy: [{ createdAt: "desc" }, { position: "desc" }],
         take: 12,
         select: bookSelect,
       }),
       db.product.findMany({
-        where: { published: true, translationStatus: "NOMINATED" },
-        orderBy: { position: "desc" },
+        where: { published: true, translationStatus: "NOMINATED", ...notDeleted },
+        orderBy: [{ createdAt: "desc" }, { position: "desc" }],
         take: 12,
         select: bookSelect,
       }),

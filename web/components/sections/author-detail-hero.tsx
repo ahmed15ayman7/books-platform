@@ -10,6 +10,7 @@ import {
   StaggerContainer,
   StaggerItem,
 } from "@/components/motion";
+import { markdownExcerpt } from "@/lib/markdown/markdown-to-plain-text";
 
 interface AuthorDetailHeroProps {
   locale: Locale;
@@ -43,7 +44,7 @@ export function AuthorDetailHero({
 }: AuthorDetailHeroProps) {
   const isAr = locale === "ar";
   const avatarSrc = imageUrl ?? ABOUT_IMAGES.authorDefault;
-  const bioExcerpt = bio ? bio.split("\n").slice(0, 3).join("\n") : null;
+  const bioExcerpt = bio ? markdownExcerpt(bio, 280) : null;
 
   return (
     <div className="bg-[var(--brand-black)] py-10">
@@ -104,7 +105,7 @@ export function AuthorDetailHero({
             </StaggerContainer>
             {bioExcerpt && (
               <FadeIn delay={0.2}>
-                <p className="mt-4 line-clamp-3 max-w-3xl text-sm leading-relaxed text-[var(--brand-gray-300)] whitespace-pre-wrap">
+                <p className="mt-4 line-clamp-3 max-w-3xl text-sm leading-relaxed text-[var(--brand-gray-300)]">
                   {bioExcerpt}
                 </p>
               </FadeIn>

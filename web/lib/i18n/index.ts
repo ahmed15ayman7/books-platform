@@ -1,5 +1,6 @@
 export { locales, defaultLocale } from "./config";
 export type { Locale } from "./config";
+export { localeHref, seoCanonicalPath, stripLocale } from "./href";
 
 export function getDirection(locale: string): "rtl" | "ltr" {
   return locale === "ar" ? "rtl" : "ltr";

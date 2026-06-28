@@ -11,6 +11,7 @@ import { BookMarketingDialog } from "./book-marketing-dialog";
 import { EntityShareDialog } from "@/components/share/entity-share-dialog";
 import { BookDeleteButton } from "./book-delete-button";
 import { AdminTimestamps } from "@/components/admin/admin-timestamps";
+import { ArticleContent } from "@/lib/markdown/article-content";
 import {
   adminArticleEditPath,
   adminArticleViewPath,
@@ -80,6 +81,22 @@ function DescriptionBlock({ title, text }: { title: string; text: string | null 
       <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--admin-text-muted)]">
         {text}
       </p>
+    </div>
+  );
+}
+
+function MarkdownDescriptionBlock({ title, text }: { title: string; text: string | null }) {
+  if (!text?.trim()) return null;
+  return (
+    <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-5">
+      <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-[var(--admin-text-subtle)]">
+        {title}
+      </h3>
+      <ArticleContent
+        content={text}
+        variant="compact"
+        className="text-sm [&_p]:text-sm [&_p]:text-[var(--admin-text-muted)] [&_li]:text-sm [&_li]:text-[var(--admin-text-muted)]"
+      />
     </div>
   );
 }
@@ -319,8 +336,8 @@ export default async function AdminBookViewPage({ params }: Props) {
 
           <DescriptionBlock title="وصف قصير — عربي" text={book.shortDescAr} />
           <DescriptionBlock title="وصف قصير — إنجليزي" text={book.shortDesc} />
-          <DescriptionBlock title="الوصف الكامل — عربي" text={book.descriptionAr} />
-          <DescriptionBlock title="الوصف الكامل — إنجليزي" text={book.description} />
+          <MarkdownDescriptionBlock title="الوصف الكامل — عربي" text={book.descriptionAr} />
+          <MarkdownDescriptionBlock title="الوصف الكامل — إنجليزي" text={book.description} />
           <DescriptionBlock title="وصف SEO (Yoast)" text={book.yoastMetadesc} />
 
           {book.authors.length > 0 && (

@@ -2,7 +2,7 @@ import type { Locale } from "@/lib/i18n";
 import { pickLocale, type BilingualString } from "./types";
 
 const missionQuote: BilingualString = {
-  ar: "«غايتنا أن نُعرّف القارئ العربي بكل كتاب جديد يُنشر في العالم»",
+  ar: " أن يعرف القارئ العربي بكل كتاب جديد يُنشر في العالم»",
   en: "\"Our purpose is to introduce the Arab reader to every new book published around the world.\"",
 };
 

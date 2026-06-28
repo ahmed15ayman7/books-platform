@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ImageUploadField } from "@/components/forms/image-upload-field";
 import { cn } from "@/lib/utils";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
@@ -40,6 +41,7 @@ interface BookEditFormProps {
   bookId?: string;
   locale: string;
   bookSlug?: string;
+  bookOriginalId?: number;
   initial: BookEditData;
   publishers: Publisher[];
   categories: Category[];
@@ -144,6 +146,7 @@ export function BookEditForm({
   bookId,
   locale,
   bookSlug,
+  bookOriginalId,
   initial,
   publishers,
   categories,
@@ -173,7 +176,8 @@ export function BookEditForm({
   }));
   const publisherOptions = publishersList.map((p) => ({
     id: p.id,
-    name: p.nameAr ?? p.name ?? p.title,
+    name: p.name ?? p.title,
+    nameAr: p.nameAr,
     slug: p.slug,
   }));
   const categoryOptions = categoriesList.map((c) => ({
@@ -336,11 +340,20 @@ export function BookEditForm({
         </Field>
 
         <Field className="sm:col-span-2">
-          <FieldLabel htmlFor="imageUrl">رابط صورة الغلاف</FieldLabel>
-          <Input id="imageUrl" type="url" className={fieldCls} value={form.imageUrl} onChange={(e) => set("imageUrl", e.target.value)} placeholder="https://..." dir="ltr" />
-          {form.imageUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={form.imageUrl} alt="cover preview" className="mt-2 h-32 w-auto rounded-lg border border-[var(--admin-border-strong)] object-contain" />
+          <ImageUploadField
+            label="صورة الغلاف"
+            folder="products"
+            field="image_url"
+            originalId={bookOriginalId}
+            value={form.imageUrl}
+            onChange={(url) => set("imageUrl", url)}
+            headers={adminAuthHeaders()}
+            disabled={isCreate}
+          />
+          {isCreate && (
+            <p className="mt-1 text-[11px] text-[var(--admin-text-subtle)]">
+              احفظ الكتاب أولاً لتتمكن من رفع الصورة
+            </p>
           )}
         </Field>
       </SectionCard>
@@ -510,8 +523,52 @@ export function BookEditForm({
           />
         </Field>
       </SectionCard>
+ {/* ── 5. Descriptions ──────────────────────────────────────── */}
+      <div className={sectionCardCls}>
+        <div className={sectionHeaderCls}>
+          <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--admin-text-muted)]">الأوصاف والمحتوى</h2>
+        </div>
+        <div className="grid grid-cols-1 gap-5 p-5 lg:grid-cols-2">
+         
 
-      {/* ── 5. Status & Commerce ─────────────────────────────────── */}
+          <Field className="lg:col-span-2">
+            <AdminRichTextHint />
+          </Field>
+
+          <AdminBilingualField
+            arValue={form.descriptionAr}
+            enValue={form.description}
+            onArChange={(v) => set("descriptionAr", v)}
+            onEnChange={(v) => set("description", v)}
+            labels={{ ar: "ملخص الكتاب — عربي", en: "ملخص الكتاب — إنجليزي" }}
+            inputClassName={fieldCls}
+            arPlaceholder="اكتب ملخص الكتاب…"
+            enPlaceholder="Write the book summary…"
+            richText={{ image: false }}
+            editorMinHeight={320}
+            layout="half"
+          />
+ <AdminBilingualField
+            arValue={form.shortDescAr}
+            enValue={form.shortDesc}
+            onArChange={(v) => set("shortDescAr", v)}
+            onEnChange={(v) => set("shortDesc", v)}
+            labels={{ ar: "مقتطف قصير — عربي", en: "مقتطف قصير — إنجليزي" }}
+            inputClassName={fieldCls}
+            arPlaceholder="جملة أو فقرتان تظهران فوق الملخص في صفحة الكتاب…"
+            enPlaceholder="Short lead text shown above the summary…"
+            multiline
+            rows={4}
+            layout="half"
+          />
+          <Field className="lg:col-span-2">
+            <FieldLabel htmlFor="notes">ملاحظات داخلية</FieldLabel>
+            <Textarea id="notes" className={cn(fieldCls, "min-h-[100px] resize-y")} value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="ملاحظات للفريق الداخلي فقط…" />
+          </Field>
+        </div>
+      </div>
+
+      {/* ── 6. Status & Commerce ─────────────────────────────────── */}
       <SectionCard title="الحالة والتسعير">
         <Field>
           <FieldLabel htmlFor="purchaseOption">خيار الشراء</FieldLabel>
@@ -555,51 +612,7 @@ export function BookEditForm({
         </div>
       </SectionCard>
 
-      {/* ── 6. Descriptions ──────────────────────────────────────── */}
-      <div className={sectionCardCls}>
-        <div className={sectionHeaderCls}>
-          <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--admin-text-muted)]">الأوصاف والمحتوى</h2>
-        </div>
-        <div className="grid grid-cols-1 gap-5 p-5 lg:grid-cols-2">
-          <AdminBilingualField
-            arValue={form.shortDescAr}
-            enValue={form.shortDesc}
-            onArChange={(v) => set("shortDescAr", v)}
-            onEnChange={(v) => set("shortDesc", v)}
-            labels={{ ar: "مقتطف قصير — عربي", en: "مقتطف قصير — إنجليزي" }}
-            inputClassName={fieldCls}
-            arPlaceholder="جملة أو فقرتان تظهران فوق الملخص في صفحة الكتاب…"
-            enPlaceholder="Short lead text shown above the summary…"
-            multiline
-            rows={4}
-            layout="half"
-          />
-
-          <Field className="lg:col-span-2">
-            <AdminRichTextHint />
-          </Field>
-
-          <AdminBilingualField
-            arValue={form.descriptionAr}
-            enValue={form.description}
-            onArChange={(v) => set("descriptionAr", v)}
-            onEnChange={(v) => set("description", v)}
-            labels={{ ar: "ملخص الكتاب — عربي", en: "ملخص الكتاب — إنجليزي" }}
-            inputClassName={fieldCls}
-            arPlaceholder="اكتب ملخص الكتاب…"
-            enPlaceholder="Write the book summary…"
-            richText={{ image: false }}
-            editorMinHeight={320}
-            layout="half"
-          />
-
-          <Field className="lg:col-span-2">
-            <FieldLabel htmlFor="notes">ملاحظات داخلية</FieldLabel>
-            <Textarea id="notes" className={cn(fieldCls, "min-h-[100px] resize-y")} value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="ملاحظات للفريق الداخلي فقط…" />
-          </Field>
-        </div>
-      </div>
-
+     
       {/* ── Save bar ─────────────────────────────────────────────── */}
       <div className="sticky bottom-0 flex items-center justify-between gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-5 py-3 shadow-lg">
         <p className="text-xs text-[var(--admin-text-subtle)]">

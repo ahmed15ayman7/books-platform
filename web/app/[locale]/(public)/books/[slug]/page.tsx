@@ -23,6 +23,8 @@ import {
 import { localizedPublisherName } from "@/lib/i18n/publisher-locale";
 import { bookSeoMetadata } from "@/lib/seo/metadata";
 import { absoluteUrl } from "@/lib/seo/site";
+import { JsonLd, bookJsonLd, breadcrumbJsonLd } from "@/components/seo/json-ld";
+import { seoCanonicalPath } from "@/lib/i18n/href";
 
 interface BookPageProps {
   params: Promise<{ slug: string; locale: string }>;
@@ -89,34 +91,42 @@ export default async function BookDetailPage({ params }: BookPageProps) {
       | "translationStatus.PARTIAL",
   );
 
-  const publicBookUrl = absoluteUrl(`/${locale}/books/${book.slug}`);
+  const publicBookUrl = absoluteUrl(seoCanonicalPath(locale, `/books/${book.slug}`));
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Book",
-    name: displayName,
+  const bookLd = bookJsonLd(locale, {
+    slug: book.slug,
+    nameAr: book.nameAr,
+    nameEn: book.nameEn,
     isbn: book.isbn,
-    inLanguage: book.language,
+    language: book.language,
+    imageUrl: book.imageUrl,
+    description: description,
+    descriptionAr: book.descriptionAr,
     publisher: book.publisher
-      ? { "@type": "Organization", name: localizedPublisherName(book.publisher, locale) }
-      : undefined,
-    image: book.imageUrl,
-    description: description?.slice(0, 500),
-  };
+      ? {
+          nameAr: localizedPublisherName(book.publisher, "ar"),
+          nameEn: localizedPublisherName(book.publisher, "en"),
+        }
+      : null,
+  });
+
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: locale === "ar" ? "الرئيسية" : "Home", path: seoCanonicalPath(locale, "/") },
+    { name: locale === "ar" ? "الكتب" : "Books", path: seoCanonicalPath(locale, "/books") },
+    { name: displayName, path: seoCanonicalPath(locale, `/books/${book.slug}`) },
+  ]);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={bookLd} />
+      <JsonLd data={breadcrumbs} />
       <div className="min-h-screen bg-[var(--brand-gray-50)]">
         <nav
           className="bg-white border-b border-[var(--brand-gray-200)] py-3"
           aria-label={locale === "ar" ? "مسار التنقل" : "Breadcrumb"}
         >
           <div className="container-platform flex items-center gap-2 text-sm text-[var(--brand-gray-500)]">
-            <Link href={`/${locale}`} className="hover:text-[var(--brand-red)]">
+            <Link href={locale === "ar" ? "/" : "/en"} className="hover:text-[var(--brand-red)]">
               {locale === "ar" ? "الرئيسية" : "Home"}
             </Link>
             <span>/</span>

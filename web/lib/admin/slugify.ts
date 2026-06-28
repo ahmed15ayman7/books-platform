@@ -17,16 +17,16 @@ export function autoSlugFromEnglish(
   previousEnglishName: string,
 ): string {
   const en = englishName.trim();
-  if (!en) return currentSlug;
+  if (!en) return currentSlug.split("-").slice(0,4).join("-");
 
   const next = slugify(en);
-  if (!currentSlug.trim()) return next;
+  if (!currentSlug.trim()) return next.split("-").slice(0,4).join("-");
 
   const prev = previousEnglishName.trim();
-  if (!prev) return currentSlug;
+  if (!prev) return currentSlug.split("-").slice(0,4).join("-");
 
-  if (currentSlug === slugify(prev)) return next;
-  return currentSlug;
+  if (currentSlug === slugify(prev)) return next.split("-").slice(0,4).join("-");
+  return currentSlug.split("-").slice(0,4).join("-");
 }
 
 export const AUTO_SLUG_HINT =

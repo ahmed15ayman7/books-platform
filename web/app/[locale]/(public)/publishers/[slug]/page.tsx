@@ -20,6 +20,10 @@ import { buildPageMetadata } from "@/lib/seo/metadata";
 import { PAGINATION } from "@/lib/utils/constants";
 import { AdminEntityPublicShell } from "@/components/admin/admin-entity-public-shell";
 import { adminPublisherEditPath, adminPublisherViewPath } from "@/lib/admin/public-urls";
+import { JsonLd, organizationEntityJsonLd, breadcrumbJsonLd } from "@/components/seo/json-ld";
+import { seoCanonicalPath } from "@/lib/i18n/href";
+import { ArticleContent } from "@/lib/markdown/article-content";
+import { markdownToPlainText } from "@/lib/markdown/markdown-to-plain-text";
 
 interface PublisherPageProps {
   params: Promise<{ slug: string; locale: string }>;
@@ -32,11 +36,13 @@ export async function generateMetadata({ params }: PublisherPageProps): Promise<
   if (!publisher) return { title: "Publisher Not Found" };
   const displayName = localizedPublisherName(publisher, locale as Locale);
   const displayDesc = localizedPublisherDescription(publisher, locale as Locale);
+  const plainDesc = displayDesc ? markdownToPlainText(displayDesc) : null;
   return buildPageMetadata({
     locale: locale as Locale,
     path: `/${locale}/publishers/${slug}`,
     title: displayName,
-    description: displayDesc ?? (locale === "ar" ? `ناشر ${displayName}` : `Publisher ${displayName}`),
+    description:
+      plainDesc ?? (locale === "ar" ? `ناشر ${displayName}` : `Publisher ${displayName}`),
     imageUrl: publisher.imageUrl,
     keywords: [displayName, locale === "ar" ? "ناشرون" : "publishers"],
   });
@@ -75,8 +81,26 @@ export default async function PublisherDetailPage({
     publisher.sponsored?.isActive && publisher.sponsored.endsAt > new Date(),
   );
 
+  const publisherLd = organizationEntityJsonLd(locale, {
+    slug: publisher.slug,
+    name: publisher.name,
+    nameAr: publisher.nameAr,
+    description: publisher.content,
+    descriptionAr: publisher.contentAr,
+    imageUrl: publisher.imageUrl,
+  });
+
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: isAr ? "الرئيسية" : "Home", path: seoCanonicalPath(locale, "/") },
+    { name: isAr ? "الناشرون" : "Publishers", path: seoCanonicalPath(locale, "/publishers") },
+    { name: displayName, path: seoCanonicalPath(locale, `/publishers/${publisher.slug}`) },
+  ]);
+
   return (
-    <AdminEntityPublicShell
+    <>
+      <JsonLd data={publisherLd} />
+      <JsonLd data={breadcrumbs} />
+      <AdminEntityPublicShell
       entityType="publisher"
       entityId={publisher.id}
       editHref={adminPublisherEditPath(locale, publisher.id)}
@@ -94,7 +118,7 @@ export default async function PublisherDetailPage({
           countries={publisher.countries}
           websiteUrl={publisher.websiteUrl}
           contactEmail={publisher.contactEmail}
-          homeHref={`/${locale}`}
+          homeHref={locale === "ar" ? "/" : "/en"}
           publishersHref={`/${locale}/publishers`}
         />
 
@@ -112,9 +136,7 @@ export default async function PublisherDetailPage({
                 imagePosition="left"
                 locale={locale}
               >
-                <p className="whitespace-pre-wrap text-base leading-relaxed text-[var(--brand-gray-700)]">
-                  {displayDescription}
-                </p>
+                <ArticleContent content={displayDescription} />
               </EditorialSplit>
             )}
 
@@ -151,5 +173,6 @@ export default async function PublisherDetailPage({
         </div>
       </div>
     </AdminEntityPublicShell>
+    </>
   );
 }

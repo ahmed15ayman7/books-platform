@@ -81,6 +81,16 @@ export function authHeaders(): HeadersInit {
   return headers;
 }
 
+/** Auth headers for multipart uploads — never set Content-Type (browser adds boundary). */
+export function authUploadHeaders(): HeadersInit {
+  const token = getAccessToken();
+  const draftToken = getStoredDraftToken();
+  const headers: Record<string, string> = {};
+  if (token) headers.Authorization = `Bearer ${token}`;
+  if (draftToken) headers["X-Draft-Token"] = draftToken;
+  return headers;
+}
+
 export interface AuthorSession {
   id: string;
   email: string;

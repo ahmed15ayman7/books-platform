@@ -59,8 +59,35 @@ const nextConfig = {
     ];
   },
 
+  async rewrites() {
+    // beforeFiles rewrites run before middleware and before filesystem routing.
+    // They make clean Arabic URLs (e.g. /books) accessible without a browser redirect,
+    // while the canonical <link> in metadata still points to /ar/books.
+    return {
+      beforeFiles: [
+        { source: "/books", destination: "/ar/books" },
+        { source: "/books/:path*", destination: "/ar/books/:path*" },
+        { source: "/articles/:path*", destination: "/ar/articles/:path*" },
+        { source: "/media", destination: "/ar/media" },
+        { source: "/media/:path*", destination: "/ar/media/:path*" },
+        { source: "/publishers", destination: "/ar/publishers" },
+        { source: "/publishers/:slug", destination: "/ar/publishers/:slug" },
+        { source: "/authors/:slug", destination: "/ar/authors/:slug" },
+        { source: "/publish", destination: "/ar/publish" },
+        { source: "/about", destination: "/ar/about" },
+        { source: "/services", destination: "/ar/services" },
+        { source: "/team", destination: "/ar/team" },
+        { source: "/contact", destination: "/ar/contact" },
+        { source: "/privacy", destination: "/ar/privacy" },
+        { source: "/terms", destination: "/ar/terms" },
+        { source: "/search", destination: "/ar/search" },
+      ],
+    };
+  },
+
   async redirects() {
     return [
+      // Legacy WordPress URLs → canonical Arabic paths
       { source: "/about-us", destination: "/ar/about", permanent: true },
       { source: "/about-us/:path*", destination: "/ar/about", permanent: true },
       { source: "/our-service", destination: "/ar/services", permanent: true },

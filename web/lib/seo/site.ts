@@ -74,9 +74,16 @@ export function alternateOpenGraphLocales(locale: Locale | string): string[] {
   return locale === "ar" ? ["en_US"] : ["ar_AR"];
 }
 
-export function localizedPaths(path: string): { ar: string; en: string } {
+/**
+ * Return canonical paths for each locale given any path (with or without locale prefix).
+ * Arabic home → "/"; all other Arabic → "/ar/..."; English → "/en/...".
+ * x-default always mirrors the Arabic canonical.
+ */
+export function localizedPaths(path: string): { ar: string; en: string; xDefault: string } {
   const withSlash = path.startsWith("/") ? path : `/${path}`;
-  const ar = withSlash.replace(/^\/(ar|en)/, "/ar");
-  const en = withSlash.replace(/^\/(ar|en)/, "/en");
-  return { ar, en };
+  // Strip existing prefix to get logical path
+  const clean = withSlash.replace(/^\/(ar|en)(?=\/|$)/, "") || "/";
+  const ar = clean === "/" ? "/" : `/ar${clean}`;
+  const en = clean === "/" ? "/en" : `/en${clean}`;
+  return { ar, en, xDefault: ar };
 }

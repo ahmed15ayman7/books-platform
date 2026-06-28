@@ -23,6 +23,8 @@ import { ArticleCommentsSection } from "@/components/sections/article-comments-s
 import { articleLinkedBookDisplay } from "@/lib/i18n/article-linked-book";
 import { resolveArticleDisplayImage } from "@/lib/articles/resolve-display-image";
 import { absoluteUrl } from "@/lib/seo/site";
+import { JsonLd, articleJsonLd, breadcrumbJsonLd } from "@/components/seo/json-ld";
+import { seoCanonicalPath } from "@/lib/i18n/href";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
@@ -39,6 +41,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     excerpt: article.excerpt,
     imageUrl: article.imageUrl,
     date: article.date,
+    modifiedTime: article.date,
   });
 }
 
@@ -89,7 +92,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
 
   const intro = stripHtml(article.excerpt);
   const isMedia = isMediaChannel(article.channel);
-  const articleUrl = absoluteUrl(`/${locale}/articles/${article.slug}`);
+  const articleUrl = absoluteUrl(seoCanonicalPath(locale, `/articles/${article.slug}`));
 
   const linkedBook = articleLinkedBookDisplay(article.products?.[0], locale);
   const heroCoverUrl =
@@ -101,35 +104,47 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
     }) ?? null;
   const heroCoverAlt = linkedBook?.name ?? article.title;
 
-  const jsonLd: Record<string, unknown>[] = [
-    {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      headline: article.title,
-      image: article.imageUrl?.split(",")[0] ?? article.imageUrl,
-      datePublished: article.date?.toISOString(),
-      description: article.excerpt,
-    },
-  ];
+  const articleLd = articleJsonLd(locale, {
+    slug: article.slug,
+    title: article.title,
+    excerpt: article.excerpt,
+    imageUrl: heroCoverUrl ?? article.imageUrl,
+    date: article.date,
+  });
 
-  if (article.videoId) {
-    jsonLd.push({
-      "@context": "https://schema.org",
-      "@type": "VideoObject",
-      name: article.title,
-      description: article.excerpt ?? article.title,
-      thumbnailUrl: youtubeThumbnail(article.videoId),
-      embedUrl: youtubeEmbedUrl(article.videoId),
-      uploadDate: article.date?.toISOString(),
-    });
-  }
+  const videoLd = article.videoId
+    ? {
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        name: article.title,
+        description: article.excerpt ?? article.title,
+        thumbnailUrl: youtubeThumbnail(article.videoId),
+        embedUrl: youtubeEmbedUrl(article.videoId),
+        uploadDate: article.date?.toISOString(),
+      }
+    : null;
+
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: locale === "ar" ? "الرئيسية" : "Home", path: seoCanonicalPath(locale, "/") },
+    ...(channelInfo
+      ? [
+          {
+            name: locale === "ar" ? channelInfo.ar : channelInfo.en,
+            path: seoCanonicalPath(
+              locale,
+              `/${isMedia ? "media" : "articles"}/${channelInfo.path}`,
+            ),
+          },
+        ]
+      : []),
+    { name: article.title, path: seoCanonicalPath(locale, `/articles/${article.slug}`) },
+  ]);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd.length === 1 ? jsonLd[0] : jsonLd) }}
-      />
+      <JsonLd data={articleLd} />
+      {videoLd && <JsonLd data={videoLd} />}
+      <JsonLd data={breadcrumbs} />
       <AdminEntityPublicShell
         entityType={isMedia ? "media" : "article"}
         entityId={article.id}
@@ -150,7 +165,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
 
           <div className="container-platform py-8 md:py-10">
             <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-[var(--brand-gray-500)]">
-              <Link href={`/${locale}`} className="hover:text-[var(--brand-red)]">
+              <Link href={locale === "ar" ? "/" : "/en"} className="hover:text-[var(--brand-red)]">
                 {locale === "ar" ? "الرئيسية" : "Home"}
               </Link>
               {channelInfo && (

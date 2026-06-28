@@ -1,5 +1,3 @@
-import { CONSENT_REMIND_MS } from "@/lib/consent/cookie-consent";
-
 export const NOTIFICATION_PROMPT_KEY = "bp-notification-prompt";
 
 export type NotificationPromptStatus = "granted" | "denied" | "dismissed";
@@ -33,16 +31,14 @@ export function isNotificationSupported(): boolean {
   return typeof window !== "undefined" && "Notification" in window;
 }
 
-export function shouldShowNotificationPrompt(now = Date.now()): boolean {
+/** Show only while browser permission is still "default" and the user has not responded yet. */
+export function shouldShowNotificationPrompt(): boolean {
   if (!isNotificationSupported()) return false;
 
   const permission = Notification.permission;
   if (permission === "granted" || permission === "denied") return false;
 
-  const record = readRecord();
-  if (!record) return true;
-  if (record.status === "granted" || record.status === "denied") return false;
-  return now - record.at >= CONSENT_REMIND_MS;
+  return readRecord() === null;
 }
 
 export function saveNotificationPrompt(status: NotificationPromptStatus): void {

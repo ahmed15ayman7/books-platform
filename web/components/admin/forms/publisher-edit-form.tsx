@@ -16,6 +16,7 @@ import { AdminRichTextHint } from "@/components/admin/admin-rich-text-hint";
 import { adminPublisherViewPath } from "@/lib/admin/public-urls";
 import { useAdminFormShortcuts } from "@/hooks/use-admin-form-shortcuts";
 import { adminToast } from "@/lib/admin/admin-toast";
+import { ImageUploadField } from "@/components/forms/image-upload-field";
 
 interface PublisherForm {
   name: string;
@@ -57,6 +58,7 @@ export function PublisherEditForm({ locale, id }: PublisherEditFormProps) {
   const draft = useFormDraft(formDraftId.adminPublisher(id), form, setForm, { ready: !loading });
   const [saving, setSaving] = useState(false);
   const [timestamps, setTimestamps] = useState<{ createdAt?: string; updatedAt?: string }>({});
+  const [originalId, setOriginalId] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     if (isNew) return;
@@ -78,6 +80,7 @@ export function PublisherEditForm({ locale, id }: PublisherEditFormProps) {
           status: String(d.status ?? "publish"),
           sponsored: Boolean(d.sponsored),
         });
+        setOriginalId(typeof d.originalId === "number" ? d.originalId : null);
         setTimestamps({
           createdAt: d.createdAt as string | undefined,
           updatedAt: d.updatedAt as string | undefined,
@@ -200,11 +203,15 @@ export function PublisherEditForm({ locale, id }: PublisherEditFormProps) {
               onChange={(e) => set("contactEmail")(e.target.value)}
               dir="ltr"
             />
-            <AdminInput
-              label="رابط صورة الغلاف"
+            <ImageUploadField
+              label="صورة الغلاف"
+              folder="publishers"
+              field="image_featured"
+              originalId={originalId}
               value={form.imageUrl}
-              onChange={(e) => set("imageUrl")(e.target.value)}
-              dir="ltr"
+              onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))}
+              headers={adminAuthHeaders()}
+              disabled={isNew}
             />
           </div>
         </AdminCard>

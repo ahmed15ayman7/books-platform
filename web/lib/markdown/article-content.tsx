@@ -142,26 +142,49 @@ function InlineArticleImage({
 interface ArticleContentProps {
   content: string;
   className?: string;
+  variant?: "article" | "compact";
 }
 
-export function ArticleContent({ content, className }: ArticleContentProps) {
+const COMPACT_HEADING_CLASS: Record<number, string> = {
+  1: "mt-4 mb-2 font-display text-lg font-bold text-[var(--brand-red)] first:mt-0",
+  2: "mt-4 mb-2 font-display text-lg font-bold text-[var(--brand-red)] first:mt-0",
+  3: "mt-3 mb-1.5 text-base font-bold text-[var(--brand-gray-900)] first:mt-0",
+  4: "mt-3 mb-1.5 text-base font-bold text-[var(--brand-gray-900)] first:mt-0",
+  5: "mt-2 mb-1 text-sm font-bold text-[var(--brand-gray-900)] first:mt-0",
+  6: "mt-2 mb-1 text-sm font-bold uppercase tracking-wide text-[var(--brand-gray-700)] first:mt-0",
+};
+
+export function ArticleContent({
+  content,
+  className,
+  variant = "article",
+}: ArticleContentProps) {
   const blocks = useMemo(() => parseArticleContent(content), [content]);
   if (blocks.length === 0) return null;
 
+  const compact = variant === "compact";
+
   return (
-    <article className={cn("article-prose prose-brand space-y-5", className)}>
+    <article
+      className={cn(
+        compact ? "article-prose space-y-1" : "article-prose prose-brand space-y-5",
+        className,
+      )}
+    >
       {blocks.map((block, index) => {
         switch (block.type) {
           case "heading": {
             const inner = inlineFormat(block.text);
-            const headingClass: Record<number, string> = {
-              1: "mt-10 mb-4 font-display text-3xl font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-4xl",
-              2: "mt-8 mb-3 font-display text-2xl font-bold text-[var(--brand-red)] first:mt-0 md:text-3xl",
-              3: "mt-7 mb-3 text-xl font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-2xl",
-              4: "mt-6 mb-2 text-lg font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-xl",
-              5: "mt-5 mb-2 text-base font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-lg",
-              6: "mt-4 mb-2 text-sm font-bold uppercase tracking-wide text-[var(--brand-gray-700)] first:mt-0",
-            };
+            const headingClass: Record<number, string> = compact
+              ? COMPACT_HEADING_CLASS
+              : {
+                  1: "mt-10 mb-4 font-display text-3xl font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-4xl",
+                  2: "mt-8 mb-3 font-display text-2xl font-bold text-[var(--brand-red)] first:mt-0 md:text-3xl",
+                  3: "mt-7 mb-3 text-xl font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-2xl",
+                  4: "mt-6 mb-2 text-lg font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-xl",
+                  5: "mt-5 mb-2 text-base font-bold text-[var(--brand-gray-900)] first:mt-0 md:text-lg",
+                  6: "mt-4 mb-2 text-sm font-bold uppercase tracking-wide text-[var(--brand-gray-700)] first:mt-0",
+                };
             const Tag = (`h${Math.min(block.level, 6)}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6");
             return (
               <Tag key={index} className={headingClass[block.level] ?? headingClass[4]}>
@@ -173,16 +196,34 @@ export function ArticleContent({ content, className }: ArticleContentProps) {
             return (
               <p
                 key={index}
-                className="text-base leading-[1.9] text-[var(--brand-gray-800)] md:text-[17px]"
+                className={
+                  compact
+                    ? "text-base leading-relaxed text-[var(--brand-gray-700)]"
+                    : "text-base leading-[1.9] text-[var(--brand-gray-800)] md:text-lg"
+                }
               >
                 {inlineFormat(block.text)}
               </p>
             );
           case "list":
             return (
-              <ul key={index} className="my-3 list-disc space-y-2 ps-6 md:text-lg">
+              <ul
+                key={index}
+                className={
+                  compact
+                    ? "my-3 list-disc space-y-1.5 ps-5 text-base leading-relaxed"
+                    : "my-3 list-disc space-y-2 ps-6 md:text-lg"
+                }
+              >
                 {block.items.map((item, i) => (
-                  <li key={i} className="text-base leading-relaxed text-[var(--brand-gray-700)]">
+                  <li
+                    key={i}
+                    className={
+                      compact
+                        ? "text-base leading-relaxed text-[var(--brand-gray-700)]"
+                        : "text-base leading-relaxed text-[var(--brand-gray-700)] md:text-lg"
+                    }
+                  >
                     {inlineFormat(item)}
                   </li>
                 ))}
