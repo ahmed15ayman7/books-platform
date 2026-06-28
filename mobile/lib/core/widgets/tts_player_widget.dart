@@ -94,6 +94,7 @@ class _TtsPlayerWidgetState extends State<TtsPlayerWidget> {
       if (mounted) setState(() => _hasTtsError = true);
       return;
     }
+    await _tts.setSpeechRate(_toTtsRate(_speed));
     await _tts.speak(_cleanText);
     if (mounted) setState(() => _isPlaying = true);
   }
