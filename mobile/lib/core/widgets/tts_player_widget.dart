@@ -203,11 +203,13 @@ class _TtsPlayerWidgetState extends State<TtsPlayerWidget> {
                 ),
               )
               .toList(),
-          onChanged: (s) async {
-            if (s == null) return;
-            await _tts.setSpeechRate(_toTtsRate(s));
-            setState(() => _speed = s);
-          },
+          onChanged: _isPlaying
+              ? null
+              : (s) async {
+                  if (s == null) return;
+                  await _tts.setSpeechRate(_toTtsRate(s));
+                  setState(() => _speed = s);
+                },
         ),
       ],
     );
