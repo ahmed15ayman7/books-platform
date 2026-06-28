@@ -82,12 +82,17 @@ class _TtsPlayerWidgetState extends State<TtsPlayerWidget> {
     var result = await _tts.setLanguage(widget.languageCode);
     var langOk = result == 1 || result == true;
 
-    // iOS may index voices under the bare language code (e.g. 'ar') rather than
-    // the full locale ('ar-SA'). Fall back to the bare code before giving up.
     if (!langOk && widget.languageCode.contains('-')) {
       final bare = widget.languageCode.split('-').first;
       result = await _tts.setLanguage(bare);
       langOk = result == 1 || result == true;
+    }
+
+    // On some Android OEMs, isLanguageAvailable() returns LANG_NOT_SUPPORTED
+    // even when a matching voice IS installed, causing setLanguage to return 0.
+    // Scanning tts.voices directly and using setVoice() bypasses that check.
+    if (!langOk) {
+      langOk = await _trySetVoiceByLanguage(widget.languageCode.split('-').first);
     }
 
     if (!langOk) {
@@ -97,6 +102,31 @@ class _TtsPlayerWidgetState extends State<TtsPlayerWidget> {
     await _tts.setSpeechRate(_toTtsRate(_speed));
     await _tts.speak(_cleanText);
     if (mounted) setState(() => _isPlaying = true);
+  }
+
+  Future<bool> _trySetVoiceByLanguage(String langCode) async {
+    final dynamic raw = await _tts.getVoices;
+    if (raw is! List) return false;
+
+    Map<String, String>? best;
+    for (final item in raw) {
+      if (item is! Map) continue;
+      final locale = item['locale']?.toString() ?? '';
+      if (!locale.startsWith(langCode)) continue;
+      final voice = {
+        'name': item['name']?.toString() ?? '',
+        'locale': locale,
+      };
+      if (item['network_required']?.toString() == '0') {
+        best = voice;
+        break;
+      }
+      best ??= voice;
+    }
+
+    if (best == null || best['name']!.isEmpty) return false;
+    final setResult = await _tts.setVoice(best);
+    return setResult == 1 || setResult == true;
   }
 
   Future<void> _pause() async {
