@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,16 +24,14 @@ class _TtsPlayerWidgetState extends State<TtsPlayerWidget> {
   late final FlutterTts _tts;
   late final String _cleanText;
   bool _isPlaying = false;
+  bool _hasTtsError = false;
   double _speed = 1.0;
-  // null = still checking, true = voice available, false = not installed
-  bool? _isAvailable;
 
   static const _speeds = [1.0, 1.25, 1.5, 2.0];
 
-  // iOS rate: 0.0–1.0, normal = 0.5. Android rate: 0.0–2.0, normal = 1.0.
-  // Multiply user-facing speed by 0.5 on iOS so 1× maps to the natural rate.
-  static double _toTtsRate(double speed) =>
-      Platform.isIOS ? speed * 0.5 : speed;
+  // flutter_tts normalizes rates so 0.5 = natural speed on both iOS and Android.
+  // (Android plugin multiplies the Flutter value by 2.0 internally.)
+  static double _toTtsRate(double speed) => speed * 0.5;
 
   static String _stripMarkdown(String md) {
     return md
@@ -69,29 +65,26 @@ class _TtsPlayerWidgetState extends State<TtsPlayerWidget> {
 
   Future<void> _initTts() async {
     await _tts.setSpeechRate(_toTtsRate(1.0));
-
-    // Try the exact locale first (ar-SA), then the bare language code (ar).
-    // setLanguage returns 1 on success (iOS) or true on Android.
-    final primary = await _tts.setLanguage(widget.languageCode);
-    if (primary == 1 || primary == true) {
-      if (mounted) setState(() => _isAvailable = true);
-    } else if (widget.languageCode.contains('-')) {
-      final bare = widget.languageCode.split('-').first;
-      final fallback = await _tts.setLanguage(bare);
-      if (mounted) setState(() => _isAvailable = fallback == 1 || fallback == true);
-    } else {
-      if (mounted) setState(() => _isAvailable = false);
-    }
-
     _tts.setCompletionHandler(() {
       if (mounted) setState(() => _isPlaying = false);
     });
     _tts.setErrorHandler((_) {
-      if (mounted) setState(() => _isPlaying = false);
+      if (mounted) {
+        setState(() {
+          _isPlaying = false;
+          _hasTtsError = true;
+        });
+      }
     });
   }
 
   Future<void> _play() async {
+    final result = await _tts.setLanguage(widget.languageCode);
+    final langOk = result == 1 || result == true;
+    if (!langOk) {
+      if (mounted) setState(() => _hasTtsError = true);
+      return;
+    }
     await _tts.speak(_cleanText);
     if (mounted) setState(() => _isPlaying = true);
   }
@@ -143,31 +136,23 @@ class _TtsPlayerWidgetState extends State<TtsPlayerWidget> {
   }
 
   Widget _buildControls() {
-    // Still checking availability
-    if (_isAvailable == null) {
-      return SizedBox(
-        height: 44.r,
-        child: Center(
-          child: SizedBox(
-            width: 20.r,
-            height: 20.r,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: AppColors.primary,
+    if (_hasTtsError) {
+      return Row(
+        children: [
+          Icon(
+            Icons.info_outline_rounded,
+            size: 18.r,
+            color: AppColors.textSecondary,
+          ),
+          SizedBox(width: 8.w),
+          Flexible(
+            child: Text(
+              'tts.voice_not_available'.tr(),
+              style: AppTextStyles.bodySmall
+                  .copyWith(color: AppColors.textSecondary),
             ),
           ),
-        ),
-      );
-    }
-
-    // Voice not installed on this device
-    if (_isAvailable == false) {
-      return Padding(
-        padding: EdgeInsetsDirectional.only(top: 4.h, bottom: 4.h),
-        child: Text(
-          'tts.voice_not_available'.tr(),
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-        ),
+        ],
       );
     }
 

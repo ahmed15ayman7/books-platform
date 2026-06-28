@@ -367,6 +367,6 @@
 
   "tts": {
     "listen": "Listen",
-    "voice_not_available": "Voice not available — install an Arabic voice in device Settings → Accessibility → Spoken Content."
+    "voice_not_available": "Arabic voice is not available on this device. Install an Arabic TTS voice from your device settings."
   }
 }
