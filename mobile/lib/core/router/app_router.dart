@@ -36,6 +36,8 @@ import '../../features/static_pages/presentation/screens/contact_screen/contact_
 import '../../features/static_pages/presentation/screens/services_screen/services_screen.dart';
 import '../../features/static_pages/presentation/screens/static_page_screen/static_page_screen.dart';
 import '../../features/static_pages/presentation/screens/team_screen/team_screen.dart';
+import '../../features/notifications/presentation/cubit/notification_settings_cubit.dart';
+import '../../features/notifications/presentation/screens/notification_settings_screen/notification_settings_screen.dart';
 import '../../features/wishlist/presentation/cubit/wishlist_cubit.dart';
 import '../../features/wishlist/presentation/screens/wishlist_screen/wishlist_screen.dart';
 import '../di/injection_container.dart';
@@ -239,6 +241,15 @@ class AppRouter {
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => const TeamScreen(),
+        );
+
+      case AppRoutes.notificationSettings:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider(
+            create: (_) => getIt<NotificationSettingsCubit>(),
+            child: const NotificationSettingsScreen(),
+          ),
         );
 
       case AppRoutes.staticPage:

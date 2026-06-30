@@ -1,17 +1,36 @@
-// ⚠️  BLOCKED (T093): Firebase config files not yet provided.
-// Requires google-services.json at android/app/ and GoogleService-Info.plist
-// at ios/Runner/. App will not compile until these are added.
+import 'dart:io';
 
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 
+import 'package:booksplatform/core/network/api_manager.dart';
 import 'package:booksplatform/core/network/failure.dart';
 
 @lazySingleton
 class NotificationsRemoteDataSource {
-  // TODO: POST /notifications/mobile/subscribe — endpoint not yet implemented (Risk #1)
+  NotificationsRemoteDataSource(this._api);
+
+  final ApiManager _api;
+
   Future<Either<Failure, Unit>> registerFcmToken(
-      String token, String locale) async {
-    return right(unit);
-  }
+    String token,
+    String locale,
+  ) =>
+      _api.post<Unit>(
+        path: '/notifications/mobile/subscribe',
+        data: {
+          'token': token,
+          'platform': Platform.isIOS ? 'ios' : 'android',
+          'locale': locale,
+          'topics': ['new-books'],
+        },
+        fromJson: (_) => unit,
+      );
+
+  Future<Either<Failure, Unit>> unregisterFcmToken(String token) =>
+      _api.delete<Unit>(
+        path: '/notifications/mobile/subscribe',
+        data: {'token': token},
+        fromJson: (_) => unit,
+      );
 }

@@ -39,6 +39,9 @@ class AppRoutes {
   static const String privacyPolicy = '/privacy-policy';
   static const String termsOfUse = '/terms-of-use';
 
+  // Settings
+  static const String notificationSettings = '/notification-settings';
+
   // Fallback
   static const String unknown = '/unknown';
 }

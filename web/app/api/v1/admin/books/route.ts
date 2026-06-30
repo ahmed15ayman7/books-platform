@@ -18,6 +18,7 @@ import {
 import { BOOK_SEARCH_FIELDS, buildTextSearchOr } from "@/lib/search/text-search-fields";
 import { revalidatePublicBookCaches } from "@/lib/cache/revalidate-public";
 import { nextProductPosition } from "@/lib/admin/product-position";
+import { sendMobileNotification } from "@/server/services/fcm.service";
 
 const createBookSchema = z.object({
   nameEn: z.string().min(1).max(300),
@@ -120,6 +121,15 @@ export async function POST(request: NextRequest) {
     });
 
     revalidatePublicBookCaches();
+
+    if (book.published) {
+      sendMobileNotification({
+        title: book.nameAr ?? book.nameEn,
+        body: book.shortDescAr ?? book.shortDesc ?? '',
+        type: 'book',
+        slug: book.slug,
+      }).catch((err) => console.error('[FCM book create send failed]', err));
+    }
 
     return apiCreated(book);
   } catch (error) {

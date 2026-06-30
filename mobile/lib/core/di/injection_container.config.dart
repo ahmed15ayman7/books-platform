@@ -67,6 +67,10 @@ import 'package:booksplatform/features/notifications/data/repositories/notificat
     as _i595;
 import 'package:booksplatform/features/notifications/domain/repositories/notifications_repository.dart'
     as _i693;
+import 'package:booksplatform/features/notifications/presentation/cubit/notification_settings_cubit.dart'
+    as _i377;
+import 'package:booksplatform/features/notifications/services/fcm_service.dart'
+    as _i438;
 import 'package:booksplatform/features/publish/data/datasources/publish_remote_data_source.dart'
     as _i1069;
 import 'package:booksplatform/features/publish/data/repositories/publish_repository_impl.dart'
@@ -144,19 +148,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i403.ConnectivityHelper>(
       () => _i403.ConnectivityHelper(),
     );
-    gh.lazySingleton<_i545.NotificationsRemoteDataSource>(
-      () => _i545.NotificationsRemoteDataSource(),
-    );
-    gh.lazySingleton<_i693.NotificationsRepository>(
-      () => _i595.NotificationsRepositoryImpl(
-        gh<_i545.NotificationsRemoteDataSource>(),
-      ),
-    );
     gh.lazySingleton<_i171.FileUploadService>(
       () => _i171.StubFileUploadServiceImpl(),
     );
     gh.lazySingleton<_i759.SecureStorageHelper>(
       () => _i759.SecureStorageHelper(gh<_i558.FlutterSecureStorage>()),
+    );
+    gh.lazySingleton<_i438.FcmService>(
+      () => _i438.FcmService(
+        gh<_i759.SecureStorageHelper>(),
+        gh<_i409.GlobalKey<_i409.NavigatorState>>(),
+      ),
     );
     gh.lazySingleton<_i498.CartStorage>(
       () => _i498.CartStorage(gh<_i460.SharedPreferences>()),
@@ -208,6 +210,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i684.NewsletterRemoteDataSource>(
       () => _i684.NewsletterRemoteDataSource(gh<_i473.ApiManager>()),
     );
+    gh.lazySingleton<_i545.NotificationsRemoteDataSource>(
+      () => _i545.NotificationsRemoteDataSource(gh<_i473.ApiManager>()),
+    );
     gh.lazySingleton<_i1069.PublishRemoteDataSource>(
       () => _i1069.PublishRemoteDataSource(gh<_i473.ApiManager>()),
     );
@@ -254,6 +259,11 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i365.PublishersRemoteDataSourceImpl>(),
       ),
     );
+    gh.lazySingleton<_i693.NotificationsRepository>(
+      () => _i595.NotificationsRepositoryImpl(
+        gh<_i545.NotificationsRemoteDataSource>(),
+      ),
+    );
     gh.lazySingleton<_i761.MediaRepository>(
       () => _i575.MediaRepositoryImpl(gh<_i417.MediaRemoteDataSourceImpl>()),
     );
@@ -282,6 +292,13 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i935.PublishersListCubit>(
       () => _i935.PublishersListCubit(gh<_i674.PublishersRepository>()),
+    );
+    gh.factory<_i377.NotificationSettingsCubit>(
+      () => _i377.NotificationSettingsCubit(
+        gh<_i460.SharedPreferences>(),
+        gh<_i438.FcmService>(),
+        gh<_i693.NotificationsRepository>(),
+      ),
     );
     gh.factory<_i557.PublishCubit>(
       () => _i557.PublishCubit(

@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -9,6 +10,8 @@ import 'core/router/app_router.dart';
 import 'core/router/app_routes.dart';
 import 'core/theme/app_theme.dart';
 import 'features/cart/presentation/cubit/cart_cubit.dart';
+import 'features/notifications/services/fcm_service.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +19,9 @@ Future<void> main() async {
   await EasyLocalization.ensureInitialized();
   await initializeDateFormatting('en');
   await initializeDateFormatting('ar');
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await configureDependencies();
+  await getIt<FcmService>().initialize();
   // Eagerly resolve CartCubit so getIt<CartCubit>() is safe to call synchronously
   // from _CartButton.build() before the first frame renders.
   getIt<CartCubit>();

@@ -8,6 +8,7 @@ import { requirePasskeyVerification } from "@/lib/auth/require-passkey";
 import { notDeleted, withSoftDelete, withUpdate } from "@/lib/admin/audit-fields";
 import { nextProductPosition } from "@/lib/admin/product-position";
 import { revalidatePublicBookCaches } from "@/lib/cache/revalidate-public";
+import { sendMobileNotification } from "@/server/services/fcm.service";
 
 interface RouteParams { params: Promise<{ id: string }> }
 
@@ -82,6 +83,15 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     });
 
     revalidatePublicBookCaches();
+
+    if (shouldBoostPosition) {
+      sendMobileNotification({
+        title: updated.nameAr ?? updated.nameEn,
+        body: updated.shortDescAr ?? updated.shortDesc ?? '',
+        type: 'book',
+        slug: updated.slug,
+      }).catch((err) => console.error('[FCM book publish send failed]', err));
+    }
 
     return apiSuccess(updated);
   } catch (error) {
