@@ -8,9 +8,11 @@ import {
   parseSiteNotifications,
   SITE_NOTIFICATIONS_KEY,
 } from "@/lib/settings/site-notifications";
+import { isFirebaseConfigured } from "@/lib/firebase/admin";
+import { sendMobileNotification } from "@/server/services/fcm.service";
 
 const broadcastSchema = z.object({
-  channel: z.enum(["push", "whatsapp", "telegram", "email"]),
+  channel: z.enum(["push", "mobile", "whatsapp", "telegram", "email"]),
   title: z.string().min(1).max(200),
   body: z.string().min(1),
   url: z.string().url().optional().or(z.literal("")),
@@ -50,6 +52,30 @@ export async function POST(request: NextRequest) {
           status: "sent",
         })),
         skipDuplicates: true,
+      });
+    } else if (channel === "mobile") {
+      if (!siteNotif.mobile.enabled || !siteNotif.mobile.broadcastAllowed) {
+        return ApiErrors.forbidden("Mobile push notifications are disabled in site settings");
+      }
+      if (!isFirebaseConfigured()) {
+        return ApiErrors.internal("Firebase is not configured on the server");
+      }
+
+      const fcmResult = await sendMobileNotification({ title, body, url: url || undefined });
+      sent = fcmResult.successCount;
+
+      await db.notificationLog.create({
+        data: {
+          type: "FCM",
+          recipient: "mobile:broadcast",
+          subject: title,
+          body: url ? `${body}\n${url}` : body,
+          status: fcmResult.successCount > 0 ? "sent" : "failed",
+          errorMessage:
+            fcmResult.failureCount > 0
+              ? `${fcmResult.failureCount} delivery failures`
+              : null,
+        },
       });
     } else if (channel === "telegram") {
       if (!siteNotif.web.enabled) {
