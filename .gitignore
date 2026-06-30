@@ -1,0 +1,6 @@
+# Firebase service account keys — never commit
+*-firebase-adminsdk-*.json
+firebase-adminsdk*.json
+
+# macOS
+.DS_Store
