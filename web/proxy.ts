@@ -115,7 +115,7 @@ export default async function proxy(request: NextRequest) {
 
   if (ADMIN_PATTERN.test(pathname) && !ADMIN_LOGIN_PATTERN.test(pathname)) {
     if (!auth?.payload || !roleAllowed(auth.payload, ["ADMIN"])) {
-      return NextResponse.redirect(new URL(`/${locale}/admin/login`, request.url));
+      return NextResponse.redirect(new URL(`/ar/admin/login`, request.url));
     }
   }
 
