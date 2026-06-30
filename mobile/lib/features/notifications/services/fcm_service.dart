@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +27,14 @@ class FcmService {
 
   Future<void> initialize() async {
     FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
-    await FirebaseMessaging.instance.subscribeToTopic('new-books');
+
+    // Android: subscribe immediately (no APNS token required).
+    // iOS: getAPNSToken() blocks indefinitely before permission is granted and
+    // would freeze runApp(). Topic subscriptions persist across restarts, so
+    // subscribing once inside requestPermission() is sufficient for iOS.
+    if (!Platform.isIOS) {
+      await FirebaseMessaging.instance.subscribeToTopic('new-books');
+    }
 
     await _initLocalNotifications();
 
@@ -42,8 +51,19 @@ class FcmService {
       badge: true,
       sound: true,
     );
-    return settings.authorizationStatus == AuthorizationStatus.authorized ||
+    final granted = settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional;
+
+    // On iOS, subscribe to topics now that the APNS token is available
+    // (iOS only provides the token after permission is granted).
+    if (granted && Platform.isIOS) {
+      final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+      if (apnsToken != null) {
+        await FirebaseMessaging.instance.subscribeToTopic('new-books');
+      }
+    }
+
+    return granted;
   }
 
   /// Fetches, stores, and returns the FCM token. Returns null if unavailable.
