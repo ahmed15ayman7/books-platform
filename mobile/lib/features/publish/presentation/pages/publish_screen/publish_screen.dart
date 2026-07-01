@@ -14,7 +14,6 @@ import '../../cubit/publish_state.dart';
 import 'publish_author_step.dart';
 import 'publish_book_step.dart';
 import 'publish_navigation_section.dart';
-import 'publish_promo_section.dart';
 import 'publish_review_step.dart';
 import 'publish_step_indicator.dart';
 
@@ -130,9 +129,6 @@ class _PublishScreenState extends State<PublishScreen> {
             state is PublishSubmitting ||
             state is UploadingFile ||
             state is CheckingEligibility;
-        final isEligible = state is EligibilityLoaded
-            ? state.isEligibleForFree
-            : null;
 
         return Scaffold(
           backgroundColor: AppColors.surface,
@@ -171,8 +167,6 @@ class _PublishScreenState extends State<PublishScreen> {
                               bioCtrl: _bioCtrl,
                             ),
                           ),
-                        if (currentStep == 0 && isEligible != null)
-                          _EligibilityBadge(isEligibleForFree: isEligible),
                         if (currentStep == 1)
                           Form(
                             key: _bookFormKey,
@@ -199,8 +193,6 @@ class _PublishScreenState extends State<PublishScreen> {
                                 setState(() => _agreedToContentStandards = v),
                           ),
                         SizedBox(height: 16.h),
-                        const PublishPromoSection(),
-                        SizedBox(height: 18.h),
                         PublishNavigationSection(
                           step: currentStep,
                           totalSteps: _totalSteps,
@@ -226,53 +218,6 @@ class _PublishScreenState extends State<PublishScreen> {
   }
 }
 
-class _EligibilityBadge extends StatelessWidget {
-  const _EligibilityBadge({required this.isEligibleForFree});
-  final bool isEligibleForFree;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsetsDirectional.only(top: 8.h),
-      child: Container(
-        padding: EdgeInsetsDirectional.symmetric(
-          horizontal: 12.w,
-          vertical: 8.h,
-        ),
-        decoration: BoxDecoration(
-          color: isEligibleForFree
-              ? AppColors.success.withValues(alpha: 0.1)
-              : AppColors.warning.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8.r),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isEligibleForFree
-                  ? Icons.check_circle_outline
-                  : Icons.info_outline,
-              color: isEligibleForFree ? AppColors.success : AppColors.warning,
-              size: 16.sp,
-            ),
-            SizedBox(width: 6.w),
-            Text(
-              isEligibleForFree
-                  ? 'publish.eligibility_free'.tr()
-                  : 'publish.eligibility_paid'.tr(),
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: isEligibleForFree
-                    ? AppColors.success
-                    : AppColors.warning,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _SuccessScreen extends StatelessWidget {
   const _SuccessScreen({

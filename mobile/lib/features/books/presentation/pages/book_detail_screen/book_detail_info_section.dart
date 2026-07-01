@@ -52,15 +52,6 @@ class BookDetailInfoSection extends StatelessWidget {
                 ),
               ),
             ),
-            const Spacer(),
-            Text(
-              '\$${book.price.toStringAsFixed(2)}',
-              style: GoogleFonts.cairo(
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w800,
-                color: AppColors.primary,
-              ),
-            ),
           ],
         ),
         SizedBox(height: 16.h),

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
-import '../theme/app_colors.dart';
-import '../theme/app_text_styles.dart';
+import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_text_styles.dart';
 
-class TtsPlayerWidget extends StatefulWidget {
-  const TtsPlayerWidget({
+class ArticleTtsPlayerWidget extends StatefulWidget {
+  const ArticleTtsPlayerWidget({
     super.key,
     required this.text,
     required this.languageCode,
@@ -17,39 +17,33 @@ class TtsPlayerWidget extends StatefulWidget {
   final String languageCode;
 
   @override
-  State<TtsPlayerWidget> createState() => _TtsPlayerWidgetState();
+  State<ArticleTtsPlayerWidget> createState() => _ArticleTtsPlayerWidgetState();
 }
 
-class _TtsPlayerWidgetState extends State<TtsPlayerWidget> {
+class _ArticleTtsPlayerWidgetState extends State<ArticleTtsPlayerWidget> {
   late final FlutterTts _tts;
   late final String _cleanText;
   bool _isPlaying = false;
   bool _hasTtsError = false;
   double _speed = 1.0;
+  Map<String, String>? _cachedVoice;
 
   static const _speeds = [1.0, 1.25, 1.5, 2.0];
 
-  // flutter_tts normalizes rates so 0.5 = natural speed on both iOS and Android.
-  // (Android plugin multiplies the Flutter value by 2.0 internally.)
   static double _toTtsRate(double speed) => speed * 0.5;
 
   static String _stripMarkdown(String md) {
     return md
-        // Images must be removed entirely — keeping alt text reads "صورة" aloud
         .replaceAll(RegExp(r'!\[[^\]]*\]\([^)]*\)'), '')
-        // Keep display text of links, discard URL
         .replaceAllMapped(
             RegExp(r'\[([^\]]*)\]\([^)]*\)'), (m) => m.group(1) ?? '')
-        // Bold and italic — unwrap inner text
         .replaceAllMapped(
             RegExp(r'\*\*(.+?)\*\*', dotAll: true), (m) => m.group(1) ?? '')
         .replaceAllMapped(
             RegExp(r'\*(.+?)\*', dotAll: true), (m) => m.group(1) ?? '')
-        // Headings, code spans, blockquotes
         .replaceAll(RegExp(r'#{1,6}\s*'), '')
         .replaceAll(RegExp(r'`+'), '')
         .replaceAll(RegExp(r'^>\s*', multiLine: true), '')
-        // Trailing whitespace on lines and collapsed blank lines
         .replaceAll(RegExp(r'[ \t]+\n'), '\n')
         .replaceAll(RegExp(r'\n{3,}'), '\n\n')
         .trim();
@@ -76,37 +70,14 @@ class _TtsPlayerWidgetState extends State<TtsPlayerWidget> {
         });
       }
     });
+    // Pre-scan voices during init so _play() can use setVoice() directly,
+    // bypassing isLanguageAvailable() which misbehaves on some Android OEMs.
+    _cachedVoice = await _findVoiceForLang(widget.languageCode.split('-').first);
   }
 
-  Future<void> _play() async {
-    var result = await _tts.setLanguage(widget.languageCode);
-    var langOk = result == 1 || result == true;
-
-    if (!langOk && widget.languageCode.contains('-')) {
-      final bare = widget.languageCode.split('-').first;
-      result = await _tts.setLanguage(bare);
-      langOk = result == 1 || result == true;
-    }
-
-    // On some Android OEMs, isLanguageAvailable() returns LANG_NOT_SUPPORTED
-    // even when a matching voice IS installed, causing setLanguage to return 0.
-    // Scanning tts.voices directly and using setVoice() bypasses that check.
-    if (!langOk) {
-      langOk = await _trySetVoiceByLanguage(widget.languageCode.split('-').first);
-    }
-
-    if (!langOk) {
-      if (mounted) setState(() => _hasTtsError = true);
-      return;
-    }
-    await _tts.setSpeechRate(_toTtsRate(_speed));
-    await _tts.speak(_cleanText);
-    if (mounted) setState(() => _isPlaying = true);
-  }
-
-  Future<bool> _trySetVoiceByLanguage(String langCode) async {
+  Future<Map<String, String>?> _findVoiceForLang(String langCode) async {
     final dynamic raw = await _tts.getVoices;
-    if (raw is! List) return false;
+    if (raw is! List) return null;
 
     Map<String, String>? best;
     for (final item in raw) {
@@ -117,16 +88,54 @@ class _TtsPlayerWidgetState extends State<TtsPlayerWidget> {
         'name': item['name']?.toString() ?? '',
         'locale': locale,
       };
-      if (item['network_required']?.toString() == '0') {
-        best = voice;
-        break;
-      }
+      if (item['network_required']?.toString() == '0') return voice;
       best ??= voice;
     }
+    return best;
+  }
 
-    if (best == null || best['name']!.isEmpty) return false;
-    final setResult = await _tts.setVoice(best);
-    return setResult == 1 || setResult == true;
+  Future<void> _play() async {
+    // Use setVoice() as the primary path — bypasses isLanguageAvailable().
+    // The cached voice is found during initState, before the user taps play.
+    if (_cachedVoice != null && _cachedVoice!['name']!.isNotEmpty) {
+      final r = await _tts.setVoice(_cachedVoice!);
+      if (r == 1 || r == true) {
+        await _tts.setSpeechRate(_toTtsRate(_speed));
+        await _tts.speak(_cleanText);
+        if (mounted) setState(() => _isPlaying = true);
+        return;
+      }
+    }
+
+    // Fallback: re-scan voices on tap in case init ran too early.
+    final lateVoice =
+        await _findVoiceForLang(widget.languageCode.split('-').first);
+    if (lateVoice != null && lateVoice['name']!.isNotEmpty) {
+      final r = await _tts.setVoice(lateVoice);
+      if (r == 1 || r == true) {
+        await _tts.setSpeechRate(_toTtsRate(_speed));
+        await _tts.speak(_cleanText);
+        if (mounted) setState(() => _isPlaying = true);
+        return;
+      }
+    }
+
+    // Last resort: setLanguage chain.
+    var result = await _tts.setLanguage(widget.languageCode);
+    var langOk = result == 1 || result == true;
+    if (!langOk && widget.languageCode.contains('-')) {
+      result = await _tts.setLanguage(widget.languageCode.split('-').first);
+      langOk = result == 1 || result == true;
+    }
+
+    if (!langOk) {
+      if (mounted) setState(() => _hasTtsError = true);
+      return;
+    }
+
+    await _tts.setSpeechRate(_toTtsRate(_speed));
+    await _tts.speak(_cleanText);
+    if (mounted) setState(() => _isPlaying = true);
   }
 
   Future<void> _pause() async {
