@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/section_header_widget.dart';
 import '../../../domain/entities/article.dart';
-import '../../widgets/article_tts_player_widget.dart';
+import '../../../../../core/widgets/tts_player_widget.dart';
 import '../../../domain/entities/article_detail.dart';
 import 'article_detail_body_content.dart';
 import 'article_detail_byline.dart';
@@ -80,7 +80,7 @@ class ArticleDetailBody extends StatelessWidget {
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsetsDirectional.fromSTEB(16.w, 14.h, 16.w, 0),
-              child: ArticleTtsPlayerWidget(
+              child: TtsPlayerWidget(
                 text: article.bodyParagraphs.join('\n\n'),
                 languageCode: 'ar-SA',
               ),
