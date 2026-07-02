@@ -41,7 +41,12 @@ class FcmService {
     FirebaseMessaging.onMessage.listen(_showLocalNotification);
     FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);
 
-    final initial = await FirebaseMessaging.instance.getInitialMessage();
+    // Timeout guards against APNs registration delays on iOS. This runs after
+    // runApp() so the navigator is mounted by the time this resolves — cold-start
+    // deep links work correctly. Null on timeout means no notification to handle.
+    final initial = await FirebaseMessaging.instance
+        .getInitialMessage()
+        .timeout(const Duration(seconds: 5), onTimeout: () => null);
     if (initial != null) _handleNotificationTap(initial);
   }
 

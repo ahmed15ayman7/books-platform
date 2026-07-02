@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +23,6 @@ Future<void> main() async {
   await initializeDateFormatting('ar');
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await configureDependencies();
-  await getIt<FcmService>().initialize();
   // Eagerly resolve CartCubit so getIt<CartCubit>() is safe to call synchronously
   // from _CartButton.build() before the first frame renders.
   getIt<CartCubit>();
@@ -34,6 +35,12 @@ Future<void> main() async {
       child: const MyApp(),
     ),
   );
+
+  // Intentionally fire-and-forget after runApp(). On iOS, getInitialMessage()
+  // blocks until APNs token registration completes — awaiting it before runApp()
+  // causes a black screen. The navigator is mounted by the time getInitialMessage()
+  // resolves, so cold-start deep links still work correctly.
+  unawaited(getIt<FcmService>().initialize());
 }
 
 class MyApp extends StatelessWidget {
