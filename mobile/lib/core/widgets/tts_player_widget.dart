@@ -1,8 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
+import '../helpers/tts_text_chunker.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 
@@ -23,6 +25,8 @@ class TtsPlayerWidget extends StatefulWidget {
 class _TtsPlayerWidgetState extends State<TtsPlayerWidget> {
   late final FlutterTts _tts;
   late final String _cleanText;
+  List<String>? _chunks;
+  int _playSession = 0;
   bool _isPlaying = false;
   bool _hasTtsError = false;
   double _speed = 1.0;
@@ -65,9 +69,9 @@ class _TtsPlayerWidgetState extends State<TtsPlayerWidget> {
 
   Future<void> _initTts() async {
     await _tts.setSpeechRate(_toTtsRate(1.0));
-    _tts.setCompletionHandler(() {
-      if (mounted) setState(() => _isPlaying = false);
-    });
+    // Playback state is owned by the chunk loop in _play(); speak() futures
+    // resolve on utterance completion, so no completion handler is needed.
+    await _tts.awaitSpeakCompletion(true);
     _tts.setErrorHandler((_) {
       if (mounted) {
         setState(() {
@@ -100,8 +104,28 @@ class _TtsPlayerWidgetState extends State<TtsPlayerWidget> {
       return;
     }
     await _tts.setSpeechRate(_toTtsRate(_speed));
-    await _tts.speak(_cleanText);
+
+    _chunks ??= await _buildChunks();
+    final session = ++_playSession;
     if (mounted) setState(() => _isPlaying = true);
+    for (final chunk in _chunks!) {
+      if (!mounted || _playSession != session || _hasTtsError) return;
+      final result = await _tts.speak(chunk);
+      // 0 = stopped/paused/engine error — abandon the rest of the queue.
+      if (result != 1) break;
+    }
+    if (mounted && _playSession == session) {
+      setState(() => _isPlaying = false);
+    }
+  }
+
+  // Android caps each speak() call at TextToSpeech.getMaxSpeechInputLength()
+  // (typically 4000 chars); longer text fails and looks like a missing voice.
+  // iOS has no limit and doesn't implement the lookup, so it stays unchunked.
+  Future<List<String>> _buildChunks() async {
+    if (defaultTargetPlatform != TargetPlatform.android) return [_cleanText];
+    final maxLength = ((await _tts.getMaxSpeechInputLength) ?? 4000) - 100;
+    return TtsTextChunker.split(_cleanText, maxLength > 0 ? maxLength : 3900);
   }
 
   Future<bool> _trySetVoiceByLanguage(String langCode) async {
@@ -130,11 +154,13 @@ class _TtsPlayerWidgetState extends State<TtsPlayerWidget> {
   }
 
   Future<void> _pause() async {
+    _playSession++;
     await _tts.stop();
     if (mounted) setState(() => _isPlaying = false);
   }
 
   Future<void> _stop() async {
+    _playSession++;
     await _tts.stop();
     if (mounted) setState(() => _isPlaying = false);
   }
