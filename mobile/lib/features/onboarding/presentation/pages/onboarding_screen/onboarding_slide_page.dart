@@ -23,8 +23,8 @@ class OnboardingSlide {
 
 const kOnboardingSlides = [
   OnboardingSlide(
-    titleAr: 'نافذة العالم على الكتب',
-    titleEn: "The World's Window on Books",
+    titleAr: 'نافذة عربية على كتب العالم',
+    titleEn: "An Arabic window onto the world's books",
     subAr:
         'اكتشف كل كتاب مهم يصدر حول العالم، مصنّفاً في ثمانية حقول معرفية ومقدَّماً للقارئ العربي.',
     subEn:
@@ -36,9 +36,9 @@ const kOnboardingSlides = [
     titleAr: 'تابِع رحلة الترجمة',
     titleEn: 'Follow the Translation Journey',
     subAr:
-        'اعرف ما تُرجم وما هو مرشّح للترجمة، وافتح نافذة معرفية على أفكار وعلوم العالم بلغتك.',
+        'اعرف ما تُرجم وما هو مرشّح للترجمة، وافتح نافذة عربية على أفكار وعلوم العالم.',
     subEn:
-        "See what's translated and what's nominated — a window onto the world's ideas, in your language.",
+        "See what's translated and what's nominated — an Arabic window onto the world's ideas.",
     accentColor: Color(0xFF46467F),
     imagePath: 'assets/onboarding/onboard-translate.png',
   ),

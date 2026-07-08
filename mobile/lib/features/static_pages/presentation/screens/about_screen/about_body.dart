@@ -15,8 +15,8 @@ import '../../helpers/bilingual_helper.dart';
 
 const _pageTitle = (ar: 'من نحن', en: 'About Us');
 const _heroSubtitle = (
-  ar: 'منصة الكتب العالمية | نافذة معرفية على ثقافات العالم',
-  en: 'Books Platform | A knowledge window onto the world\'s cultures',
+  ar: 'منصة الكتب العالمية | نافذة عربية على ثقافات العالم',
+  en: 'Books Platform | An Arabic window onto the world\'s cultures',
 );
 const _introTitle = (ar: 'تقديم', en: 'Introduction');
 const _intro = [
