@@ -17,8 +17,8 @@ function stripMarkdown(md: string): string {
   return md
     .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
     .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
-    .replace(/\*\*(.+?)\*\*/gs, "$1")
-    .replace(/\*(.+?)\*/gs, "$1")
+    .replace(/\*\*([\s\S]+?)\*\*/g, "$1")
+    .replace(/\*([\s\S]+?)\*/g, "$1")
     .replace(/#{1,6}\s*/g, "")
     .replace(/`+/g, "")
     .replace(/^>\s*/gm, "")
