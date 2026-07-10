@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ExternalLink, Heart, ShoppingCart, Star } from "lucide-react";
 import { BookDetailCover } from "@/components/sections/book-detail-cover";
+import { BookTtsButton } from "@/components/sections/book-tts-button";
 import { EntityShareButton } from "@/components/share/entity-share-button";
 import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ interface BookDetailHeroProps {
   alternateName: string | null;
   imageUrl: string | null;
   summaryMarkdown: string | null;
+  ttsText: string | null;
   leadText: string | null;
   categories: Category[];
   translationStatusVariant: string;
@@ -46,6 +48,7 @@ export function BookDetailHero({
   alternateName,
   imageUrl,
   summaryMarkdown,
+  ttsText,
   leadText,
   categories,
   translationStatusVariant,
@@ -138,6 +141,13 @@ export function BookDetailHero({
         width={BOOK_DETAIL_COVER_WIDTH}
         height={BOOK_DETAIL_COVER_HEIGHT}
       />
+
+      {ttsText && (
+        <BookTtsButton
+          text={ttsText}
+          lang={isAr ? "ar-SA" : "en-US"}
+        />
+      )}
 
       <div className="flex flex-col gap-2">
         {purchaseOption === "DIRECT" && price != null && (
