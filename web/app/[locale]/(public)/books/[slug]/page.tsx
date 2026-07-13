@@ -157,6 +157,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             alternateName={alternateName}
             imageUrl={book.imageUrl}
             summaryMarkdown={description}
+            ttsText={description ? `${displayName}. ${description}` : displayName}
             leadText={leadText}
             categories={book.categories}
             translationStatusVariant={translationStatusVariant}
