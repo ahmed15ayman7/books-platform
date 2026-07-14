@@ -6,6 +6,7 @@ import { nextProductPosition } from "@/lib/admin/product-position";
 import { revalidatePublicBookCaches } from "@/lib/cache/revalidate-public";
 import { slugify } from "@/lib/admin/slugify";
 import { revalidatePath } from "next/cache";
+import { sendMobileNotification } from "@/server/services/fcm.service";
 
 export interface BookEditData {
   nameEn: string;
@@ -113,6 +114,19 @@ export async function updateBook(id: string, data: BookEditData): Promise<BookAc
 
     revalidatePublicBookCaches();
     revalidatePath(`/`, "layout");
+
+    if (shouldBoostPosition) {
+      console.log('[FCM DEBUG] updateBook — shouldBoostPosition=true, calling sendMobileNotification', { bookId: id, slug });
+      sendMobileNotification({
+        title: data.nameAr || nameEn,
+        body: data.shortDescAr || data.shortDesc || '',
+        type: 'book',
+        slug,
+      })
+        .then((result) => console.log('[FCM DEBUG] updateBook — sendMobileNotification resolved', result))
+        .catch((err) => console.error('[FCM book publish send failed]', err));
+    }
+
     return { ok: true, id, slug };
   } catch (err) {
     console.error("[updateBook]", err);
@@ -184,6 +198,21 @@ export async function createBook(data: BookEditData): Promise<BookActionResult> 
 
     revalidatePublicBookCaches();
     revalidatePath(`/`, "layout");
+
+    if (book.published) {
+      console.log('[FCM DEBUG] createBook — published=true, calling sendMobileNotification', { bookId: book.id, slug: book.slug });
+      sendMobileNotification({
+        title: book.nameAr ?? book.nameEn,
+        body: book.shortDescAr ?? book.shortDesc ?? '',
+        type: 'book',
+        slug: book.slug,
+      })
+        .then((result) => console.log('[FCM DEBUG] createBook — sendMobileNotification resolved', result))
+        .catch((err) => console.error('[FCM book create send failed]', err));
+    } else {
+      console.log('[FCM DEBUG] createBook — published=false, skipping notification', { bookId: book.id });
+    }
+
     return { ok: true, id: book.id, slug: book.slug };
   } catch (err) {
     console.error("[createBook]", err);

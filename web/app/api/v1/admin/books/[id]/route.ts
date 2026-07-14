@@ -85,12 +85,15 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     revalidatePublicBookCaches();
 
     if (shouldBoostPosition) {
+      console.log('[FCM DEBUG] book update — shouldBoostPosition=true, calling sendMobileNotification', { bookId: updated.id, slug: updated.slug });
       sendMobileNotification({
         title: updated.nameAr ?? updated.nameEn,
         body: updated.shortDescAr ?? updated.shortDesc ?? '',
         type: 'book',
         slug: updated.slug,
-      }).catch((err) => console.error('[FCM book publish send failed]', err));
+      })
+        .then((result) => console.log('[FCM DEBUG] book update — sendMobileNotification resolved', result))
+        .catch((err) => console.error('[FCM book publish send failed]', err));
     }
 
     return apiSuccess(updated);

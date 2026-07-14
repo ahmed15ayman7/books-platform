@@ -85,14 +85,14 @@ class FcmService {
       // onTokenRefresh event instead of polling — a timeout guards against
       // APNs never completing.
       if (!Platform.isIOS || e.code != 'apns-token-not-set') rethrow;
-      debugPrint('>>> [FCM DEBUG] falling back to onTokenRefresh.first (10s timeout)');
+      debugPrint('>>> [FCM DEBUG] falling back to onTokenRefresh.first (25s timeout)');
       try {
         token = await FirebaseMessaging.instance.onTokenRefresh
             .first
-            .timeout(const Duration(seconds: 10));
+            .timeout(const Duration(seconds: 25));
         debugPrint('>>> [FCM DEBUG] onTokenRefresh fallback succeeded');
       } on TimeoutException {
-        debugPrint('>>> [FCM DEBUG] onTokenRefresh fallback TIMED OUT after 10s');
+        debugPrint('>>> [FCM DEBUG] onTokenRefresh fallback TIMED OUT after 25s');
         token = null;
       }
     }
@@ -115,6 +115,19 @@ class FcmService {
     await _localNotifications.initialize(
       const InitializationSettings(android: androidInit, iOS: iosInit),
     );
+
+    // Must be created proactively, not lazily on first show(): FCM background/killed
+    // notifications are auto-displayed by the OS on this channel id, and Android 8+
+    // silently drops them if the channel doesn't already exist on the device.
+    const channel = AndroidNotificationChannel(
+      'books_platform_channel',
+      'Books Platform',
+      importance: Importance.high,
+    );
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
   }
 
   void _showLocalNotification(RemoteMessage msg) {
