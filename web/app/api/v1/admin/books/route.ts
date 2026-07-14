@@ -123,12 +123,17 @@ export async function POST(request: NextRequest) {
     revalidatePublicBookCaches();
 
     if (book.published) {
+      console.log('[FCM DEBUG] book create — published=true, calling sendMobileNotification', { bookId: book.id, slug: book.slug });
       sendMobileNotification({
         title: book.nameAr ?? book.nameEn,
         body: book.shortDescAr ?? book.shortDesc ?? '',
         type: 'book',
         slug: book.slug,
-      }).catch((err) => console.error('[FCM book create send failed]', err));
+      })
+        .then((result) => console.log('[FCM DEBUG] book create — sendMobileNotification resolved', result))
+        .catch((err) => console.error('[FCM book create send failed]', err));
+    } else {
+      console.log('[FCM DEBUG] book create — published=false, skipping notification', { bookId: book.id });
     }
 
     return apiCreated(book);

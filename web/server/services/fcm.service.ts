@@ -27,7 +27,10 @@ export async function sendMobileNotification(
     select: { id: true, token: true },
   });
 
+  console.log('[FCM DEBUG] sendMobileNotification — token lookup', { where, foundTokens: records.length });
+
   if (records.length === 0) {
+    console.log('[FCM DEBUG] sendMobileNotification — no active tokens matched, nothing sent');
     return { successCount: 0, failureCount: 0, invalidTokens: [], totalTargets: 0 };
   }
 
@@ -36,11 +39,14 @@ export async function sendMobileNotification(
     payload,
   );
 
+  console.log('[FCM DEBUG] sendMobileNotification — sendFcmToTokens result', result);
+
   if (result.invalidTokens.length > 0) {
     await db.fcmToken.updateMany({
       where: { token: { in: result.invalidTokens } },
       data: { isActive: false },
     });
+    console.log('[FCM DEBUG] sendMobileNotification — deactivated invalid tokens', result.invalidTokens);
   }
 
   return { ...result, totalTargets: records.length };
