@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,6 +28,7 @@ class NotificationSettingsCubit extends Cubit<NotificationSettingsState> {
   }
 
   Future<void> togglePush(bool enabled, {String locale = 'ar'}) async {
+    debugPrint('>>> [FCM DEBUG] togglePush called with enabled=$enabled');
     emit(const NotificationSettingsUpdating());
     if (!enabled) {
       await _prefs.setBool(kNotifOptInKey, false);
@@ -35,6 +37,7 @@ class NotificationSettingsCubit extends Cubit<NotificationSettingsState> {
     }
 
     final granted = await _fcmService.requestPermission();
+    debugPrint('>>> [FCM DEBUG] requestPermission granted=$granted');
     if (!granted) {
       await _prefs.setBool(kNotifOptInKey, false);
       emit(const NotificationSettingsLoaded(pushEnabled: false));
@@ -47,14 +50,20 @@ class NotificationSettingsCubit extends Cubit<NotificationSettingsState> {
     await _prefs.setBool(kNotifOptInKey, true);
     emit(const NotificationSettingsLoaded(pushEnabled: true));
 
+    debugPrint('>>> [FCM DEBUG] calling getToken()...');
     final token = await _fcmService.getToken();
+    debugPrint('>>> [FCM DEBUG] getToken() returned: ${token == null ? 'null' : '${token.substring(0, 12)}...'}');
     if (token != null) {
       final result = await _repository.registerFcmToken(token, locale);
       result.fold(
-        (failure) =>
-            emit(NotificationSettingsError(core.failureToMessage(failure))),
-        (_) {},
+        (failure) {
+          debugPrint('>>> [FCM DEBUG] registerFcmToken FAILED: ${core.failureToMessage(failure)}');
+          emit(NotificationSettingsError(core.failureToMessage(failure)));
+        },
+        (_) => debugPrint('>>> [FCM DEBUG] registerFcmToken SUCCESS'),
       );
+    } else {
+      debugPrint('>>> [FCM DEBUG] token was null — registerFcmToken NOT called');
     }
   }
 }

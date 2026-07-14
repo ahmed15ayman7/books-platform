@@ -77,17 +77,22 @@ class FcmService {
     String? token;
     try {
       token = await FirebaseMessaging.instance.getToken();
+      debugPrint('>>> [FCM DEBUG] getToken() succeeded directly: ${token == null ? 'null' : 'non-null'}');
     } on FirebaseException catch (e) {
+      debugPrint('>>> [FCM DEBUG] getToken() threw FirebaseException code=${e.code} message=${e.message}');
       // On iOS, getToken() can be called before Apple's async APNs
       // device-token registration finishes. Fall back to the next
       // onTokenRefresh event instead of polling — a timeout guards against
       // APNs never completing.
       if (!Platform.isIOS || e.code != 'apns-token-not-set') rethrow;
+      debugPrint('>>> [FCM DEBUG] falling back to onTokenRefresh.first (10s timeout)');
       try {
         token = await FirebaseMessaging.instance.onTokenRefresh
             .first
             .timeout(const Duration(seconds: 10));
+        debugPrint('>>> [FCM DEBUG] onTokenRefresh fallback succeeded');
       } on TimeoutException {
+        debugPrint('>>> [FCM DEBUG] onTokenRefresh fallback TIMED OUT after 10s');
         token = null;
       }
     }
