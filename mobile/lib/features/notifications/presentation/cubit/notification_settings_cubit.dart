@@ -28,24 +28,33 @@ class NotificationSettingsCubit extends Cubit<NotificationSettingsState> {
 
   Future<void> togglePush(bool enabled, {String locale = 'ar'}) async {
     emit(const NotificationSettingsUpdating());
-    if (enabled) {
-      final granted = await _fcmService.requestPermission();
-      if (!granted) {
-        await _prefs.setBool(kNotifOptInKey, false);
-        emit(const NotificationSettingsLoaded(pushEnabled: false));
-        return;
-      }
-      final token = await _fcmService.getToken();
-      if (token != null) {
-        final result = await _repository.registerFcmToken(token, locale);
-        result.fold(
-          (failure) =>
-              emit(NotificationSettingsError(core.failureToMessage(failure))),
-          (_) {},
-        );
-      }
+    if (!enabled) {
+      await _prefs.setBool(kNotifOptInKey, false);
+      emit(const NotificationSettingsLoaded(pushEnabled: false));
+      return;
     }
-    await _prefs.setBool(kNotifOptInKey, enabled);
-    emit(NotificationSettingsLoaded(pushEnabled: enabled));
+
+    final granted = await _fcmService.requestPermission();
+    if (!granted) {
+      await _prefs.setBool(kNotifOptInKey, false);
+      emit(const NotificationSettingsLoaded(pushEnabled: false));
+      return;
+    }
+
+    // Persist opt-in as soon as OS permission is confirmed, decoupled from
+    // token registration latency — the toggle reflects user consent, not
+    // whether the backend call has finished yet.
+    await _prefs.setBool(kNotifOptInKey, true);
+    emit(const NotificationSettingsLoaded(pushEnabled: true));
+
+    final token = await _fcmService.getToken();
+    if (token != null) {
+      final result = await _repository.registerFcmToken(token, locale);
+      result.fold(
+        (failure) =>
+            emit(NotificationSettingsError(core.failureToMessage(failure))),
+        (_) {},
+      );
+    }
   }
 }

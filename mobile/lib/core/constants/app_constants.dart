@@ -25,6 +25,7 @@ const String kOnboardingDoneKey = 'onboarding_done';
 
 // Storage keys (features)
 const String kNotifOptInKey = 'notif_opt_in';
+const String kNotifPermissionRequestedKey = 'notif_permission_requested';
 const String kWishlistKey = 'wishlist_slugs';
 const String kCartKey = 'cart_items';
 const String kSearchHistoryKey = 'search_history';

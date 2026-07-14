@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -73,7 +74,23 @@ class FcmService {
 
   /// Fetches, stores, and returns the FCM token. Returns null if unavailable.
   Future<String?> getToken() async {
-    final token = await FirebaseMessaging.instance.getToken();
+    String? token;
+    try {
+      token = await FirebaseMessaging.instance.getToken();
+    } on FirebaseException catch (e) {
+      // On iOS, getToken() can be called before Apple's async APNs
+      // device-token registration finishes. Fall back to the next
+      // onTokenRefresh event instead of polling — a timeout guards against
+      // APNs never completing.
+      if (!Platform.isIOS || e.code != 'apns-token-not-set') rethrow;
+      try {
+        token = await FirebaseMessaging.instance.onTokenRefresh
+            .first
+            .timeout(const Duration(seconds: 10));
+      } on TimeoutException {
+        token = null;
+      }
+    }
     if (token == null) return null;
     // Token stored securely — never logged
     await _secureStorage.saveString('fcm_token', token);
@@ -82,7 +99,14 @@ class FcmService {
 
   Future<void> _initLocalNotifications() async {
     const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const iosInit = DarwinInitializationSettings();
+    // Permission requests are never delegated to this plugin — it only
+    // displays notifications. The OS permission dialog is requested
+    // exclusively via requestPermission() below, at an intentional moment.
+    const iosInit = DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
+    );
     await _localNotifications.initialize(
       const InitializationSettings(android: androidInit, iOS: iosInit),
     );
