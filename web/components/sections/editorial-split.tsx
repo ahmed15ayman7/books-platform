@@ -48,6 +48,8 @@ export function EditorialSplit({
         </div>
       </BlurIn>
       <SlideIn from={imageFirst ? "end" : "start"} className={cn(!imageFirst && "lg:order-1")}>
+       <div className="rounded-xl border border-[var(--brand-red-soft)] bg-gradient-to-br from-[var(--brand-red-soft)]/40 to-white px-5 py-6 md:px-7 md:py-8">
+
         <div className="space-y-4">
           {lead && (
             <FadeIn>
@@ -56,6 +58,7 @@ export function EditorialSplit({
           )}
           {children}
         </div>
+          </div>
       </SlideIn>
     </div>
   );
