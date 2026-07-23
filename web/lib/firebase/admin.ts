@@ -14,6 +14,11 @@ export function getFirebaseAdmin(): App | null {
   const privateKey = process.env["FIREBASE_PRIVATE_KEY"]?.replace(/\\n/g, "\n");
 
   if (!projectId || !clientEmail || !privateKey) {
+    console.error("[FCM DEBUG] getFirebaseAdmin — missing env vars", {
+      hasProjectId: !!projectId,
+      hasClientEmail: !!clientEmail,
+      hasPrivateKey: !!privateKey,
+    });
     return null;
   }
 
