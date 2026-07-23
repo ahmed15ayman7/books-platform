@@ -97,22 +97,45 @@ When a feature needs a **local data source** (offline cache, Hive, SQLite), intr
 abstract contract and split into two implementations:
 ```
 datasources/
-├── base_<feature>_data_source.dart              # abstract contract
-├── <feature>_remote_data_source_impl.dart       # @Named('remote') @lazySingleton
+├── base_<feature>_data_source.dart              # abstract contract, read operations only
+├── <feature>_remote_data_source_impl.dart       # @Named('remote') @LazySingleton(as: Base<Feature>DataSource)
 └── <feature>_local_data_source_impl.dart        # @Named('local')  @lazySingleton
 ```
 
-The repository impl then holds both and decides which to call:
+The remote impl must bind **as** the abstract contract — plain `@lazySingleton` only
+registers it under its own concrete type, and the repository's `Base<Feature>DataSource`-typed
+constructor parameter can't resolve it (`build_runner` fails with "depends on unregistered
+type"). `@LazySingleton(as: Base<Feature>DataSource)` is what actually satisfies that.
+
+The abstract contract covers **read** operations only — whatever the repository needs to
+be able to serve from either source. The local impl also exposes its own `save*` methods to
+populate the cache after a successful remote fetch; those have no remote equivalent, so they
+live only on the concrete local class, never on the shared interface.
+
+The repository impl holds `_remote` typed against the abstraction (swappable, no extra
+methods) and `_local` typed against its **concrete** class (so it can call the save methods):
 ```dart
 @LazySingleton(as: BookRepository)
 class BookRepositoryImpl implements BookRepository {
-  final BaseBookDataSource _remote;
-  final BaseBookDataSource _local;
+  final BaseBookDataSource _remote;        // abstract — read-only contract
+  final BookLocalDataSourceImpl _local;    // concrete — exposes save* too
 
   BookRepositoryImpl(
     @Named('remote') this._remote,
     @Named('local') this._local,
   );
+
+  @override
+  Future<Either<Failure, Book>> getBook(String id) async {
+    final result = await _remote.getBook(id);
+    return result.fold(
+      (_) => _local.getBook(id),
+      (book) async {
+        await _local.saveBook(book);
+        return right(book);
+      },
+    );
+  }
 }
 ```
 

@@ -90,7 +90,7 @@ features/<feature>/
     └── widgets/       # only when shared across 2+ screens within the feature
 ```
 
-**Local data source:** add one only when the feature needs offline cache or local persistence. When you do, introduce an abstract `base_<feature>_data_source.dart` contract, create both `*_remote_data_source_impl.dart` (`@Named('remote') @lazySingleton`) and `*_local_data_source_impl.dart` (`@Named('local') @lazySingleton`), then inject both into the repository impl using `@Named('remote')` and `@Named('local')` constructor parameters. Do not create the abstract contract until the local source actually exists.
+**Local data source:** add one only when the feature needs offline cache or local persistence. When you do, introduce an abstract `base_<feature>_data_source.dart` contract covering read operations only, create `*_remote_data_source_impl.dart` (`@Named('remote') @LazySingleton(as: Base<Feature>DataSource)` — must bind *as* the interface, plain `@lazySingleton` leaves the repository's abstract-typed parameter unresolvable) and `*_local_data_source_impl.dart` (`@Named('local') @lazySingleton`, plus its own `save*` write methods that have no remote equivalent). Inject both into the repository impl via `@Named('remote')`/`@Named('local')` constructor parameters — type `_remote` against the abstraction, `_local` against its concrete class so the repo can call the save methods. Do not create the abstract contract until the local source actually exists.
 
 ---
 
