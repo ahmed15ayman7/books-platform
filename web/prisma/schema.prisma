@@ -198,6 +198,7 @@ model Product {
   translationStatus   String           @default("NOT_TRANSLATED") @map("translation_status")
   purchaseOption      String           @default("NOT_AVAILABLE") @map("purchase_option")
   referralLink        String?          @map("referral_link")
+  downloadUrl         String?          @map("download_url")
   catalogVisibility   String?          @map("catalog_visibility")
   shortDesc           String?          @map("short_desc") @db.Text
   shortDescAr         String?          @map("short_desc_ar") @db.Text

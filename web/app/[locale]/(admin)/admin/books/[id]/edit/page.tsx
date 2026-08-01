@@ -113,6 +113,7 @@ export default async function BookEditPage({ params }: Props) {
             price: book.price?.toString() ?? "",
             currency: book.currency ?? "USD",
             referralLink: book.referralLink ?? "",
+            downloadUrl: book.downloadUrl ?? "",
             shortDesc: book.shortDesc ?? "",
             shortDescAr: book.shortDescAr ?? "",
             description: book.description ?? "",

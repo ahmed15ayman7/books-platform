@@ -158,6 +158,8 @@ export default async function BookDetailPage({ params }: BookPageProps) {
             imageUrl={book.imageUrl}
             summaryMarkdown={description}
             ttsText={description ? `${displayName}. ${description}` : displayName}
+            downloadUrl={book.downloadUrl}
+            downloadLabel={locale === "ar" ? "تحميل مجاني" : "Free Download"}
             leadText={leadText}
             categories={book.categories}
             translationStatusVariant={translationStatusVariant}

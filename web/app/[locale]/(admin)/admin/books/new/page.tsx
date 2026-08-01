@@ -28,6 +28,7 @@ const emptyBook: BookEditData = {
   price: "",
   currency: "USD",
   referralLink: "",
+  downloadUrl: "",
   shortDesc: "",
   shortDescAr: "",
   description: "",

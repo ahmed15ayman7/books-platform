@@ -604,6 +604,12 @@ export function BookEditForm({
           <Input id="referralLink" type="url" className={fieldCls} value={form.referralLink} onChange={(e) => set("referralLink", e.target.value)} placeholder="https://..." dir="ltr" />
         </Field>
 
+        <Field className="sm:col-span-2">
+          <FieldLabel htmlFor="downloadUrl">رابط التحميل المجاني</FieldLabel>
+          <Input id="downloadUrl" type="url" className={fieldCls} value={form.downloadUrl} onChange={(e) => set("downloadUrl", e.target.value)} placeholder="https://..." dir="ltr" />
+          <p className="mt-1 text-[11px] text-[var(--admin-text-subtle)]">إذا أُضيف هذا الرابط ظهر زر «تحميل مجاني» في صفحة الكتاب</p>
+        </Field>
+
         {/* Checkboxes row */}
         <div className="sm:col-span-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <CheckboxField id="published" label="منشور" checked={form.published} onChange={(v) => set("published", v)} />

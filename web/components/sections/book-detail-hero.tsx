@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink, Heart, ShoppingCart, Star } from "lucide-react";
+import { Download, ExternalLink, Heart, ShoppingCart, Star } from "lucide-react";
 import { BookDetailCover } from "@/components/sections/book-detail-cover";
 import { BookTtsButton } from "@/components/sections/book-tts-button";
 import { EntityShareButton } from "@/components/share/entity-share-button";
@@ -40,6 +40,8 @@ interface BookDetailHeroProps {
   addToWishlistLabel: string;
   shareLabel: string;
   publicUrl: string;
+  downloadUrl?: string | null;
+  downloadLabel?: string;
 }
 
 export function BookDetailHero({
@@ -63,6 +65,8 @@ export function BookDetailHero({
   addToWishlistLabel,
   shareLabel,
   publicUrl,
+  downloadUrl,
+  downloadLabel,
 }: BookDetailHeroProps) {
   const isAr = locale === "ar";
 
@@ -150,6 +154,14 @@ export function BookDetailHero({
       )}
 
       <div className="flex flex-col gap-2">
+        {downloadUrl && (
+          <Button asChild size="lg" className="w-full bg-[var(--brand-red)] hover:bg-[var(--brand-red)]/90">
+            <a href={downloadUrl} target="_blank" rel="noopener noreferrer" download>
+              <Download className="h-4 w-4" aria-hidden="true" />
+              {downloadLabel ?? (isAr ? "تحميل مجاني" : "Free Download")}
+            </a>
+          </Button>
+        )}
         {purchaseOption === "DIRECT" && price != null && (
           <Button size="lg" className="w-full">
             <ShoppingCart className="h-4 w-4" aria-hidden="true" />

@@ -26,6 +26,7 @@ export interface BookEditData {
   price: string;
   currency: string;
   referralLink: string;
+  downloadUrl: string;
   shortDesc: string;
   shortDescAr: string;
   description: string;
