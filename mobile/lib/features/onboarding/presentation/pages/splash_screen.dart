@@ -5,8 +5,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/di/injection_container.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../notifications/presentation/cubit/notification_settings_cubit.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -41,6 +43,17 @@ class _SplashScreenState extends State<SplashScreen>
     Navigator.of(context).pushReplacementNamed(
       done ? AppRoutes.home : AppRoutes.language,
     );
+    _requestNotificationPermissionOnce(prefs);
+  }
+
+  // Fires once ever, right after the first navigation away from splash, so
+  // the OS asks for notification permission at a consistent, intentional
+  // moment on both platforms instead of iOS asking early (fcm_service.dart)
+  // or Android never asking at all.
+  void _requestNotificationPermissionOnce(SharedPreferences prefs) {
+    if (prefs.getBool(kNotifPermissionRequestedKey) ?? false) return;
+    unawaited(prefs.setBool(kNotifPermissionRequestedKey, true));
+    unawaited(getIt<NotificationSettingsCubit>().togglePush(true));
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -56,6 +57,7 @@ class FcmService {
       badge: true,
       sound: true,
     );
+    debugPrint('>>> [FCM DEBUG] requestPermission authorizationStatus=${settings.authorizationStatus}');
     final granted = settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional;
 
@@ -63,8 +65,11 @@ class FcmService {
     // (iOS only provides the token after permission is granted).
     if (granted && Platform.isIOS) {
       final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+      debugPrint('>>> [FCM DEBUG] getAPNSToken() right after permission grant: ${apnsToken == null ? 'null' : 'non-null'}');
       if (apnsToken != null) {
         await FirebaseMessaging.instance.subscribeToTopic('new-books');
+      } else {
+        debugPrint('>>> [FCM DEBUG] skipping subscribeToTopic — APNS token not yet available (not retried elsewhere)');
       }
     }
 
@@ -73,7 +78,28 @@ class FcmService {
 
   /// Fetches, stores, and returns the FCM token. Returns null if unavailable.
   Future<String?> getToken() async {
-    final token = await FirebaseMessaging.instance.getToken();
+    String? token;
+    try {
+      token = await FirebaseMessaging.instance.getToken();
+      debugPrint('>>> [FCM DEBUG] getToken() succeeded directly: ${token == null ? 'null' : 'non-null'}');
+    } on FirebaseException catch (e) {
+      debugPrint('>>> [FCM DEBUG] getToken() threw FirebaseException code=${e.code} message=${e.message}');
+      // On iOS, getToken() can be called before Apple's async APNs
+      // device-token registration finishes. Fall back to the next
+      // onTokenRefresh event instead of polling — a timeout guards against
+      // APNs never completing.
+      if (!Platform.isIOS || e.code != 'apns-token-not-set') rethrow;
+      debugPrint('>>> [FCM DEBUG] falling back to onTokenRefresh.first (25s timeout)');
+      try {
+        token = await FirebaseMessaging.instance.onTokenRefresh
+            .first
+            .timeout(const Duration(seconds: 25));
+        debugPrint('>>> [FCM DEBUG] onTokenRefresh fallback succeeded');
+      } on TimeoutException {
+        debugPrint('>>> [FCM DEBUG] onTokenRefresh fallback TIMED OUT after 25s');
+        token = null;
+      }
+    }
     if (token == null) return null;
     // Token stored securely — never logged
     await _secureStorage.saveString('fcm_token', token);
@@ -82,10 +108,30 @@ class FcmService {
 
   Future<void> _initLocalNotifications() async {
     const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const iosInit = DarwinInitializationSettings();
+    // Permission requests are never delegated to this plugin — it only
+    // displays notifications. The OS permission dialog is requested
+    // exclusively via requestPermission() below, at an intentional moment.
+    const iosInit = DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
+    );
     await _localNotifications.initialize(
       const InitializationSettings(android: androidInit, iOS: iosInit),
     );
+
+    // Must be created proactively, not lazily on first show(): FCM background/killed
+    // notifications are auto-displayed by the OS on this channel id, and Android 8+
+    // silently drops them if the channel doesn't already exist on the device.
+    const channel = AndroidNotificationChannel(
+      'books_platform_channel',
+      'Books Platform',
+      importance: Importance.high,
+    );
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
   }
 
   void _showLocalNotification(RemoteMessage msg) {

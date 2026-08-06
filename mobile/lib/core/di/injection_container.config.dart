@@ -81,6 +81,10 @@ import 'package:booksplatform/features/publish/presentation/cubit/publish_cubit.
     as _i557;
 import 'package:booksplatform/features/publish/services/file_upload_service.dart'
     as _i171;
+import 'package:booksplatform/features/publishers/data/datasources/base_publishers_data_source.dart'
+    as _i141;
+import 'package:booksplatform/features/publishers/data/datasources/publishers_local_data_source_impl.dart'
+    as _i844;
 import 'package:booksplatform/features/publishers/data/datasources/publishers_remote_data_source_impl.dart'
     as _i365;
 import 'package:booksplatform/features/publishers/data/repositories/publishers_repository_impl.dart'
@@ -160,6 +164,10 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i409.GlobalKey<_i409.NavigatorState>>(),
       ),
     );
+    gh.lazySingleton<_i844.PublishersLocalDataSourceImpl>(
+      () => _i844.PublishersLocalDataSourceImpl(gh<_i460.SharedPreferences>()),
+      instanceName: 'local',
+    );
     gh.lazySingleton<_i498.CartStorage>(
       () => _i498.CartStorage(gh<_i460.SharedPreferences>()),
     );
@@ -198,6 +206,16 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.singleton<_i361.Dio>(() => registerModule.dio(gh<_i339.DioFactory>()));
     gh.lazySingleton<_i473.ApiManager>(() => _i473.ApiManager(gh<_i361.Dio>()));
+    gh.lazySingleton<_i141.BasePublishersDataSource>(
+      () => _i365.PublishersRemoteDataSourceImpl(gh<_i473.ApiManager>()),
+      instanceName: 'remote',
+    );
+    gh.lazySingleton<_i674.PublishersRepository>(
+      () => _i1006.PublishersRepositoryImpl(
+        gh<_i141.BasePublishersDataSource>(instanceName: 'remote'),
+        gh<_i844.PublishersLocalDataSourceImpl>(instanceName: 'local'),
+      ),
+    );
     gh.lazySingleton<_i652.ArticlesRemoteDataSourceImpl>(
       () => _i652.ArticlesRemoteDataSourceImpl(gh<_i473.ApiManager>()),
     );
@@ -216,9 +234,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1069.PublishRemoteDataSource>(
       () => _i1069.PublishRemoteDataSource(gh<_i473.ApiManager>()),
     );
-    gh.lazySingleton<_i365.PublishersRemoteDataSourceImpl>(
-      () => _i365.PublishersRemoteDataSourceImpl(gh<_i473.ApiManager>()),
-    );
     gh.lazySingleton<_i519.RatingsRemoteDataSource>(
       () => _i519.RatingsRemoteDataSource(gh<_i473.ApiManager>()),
     );
@@ -229,6 +244,12 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i653.ArticlesRepositoryImpl(
         gh<_i652.ArticlesRemoteDataSourceImpl>(),
       ),
+    );
+    gh.factory<_i618.PublisherDetailCubit>(
+      () => _i618.PublisherDetailCubit(gh<_i674.PublishersRepository>()),
+    );
+    gh.factory<_i935.PublishersListCubit>(
+      () => _i935.PublishersListCubit(gh<_i674.PublishersRepository>()),
     );
     gh.lazySingleton<_i407.BooksRepository>(
       () => _i680.BooksRepositoryImpl(
@@ -253,11 +274,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i95.PublishRepository>(
       () => _i655.PublishRepositoryImpl(gh<_i1069.PublishRemoteDataSource>()),
-    );
-    gh.lazySingleton<_i674.PublishersRepository>(
-      () => _i1006.PublishersRepositoryImpl(
-        gh<_i365.PublishersRemoteDataSourceImpl>(),
-      ),
     );
     gh.lazySingleton<_i693.NotificationsRepository>(
       () => _i595.NotificationsRepositoryImpl(
@@ -284,14 +300,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i14.RatingsRepository>(
       () => _i341.RatingsRepositoryImpl(gh<_i519.RatingsRemoteDataSource>()),
     );
-    gh.factory<_i618.PublisherDetailCubit>(
-      () => _i618.PublisherDetailCubit(gh<_i674.PublishersRepository>()),
-    );
     gh.factory<_i699.MediaListCubit>(
       () => _i699.MediaListCubit(gh<_i761.MediaRepository>()),
-    );
-    gh.factory<_i935.PublishersListCubit>(
-      () => _i935.PublishersListCubit(gh<_i674.PublishersRepository>()),
     );
     gh.factory<_i377.NotificationSettingsCubit>(
       () => _i377.NotificationSettingsCubit(
