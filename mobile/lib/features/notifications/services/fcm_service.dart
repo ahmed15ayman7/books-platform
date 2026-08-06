@@ -57,6 +57,7 @@ class FcmService {
       badge: true,
       sound: true,
     );
+    debugPrint('>>> [FCM DEBUG] requestPermission authorizationStatus=${settings.authorizationStatus}');
     final granted = settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional;
 
@@ -64,8 +65,11 @@ class FcmService {
     // (iOS only provides the token after permission is granted).
     if (granted && Platform.isIOS) {
       final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+      debugPrint('>>> [FCM DEBUG] getAPNSToken() right after permission grant: ${apnsToken == null ? 'null' : 'non-null'}');
       if (apnsToken != null) {
         await FirebaseMessaging.instance.subscribeToTopic('new-books');
+      } else {
+        debugPrint('>>> [FCM DEBUG] skipping subscribeToTopic — APNS token not yet available (not retried elsewhere)');
       }
     }
 

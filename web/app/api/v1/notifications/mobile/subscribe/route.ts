@@ -44,6 +44,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    console.log("[FCM DEBUG] POST /notifications/mobile/subscribe — token registered", {
+      id: record.id,
+      platform,
+      locale,
+      topics,
+      userId: auth?.userId ?? null,
+    });
+
     return apiSuccess({
       id: record.id,
       message: "Subscribed to mobile push notifications",

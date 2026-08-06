@@ -77,6 +77,11 @@ export async function sendFcmToTokens(
     response.responses.forEach((result, index) => {
       if (result.success) return;
       const code = result.error?.code;
+      console.error("[FCM DEBUG] sendFcmToTokens — send failed", {
+        token: batch[index]!.slice(0, 12) + "...",
+        code,
+        message: result.error?.message,
+      });
       if (
         code === "messaging/invalid-registration-token" ||
         code === "messaging/registration-token-not-registered"
