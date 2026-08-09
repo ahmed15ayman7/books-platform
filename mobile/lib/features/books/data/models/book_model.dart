@@ -32,6 +32,7 @@ class BookModel {
     required this.purchaseOption,
     this.imageUrl,
     this.referralLink,
+    this.downloadUrl,
     this.averageRating,
     this.ratingsCount,
     this.descriptionEn,
@@ -73,6 +74,7 @@ class BookModel {
   final PurchaseOption purchaseOption;
   final String? imageUrl;
   final String? referralLink;
+  final String? downloadUrl;
   final double? averageRating;
   final int? ratingsCount;
   final String? descriptionEn;
@@ -170,6 +172,7 @@ class BookModel {
       purchaseOption: PurchaseOptionX.fromString(json['purchaseOption'] as String?),
       imageUrl: json['imageUrl'] as String? ?? json['coverImageUrl'] as String?,
       referralLink: json['referralLink'] as String?,
+      downloadUrl: json['downloadUrl'] as String?,
       averageRating: (json['averageRating'] as num?)?.toDouble(),
       ratingsCount: (json['ratingsCount'] as num?)?.toInt(),
       isNew: json['isNew'] as bool? ?? false,
@@ -225,6 +228,7 @@ class BookModel {
         purchaseOption: purchaseOption,
         imageUrl: imageUrl,
         referralLink: referralLink,
+        downloadUrl: downloadUrl,
         averageRating: averageRating,
         ratingsCount: ratingsCount,
         isNew: isNew,

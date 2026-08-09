@@ -97,30 +97,32 @@ class BookDetailInfoSection extends StatelessWidget {
         ),
         SizedBox(height: 20.h),
         BookDetailBiblioTable(book: book, locale: locale),
-        SizedBox(height: 18.h),
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton(
-            onPressed: onToggleSave,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  saved
-                      ? Icons.favorite_rounded
-                      : Icons.favorite_border_rounded,
-                  color: AppColors.primary,
-                ),
-                SizedBox(width: 8.w),
-                Text(
-                  saved
-                      ? 'book_detail.saved'.tr()
-                      : 'book_detail.save_to_wishlist'.tr(),
-                ),
-              ],
+        if (book.downloadUrl == null || book.downloadUrl!.isEmpty) ...[
+          SizedBox(height: 18.h),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: onToggleSave,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    saved
+                        ? Icons.favorite_rounded
+                        : Icons.favorite_border_rounded,
+                    color: AppColors.primary,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    saved
+                        ? 'book_detail.saved'.tr()
+                        : 'book_detail.save_to_wishlist'.tr(),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
+        ],
         SizedBox(height: 26.h),
       ],
     );

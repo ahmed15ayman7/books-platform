@@ -32,6 +32,7 @@ class Book extends Equatable {
     this.imageUrl,
     this.purchaseOption = PurchaseOption.notAvailable,
     this.referralLink,
+    this.downloadUrl,
     this.averageRating,
     this.ratingsCount,
     this.descriptionEn,
@@ -73,6 +74,7 @@ class Book extends Equatable {
   final String? imageUrl;
   final PurchaseOption purchaseOption;
   final String? referralLink;
+  final String? downloadUrl;
   final double? averageRating;
   final int? ratingsCount;
   final String? descriptionEn;

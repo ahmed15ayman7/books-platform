@@ -117,6 +117,7 @@
   "book_detail": {
     "description": "وصف الكتاب",
     "add_to_cart": "أضف إلى السلة",
+    "free_download": "تحميل مجاني",
     "saved": "تم الحفظ",
     "save_to_wishlist": "حفظ في القائمة",
     "similar_books": "كتب مشابهة",

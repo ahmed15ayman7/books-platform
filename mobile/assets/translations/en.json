@@ -117,6 +117,7 @@
   "book_detail": {
     "description": "Book Description",
     "add_to_cart": "Add to Cart",
+    "free_download": "Free Download",
     "saved": "Saved",
     "save_to_wishlist": "Save to Wishlist",
     "similar_books": "Similar Books",
