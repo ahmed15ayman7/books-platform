@@ -12,6 +12,9 @@ class ApiConstants {
   static String get baseUrl =>
       _environment == 'prod' ? _prodBaseUrl : _devBaseUrl;
 
+  /// Public web app host — used to build shareable links (no `/api/v1` suffix).
+  static const String webBaseUrl = 'https://booksplatform.net';
+
   static const Duration connectTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
   static const Duration sendTimeout = Duration(seconds: 30);
