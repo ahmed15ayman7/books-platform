@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../../core/helpers/markdown_plain_text_helper.dart';
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/widgets/app_markdown_body.dart';
 import '../../../../../core/widgets/translation_status_badge.dart';
 import '../../../../../core/widgets/tts_player_widget.dart';
 import '../../../domain/entities/book.dart';
@@ -64,16 +66,19 @@ class BookDetailInfoSection extends StatelessWidget {
           ),
         ),
         SizedBox(height: 8.h),
-        Text(
-          locale == 'ar' ? book.descriptionAr : (book.descriptionEn ?? book.descriptionAr),
-          style: GoogleFonts.tajawal(
-            fontSize: 14.5.sp,
-            color: AppColors.textSecondary,
-            height: 1.8,
+        if (expanded)
+          AppMarkdownBody(data: _description)
+        else
+          Text(
+            MarkdownPlainTextHelper.strip(_description),
+            style: GoogleFonts.tajawal(
+              fontSize: 14.5.sp,
+              color: AppColors.textSecondary,
+              height: 1.8,
+            ),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
           ),
-          maxLines: expanded ? null : 3,
-          overflow: expanded ? TextOverflow.visible : TextOverflow.ellipsis,
-        ),
         TextButton(
           onPressed: onToggleExpand,
           style: TextButton.styleFrom(padding: EdgeInsets.zero),
@@ -90,9 +95,7 @@ class BookDetailInfoSection extends StatelessWidget {
         ),
         SizedBox(height: 8.h),
         TtsPlayerWidget(
-          text: locale == 'ar'
-              ? book.descriptionAr
-              : (book.descriptionEn ?? book.descriptionAr),
+          text: _description,
           languageCode: locale == 'ar' ? 'ar-SA' : 'en-US',
         ),
         SizedBox(height: 20.h),
@@ -127,6 +130,9 @@ class BookDetailInfoSection extends StatelessWidget {
       ],
     );
   }
+
+  String get _description =>
+      locale == 'ar' ? book.descriptionAr : (book.descriptionEn ?? book.descriptionAr);
 
   String _categoryLabel() {
     final fromApi = book.categoryDisplayName(locale);

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
+import '../helpers/markdown_plain_text_helper.dart';
 import '../helpers/tts_text_chunker.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
@@ -37,32 +38,10 @@ class _TtsPlayerWidgetState extends State<TtsPlayerWidget> {
   // (Android plugin multiplies the Flutter value by 2.0 internally.)
   static double _toTtsRate(double speed) => speed * 0.5;
 
-  static String _stripMarkdown(String md) {
-    return md
-        // Images must be removed entirely — keeping alt text reads "صورة" aloud
-        .replaceAll(RegExp(r'!\[[^\]]*\]\([^)]*\)'), '')
-        // Keep display text of links, discard URL
-        .replaceAllMapped(
-            RegExp(r'\[([^\]]*)\]\([^)]*\)'), (m) => m.group(1) ?? '')
-        // Bold and italic — unwrap inner text
-        .replaceAllMapped(
-            RegExp(r'\*\*(.+?)\*\*', dotAll: true), (m) => m.group(1) ?? '')
-        .replaceAllMapped(
-            RegExp(r'\*(.+?)\*', dotAll: true), (m) => m.group(1) ?? '')
-        // Headings, code spans, blockquotes
-        .replaceAll(RegExp(r'#{1,6}\s*'), '')
-        .replaceAll(RegExp(r'`+'), '')
-        .replaceAll(RegExp(r'^>\s*', multiLine: true), '')
-        // Trailing whitespace on lines and collapsed blank lines
-        .replaceAll(RegExp(r'[ \t]+\n'), '\n')
-        .replaceAll(RegExp(r'\n{3,}'), '\n\n')
-        .trim();
-  }
-
   @override
   void initState() {
     super.initState();
-    _cleanText = _stripMarkdown(widget.text);
+    _cleanText = MarkdownPlainTextHelper.strip(widget.text);
     _tts = FlutterTts();
     _initTts();
   }
