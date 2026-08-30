@@ -4,11 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:booksplatform/core/router/app_routes.dart';
 import 'package:booksplatform/core/theme/app_colors.dart';
 import 'package:booksplatform/core/widgets/app_bar_widget.dart';
 import 'package:booksplatform/core/widgets/app_loading_indicator.dart';
-import 'package:booksplatform/core/widgets/bottom_nav_widget.dart';
 import 'package:booksplatform/core/widgets/empty_state_widget.dart';
 
 import '../../cubit/wishlist_cubit.dart';
@@ -31,7 +29,6 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final locale = context.locale.languageCode;
     return Scaffold(
       body: Column(
         children: [
@@ -85,32 +82,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
               },
             ),
           ),
-          BottomNavWidget(
-            activeTab: BottomNavTab.wishlist,
-            onTabSelected: (tab) => _onTabSelected(context, tab),
-            onPublishTap: () =>
-                Navigator.of(context).pushNamed(AppRoutes.publish),
-            currentLocale: locale,
-          ),
         ],
       ),
     );
-  }
-
-  void _onTabSelected(BuildContext context, BottomNavTab tab) {
-    switch (tab) {
-      case BottomNavTab.home:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
-      case BottomNavTab.books:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.books);
-      case BottomNavTab.articles:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.articles);
-      case BottomNavTab.media:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.media);
-      case BottomNavTab.publishers:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.publishers);
-      case BottomNavTab.wishlist:
-        break;
-    }
   }
 }

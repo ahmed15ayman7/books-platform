@@ -16,6 +16,7 @@ import 'package:booksplatform/core/helpers/url_launcher_helper.dart' as _i573;
 import 'package:booksplatform/core/network/api_manager.dart' as _i473;
 import 'package:booksplatform/core/network/connectivity_helper.dart' as _i403;
 import 'package:booksplatform/core/network/dio_factory.dart' as _i339;
+import 'package:booksplatform/core/router/shell_tab_notifier.dart' as _i980;
 import 'package:booksplatform/core/storage/cart_storage.dart' as _i498;
 import 'package:booksplatform/core/storage/search_history_storage.dart'
     as _i603;
@@ -152,6 +153,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i403.ConnectivityHelper>(
       () => _i403.ConnectivityHelper(),
     );
+    gh.lazySingleton<_i980.ShellTabNotifier>(() => _i980.ShellTabNotifier());
     gh.lazySingleton<_i171.FileUploadService>(
       () => _i171.StubFileUploadServiceImpl(),
     );

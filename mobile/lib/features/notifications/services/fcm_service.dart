@@ -9,7 +9,9 @@ import 'package:injectable/injectable.dart';
 
 import 'package:booksplatform/core/router/app_routes.dart';
 import 'package:booksplatform/core/router/args/book_detail_args.dart';
+import 'package:booksplatform/core/router/args/main_shell_args.dart';
 import 'package:booksplatform/core/storage/secure_storage_helper.dart';
+import 'package:booksplatform/core/widgets/bottom_nav_widget.dart' show BottomNavTab;
 import '../../../firebase_options.dart';
 
 @pragma('vm:entry-point')
@@ -168,9 +170,17 @@ class FcmService {
           arguments: BookDetailArgs(slug: slug, titleAr: ''),
         );
       case 'article':
-        nav.pushNamed(AppRoutes.articles);
+        nav.pushNamedAndRemoveUntil(
+          AppRoutes.home,
+          (_) => false,
+          arguments: const MainShellArgs(initialTab: BottomNavTab.articles),
+        );
       default:
-        nav.pushNamed(AppRoutes.home);
+        nav.pushNamedAndRemoveUntil(
+          AppRoutes.home,
+          (_) => false,
+          arguments: const MainShellArgs(),
+        );
     }
   }
 }
