@@ -1,0 +1,202 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Bold;\f1\fmodern\fcharset0 Courier-Bold;\f2\froman\fcharset0 Times-Roman;
+\f3\fmodern\fcharset0 Courier;\f4\froman\fcharset0 Times-Italic;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red241\green244\blue245;\red0\green0\blue233;
+\red109\green109\blue109;\red127\green11\blue224;\red24\green112\blue43;\red182\green14\blue24;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c95686\c96471\c96863;\cssrgb\c0\c0\c93333;
+\cssrgb\c50196\c50196\c50196;\cssrgb\c57647\c20392\c90196;\cssrgb\c9412\c50196\c21961;\cssrgb\c77255\c13333\c12157;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}}{\leveltext\leveltemplateid1\'01\'00;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat0\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat0\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid201\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid3}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs24 \cf0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 A professional 
+\f1\fs26 \cb3 DESIGN.md
+\f0\fs24 \cb1  file is a two-layer structured specification
+\f2\b0  that translates a brand's user interface rules into an open-standard format natively understood by AI coding agents. Originally open-sourced by Google Labs (via Google Stitch), it combines machine-readable 
+\f0\b YAML design tokens
+\f2\b0  with human-readable 
+\f0\b markdown design rationale
+\f2\b0  to prevent AI from generating generic "AI slop" interfaces. [1, 2, 3, 4, 5]\
+Popular repositories like the {\field{\*\fldinst{HYPERLINK "https://github.com/VoltAgent/awesome-design-md/"}}{\fldrslt \cf4 \ul \ulc4 \strokec4 VoltAgent/awesome-design-md GitHub repository}} provide production-ready 
+\f3\fs26 \cb3 DESIGN.md
+\f2\fs24 \cb1  files for top design systems like Stripe, Apple, Linear, and Notion. [5, 6]\
+\pard\pardeftab720\partightenfactor0
+\cf5 \strokec5 \
+\pard\pardeftab720\sa331\partightenfactor0
+
+\f0\b\fs40 \cf0 \strokec2 The Two-Layer Architecture\
+\pard\pardeftab720\partightenfactor0
+
+\f2\b0\fs24 \cf0 A valid, professional 
+\f3\fs26 \cb3 DESIGN.md
+\f2\fs24 \cb1  file is strictly split into two layers within the same document: [3]\
+\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls1\ilvl0
+\f0\b \cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	1	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 The YAML Frontmatter (Data Layer):
+\f2\b0  Strict, machine-readable variables for keys like colors, border radii, and spacing.\
+\ls1\ilvl0
+\f0\b \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	2	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 The Markdown Prose (Intent Layer):
+\f2\b0  Rules, constraints, and instructions that explain 
+\f4\i why
+\f2\i0  these values exist and 
+\f4\i how
+\f2\i0  they apply. [2, 3, 5]\
+\pard\pardeftab720\partightenfactor0
+\cf5 \strokec5 \
+\pard\pardeftab720\sa331\partightenfactor0
+
+\f0\b\fs40 \cf0 \strokec2 Professional 
+\f1 \cb3 DESIGN.md
+\f0 \cb1  Production Template\
+\pard\pardeftab720\partightenfactor0
+
+\f2\b0\fs24 \cf0 To use this, drop a file named 
+\f3\fs26 \cb3 DESIGN.md
+\f2\fs24 \cb1  into your project's root folder. Claude Code, Cursor, or Google Stitch will automatically read it as a visual blueprint. [6, 7]\
+\pard\pardeftab720\partightenfactor0
+
+\f3\fs26 \cf6 \cb3 \strokec6 ---\
+# ============================================================================\
+# LAYER 1: MACHINE-READABLE DESIGN TOKENS (YAML Frontmatter)\
+# ============================================================================\
+\pard\pardeftab720\partightenfactor0
+\cf0 \strokec2 theme: "Modern Minimalist"\
+version: "1.0.0"\
+\
+tokens:\
+  colors:\
+    primary: "#11171B"     # Core text and dominant structural elements\
+    surface: "#FFFFFF"     # Primary page background\
+    muted: "#8C9A9E"       # Low-contrast secondary text and subtle borders\
+    accent: "#44545B"      # Interaction states, highlights, and primary CTAs\
+    error: "#D9383A"       # System destructive actions or alerts\
+  \
+  typography:\
+    sans: "Inter, system-ui, sans-serif"\
+    mono: "JetBrains Mono, monospace"\
+    base_size: "16px"\
+    scale: "minor-third"\
+  \
+  spacing:\
+    unit: 4\
+    scale: \cf7 \strokec7 [4, 8, 12, 16, 24, 32, 48, 64]\cf0 \strokec2 \
+  \
+  radius:\
+    none: "0px"\
+    sm: "4px"\
+    md: "8px"              # Standard component rounding (cards, buttons)\
+    \cf6 \strokec6 lg: "16px"\
+---\
+\cf0 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \strokec6 # LAYER 2: HUMAN & AI DESIGN RATIONALE (Markdown Prose)\
+\pard\pardeftab720\partightenfactor0
+\cf0 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \strokec6 ## 1. Brand Identity & Rationale\
+* \cf0 \strokec2 **The Aesthetic:** Editorial, code-inspired utility with expansive negative space.\
+\cf6 \strokec6 * \cf0 \strokec2 **The Goal:** The UI should feel like an intentional desktop utility tool rather than a generic SaaS template.\
+\cf6 \strokec6 * \cf0 \strokec2 **Layout Principle:** Rely on strict spacing grid alignments and explicit typography scales instead of heavy background colored containers.\
+\
+\cf6 \strokec6 ## 2. Visual Rules & Tokens Usage\
+### Colors\
+\pard\pardeftab720\partightenfactor0
+\cf0 \strokec2 * Use \cf8 \strokec8 `surface`\cf0 \strokec2  for major panel backdrops. Never inject colored gradients into containers.\
+* Use \cf8 \strokec8 `primary`\cf0 \strokec2  text strictly for semantic headings (\cf8 \strokec8 `h1`\cf0 \strokec2 , \cf8 \strokec8 `h2`\cf0 \strokec2 ). \
+* Use \cf8 \strokec8 `muted`\cf0 \strokec2  for secondary descriptive metadata text and light structural borders.\
+\
+\pard\pardeftab720\partightenfactor0
+\cf6 \strokec6 ### Layout & Spacing\
+\pard\pardeftab720\partightenfactor0
+\cf0 \strokec2 * Every padding and margin value must align to an increment of the \cf8 \strokec8 `spacing.unit`\cf0 \strokec2  (4px grid).\
+\pard\pardeftab720\partightenfactor0
+\cf6 \strokec6 * \cf0 \strokec2 Keep mobile viewports strictly linear. Do not use multi-column card splits on viewports narrower than 768px.\
+\
+\cf6 \strokec6 ## 3. UI Component Specifications\
+\pard\pardeftab720\partightenfactor0
+\cf0 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \strokec6 ### Buttons\
+\pard\pardeftab720\partightenfactor0
+\cf0 \strokec2 * **Default Structure:** Flat, borders must use \cf8 \strokec8 `radius.md`\cf0 \strokec2  (8px). \
+* **Interaction:** Micro-interactions only. Use \cf8 \strokec8 `transition: all 160ms ease-out`\cf0 \strokec2 . \
+\pard\pardeftab720\partightenfactor0
+\cf6 \strokec6 * \cf0 \strokec2 **Hover State:** Shift background contrast or brightness slightly. Never scale or pop buttons dynamically.\
+\
+\cf6 \strokec6 ### Inputs & Cards\
+\pard\pardeftab720\partightenfactor0
+\cf0 \strokec2 * Active text inputs must throw a \cf8 \strokec8 `1px solid`\cf0 \strokec2  border using the \cf8 \strokec8 `accent`\cf0 \strokec2  color token.\
+* Cards do not use drop shadows. Separate cards using a \cf8 \strokec8 `1px`\cf0 \strokec2  crisp outline colored with the \cf8 \strokec8 `muted`\cf0 \strokec2  token.\
+\
+\pard\pardeftab720\partightenfactor0
+\cf6 \strokec6 ## 4. Design Boundary Conditions (Dos and Don'ts)\
+\pard\pardeftab720\partightenfactor0
+\cf0 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \strokec6 ### \uc0\u9989  DO\
+\pard\pardeftab720\partightenfactor0
+\cf0 \strokec2 * Maintain generous \cf8 \strokec8 `padding`\cf0 \strokec2  inside lists and tables (minimum 16px).\
+\pard\pardeftab720\partightenfactor0
+\cf6 \strokec6 * \cf0 \strokec2 Use custom SVG icons styled entirely with monochromatic fills.\
+\cf6 \strokec6 * \cf0 \strokec2 Ensure all text against background variations maintains a minimum 4.5:1 contrast ratio (WCAG AA compliance).\
+\
+\cf6 \strokec6 ### \uc0\u10060  DON'T\
+* \cf0 \strokec2 **No AI Slop:** Do not generate random purple/blue gradients or generic rounded buttons unless explicitly defined.\
+\cf6 \strokec6 * \cf0 \strokec2 **No Inline Tooling:** Do not invent color variations outside of the defined YAML palette.\
+\cf6 \strokec6 * \cf0 \strokec2 **No Complex Modals:** Avoid stackable modals; prefer contextual inline layout expansion instead.\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs24 \cf5 \cb1 \strokec5 \
+\pard\pardeftab720\sa331\partightenfactor0
+
+\f0\b\fs40 \cf0 \strokec2 Why This Format Works Better than Figma or JSON\
+\pard\pardeftab720\partightenfactor0
+
+\f2\b0\fs24 \cf0 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls2\ilvl0
+\f0\b \cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Maintains "Taste" and Intent:
+\f2\b0  Pure JSON design tokens only give the AI a variable (e.g., 
+\f3\fs26 \cb3 --color-primary: #11171B
+\f2\fs24 \cb1 ). A 
+\f3\fs26 \cb3 DESIGN.md
+\f2\fs24 \cb1  file goes a step further by explaining that the primary color should evoke structural authority and should only be applied to headings. [3, 5, 8, 9]\
+\ls2\ilvl0
+\f0\b \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Context Preservation:
+\f2\b0  LLMs process Markdown effortlessly. Because both values and contextual rationale sit in the same document, the AI references it natively without costly API lookups to design tools. [2, 7]\
+\pard\pardeftab720\partightenfactor0
+\cf0 If you would like to explore further, let me know:\
+\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls3\ilvl0\cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 What 
+\f0\b specific stack or framework
+\f2\b0  you are targeting (e.g., Tailwind CSS, React, raw CSS)?\
+\ls3\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 If you want a tailored template based on an existing design system like 
+\f0\b Stripe, Apple, or Notion
+\f2\b0 . [5, 6]\
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+[1] {\field{\*\fldinst{HYPERLINK "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"}}{\fldrslt \cf4 \ul \ulc4 \strokec4 https://platform.claude.com}}\
+[2] {\field{\*\fldinst{HYPERLINK "https://github.com/google-labs-code/design.md/blob/main/docs/spec.md"}}{\fldrslt \cf4 \ul \ulc4 \strokec4 https://github.com}}\
+[3] {\field{\*\fldinst{HYPERLINK "https://departmentofproduct.substack.com/p/designmd-explained-the-format-reshaping"}}{\fldrslt \cf4 \ul \ulc4 \strokec4 https://departmentofproduct.substack.com}}\
+[4] {\field{\*\fldinst{HYPERLINK "https://www.youtube.com/watch?v=5KOkG1UurCc"}}{\fldrslt \cf4 \ul \ulc4 \strokec4 https://www.youtube.com}}\
+[5] {\field{\*\fldinst{HYPERLINK "https://www.youtube.com/watch?v=pY52H5gKhGg&t=22"}}{\fldrslt \cf4 \ul \ulc4 \strokec4 https://www.youtube.com}}\
+[6] {\field{\*\fldinst{HYPERLINK "https://www.mindstudio.ai/blog/best-brand-design-systems-awesome-design-md-creators"}}{\fldrslt \cf4 \ul \ulc4 \strokec4 https://www.mindstudio.ai}}\
+[7] {\field{\*\fldinst{HYPERLINK "https://github.com/VoltAgent/awesome-design-md/"}}{\fldrslt \cf4 \ul \ulc4 \strokec4 https://github.com}}\
+[8] {\field{\*\fldinst{HYPERLINK "https://www.youtube.com/watch?v=W1gWIQp9k1Y"}}{\fldrslt \cf4 \ul \ulc4 \strokec4 https://www.youtube.com}}\
+[9] {\field{\*\fldinst{HYPERLINK "https://dev.to/aws-builders/agentsmd-skillmd-designmd-how-ai-instructions-split-into-three-layers-d0g"}}{\fldrslt \cf4 \ul \ulc4 \strokec4 https://dev.to}}\
+\
+\
+}

@@ -1,0 +1,10 @@
+we need plan for re-handel articls screens in @lib\features\articles\presentation\pages i will provide you the api ulr with its response for full context:
+- the articles_article_row will be static from ARTICLE_SLUG_CHANNELS = [
+  { slug: "world-reads", labelAr: "العالم يقرأ", labelEn: "World Reads" },
+  { slug: "harvest", labelAr: "حصاد الكتب", labelEn: "Book Harvest" },
+  { slug: "ideas", labelAr: "زبدة الأفكار", labelEn: "Essence of Ideas" },
+]
+
+and all tab will be from get-all-articles.txt other tabs will be ARTICLE_SLUG_CHANNELS.
+- after readings request responses handel all cases might be exit from audio and video when reading @lib\features\articles features and widgets you will unerstante what i mean.
+- also make Ui consistence between request response and ui exist in @doc\claude-design\books-platfotm-mobile-designs\Books Platform Mobile.html - the articles screens - you are not stricted on specified somthinge , just balance and consistence between api response and Ui.
