@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Books Platform — Mobile App (design prototype)</title>
+<link rel="icon" href="assets/app_icon_removed_bg_1024.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@300;400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+</head>
+<body>
+<helmet>
+  <link rel="stylesheet" href="_ds/books-platform-mobile/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/books-platform-mobile/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/books-platform-mobile/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/books-platform-mobile/tokens/radius.css">
+  <link rel="stylesheet" href="_ds/books-platform-mobile/tokens/elevation.css">
+  <link rel="stylesheet" href="_ds/books-platform-mobile/tokens/motion.css">
+  <link rel="stylesheet" href="bp/styles.css">
+  <link rel="stylesheet" href="bp/styles-screens.css">
+  <link rel="stylesheet" href="bp/styles-static.css">
+  <link rel="stylesheet" href="bp/styles-flow.css">
+  <link rel="stylesheet" href="bp/styles-content.css">
+  <link rel="stylesheet" href="bp/styles-discover.css">
+</helmet>
+
+<!-- Warm every font at load so lazy web-font downloads finish before the first capture. -->
+<div class="fontwarm" aria-hidden="true"><span style="font:400 14px Cairo">أبت abc</span><span style="font:500 14px Cairo">أبت abc</span><span style="font:600 14px Cairo">أبت abc</span><span style="font:700 14px Cairo">أبت abc</span><span style="font:800 14px Cairo">أبت abc</span><span style="font:400 14px Tajawal">أبت abc</span><span style="font:500 14px Tajawal">أبت abc</span><span style="font:700 14px Tajawal">أبت abc</span><span style="font:800 14px Tajawal">أبت abc</span><span style="font:400 14px Inter">abc 123</span><span style="font:500 14px Inter">abc 123</span><span style="font:600 14px Inter">abc 123</span><span style="font:700 14px Inter">abc 123</span><span style="font:italic 400 14px Inter">abc</span><span class="mi">home</span><span class="mio">home</span></div>
+
+<div id="root"></div>
+
+<script src="vendor/react.bundle.js"></script>
+<script src="bp/strings.js"></script>
+<script src="bp/core.js"></script>
+<script src="bp/data.js"></script>
+<script src="bp/copy-static.js"></script>
+<script src="bp/screens-onboarding.js"></script>
+<script src="bp/screens-home.js"></script>
+<script src="bp/screens-books.js"></script>
+<script src="bp/screens-book-detail.js"></script>
+<script src="bp/screens-discover.js"></script>
+<script src="bp/screens-content.js"></script>
+<script src="bp/screens-misc.js"></script>
+<script src="bp/screens-static.js"></script>
+
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = Object.assign({ screen: 'splash' }, window.BP.initialState);
+
+  keys = ['splash', 'language', 'onboarding', 'home', 'catalog', 'articles', 'media', 'publishers', 'wishlist',
+    'bookDetail', 'articleDetail', 'publisherDetail', 'categoryBooks', 'translatedBooks', 'recommendedBooks',
+    'search', 'cart', 'publish', 'more', 'notifications', 'about', 'services', 'team', 'contact', 'privacy', 'terms'];
+
+  go = (screen, extra = {}) =>
+    this.setState({ ...window.BP.resetState, prev: this.state.screen, screen, variant: 'default', scroll: 0, sheet: null, ...extra });
+
+  screenIs = (key) => this.state.screen === key;
+
+  render() {
+    const pick = (key) => window.BP.views[key](this, key);
+    if (this.screenIs('splash')) return pick('splash');
+    if (this.screenIs('language')) return pick('language');
+    if (this.screenIs('onboarding')) return pick('onboarding');
+    if (this.screenIs('home')) return pick('home');
+    if (this.screenIs('catalog')) return pick('catalog');
+    if (this.screenIs('articles')) return pick('articles');
+    if (this.screenIs('media')) return pick('media');
+    if (this.screenIs('publishers')) return pick('publishers');
+    if (this.screenIs('wishlist')) return pick('wishlist');
+    if (this.screenIs('bookDetail')) return pick('bookDetail');
+    if (this.screenIs('articleDetail')) return pick('articleDetail');
+    if (this.screenIs('publisherDetail')) return pick('publisherDetail');
+    if (this.screenIs('categoryBooks')) return pick('categoryBooks');
+    if (this.screenIs('translatedBooks')) return pick('translatedBooks');
+    if (this.screenIs('recommendedBooks')) return pick('recommendedBooks');
+    if (this.screenIs('search')) return pick('search');
+    if (this.screenIs('cart')) return pick('cart');
+    if (this.screenIs('publish')) return pick('publish');
+    if (this.screenIs('more')) return pick('more');
+    if (this.screenIs('notifications')) return pick('notifications');
+    if (this.screenIs('about')) return pick('about');
+    if (this.screenIs('services')) return pick('services');
+    if (this.screenIs('team')) return pick('team');
+    if (this.screenIs('contact')) return pick('contact');
+    if (this.screenIs('privacy')) return pick('privacy');
+    if (this.screenIs('terms')) return pick('terms');
+    return window.BP.notFound(this);
+  }
+}
+</script>
+<script src="support.js"></script>
+</body>
+</html>

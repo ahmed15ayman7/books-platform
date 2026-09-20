@@ -1,0 +1,12 @@
+/* From lib/core/theme/app_text_styles.dart + app_font_weight.dart (google_fonts: Cairo / Tajawal / Inter) */
+:root {
+  --font-display: 'Cairo', system-ui, sans-serif;
+  --font-body: 'Tajawal', system-ui, sans-serif;
+  --font-latin: 'Inter', system-ui, sans-serif;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-extrabold: 800;
+  --lh-body: 1.7;
+}

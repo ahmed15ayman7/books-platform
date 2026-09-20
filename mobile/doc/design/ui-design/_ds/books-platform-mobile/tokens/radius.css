@@ -1,0 +1,10 @@
+/* From lib/core/constants/app_constants.dart radius tokens + app_theme.dart */
+:root {
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-2xl: 28px;
+  --radius-pill: 999px;
+  --button-height: 52px;
+}

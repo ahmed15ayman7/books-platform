@@ -1,5 +1,7 @@
 # Books Platform — منصة الكتب العالمية
 
+![Mobile app version](https://img.shields.io/badge/mobile-3.0.2%2B20-blue) ![Flutter](https://img.shields.io/badge/Flutter-3.41.9-02569B?logo=flutter&logoColor=white) ![Next.js](https://img.shields.io/badge/Next.js-16.2.6-black?logo=nextdotjs) ![License](https://img.shields.io/badge/license-none%20(proprietary)-lightgrey)
+
 > **A window to world books — discover, read, and publish.** | **نافذة العالم على الكتب — اكتشف، اقرأ، انشر**
 
 A bilingual (Arabic/English) books discovery and publishing platform consisting of a **Next.js web application** and a **Flutter mobile application** (iOS + Android), sharing a common PostgreSQL database and REST API.
@@ -8,26 +10,230 @@ A bilingual (Arabic/English) books discovery and publishing platform consisting 
 
 ## Table of Contents
 
-1. [Tech Stack](#tech-stack)
-2. [Architecture Overview](#architecture-overview)
-3. [Features](#features)
-4. [Getting Started](#getting-started)
+1. [Screens](#screens)
+2. [Tech Stack](#tech-stack)
+3. [Architecture Overview](#architecture-overview)
+4. [Features](#features)
+5. [Getting Started](#getting-started)
    - [Prerequisites](#prerequisites)
    - [Environment Setup](#environment-setup)
    - [Installation](#installation)
    - [Run](#run)
    - [Build](#build)
-5. [Project Structure](#project-structure)
-6. [API Overview](#api-overview)
-7. [State Management](#state-management)
-8. [Dependency Injection (Mobile)](#dependency-injection-mobile)
-9. [Environment Variables Reference](#environment-variables-reference)
-10. [Testing](#testing)
-11. [CI/CD](#cicd)
-12. [Deployment](#deployment)
-13. [Contributing](#contributing)
-14. [Known Limitations / TODO](#known-limitations--todo)
-15. [License](#license)
+6. [Project Structure](#project-structure)
+7. [API Overview](#api-overview)
+8. [State Management](#state-management)
+9. [Dependency Injection (Mobile)](#dependency-injection-mobile)
+10. [Environment Variables Reference](#environment-variables-reference)
+11. [Testing](#testing)
+12. [CI/CD](#cicd)
+13. [Deployment](#deployment)
+14. [Contributing](#contributing)
+15. [Known Limitations / TODO](#known-limitations--todo)
+16. [License](#license)
+
+---
+
+## Screens
+
+These are frames of the **design prototype** in [mobile/doc/design/ui-design/](mobile/doc/design/ui-design/), a hand-built, bilingual
+replica of the shipped Flutter app (real tokens, translations and copy; sample data; no photos). They are not screenshots of the
+running app. Frames are in [mobile/doc/design/screenshots/](mobile/doc/design/screenshots/) and regenerate with `/capture-design-screens`.
+
+<table>
+<tr>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/01-splash.png" width="180" alt="Splash"><br>
+<sub>Splash</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/02-language.png" width="180" alt="Language picker"><br>
+<sub>Language picker</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/03-language-selected.png" width="180" alt="Language selected"><br>
+<sub>Language selected</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/04-onboarding-1.png" width="180" alt="Onboarding: discover"><br>
+<sub>Onboarding: discover</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/05-onboarding-2.png" width="180" alt="Onboarding: translation"><br>
+<sub>Onboarding: translation</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/06-onboarding-3.png" width="180" alt="Onboarding: publish"><br>
+<sub>Onboarding: publish</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/07-home.png" width="180" alt="Home"><br>
+<sub>Home</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/08-home-loading.png" width="180" alt="Home (loading)"><br>
+<sub>Home (loading)</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/09-more.png" width="180" alt="More sheet"><br>
+<sub>More sheet</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/10-catalog.png" width="180" alt="Books catalog"><br>
+<sub>Books catalog</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/11-catalog-filtered.png" width="180" alt="Catalog (filtered)"><br>
+<sub>Catalog (filtered)</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/12-articles.png" width="180" alt="Articles"><br>
+<sub>Articles</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/13-media.png" width="180" alt="Media"><br>
+<sub>Media</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/14-publishers.png" width="180" alt="Publishers"><br>
+<sub>Publishers</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/15-wishlist.png" width="180" alt="Wishlist"><br>
+<sub>Wishlist</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/16-wishlist-empty.png" width="180" alt="Wishlist (empty)"><br>
+<sub>Wishlist (empty)</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/17-book-detail.png" width="180" alt="Book detail"><br>
+<sub>Book detail</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/18-book-detail-download.png" width="180" alt="Book detail (free download)"><br>
+<sub>Book detail (free download)</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/19-book-detail-expanded.png" width="180" alt="Book detail (expanded)"><br>
+<sub>Book detail (expanded)</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/20-article-detail.png" width="180" alt="Article detail"><br>
+<sub>Article detail</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/21-article-detail-video.png" width="180" alt="Article detail (video)"><br>
+<sub>Article detail (video)</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/22-publisher-detail.png" width="180" alt="Publisher detail"><br>
+<sub>Publisher detail</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/23-category-books.png" width="180" alt="Category books"><br>
+<sub>Category books</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/24-translated-books.png" width="180" alt="Translated books"><br>
+<sub>Translated books</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/25-recommended-books.png" width="180" alt="Recommended for translation"><br>
+<sub>Recommended for translation</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/26-search.png" width="180" alt="Search (history)"><br>
+<sub>Search (history)</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/27-search-results.png" width="180" alt="Search results"><br>
+<sub>Search results</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/28-search-no-results.png" width="180" alt="Search (no results)"><br>
+<sub>Search (no results)</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/29-cart.png" width="180" alt="Cart (empty)"><br>
+<sub>Cart (empty)</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/30-cart-populated.png" width="180" alt="Cart (with items)"><br>
+<sub>Cart (with items)</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/31-publish-author.png" width="180" alt="Publish: author info"><br>
+<sub>Publish: author info</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/32-publish-book.png" width="180" alt="Publish: book info"><br>
+<sub>Publish: book info</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/33-publish-review.png" width="180" alt="Publish: review"><br>
+<sub>Publish: review</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/34-publish-success.png" width="180" alt="Publish: success"><br>
+<sub>Publish: success</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/35-notifications.png" width="180" alt="Notification settings"><br>
+<sub>Notification settings</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/36-about.png" width="180" alt="About us"><br>
+<sub>About us</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/37-services.png" width="180" alt="Our services"><br>
+<sub>Our services</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/38-team.png" width="180" alt="Our team"><br>
+<sub>Our team</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/39-contact.png" width="180" alt="Contact us"><br>
+<sub>Contact us</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/40-privacy.png" width="180" alt="Privacy policy"><br>
+<sub>Privacy policy</sub>
+</td>
+<td align="center" width="200">
+<img src="mobile/doc/design/screenshots/41-terms.png" width="180" alt="Terms of use"><br>
+<sub>Terms of use</sub>
+</td>
+</tr>
+</table>
 
 ---
 
@@ -54,6 +260,7 @@ A bilingual (Arabic/English) books discovery and publishing platform consisting 
 | File storage | Cloudflare R2 (S3-compatible) | aws-sdk v3 ^3.1068 |
 | Email | Nodemailer (SMTP) | ^9.0.1 |
 | Push notifications | Web Push (VAPID) | ^3.6.7 |
+| Mobile push (server side) | firebase-admin (FCM) | ^13.10.0 |
 | Localization | next-intl | ^4.12.0 |
 | Search | Fuse.js | ^7.3.0 |
 | Charts | Recharts | ^3.8.1 |
@@ -71,10 +278,10 @@ A bilingual (Arabic/English) books discovery and publishing platform consisting 
 
 | Layer | Technology | Version |
 |---|---|---|
-| Framework | Flutter | SDK ^3.11.5 |
-| Language | Dart | ^3.11.5 |
-| App version | booksplatform | 2.0.0+9 |
-| Platforms | iOS + Android | Android min SDK 21 |
+| Framework | Flutter (pinned via FVM, `mobile/.fvmrc`) | 3.41.9 |
+| Language | Dart | SDK ^3.11.5 |
+| App version | booksplatform | 3.0.2+20 |
+| Platforms | iOS + Android | Android min SDK 24 (Flutter default), iOS 13.0 |
 | State management | flutter_bloc (Cubit) | ^9.1.1 |
 | Dependency injection | get_it + injectable | ^9.2.1 / ^3.0.0 |
 | HTTP | Dio + pretty_dio_logger | ^5.9.2 / ^1.4.0 |
@@ -93,6 +300,8 @@ A bilingual (Arabic/English) books discovery and publishing platform consisting 
 | Text-to-speech | flutter_tts | ^4.2.0 |
 | Markdown rendering | flutter_markdown | ^0.7.7 |
 | URL handling | url_launcher | ^6.3.2 |
+| Sharing | share_plus | ^12.0.2 |
+| Push notifications | firebase_core + firebase_messaging + flutter_local_notifications | ^3.11.0 / ^15.2.4 / ^18.0.1 |
 | Fonts | google_fonts | ^6.2.1 |
 | File picking | file_picker + image_picker | ^8.1.7 / ^1.1.2 |
 | Unit tests | flutter_test + mocktail | SDK / ^1.0.4 |
@@ -119,11 +328,12 @@ web/
 │   │   │   ├── media/          # Media / video content
 │   │   │   ├── search/         # Global search
 │   │   │   ├── publish/        # Book submission form
-│   │   │   ├── about/contact/  # Static + marketing pages
+│   │   │   ├── about/ contact/ services/ team/ privacy/ terms/  # Static + marketing pages
+│   │   │   ├── newsletter/     # Newsletter preferences + unsubscribed pages
 │   │   │   └── auth/           # Login + register
 │   │   └── admin/              # Admin dashboard + login
 │   └── api/v1/                 # REST Route Handlers (JSON)
-│       ├── books/ articles/ publishers/ authors/ media/ search/
+│       ├── books/ articles/ publishers/ media/ search/ hero-slides/
 │       ├── auth/ cart/ wishlist/ ratings/ comments/ contact/
 │       ├── newsletter/ notifications/ orders/ submissions/
 │       ├── admin/ (CRUD for all content types, passkey management)
@@ -138,13 +348,15 @@ web/
 │   ├── auth/                   # JWT, passkeys, RBAC, session management
 │   ├── db/                     # Prisma client singleton
 │   ├── email/ storage/ cache/  # Nodemailer, R2 upload, Redis cache
+│   ├── firebase/               # Firebase Admin (FCM) setup
 │   ├── articles/ search/       # Domain-specific helpers
 │   └── validation/ forms/      # Zod schemas + form helpers
 ├── hooks/                      # Custom React hooks
 ├── i18n/                       # next-intl config + request locale resolver
 ├── messages/                   # Translation JSON files (ar.json, en.json)
 ├── prisma/                     # Prisma schema + migrations + seed
-├── server/services/            # Longer server-side service classes
+├── server/services/            # Longer server-side service classes (incl. fcm.service.ts)
+├── docs/adr/                   # Architecture decision records
 ├── tests/
 │   ├── unit/                   # Vitest unit tests
 │   └── e2e/                    # Playwright end-to-end tests
@@ -173,20 +385,24 @@ mobile/lib/
     ├── media_creations/        # Video media content list
     ├── more/                   # "More" bottom sheet
     ├── newsletter/             # Newsletter subscription
-    ├── notifications/          # Push notification settings
+    ├── notifications/          # FCM push service + notification settings
     ├── onboarding/             # Splash, language selection, onboarding slides
     ├── publish/                # Multi-step book publishing form
     ├── publishers/             # Publishers list + detail
+    ├── ratings/                # Ratings + comments cubits and widgets
     ├── search/                 # Global search + search history
+    ├── static_pages/           # About, Contact, Services, Team, Privacy, Terms
     └── wishlist/               # Wishlist management
 ```
+
+The six main tabs (home, books, articles, media, publishers, wishlist) are hosted by `MainShellScreen`, a persistent `IndexedStack` shell built lazily on first visit; the tab cubits are provided once in `AppRouter` so state and scroll position survive tab switches.
 
 Each feature follows the same three-layer layout:
 
 ```
 features/<feature>/
 ├── data/
-│   ├── datasources/            # Remote data source (HTTP via ApiManager)
+│   ├── datasources/            # Remote data source (HTTP via ApiManager); local source only where cached (e.g. publishers)
 │   ├── models/                 # *_request.dart (toJson) + *_response.dart (fromJson + toEntity)
 │   └── repositories/           # Repository implementation (@LazySingleton)
 ├── domain/
@@ -206,7 +422,8 @@ features/<feature>/
 
 - **Bilingual browsing** — full AR/EN locale switching with RTL support, clean URLs via `next.config.mjs` rewrites
 - **Book catalog** — paginated/filtered listing, category browsing, translated books, nominated-for-translation subset
-- **Book detail** — full bibliographic info, cover image, description, ratings, related articles
+- **Book detail** — full bibliographic info, cover image, description, ratings, related articles, optional free-download link
+- **Static & marketing pages** — about, contact, services, team, privacy policy, terms
 - **Article hub** — list with featured card, article detail with rich content, comments, media embeds
 - **Publisher profiles** — publisher directory with associated book listings
 - **Author profiles** — author directory with associated books
@@ -219,7 +436,7 @@ features/<feature>/
 - **Book ratings** — user star ratings on books
 - **Comments** — article commenting system
 - **Newsletter** — subscribe/confirm/unsubscribe with double-opt-in, digest email via cron
-- **Push notifications** — Web Push (VAPID) subscription management + admin broadcast
+- **Push notifications** — Web Push (VAPID) subscription management + admin broadcast; FCM push to the mobile app when a book is created/published from the admin UI
 - **Ambassador program** — referral links + dashboard for ambassadors
 - **Contact form** — validated contact submission with email notification
 - **Admin dashboard** — full CRUD for books, articles, publishers, authors, categories, users, hero slides, orders, submissions, drafts, static pages, comments, B2B inquiries, trash/restore
@@ -235,7 +452,7 @@ features/<feature>/
 - **Onboarding** — splash, language selection, illustrated slides
 - **Home** — hero carousel (from admin-managed hero slides), category sections, book carousels, publisher strip, newsletter CTA
 - **Book catalog** — paginated grid, filter by category, sort order
-- **Book detail** — hero cover, bibliographic table, TTS (text-to-speech) player, similar books, purchase options
+- **Book detail** — hero cover, bibliographic table, TTS (text-to-speech) player, similar books, wishlist toggle, share button, and a free-download button when the book has a download URL
 - **Category books** — filtered listing per category
 - **Translated / Recommended books** — dedicated screens
 - **Article hub** — featured card + article rows; detail with hero header, rich markdown body, embedded audio player, video badge/player, reader comments
@@ -246,7 +463,8 @@ features/<feature>/
 - **Wishlist** — add/remove books with local persistence
 - **Publish a book** — multi-step form: author info → book info → review → success
 - **Newsletter** — bottom sheet subscription widget
-- **Push notification settings** — toggle notification preferences
+- **Push notifications** — Firebase Cloud Messaging (`new-books` topic), foreground local notifications, tap deep-links to a book or the articles tab, and a notification settings screen
+- **Persistent tab shell** — bottom-nav tabs keep their state and scroll position while switching
 - **Static pages** — About Us, Contact, Services, Team, Privacy Policy, Terms of Use
 - **Bilingual** — AR/EN with easy_localization JSON keys; RTL layout via `EdgeInsetsDirectional`
 
@@ -269,11 +487,11 @@ features/<feature>/
 
 | Tool | Version |
 |---|---|
-| Flutter SDK | ^3.11.5 |
+| Flutter SDK | 3.41.9 (pinned in `mobile/.fvmrc`; [FVM](https://fvm.app) recommended) |
 | Dart SDK | ^3.11.5 (bundled with Flutter) |
 | Android Studio / Xcode | Latest stable |
-| Android emulator or physical device | Android min SDK 21 |
-| iOS Simulator or physical device | iOS 14+ recommended |
+| Android emulator or physical device | Android min SDK 24 (Flutter 3.41.9 default) |
+| iOS Simulator or physical device | iOS 13.0+ (deployment target) |
 
 ### Environment Setup
 
@@ -281,8 +499,9 @@ features/<feature>/
 
 1. Copy the example env file and fill in your values:
    ```bash
-   cp web/.env.example web/.env.local
+   cp web/.env.example web/.env
    ```
+   Use `.env` (not only `.env.local`): `prisma.config.ts` loads `dotenv/config`, and the `db:seed` / `test:e2e:*` scripts pass `--env-file=.env`, so none of them read `.env.local`. Next.js loads `.env` as well.
 2. At minimum, set `DATABASE_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, and `NEXT_PUBLIC_APP_URL`. All other variables are optional for local development (features that require them will be disabled or error gracefully).
 
 #### Mobile
@@ -290,7 +509,9 @@ features/<feature>/
 No `.env` file needed. The mobile app uses compile-time `--dart-define` flags:
 
 - **Dev** (default): run without any flags — the app points to `https://booksplatform.net/api/v1`
-- **Prod**: pass `--dart-define=ENVIRONMENT=prod`
+- **Prod**: pass `--dart-define=ENVIRONMENT=prod` (currently the same base URL as dev — see `mobile/lib/core/constants/api_constants.dart`)
+
+Firebase client config (`mobile/android/app/google-services.json`, `mobile/ios/Runner/GoogleService-Info.plist`, `mobile/lib/firebase_options.dart`) is committed to the repo, so no extra setup is needed for push notifications.
 
 To set this permanently in VS Code, add to `.vscode/launch.json`:
 ```json
@@ -307,7 +528,7 @@ To set this permanently in VS Code, add to `.vscode/launch.json`:
 cd web
 npm ci
 npx prisma generate   # generate Prisma client
-npm run db:migrate    # run migrations (requires DATABASE_URL in .env.local)
+npm run db:migrate    # run migrations (requires DATABASE_URL in .env)
 npm run db:seed       # optional — seed sample data
 ```
 
@@ -315,6 +536,7 @@ npm run db:seed       # optional — seed sample data
 
 ```bash
 cd mobile
+fvm install                # optional — installs the pinned Flutter 3.41.9; then prefix commands with `fvm`
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs   # generate DI config
 ```
@@ -373,7 +595,7 @@ flutter build ios --dart-define=ENVIRONMENT=prod
 flutter build appbundle --dart-define=ENVIRONMENT=prod
 ```
 
-> For iOS App Store submission, see `mobile/build_release.ps1` for build automation steps.
+> For the obfuscated Google Play release build, run `mobile/build_release.ps1` (`flutter build appbundle --release --obfuscate --split-debug-info=build/app/outputs/symbols`). Back up the symbols directory with every release. The script is Android-only; iOS release steps are documented in `mobile/doc/handoffs/008-ios-release-prep/`.
 
 ---
 
@@ -386,6 +608,10 @@ books-platform/               # Monorepo root
 │   │   ├── core/             # Infrastructure: DI, networking, routing, theme, storage
 │   │   └── features/         # Product features (articles, books, cart, …)
 │   ├── test/                 # Unit + widget tests
+│   ├── doc/                  # Design system, localization guide, handoffs, release notes, design exports
+│   ├── scripts/              # validate_search_apis.py
+│   ├── build_release.ps1     # Android AAB release build (obfuscated)
+│   ├── .fvmrc                # Pinned Flutter version (FVM)
 │   ├── assets/
 │   │   ├── translations/     # en.json, ar.json (easy_localization)
 │   │   ├── static/           # Static images
@@ -403,9 +629,13 @@ books-platform/               # Monorepo root
 │   ├── prisma/               # Schema + migrations + seed
 │   ├── tests/                # Vitest unit + Playwright E2E
 │   ├── scripts/              # Data management scripts
+│   ├── docs/adr/             # Architecture decision records
+│   ├── .github/workflows/    # CI pipeline (ci.yml) + PR template
 │   ├── Dockerfile            # Multi-stage production build
 │   ├── docker-compose.yml    # Coolify / server deployment
 │   └── package.json          # Dependency manifest
+├── specs/                    # Spec Kit artifacts for the mobile app (spec, plan, tasks)
+├── doc/handoffs/             # Session handoff notes
 ├── schema.prisma             # Root-level Prisma schema reference (canonical copy in web/prisma/)
 └── api-docs.md               # API endpoint documentation
 ```
@@ -435,7 +665,7 @@ books-platform/               # Monorepo root
 | Comments | `/comments` | Article comments |
 | Contact | `/contact` | Contact form submission |
 | Newsletter | `/newsletter` | Subscribe, confirm, unsubscribe, preferences |
-| Notifications | `/notifications` | Web Push subscription + channel subscription |
+| Notifications | `/notifications` | Web Push subscription, channel subscription, mobile FCM token subscription (`/notifications/mobile/subscribe`) |
 | Orders | `/orders/checkout` | Order placement |
 | Submissions | `/submissions` | Book publishing submissions + draft management |
 | Hero Slides | `/hero-slides` | Home carousel slides |
@@ -512,7 +742,7 @@ To register a new dependency:
 
 ## Environment Variables Reference
 
-### Web (`web/.env.local`)
+### Web (`web/.env`)
 
 | Key | Purpose | Required? |
 |---|---|---|
@@ -559,10 +789,22 @@ To register a new dependency:
 | `NEXT_PUBLIC_GOOGLE_PLAY_URL` | Google Play link (footer badge) | No |
 | `NEXT_PUBLIC_SITE_NAME_AR` | Arabic site name (SEO) | No |
 | `NEXT_PUBLIC_SITE_NAME_EN` | English site name (SEO) | No |
+| `NEXT_PUBLIC_SITE_TAGLINE_AR` / `NEXT_PUBLIC_SITE_TAGLINE_EN` | Site tagline (SEO) | No |
+| `NEXT_PUBLIC_OG_IMAGE` | Default Open Graph image URL | No |
+| `NEXT_PUBLIC_TWITTER_HANDLE` | Twitter handle for social cards | No |
+| `FIREBASE_PROJECT_ID` | Firebase project ID (FCM push to the mobile app) | Yes (mobile push) |
+| `FIREBASE_CLIENT_EMAIL` | Firebase service-account email | Yes (mobile push) |
+| `FIREBASE_PRIVATE_KEY` | Firebase service-account private key (literal `\n` for newlines) | Yes (mobile push) |
+| `LIBRETRANSLATE_URL` / `LIBRETRANSLATE_API_KEY` | Self-hosted LibreTranslate endpoint / key (commented out in `.env.example`) | No |
+| `MYMEMORY_EMAIL` | Raises the MyMemory free translation quota (commented out in `.env.example`) | No |
+| `TRANSLATION_PROVIDER_ORDER` | Auto-translation provider order, default `libretranslate,mymemory,google,lingva` (commented out in `.env.example`) | No |
+| `REDIS_URL` | Local Redis alternative to Upstash for dev (commented out in `.env.example`) | No |
+| `BOOKS_PLATFORM_IMAGES_DIR` | Local folder used by bulk image ingestion scripts | No |
 | `NEWSLETTER_DIGEST_LOOKBACK_DAYS` | Days to look back on first digest run | No |
 | `OPENAI_API_KEY` | OpenAI key for AI description generation | No |
-| `FACEBOOK_ACCESS_TOKEN` | Facebook Graph API token for auto-post | No |
-| `TWITTER_API_KEY` / `TWITTER_API_SECRET` | Twitter API credentials | No |
+| `FACEBOOK_ACCESS_TOKEN` / `FACEBOOK_PAGE_ID` | Facebook Graph API token and page ID for auto-post | No |
+| `TWITTER_API_KEY` / `TWITTER_API_SECRET` / `TWITTER_ACCESS_TOKEN` / `TWITTER_ACCESS_SECRET` | Twitter API credentials | No |
+| `INSTAGRAM_ACCESS_TOKEN` | Instagram API token for auto-post | No |
 | `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_WHATSAPP_FROM` | WhatsApp via Twilio | No |
 | `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHANNEL_ID` | Telegram bot credentials | No |
 | `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | Sentry error monitoring DSN | No |
@@ -576,7 +818,7 @@ No runtime env file. Use compile-time flags:
 
 | Flag | Purpose | Required? |
 |---|---|---|
-| `--dart-define=ENVIRONMENT=prod` | Switch API base URL to production | No (default: dev) |
+| `--dart-define=ENVIRONMENT=prod` | Select the prod environment (dev and prod currently share the same base URL) | No (default: dev) |
 
 ---
 
@@ -609,7 +851,7 @@ E2E tests live in `web/tests/e2e/`. Coverage includes: public route health, auth
 
 ### Mobile
 
-**Unit tests (flutter_test + mocktail):**
+**Unit and widget tests (flutter_test + mocktail):**
 
 ```bash
 cd mobile
@@ -617,15 +859,17 @@ flutter test                              # run all tests
 flutter test test/path/to/test_file.dart  # run a single file
 ```
 
-Tests live in `mobile/test/`. Coverage areas include: data source models (books, articles, publishers), repository implementations, cubits (newsletter, publish, notifications), API envelope parsing, search response models.
+Tests live in `mobile/test/`. Coverage areas include: data source models (books, articles, publishers), remote/local data sources and repository implementations (books, publishers, search, ratings, wishlist, newsletter), cubits (newsletter, publish, notification settings), API envelope parsing, search response models, helpers (TTS text chunker, biblio helpers), the tab-shell notifier, and widget tests for `BottomNavWidget`, `TtsPlayerWidget`, and search-results list performance.
 
-> ⚠️ Widget tests are not yet comprehensively implemented beyond the default `widget_test.dart`.
+> ⚠️ Widget-test coverage is still narrow: no screen-level widget tests exist, and `test/widget_test.dart` is the default template test.
 
 ---
 
 ## CI/CD
 
-CI is configured for the **web application only** via GitHub Actions (`.github/workflows/ci.yml`).
+CI is configured for the **web application only** via GitHub Actions (`web/.github/workflows/ci.yml`). All jobs use Node 20 and install with `npm ci --legacy-peer-deps`.
+
+> ⚠️ The workflow lives under `web/.github/`, and this repository has no root-level `.github/` directory. GitHub Actions only reads workflows from the repository root, so this pipeline will not run from this monorepo unless the file is moved to `.github/workflows/` (with `working-directory: web`) or `web/` is its own repository.
 
 | Job | What it does | Trigger |
 |---|---|---|
@@ -656,14 +900,14 @@ CI is configured for the **web application only** via GitHub Actions (`.github/w
    ```
 4. The container exposes port `3000` internally. Reverse proxy (Caddy/Nginx via Coolify) handles TLS.
 
-The `Dockerfile` uses a **3-stage multi-stage build** (deps → builder → runner) on `node:20-bookworm-slim`. The runner image uses Next.js `standalone` output mode and runs as a non-root `nextjs` user. `tini` is used as PID 1.
+The `Dockerfile` uses a **multi-stage build** (base → deps → builder → runner) on `node:20-bookworm-slim`; the builder stage runs `scripts/docker-next-build.sh`. The runner image uses Next.js `standalone` output mode and runs as a non-root `nextjs` user. `tini` is used as PID 1.
 
 `docker-compose.yml` targets Coolify deployments where the reverse proxy handles host-port binding.
 
 ### Mobile
 
 - **Android APK:** `flutter build apk --dart-define=ENVIRONMENT=prod` → `build/app/outputs/flutter-apk/app-release.apk`
-- **Android App Bundle:** `flutter build appbundle --dart-define=ENVIRONMENT=prod`
+- **Android App Bundle:** `flutter build appbundle --dart-define=ENVIRONMENT=prod` (or `mobile/build_release.ps1` for the obfuscated Play Store build)
 - **iOS:** `flutter build ios --dart-define=ENVIRONMENT=prod` → archive + distribute via Xcode or Transporter
 
 ---
@@ -673,14 +917,16 @@ The `Dockerfile` uses a **3-stage multi-stage build** (deps → builder → runn
 ### Branch naming (detected from git history)
 
 ```
-feat/<short-description>   # new feature
-fix/<short-description>    # bug fix
-chore/<short-description>  # tooling, config, non-functional
-refactor/<short-description>
-docs/<short-description>
+feat/<short-description>        # new feature (feature/<name> also used)
+fix/<short-description>         # bug fix
+debug/<short-description>       # investigation branches
+ref/<short-description>         # refactors
+release/v<version>+<build>      # release branches, e.g. release/v3.0.0+17
 ```
 
-### Commit convention (commitlint — Conventional Commits)
+### Commit convention (Conventional Commits, enforced by commitlint + Husky in `web/`)
+
+Allowed types (`web/commitlint.config.ts`): `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `perf`, `ci`, `build`, `revert`. The git history also contains a few `debug:` commits, which that config would reject.
 
 ```
 feat: add TTS player to book detail screen
@@ -691,9 +937,9 @@ chore: update dependencies
 ### Pull request process
 
 1. Branch from `main`
-2. Open a PR against `main` or `develop`
-3. CI must pass all jobs (quality, tests, e2e, build) before merge
-4. PRs should use the `.github/PULL_REQUEST_TEMPLATE.md` template
+2. Open a PR against `main` (the CI config also lists `develop`, but no such branch exists in this repo)
+3. CI must pass all jobs (quality, tests, e2e, build) before merge — see the CI/CD caveat above
+4. PRs should use the `web/.github/PULL_REQUEST_TEMPLATE.md` template
 
 ### After adding `@injectable` classes (mobile)
 
@@ -710,15 +956,19 @@ Verify the generated class appears in `lib/core/di/injection_container.config.da
 
 | Area | Item |
 |---|---|
-| Mobile — push notifications | Firebase FCM is commented out in `pubspec.yaml`. Requires adding `google-services.json` (Android), `GoogleService-Info.plist` (iOS), and calling `Firebase.initializeApp()` |
-| Mobile — push notifications | Backend endpoint `POST /notifications/mobile/subscribe` is not yet implemented |
+| Mobile — push notifications | `FcmService` still emits `>>> [FCM DEBUG]` `debugPrint` tracing; on iOS the `new-books` topic subscription is only attempted right after permission grant and is not retried if the APNs token is not yet available |
 | Mobile — article audio | Audio URL format for article audio player is not yet confirmed with the backend (`article_detail_audio_player.dart`) |
-| Mobile — file upload | Cover image and manuscript upload in the publish flow are not integrated (blocked on backend S3/UploadThing endpoint) |
+| Mobile — file upload | Cover image and manuscript upload in the publish flow use `StubFileUploadServiceImpl`, which returns placeholder URLs (blocked on backend S3/UploadThing endpoint) |
+| Mobile — cart | `CartCubit.addItem` has no callers, so nothing in the UI can add a book to the cart; `CartScreen` only shows persisted items |
+| Mobile — ratings | `RatingForm` and `RatingSummaryWidget` exist but no screen renders them (only article comments are wired up), although `RatingsCubit` is provided on the book-detail route |
+| Mobile — environments | `ApiConstants` dev and prod base URLs are identical (`https://booksplatform.net/api/v1`) |
+| Web — wishlist | `POST /wishlist` has a `TODO` to send a magic-link email via Resend once email integration is active (`web/app/api/v1/wishlist/route.ts`) |
 | Web — payments | Stripe and Paymob integration code is wired at the API layer; end-to-end checkout flow requires platform account configuration |
 | Web — social auto-post | Facebook, Twitter, Instagram auto-post is env-configured but untested in the current deployment |
 | Web — WhatsApp | Twilio WhatsApp integration is env-configured but not verified end-to-end |
 | Web — Telegram | Telegram bot integration is env-configured but not verified end-to-end |
 | CI — mobile | No CI pipeline exists for the Flutter mobile app |
+| CI — web | `ci.yml` sits in `web/.github/workflows/`, not a root `.github/`, so GitHub will not run it from this repo as-is |
 
 ---
 

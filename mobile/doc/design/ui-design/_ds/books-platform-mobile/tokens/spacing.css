@@ -1,0 +1,7 @@
+/* From lib/core/constants/spacing_constants.dart and app_constants.dart (design canvas 390 x 844) */
+:root {
+  --canvas-width: 390px;
+  --canvas-height: 844px;
+  --s4: 4px; --s8: 8px; --s12: 12px; --s16: 16px; --s20: 20px;
+  --s24: 24px; --s32: 32px; --s48: 48px; --s64: 64px;
+}

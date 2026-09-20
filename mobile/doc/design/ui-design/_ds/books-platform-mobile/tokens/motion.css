@@ -1,0 +1,7 @@
+/* From lib/core/constants/app_constants.dart (animation 300ms, splash 2500ms, splash fade 1000ms, hero 7s) */
+:root {
+  --motion-animation: 300ms;
+  --motion-chip: 180ms;
+  --motion-splash-fade: 1000ms;
+  --motion-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
+}

@@ -1,0 +1,7 @@
+/* From lib/core/theme/app_shadows.dart */
+:root {
+  --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --shadow-soft-lg: 0 12px 40px rgba(0, 0, 0, 0.08);
+  --shadow-brand: 0 8px 28px rgba(177, 30, 46, 0.22);
+  --shadow-header: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
