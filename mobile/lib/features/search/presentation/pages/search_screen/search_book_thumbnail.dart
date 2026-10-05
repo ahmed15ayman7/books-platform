@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/widgets/app_network_image.dart';
 
 /// Compact book cover thumbnail for search result rows.
 /// Renders the cover image when available, falling back to the gradient.
@@ -54,11 +54,10 @@ class SearchBookThumbnail extends StatelessWidget {
             ),
           ),
           if (imageUrl != null)
-            CachedNetworkImage(
-              imageUrl: imageUrl!,
-              fit: BoxFit.cover,
-              placeholder: (_, _) => const SizedBox.shrink(),
-              errorWidget: (_, _, _) => const SizedBox.shrink(),
+            AppNetworkImage(
+              url: imageUrl,
+              placeholder: (_) => const SizedBox.shrink(),
+              error: (_) => const SizedBox.shrink(),
             ),
         ],
       ),
