@@ -80,7 +80,7 @@
 ## Key References
 
 - `mobile/CLAUDE.md`, `mobile/.claude/rules/flutter_scaffold_prompt.md`, `mobile/.claude/rules/flutter_feature_prompt.md` — architecture rules for this repo.
-- SSH access to production VPS already set up: key at `~/.ssh/claude_books_platform` (passphrase-less ed25519, dedicated to this debugging task), host `49.13.218.137`, user `root`, port 22. Backend container name: `web-q9vnuussumtcsfv4bzjxzxoq-130936095621` (Coolify-managed). Command pattern: `ssh -i ~/.ssh/claude_books_platform root@49.13.218.137 "docker logs --since 10m web-q9vnuussumtcsfv4bzjxzxoq-130936095621 2>&1 | grep -i fcm"`.
+- Production server access: see the private ops notes (not in this repo).
 - This is a **single monorepo** at `/Users/youssefemadeldin.ai/SOURCE-CODE/books-platform` — `mobile/` and `web/` are folders in the same repo, not separate repos. Current branch: `release/v3.0.0+17`. Main branch: `main`.
 - Device under test: "iPhone Yousef", iOS 26.1 (23B85), physical iPhone 11 (iPhone12,1), UDID `00008030-000655020E86802E`.
 - Flutter run log convention used this session: redirect to `/private/tmp/claude-501/.../scratchpad/flutter_run.log` in background, then `Monitor` tool tailing it filtered to `FCM DEBUG|Native|Exception|error:|Lost connection|...` — this scratchpad path is session-specific and won't survive into the new session; recreate as needed.

@@ -35,8 +35,7 @@
    there is still no visibility into whether a book-create send actually succeeded server-side, short
    of reading raw Coolify/Docker logs. This is now the main open thread for the next session (see
    Pending Tasks).
-7. **Set up direct SSH root access to the production server** (`49.13.218.137`, hostname
-   `books-platform-vps`) for this Claude session, at the user's explicit request and confirmation.
+7. **Set up direct SSH root access to the production server** for this Claude session, at the user's explicit request and confirmation.
    See "Server Access" section below — this access likely still exists at the start of the new
    session unless the user has revoked it.
 
@@ -45,7 +44,7 @@
 | # | Bug | Severity | Location | Evidence |
 |---|---|---|---|---|
 | 1 | **(Open)** On iOS real device (debug build via `flutter run`), `onTokenRefresh` does not fire within the fallback timeout after `getToken()` throws `apns-token-not-set` — tested twice, timed out both times at the original 10s. Timeout has been bumped to 25s (uncommitted) but **not yet retested**. | High — iOS push registration still completely non-functional | `lib/features/notifications/services/fcm_service.dart:75-99` | Two consecutive real-device console captures, both showing `getToken() threw ... apns-token-not-set` → `falling back to onTokenRefresh.first` → `TIMED OUT`. Full traces preserved in conversation history if needed. |
-| 2 | **(Fixed this session)** Production database (`postgres://...@49.13.218.137:5433/postgres`) was completely missing the `fcm_tokens` table — the table Prisma's `FcmToken` model maps to (`@@map("fcm_tokens")`, `prisma/schema.prisma:721-739`). Confirmed via `prisma migrate diff` (the *only* drift between schema and live DB — no other tables/columns missing). Also confirmed via `_prisma_migrations`: last applied migration was `20260619180557_add_newsletter_preferences`, nothing FCM-related ever deployed. This repo has **no `prisma/migrations/` folder checked in at all** — schema sync isn't happening via versioned migrations here, which is *why* this was never caught. | Was Critical, now Fixed | DB schema, no local migrations folder | Applied the exact `CREATE TABLE`/`CREATE INDEX` SQL Prisma generated, directly via a one-off Postgres connection (see Server/DB Access). Re-ran `prisma migrate diff --exit-code` after → confirmed empty diff (fully in sync). |
+| 2 | **(Fixed this session)** Production database was completely missing the `fcm_tokens` table — the table Prisma's `FcmToken` model maps to (`@@map("fcm_tokens")`, `prisma/schema.prisma:721-739`). Confirmed via `prisma migrate diff` (the *only* drift between schema and live DB — no other tables/columns missing). Also confirmed via `_prisma_migrations`: last applied migration was `20260619180557_add_newsletter_preferences`, nothing FCM-related ever deployed. This repo has **no `prisma/migrations/` folder checked in at all** — schema sync isn't happening via versioned migrations here, which is *why* this was never caught. | Was Critical, now Fixed | DB schema, no local migrations folder | Applied the exact `CREATE TABLE`/`CREATE INDEX` SQL Prisma generated, directly via a one-off Postgres connection (see Server/DB Access). Re-ran `prisma migrate diff --exit-code` after → confirmed empty diff (fully in sync). |
 | 3 | **(Open, not yet fixed, lower priority)** `sendMobileNotification` in `app/api/v1/admin/books/route.ts:126` and `[id]/route.ts:88` is fire-and-forget with only `.catch((err) => console.error('[FCM book create send failed]', err))` — no success logging at all, and does not write to `notification_logs`. This means there is currently **zero server-side visibility** into whether a book-create notification send succeeded, short of reading raw container logs. | Medium — pure observability gap, not a functional bug per se | `app/api/v1/admin/books/route.ts:126`, `app/api/v1/admin/books/[id]/route.ts:88` | Confirmed via grep — `notificationLog` is only referenced in `admin/settings/notifications/route.ts`, `admin/notifications/mobile/send/route.ts`, `admin/notifications/broadcast/route.ts`, `lib/email/mailer.ts`, `lib/email/newsletter-digest.ts` — **not** in either books route. |
 | 4 | **(Open, flagged, not investigated)** The Notification Settings screen has no `BlocListener`/`BlocConsumer` for `NotificationSettingsError` — only a `BlocBuilder` for `NotificationSettingsLoaded` (`lib/features/notifications/presentation/screens/notification_settings_screen/notification_settings_screen.dart:56-73`). This means if `registerFcmToken` ever fails server-side, the toggle silently shows ON with no error shown to the user — this was the mechanism behind "toggle succeeded silently" reported earlier in the session, independent of the DB table bug. | Medium — real UX gap, not yet fixed | `lib/features/notifications/presentation/screens/notification_settings_screen/notification_settings_screen.dart` | Confirmed by reading the screen file — no listener wired for the error state at all. |
 
@@ -88,7 +87,7 @@ document this, even if applied out-of-band.**
 ## What's Next (ordered)
 
 1. Retest iOS with the 25s timeout via `flutter run --profile` first (fast, rules out debug-mode Dart overhead) — check the `[FCM DEBUG]` trace for actual timing.
-2. If still failing/timing out, use the now-established SSH server access to pull `docker logs` for the `books-platform` web container directly (was in progress at session end — command was about to run `docker ps` to find the exact container name, e.g. something like `web-q9vnuussumtcsfv4bzjxzxoq-...`) to cross-reference server-side timing/errors against the client-side timeout.
+2. If still failing/timing out, use the now-established SSH server access to pull `docker logs` for the `books-platform` web container directly (was in progress at session end — command was about to run `docker ps` to find the exact container name, e.g. something like `web-<coolify-app-id>-...`) to cross-reference server-side timing/errors against the client-side timeout.
 3. Once `--profile` result is known, decide whether a TestFlight build test is still needed before considering iOS done (see Pending Tasks — likely yes regardless, since debug/profile both use sandbox APNs).
 4. Address the `notification_logs` observability gap (Bugs Found #3) — ask user whether in scope now or deferred, given it requires a backend `main` push.
 5. Clean up debug prints and decide on commit/push strategy for the whole branch.
@@ -102,30 +101,11 @@ document this, even if applied out-of-band.**
 
 ## Server / DB Access
 
-**Production Postgres** (same VPS as below): `postgres://postgres:<password>@49.13.218.137:5433/postgres`
-— the password was shared in this session's chat history in plaintext. **Recommend rotating this
-credential** when convenient; not urgent enough to block work, per user's own earlier acknowledgment
-of this tradeoff in a prior session too.
-
-**Production server SSH**: root access to `49.13.218.137` (hostname `books-platform-vps`) was set up
-this session via a fresh SSH keypair generated specifically for this Claude session, at the user's
-explicit request. The public key was appended to `root`'s `~/.ssh/authorized_keys` on the host (added
-via Coolify's **Terminal** tab → selecting the plain `localhost` entry, which connects to the host
-itself rather than any individual container — the per-app "Terminal" tab and the "localhost -> <container>"
-entries in the team-level Terminal page both connect *inside* Docker containers instead, which do not
-have the permissions or persistence needed for this). Connection was verified working
-(`whoami` → `root`, `hostname` → `books-platform-vps`) at the end of this session, but the next
-command (`docker ps` to enumerate containers) was interrupted by the user right as this handoff was
-requested — **not yet run**.
-
-The private key lives in this session's scratchpad directory (session-specific, will not persist to a
-new session): `coolify_session_key` / `coolify_session_key.pub`. **A new session will need to either
-regenerate a new keypair (if the user wants to grant fresh access again) or ask the user whether the
-existing `authorized_keys` entry should be reused/removed.** To revoke: remove the
-`claude-session-temp-access` line from `root@49.13.218.137:~/.ssh/authorized_keys`.
+**Production Postgres and server SSH**: see the private ops notes (not in this repo). The DB password
+was shared in plaintext in an earlier chat; rotating it is recommended.
 
 **Coolify app config** (for reference): the `books-platform` web app is Docker Compose–based, base
-directory `/web`, container name pattern `web-q9vnuussumtcsfv4bzjxzxoq-<timestamp>`, domain
+directory `/web`, container name pattern `web-<coolify-app-id>-<timestamp>`, domain
 `https://booksplatform.net`, `NODE_ENV: production` set in the compose file.
 
 ## Clarifications & Decisions
@@ -138,7 +118,7 @@ directory `/web`, container name pattern `web-q9vnuussumtcsfv4bzjxzxoq-<timestam
 | Should Claude check whether anything else in the schema is missing from prod first? | Yes, requested explicitly — done via `prisma migrate diff`, confirmed `fcm_tokens` was the only gap |
 | Will backend code changes pushed to `main` deploy immediately? | Yes, confirmed by user — must get explicit sign-off before any backend push, not just DB changes |
 | How should Claude get direct access to check server-side (Coolify) logs? | User explicitly asked Claude to set up direct SSH access rather than relay copy-pasted logs; this was initially blocked by an auto-mode safety classifier requiring more explicit confirmation, which the user then gave explicitly |
-| Which Coolify Terminal option connects to the actual host vs. a container? | Resolved through trial: per-app "Terminal" tab and "localhost -> <container-name>" entries in the team-level Terminal page both connect inside Docker containers (confirmed via `whoami` → `nextjs`, permission denied on home dir); the plain `localhost` entry (no arrow) connects to the actual host (confirmed via `whoami` → `root`, `hostname` → `books-platform-vps`) |
+| Which Coolify Terminal option connects to the actual host vs. a container? | Resolved through trial: per-app "Terminal" tab and "localhost -> <container-name>" entries in the team-level Terminal page both connect inside Docker containers (confirmed via `whoami` → `nextjs`, permission denied on home dir); the plain `localhost` entry (no arrow) connects to the actual host (confirmed via `whoami` → `root`, `hostname` → the prod host) |
 
 ## Notes
 

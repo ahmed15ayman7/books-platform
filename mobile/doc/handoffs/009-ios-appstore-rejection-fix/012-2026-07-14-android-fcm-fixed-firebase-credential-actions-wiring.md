@@ -18,9 +18,9 @@
 1. **Reconnected to production SSH access** from the previous session — the private key had not
    persisted into this new session's scratchpad (expected, session-specific), but the *previous*
    session's scratchpad directory still existed on disk at
-   `/private/tmp/claude-501/.../5cb74783-b727-4115-9bd0-df7fb7f5cc46/scratchpad/coolify_session_key`,
+   the previous session's scratchpad (key file),
    and the corresponding public key was still in the server's `authorized_keys` (never revoked).
-   Connection verified working (`whoami` → `root`, `hostname` → `books-platform-vps`).
+   Connection verified working (`whoami` → `root`, `hostname` → the prod host).
 2. **Retested iOS with the 25s `onTokenRefresh` timeout** (from previous session's fix) via
    `flutter run --profile` on the real device. **Still timed out** — third consecutive failure
    (2× at 10s in debug mode previously, now 1× at 25s in profile mode). Ruled out server-side cause
@@ -62,16 +62,16 @@
    meaning **no FCM send had ever actually succeeded**, on any platform, at any point in this
    project's history, until fixed in this session.
 8. **Fixed the credential**: validated a fresh Firebase service account JSON at
-   `/Users/youssefemadeldin.ai/Downloads/books-platform-9cfbb-firebase-adminsdk-fbsvc-888927ae82.json`
+   the Firebase service account JSON (kept locally, not in this repo)
    (confirmed valid PEM structure locally via Python, without printing the key value). Located
    Coolify's actual on-disk env file for this app at
-   `/data/coolify/applications/q9vnuussumtcsfv4bzjxzxoq/.env` (confirmed this is a **generated
+   `/data/coolify/applications/<coolify-app-id>/.env` (confirmed this is a **generated
    artifact**, rewritten from Coolify's internal database on every UI-triggered deploy — timestamp
    matched the last deploy exactly). Generated the correctly-escaped single-line value locally,
    transferred it to the server via `scp` (file-based, never as a shell argument, to avoid shell
    history exposure), and replaced the `FIREBASE_PRIVATE_KEY=` line via a Python script reading from
    that file (again avoiding printing the secret to any transcript or shell history). Recreated the
-   container via `docker compose -p q9vnuussumtcsfv4bzjxzxoq up -d --force-recreate` to pick up the
+   container via `docker compose -p <coolify-app-id> up -d --force-recreate` to pick up the
    corrected env (a plain `docker restart` would not have reloaded env vars).
 9. **Verified end-to-end on Android, live in production**: published a test book →
    `[FCM DEBUG] createBook — published=true` → token lookup found 3 registered tokens →
@@ -86,7 +86,7 @@
 |---|---|---|---|---|
 | 1 | **(Open, carried over from `011-...md`)** On iOS real device, `onTokenRefresh` does not fire within 25s after `getToken()` throws `apns-token-not-set` — retested this session in `--profile` mode, still timed out. Server-side and OS-permission causes both ruled out this session. Points at sandbox-APNs unreliability, which only a TestFlight build (production APNs entitlement) can confirm/deny. | High — iOS push still completely non-functional | `lib/features/notifications/services/fcm_service.dart:75-103` | Clean instrumented trace: `getToken() threw apns-token-not-set` → `falling back to onTokenRefresh.first (25s timeout)` → `onTokenRefresh fallback TIMED OUT after 25s` → `getToken() returned: null`. Zero server-side FCM/subscribe activity during the test window (confirmed via `docker logs`). Device Notification permission and Background App Refresh both confirmed ON via screenshots. |
 | 2 | **(Fixed this session)** Admin dashboard's book create/edit form (`book-edit-form.tsx`) calls Server Actions `createBook`/`updateBook` in `app/[locale]/(admin)/admin/books/[id]/edit/actions.ts` — **not** the REST API route `app/api/v1/admin/books/route.ts`, which was the only place `sendMobileNotification` was ever called. The Server Actions had zero FCM logic. This meant no notification was ever attempted from the actual UI the user uses, regardless of `published` state, silently, for the entire project history. | Was Critical, now Fixed | `web/app/[locale]/(admin)/admin/books/[id]/edit/actions.ts` (fix); `web/app/api/v1/admin/books/route.ts` (the now-effectively-dead code path that was originally instrumented/assumed to be the live one) | Confirmed via `grep -rn "createBook\|updateBook"` across the admin books UI — only `book-edit-form.tsx` imports/calls them, at lines 8, 237, 257. Confirmed via direct production log tailing during a real publish through the UI: zero `[FCM DEBUG]` output at all from the REST route, even after deploying debug logging to it. |
-| 3 | **(Fixed this session)** `FIREBASE_PRIVATE_KEY` in Coolify's stored env config for the `books-platform` web app was a corrupted/malformed PEM value. Firebase Admin SDK could not authenticate at all — `sendFcmToTokens` threw `FirebaseAppError: app/invalid-credential — Failed to parse private key: Error: error:1E08010C:DECODER routines::unsupported` on every call, unconditionally, regardless of which code path invoked it. This had presumably been broken since the credential was first configured — meaning **zero FCM sends had ever succeeded**, on either platform, before this session, independent of bug #2 above. | Was Critical, now Fixed | Coolify env var storage (source of truth: internal DB, not directly inspected); generated artifact at `/data/coolify/applications/q9vnuussumtcsfv4bzjxzxoq/.env` on the VPS | `errorInfo.code: 'app/invalid-credential'` in production logs, captured live during a test send immediately after bug #2's fix was deployed. Root Firebase service account JSON validated locally as structurally correct (proper PEM markers, 28 newlines, matches expected RSA-2048 PKCS8 length) — confirming the corruption happened specifically in how the value was entered into Coolify, not in the source credential file. |
+| 3 | **(Fixed this session)** `FIREBASE_PRIVATE_KEY` in Coolify's stored env config for the `books-platform` web app was a corrupted/malformed PEM value. Firebase Admin SDK could not authenticate at all — `sendFcmToTokens` threw `FirebaseAppError: app/invalid-credential — Failed to parse private key: Error: error:1E08010C:DECODER routines::unsupported` on every call, unconditionally, regardless of which code path invoked it. This had presumably been broken since the credential was first configured — meaning **zero FCM sends had ever succeeded**, on either platform, before this session, independent of bug #2 above. | Was Critical, now Fixed | Coolify env var storage (source of truth: internal DB, not directly inspected); generated artifact at `/data/coolify/applications/<coolify-app-id>/.env` on the VPS | `errorInfo.code: 'app/invalid-credential'` in production logs, captured live during a test send immediately after bug #2's fix was deployed. Root Firebase service account JSON validated locally as structurally correct (proper PEM markers, 28 newlines, matches expected RSA-2048 PKCS8 length) — confirming the corruption happened specifically in how the value was entered into Coolify, not in the source credential file. |
 | 4 | **(Open, not yet fixed)** `notification_logs` observability gap from previous handoff — now partially superseded by the `[FCM DEBUG]` console tracing added this session, but that tracing is still only visible via raw `docker logs`, not queryable/persisted anywhere. Worth reconsidering whether to also write these attempts to the `notification_logs` table now that the send path is confirmed working, so future issues are diagnosable without SSH access. | Low-Medium — nice-to-have now that the critical bugs are fixed | `web/server/services/fcm.service.ts`, `web/app/[locale]/(admin)/admin/books/[id]/edit/actions.ts` | Not re-investigated this session beyond adding console logging; carried over from `011-...md` Bugs Found #3. |
 | 5 | **(Open, flagged previously, not investigated this session)** Notification Settings screen has no `BlocListener`/`BlocConsumer` for `NotificationSettingsError` — silent failure on the client if `registerFcmToken` ever fails server-side. Carried over unchanged from `011-...md` Bugs Found #4. | Medium — real UX gap | `lib/features/notifications/presentation/screens/notification_settings_screen/notification_settings_screen.dart:56-73` | Unchanged from previous session's finding. |
 
@@ -99,15 +99,15 @@
 | `web/app/api/v1/admin/books/[id]/route.ts` | Added `[FCM DEBUG]` tracing around the existing `sendMobileNotification` call (update path) | Same as above | Yes — commit `ec85507` on `main` |
 | `web/server/services/fcm.service.ts` | Added `[FCM DEBUG]` tracing: token lookup count, raw `sendFcmToTokens` result, invalid-token deactivation | Core visibility fix — this is what actually let us see the private-key error and then the final success | Yes — commit `ec85507` on `main` |
 | `lib/features/notifications/services/fcm_service.dart` | Added explicit, proactive Android notification channel creation (`books_platform_channel`) inside `_initLocalNotifications()`, using `AndroidNotificationChannel` + `createNotificationChannel()` | **Investigated as a hypothesis this session** — Android 8+ silently drops FCM notifications targeting a channel that doesn't already exist on-device, and the channel was previously only created lazily on first foreground `.show()` call. **Not yet confirmed necessary** — the actual Android fix that got verified working was the backend credential/wiring fix (bugs #2 and #3); this client-side channel fix has not been separately tested against a background/killed-app notification. Still uncommitted on `debug/push-notifications-e2e`. | No — uncommitted on `debug/push-notifications-e2e` |
-| `[NOT a code file]` Coolify env config for `books-platform` web app | `FIREBASE_PRIVATE_KEY` value replaced with a correctly re-escaped value derived from `/Users/youssefemadeldin.ai/Downloads/books-platform-9cfbb-firebase-adminsdk-fbsvc-888927ae82.json` | Fixes bug #3 | Applied directly via SSH to the on-disk `.env` + container recreate. **Not yet reflected in Coolify's UI/database** — see Pending Tasks, this is the single most important follow-up item |
+| `[NOT a code file]` Coolify env config for `books-platform` web app | `FIREBASE_PRIVATE_KEY` value replaced with a correctly re-escaped value derived from the Firebase service account JSON (kept locally, not in this repo) | Fixes bug #3 | Applied directly via SSH to the on-disk `.env` + container recreate. **Not yet reflected in Coolify's UI/database** — see Pending Tasks, this is the single most important follow-up item |
 
 ## Files Audited (no changes)
 
 | File | Checked For | Result |
 |---|---|---|
 | `book-edit-form.tsx` | Which server functions the admin book form actually calls | Confirmed `createBook`/`updateBook` from `./actions`, not the REST API route — this is what led to finding bug #2 |
-| `/Users/youssefemadeldin.ai/Downloads/books-platform-9cfbb-firebase-adminsdk-fbsvc-888927ae82.json` | Whether the *source* service account JSON was itself corrupted (vs. corruption happening during entry into Coolify) | Valid — correct PEM `BEGIN`/`END` markers, 28 newlines, 1704-char length consistent with a standard RSA-2048 PKCS8 key. Confirms the corruption was introduced specifically when pasting into Coolify, not in the credential file itself |
-| `/data/coolify/applications/q9vnuussumtcsfv4bzjxzxoq/docker-compose.yaml` | Whether the compose file references `.env` via `env_file` (needed to know if editing `.env` + recreating the container would actually apply the fix) | Confirmed — `env_file:` directive present, pointing at the `.env` file in the same directory |
+| the Firebase service account JSON (kept locally, not in this repo) | Whether the *source* service account JSON was itself corrupted (vs. corruption happening during entry into Coolify) | Valid — correct PEM `BEGIN`/`END` markers, 28 newlines, 1704-char length consistent with a standard RSA-2048 PKCS8 key. Confirms the corruption was introduced specifically when pasting into Coolify, not in the credential file itself |
+| `/data/coolify/applications/<coolify-app-id>/docker-compose.yaml` | Whether the compose file references `.env` via `env_file` (needed to know if editing `.env` + recreating the container would actually apply the fix) | Confirmed — `env_file:` directive present, pointing at the `.env` file in the same directory |
 
 ## Pending Tasks
 
@@ -139,17 +139,15 @@
 
 ## Server / DB Access
 
-**Production Postgres**: unchanged from previous session — `postgres://postgres:<password>@49.13.218.137:5433/postgres`. Password still shared in plaintext in earlier session history; rotation still recommended, still not urgent per user.
-
-**Production server SSH**: same keypair from the previous session (`011-...md`) was reused successfully this session — it had never been revoked, and the previous session's scratchpad directory (`/private/tmp/claude-501/.../5cb74783-b727-4115-9bd0-df7fb7f5cc46/scratchpad/`) still existed on this machine, so the private key was still readable. **A new session should check whether that scratchpad directory still exists before assuming it needs to regenerate a keypair.** If it's gone, a fresh keypair will need to be generated and the public key added again via Coolify's Terminal → plain `localhost` entry (connects to the host, not a container — confirmed in the previous session).
+**Production Postgres and server SSH**: see the private ops notes (not in this repo). DB password rotation still recommended.
 
 **Coolify app config**: `books-platform` web app, Docker Compose–based, on-disk config at
-`/data/coolify/applications/q9vnuussumtcsfv4bzjxzxoq/` (contains `.env`, `docker-compose.yaml`,
-`README.md`). Container naming pattern `web-q9vnuussumtcsfv4bzjxzxoq-<timestamp>` — a new container
+`/data/coolify/applications/<coolify-app-id>/` (contains `.env`, `docker-compose.yaml`,
+`README.md`). Container naming pattern `web-<coolify-app-id>-<timestamp>` — a new container
 name appears after every deploy triggered from the Coolify UI (confirmed twice this session by
 polling `docker ps` after pushing to `main`). To recreate the container after manually editing the
 on-disk `.env` (e.g., for an emergency credential fix outside the UI), use:
-`cd /data/coolify/applications/q9vnuussumtcsfv4bzjxzxoq && docker compose -p q9vnuussumtcsfv4bzjxzxoq up -d --force-recreate`
+`cd /data/coolify/applications/<coolify-app-id> && docker compose -p <coolify-app-id> up -d --force-recreate`
 — a plain `docker restart` does **not** reload environment variables from a changed `.env` file.
 
 **Production Postgres tables used this session**: `products` (snake_case columns — `name_en`,
