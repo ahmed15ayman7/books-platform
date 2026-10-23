@@ -105,3 +105,9 @@
 - The Xcode Console approach (no extra tooling, GUI-only) worked cleanly: `Window → Devices and Simulators → select device → Open Console`, then filter by typing `apsd` in the search box. This is the path to use going forward for any further native-log inspection — no need to revisit the Python route.
 - A `flutter run` background process got stuck once mid-session (hung ~60s+ past normal on "Installing and launching...", log showed "The Dart VM Service was not discovered after 60 seconds") — root cause looked like an unattended macOS "Xcode automation" permission dialog that nothing could click. Had to `kill` the stale process and relaunch. If this happens again, check for and manually approve any "Terminal/Claude wants to control Xcode" system permission popup.
 - All communication in this session was in English per explicit user instruction, despite the user writing partly in Arabic/mixed Arabic-English (Egyptian Arabic). Continue responding in English unless told otherwise.
+
+## Status update — 2026-10-23
+
+- The two mobile debug-logging files (`AppDelegate.swift`, `fcm_service.dart`) are no longer uncommitted: they were committed with the matching web logging in `ed75801` (2026-08-06). The "keep mobile uncommitted" decision above is closed.
+- The repo has no later record of a root cause or fix for the iOS APNs hang. Treat the investigation as open until a new handoff says otherwise.
+- `mobile/` and `web/` are folders in one repo (`books-platform`), not separate repos.
