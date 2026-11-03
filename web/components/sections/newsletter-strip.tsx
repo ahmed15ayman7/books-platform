@@ -9,12 +9,20 @@ import { Input } from "@/components/ui/input";
 import { FormDraftNotice } from "@/components/forms/form-draft-notice";
 import { formDraftId, useFormDraft } from "@/lib/forms/use-form-autosave";
 
+const WELCOME_MAIL_FAILED = "WELCOME_MAIL_FAILED";
+
+export function newsletterFailureKey(body: unknown): "error" | "mailFailed" {
+  if (!body || typeof body !== "object") return "error";
+  const code = (body as { error?: { code?: unknown } }).error?.code;
+  return code === WELCOME_MAIL_FAILED ? "mailFailed" : "error";
+}
+
 export function NewsletterStrip() {
   const t = useTranslations("home.newsletter");
   const locale = useLocale();
   const [email, setEmail] = useState("");
   const draft = useFormDraft(formDraftId.newsletter(), { email }, (v) => setEmail(v.email));
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "mailFailed">("idle");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,8 +38,15 @@ export function NewsletterStrip() {
         setStatus("success");
         setEmail("");
         draft.clearDraft();
+      } else {
+        let body: unknown = null;
+        try {
+          body = await res.json();
+        } catch {
+          body = null;
+        }
+        setStatus(newsletterFailureKey(body));
       }
-      else setStatus("error");
     } catch { setStatus("error"); }
   }
 
@@ -107,13 +122,13 @@ export function NewsletterStrip() {
             </>
           )}
 
-          {status === "error" && (
+          {(status === "error" || status === "mailFailed") && (
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="mt-2 text-sm text-[var(--error)]"
             >
-              {t("error")}
+              {t(status)}
             </motion.p>
           )}
         </div>
