@@ -14,6 +14,7 @@ const updateSchema = z.object({
   country: z.string().max(100).optional(),
   websiteUrl: z.string().url().optional().or(z.literal("")),
   contactEmail: z.string().email().optional().or(z.literal("")),
+  marketingNumber: z.string().trim().max(30).optional(),
   content: z.string().optional(),
   contentAr: z.string().optional(),
   imageUrl: z.string().url().optional().or(z.literal("")),
@@ -47,6 +48,7 @@ export async function GET(
       country: publisher.countries[0]?.name ?? "",
       websiteUrl: publisher.websiteUrl ?? "",
       contactEmail: publisher.contactEmail ?? "",
+      marketingNumber: publisher.marketingNumber ?? "",
       content: publisher.content ?? "",
       contentAr: publisher.contentAr ?? "",
       imageUrl: publisher.imageFeatured ?? publisher.imageUrl ?? "",
@@ -84,10 +86,21 @@ export async function PATCH(
       contentAr,
       websiteUrl,
       contactEmail,
+      marketingNumber,
       imageUrl,
       status,
       sponsored,
     } = parsed.data;
+
+    if (marketingNumber) {
+      const taken = await db.publisher.findFirst({
+        where: { marketingNumber, id: { not: id } },
+        select: { nameAr: true, name: true, title: true },
+      });
+      if (taken) {
+        return ApiErrors.badRequest(`الرقم التسويقي ${marketingNumber} مستخدم لناشر تاني: ${taken.nameAr || taken.name || taken.title}`);
+      }
+    }
 
     const bilingual =
       name !== undefined ||
@@ -108,6 +121,7 @@ export async function PATCH(
         ...(bilingual ?? {}),
         ...(websiteUrl !== undefined && { websiteUrl: websiteUrl || null }),
         ...(contactEmail !== undefined && { contactEmail: contactEmail || null }),
+        ...(marketingNumber !== undefined && { marketingNumber: marketingNumber || null }),
         ...(imageUrl !== undefined && { imageFeatured: imageUrl || null }),
         ...(status !== undefined && { status }),
         postModifiedDate: new Date(),

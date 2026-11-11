@@ -95,6 +95,7 @@ export default async function AdminPublisherViewPage({ params }: Props) {
               />
               <AdminReadOnlyField label="الموقع" value={publisher.websiteUrl} variant="url" />
               <AdminReadOnlyField label="البريد" value={publisher.contactEmail} dir="ltr" />
+              <AdminReadOnlyField label="الرقم التسويقي" value={publisher.marketingNumber ?? undefined} />
               <AdminReadOnlyField label="عدد الكتب" value={String(publisher._count.products)} />
             </dl>
           </div>

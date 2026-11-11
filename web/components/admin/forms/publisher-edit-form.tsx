@@ -24,6 +24,7 @@ interface PublisherForm {
   country: string;
   websiteUrl: string;
   contactEmail: string;
+  marketingNumber: string;
   content: string;
   contentAr: string;
   imageUrl: string;
@@ -37,6 +38,7 @@ const empty: PublisherForm = {
   country: "",
   websiteUrl: "",
   contactEmail: "",
+  marketingNumber: "",
   content: "",
   contentAr: "",
   imageUrl: "",
@@ -74,6 +76,7 @@ export function PublisherEditForm({ locale, id }: PublisherEditFormProps) {
           country: String(d.country ?? ""),
           websiteUrl: String(d.websiteUrl ?? ""),
           contactEmail: String(d.contactEmail ?? ""),
+          marketingNumber: String(d.marketingNumber ?? ""),
           content: String(d.content ?? ""),
           contentAr: String(d.contentAr ?? ""),
           imageUrl: String(d.imageUrl ?? ""),
@@ -202,6 +205,12 @@ export function PublisherEditForm({ locale, id }: PublisherEditFormProps) {
               value={form.contactEmail}
               onChange={(e) => set("contactEmail")(e.target.value)}
               dir="ltr"
+            />
+            <AdminInput
+              label="الرقم التسويقي"
+              value={form.marketingNumber}
+              onChange={(e) => set("marketingNumber")(e.target.value)}
+              placeholder="مثلًا 134 أو ج-12"
             />
             <ImageUploadField
               label="صورة الغلاف"

@@ -291,6 +291,8 @@ model Publisher {
   postModifiedDate DateTime?  @map("post_modified_date")
   websiteUrl       String?    @map("website_url")
   contactEmail     String?    @map("contact_email")
+  /// الرقم التسويقي (من جداول التواصل مع دور النشر). أرقام دور النشر الجامعية بتبدأ بـ"ج-"
+  marketingNumber  String?    @unique @map("marketing_number")
   address          String?    @db.Text
   countries        Country[]  @relation("PublisherCountries")
   products         Product[]

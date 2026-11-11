@@ -17,6 +17,7 @@ const createSchema = z.object({
   country: z.string().max(100).optional(),
   websiteUrl: z.string().url().optional().or(z.literal("")),
   contactEmail: z.string().email().optional().or(z.literal("")),
+  marketingNumber: z.string().trim().max(30).optional(),
   content: z.string().optional(),
   contentAr: z.string().optional(),
   imageUrl: z.string().url().optional().or(z.literal("")),
@@ -43,7 +44,12 @@ export async function GET(request: NextRequest) {
       ...(status && status !== "all" ? { status } : {}),
       ...(sponsoredFilter === true ? { sponsored: { isNot: null } } : {}),
       ...(sponsoredFilter === false ? { sponsored: null } : {}),
-      ...(search && buildTextSearchOr(search, PUBLISHER_SEARCH_FIELDS)),
+      ...(search && {
+        OR: [
+          ...buildTextSearchOr(search, PUBLISHER_SEARCH_FIELDS).OR,
+          { marketingNumber: { equals: search.trim(), mode: "insensitive" as const } },
+        ],
+      }),
     };
 
     const publisherSortFields = ["updatedAt", "createdAt", "title", "name", "nameAr"] as const;
@@ -71,6 +77,7 @@ export async function GET(request: NextRequest) {
       nameEn: p.name,
       imageUrl: p.imageFeatured ?? p.imageUrl ?? null,
       country: p.countries[0]?.name ?? null,
+      marketingNumber: p.marketingNumber,
       status: p.status,
       sponsored: p.sponsored !== null,
       createdAt: p.createdAt,
@@ -108,10 +115,15 @@ export async function POST(request: NextRequest) {
       contentAr,
       websiteUrl,
       contactEmail,
+      marketingNumber,
       imageUrl,
       status,
       sponsored,
     } = parsed.data;
+
+    if (marketingNumber && (await db.publisher.findFirst({ where: { marketingNumber }, select: { id: true } }))) {
+      return ApiErrors.badRequest(`الرقم التسويقي ${marketingNumber} مستخدم لناشر تاني`);
+    }
 
     const bilingual = publisherBilingualDbData({
       name,
@@ -131,6 +143,7 @@ export async function POST(request: NextRequest) {
         ...bilingual,
         websiteUrl: websiteUrl || null,
         contactEmail: contactEmail || null,
+        marketingNumber: marketingNumber || null,
         imageFeatured: imageUrl || null,
         status,
         slug,

@@ -42,6 +42,7 @@ interface Publisher {
   name: string;
   imageUrl: string | null;
   country: string | null;
+  marketingNumber: string | null;
   status: string;
   sponsored: boolean;
   _count?: { products: number };
@@ -117,6 +118,13 @@ export default function AdminPublishersPage() {
             <Star className="h-3.5 w-3.5 text-[var(--warning)]" aria-label="مموّل" />
           )}
         </div>
+      ),
+    },
+    {
+      key: "marketingNumber",
+      label: "الرقم التسويقي",
+      render: (row: Publisher) => (
+        <span className="text-[var(--admin-text-muted)]">{row.marketingNumber ?? "—"}</span>
       ),
     },
     {

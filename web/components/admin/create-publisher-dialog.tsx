@@ -32,6 +32,7 @@ interface PublisherFormState {
   country: string;
   websiteUrl: string;
   contactEmail: string;
+  marketingNumber: string;
   content: string;
   contentAr: string;
   imageUrl: string;
@@ -45,6 +46,7 @@ const emptyForm: PublisherFormState = {
   country: "",
   websiteUrl: "",
   contactEmail: "",
+  marketingNumber: "",
   content: "",
   contentAr: "",
   imageUrl: "",
@@ -161,6 +163,12 @@ export function CreatePublisherDialog({
                 value={form.contactEmail}
                 onChange={(e) => set("contactEmail")(e.target.value)}
                 dir="ltr"
+              />
+              <AdminInput
+                label="الرقم التسويقي"
+                value={form.marketingNumber}
+                onChange={(e) => set("marketingNumber")(e.target.value)}
+                placeholder="مثلًا 134 أو ج-12"
               />
               <AdminInput
                 label="رابط صورة الغلاف"
