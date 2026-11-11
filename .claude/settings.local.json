@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(node -p \"require\\('./node_modules/recharts/package.json'\\).version\")",
+      "Bash(npx next *)",
+      "Bash(npx eslint *)"
+    ]
+  }
+}
