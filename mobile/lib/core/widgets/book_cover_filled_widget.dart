@@ -1,9 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../theme/app_colors.dart';
+import 'app_network_image.dart';
 
 /// Book cover that fills its frame with the photo ([BoxFit.cover]).
 /// Used where the cover should bleed edge-to-edge (hero banners, detail header).
@@ -111,11 +111,10 @@ class BookCoverFilledWidget extends StatelessWidget {
           ),
           if (imageUrl != null)
             Positioned.fill(
-              child: CachedNetworkImage(
-                imageUrl: imageUrl!,
-                fit: BoxFit.cover,
-                placeholder: (_, _) => const SizedBox.shrink(),
-                errorWidget: (_, _, _) => const SizedBox.shrink(),
+              child: AppNetworkImage(
+                url: imageUrl,
+                placeholder: (_) => const SizedBox.shrink(),
+                error: (_) => const SizedBox.shrink(),
               ),
             ),
         ],

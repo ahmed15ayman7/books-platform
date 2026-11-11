@@ -87,7 +87,15 @@ Books Platform uses **JWT (JSON Web Tokens)** with short-lived Access Tokens and
 
 ### 2.1 Login
 
+```http
+POST /api/v1/auth/login
+Content-Type: application/json
 
+{
+  "email": "admin@booksplatform.net",
+  "password": "Admin@123456"
+}
+```
 
 **Response (200 OK):**
 ```json
@@ -98,7 +106,7 @@ Books Platform uses **JWT (JSON Web Tokens)** with short-lived Access Tokens and
     "expiresIn": 900,
     "user": {
       "id": "cuid123",
-      "email": ""  ,
+      "email": "admin@booksplatform.net",
       "fullName": "مدير المنصة",
       "role": "ADMIN"
     }

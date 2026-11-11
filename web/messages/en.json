@@ -66,7 +66,8 @@
       "placeholder": "Enter your email address",
       "subscribe": "Subscribe",
       "success": "Successfully subscribed!",
-      "error": "An error occurred, please try again"
+      "error": "An error occurred, please try again",
+      "mailFailed": "We couldn't send the confirmation email. Please try again."
     },
     "finalCta": {
       "startJourney": "Start Your Journey",

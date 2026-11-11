@@ -4,16 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/articles/presentation/cubit/article_detail_cubit/article_detail_cubit.dart';
 import '../../features/articles/presentation/cubit/articles_list_cubit/articles_list_cubit.dart';
 import '../../features/articles/presentation/pages/article_detail_screen/article_detail_screen.dart';
-import '../../features/articles/presentation/pages/articles_screen/articles_screen.dart';
 import '../../features/media_creations/presentation/cubit/media_list_cubit/media_list_cubit.dart';
-import '../../features/media_creations/presentation/pages/media_screen/media_screen.dart';
 import '../../features/books/presentation/cubit/book_detail_cubit/book_detail_cubit.dart';
 import '../../features/books/presentation/cubit/catalog_cubit/catalog_cubit.dart';
 import '../../features/books/presentation/cubit/home_content_cubit/home_content_cubit.dart';
 import '../../features/books/presentation/pages/book_detail_screen/book_detail_screen.dart';
-import '../../features/books/presentation/pages/catalog_screen/catalog_screen.dart';
 import '../../features/books/presentation/pages/category_books_screen.dart';
-import '../../features/books/presentation/pages/home_screen/home_screen.dart';
 import '../../features/cart/presentation/pages/cart_screen/cart_screen.dart';
 import '../../features/onboarding/presentation/pages/language_screen.dart';
 import '../../features/onboarding/presentation/pages/onboarding_screen/onboarding_screen.dart';
@@ -23,7 +19,6 @@ import '../../features/publish/presentation/pages/publish_screen/publish_screen.
 import '../../features/publishers/presentation/cubit/publisher_detail_cubit/publisher_detail_cubit.dart';
 import '../../features/publishers/presentation/cubit/publishers_list_cubit/publishers_list_cubit.dart';
 import '../../features/publishers/presentation/pages/publisher_detail_screen/publisher_detail_screen.dart';
-import '../../features/publishers/presentation/pages/publishers_screen/publishers_screen.dart';
 import '../../features/books/presentation/pages/recommended_books_screen/recommended_books_screen.dart';
 import '../../features/books/presentation/pages/translated_books_screen/translated_books_screen.dart';
 import '../../features/ratings/presentation/cubit/comments_cubit.dart';
@@ -39,14 +34,16 @@ import '../../features/static_pages/presentation/screens/team_screen/team_screen
 import '../../features/notifications/presentation/cubit/notification_settings_cubit.dart';
 import '../../features/notifications/presentation/screens/notification_settings_screen/notification_settings_screen.dart';
 import '../../features/wishlist/presentation/cubit/wishlist_cubit.dart';
-import '../../features/wishlist/presentation/screens/wishlist_screen/wishlist_screen.dart';
 import '../di/injection_container.dart';
+import '../widgets/bottom_nav_widget.dart';
 import 'app_routes.dart';
 import 'args/article_detail_args.dart';
 import 'args/book_detail_args.dart';
 import 'args/category_books_args.dart';
+import 'args/main_shell_args.dart';
 import 'args/publisher_detail_args.dart';
 import 'args/static_page_args.dart';
+import 'main_shell_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -72,22 +69,10 @@ class AppRouter {
         );
 
       case AppRoutes.home:
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) => BlocProvider(
-            create: (_) => getIt<HomeContentCubit>(),
-            child: const HomeScreen(),
-          ),
-        );
+        return _mainShell(settings, BottomNavTab.home);
 
       case AppRoutes.books:
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) => BlocProvider(
-            create: (_) => getIt<CatalogCubit>(),
-            child: const CatalogScreen(),
-          ),
-        );
+        return _mainShell(settings, BottomNavTab.books);
 
       case AppRoutes.bookDetail:
         final args = settings.arguments as BookDetailArgs?;
@@ -106,31 +91,13 @@ class AppRouter {
         );
 
       case AppRoutes.publishers:
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) => BlocProvider(
-            create: (_) => getIt<PublishersListCubit>(),
-            child: const PublishersScreen(),
-          ),
-        );
+        return _mainShell(settings, BottomNavTab.publishers);
 
       case AppRoutes.articles:
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) => BlocProvider(
-            create: (_) => getIt<ArticlesListCubit>(),
-            child: const ArticlesScreen(),
-          ),
-        );
+        return _mainShell(settings, BottomNavTab.articles);
 
       case AppRoutes.media:
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) => BlocProvider(
-            create: (_) => getIt<MediaListCubit>(),
-            child: const MediaScreen(),
-          ),
-        );
+        return _mainShell(settings, BottomNavTab.media);
 
       case AppRoutes.categoryBooks:
         final args = settings.arguments as CategoryBooksArgs?;
@@ -193,13 +160,7 @@ class AppRouter {
         );
 
       case AppRoutes.wishlist:
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) => BlocProvider(
-            create: (_) => getIt<WishlistCubit>(),
-            child: const WishlistScreen(),
-          ),
-        );
+        return _mainShell(settings, BottomNavTab.wishlist);
 
       case AppRoutes.translatedBooks:
         return MaterialPageRoute(
@@ -274,6 +235,32 @@ class AppRouter {
     settings: settings,
     builder: (_) => const _UnknownScreen(),
   );
+
+  /// Builds the persistent main-tab shell. The six tab cubits are provided here
+  /// (one level above the shell) so they survive tab switches. An explicit
+  /// [MainShellArgs] in `settings.arguments` wins over [initialTab], letting
+  /// callers such as "continue shopping" land the shell on a specific tab.
+  static Route<dynamic> _mainShell(
+    RouteSettings settings,
+    BottomNavTab initialTab,
+  ) {
+    final args = settings.arguments as MainShellArgs? ??
+        MainShellArgs(initialTab: initialTab);
+    return MaterialPageRoute(
+      settings: settings,
+      builder: (_) => MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => getIt<HomeContentCubit>()),
+          BlocProvider(create: (_) => getIt<CatalogCubit>()),
+          BlocProvider(create: (_) => getIt<ArticlesListCubit>()),
+          BlocProvider(create: (_) => getIt<MediaListCubit>()),
+          BlocProvider(create: (_) => getIt<PublishersListCubit>()),
+          BlocProvider(create: (_) => getIt<WishlistCubit>()),
+        ],
+        child: MainShellScreen(args: args),
+      ),
+    );
+  }
 }
 
 class _UnknownScreen extends StatelessWidget {

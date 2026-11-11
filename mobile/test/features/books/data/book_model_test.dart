@@ -178,6 +178,17 @@ void main() {
       });
     });
 
+    group('downloadUrl field', () {
+      test('maps downloadUrl from json', () {
+        final json = _baseJson({'downloadUrl': 'https://example.com/file.pdf'});
+        expect(BookModel.fromJson(json).downloadUrl, 'https://example.com/file.pdf');
+      });
+
+      test('defaults downloadUrl to null when absent', () {
+        expect(BookModel.fromJson(_baseJson({})).downloadUrl, isNull);
+      });
+    });
+
     group('toEntity()', () {
       test('maps biblio fields correctly to Book entity', () {
         final json = _baseJson({

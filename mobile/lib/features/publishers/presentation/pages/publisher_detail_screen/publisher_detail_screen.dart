@@ -8,7 +8,6 @@ import '../../../../../core/router/args/publisher_detail_args.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/app_bar_widget.dart';
 import '../../../../../core/widgets/app_loading_indicator.dart';
-import '../../../../../core/widgets/bottom_nav_widget.dart';
 import '../../../../../core/widgets/error_state_widget.dart';
 import '../../cubit/publisher_detail_cubit/publisher_detail_cubit.dart';
 import '../../cubit/publisher_detail_cubit/publisher_detail_state.dart';
@@ -73,13 +72,6 @@ class _PublisherDetailScreenState extends State<PublisherDetailScreen> {
                     ),
                   ),
                 ),
-                BottomNavWidget(
-                  activeTab: BottomNavTab.publishers,
-                  onTabSelected: (tab) => _onTabSelected(ctx, tab),
-                  onPublishTap: () =>
-                      Navigator.of(ctx).pushNamed(AppRoutes.publish),
-                  currentLocale: locale,
-                ),
               ],
             ),
             },
@@ -87,22 +79,5 @@ class _PublisherDetailScreenState extends State<PublisherDetailScreen> {
         },
       ),
     );
-  }
-
-  void _onTabSelected(BuildContext context, BottomNavTab tab) {
-    switch (tab) {
-      case BottomNavTab.home:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
-      case BottomNavTab.books:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.books);
-      case BottomNavTab.articles:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.articles);
-      case BottomNavTab.media:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.media);
-      case BottomNavTab.publishers:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.publishers);
-      case BottomNavTab.wishlist:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.wishlist);
-    }
   }
 }

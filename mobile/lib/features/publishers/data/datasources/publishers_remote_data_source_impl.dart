@@ -9,16 +9,18 @@ import '../../domain/entities/publisher.dart';
 import '../../domain/entities/publisher_book.dart';
 import '../models/publisher_book_model.dart';
 import '../models/publisher_model.dart';
+import 'base_publishers_data_source.dart';
 
-@lazySingleton
-class PublishersRemoteDataSourceImpl {
+@Named('remote')
+@LazySingleton(as: BasePublishersDataSource)
+class PublishersRemoteDataSourceImpl implements BasePublishersDataSource {
   PublishersRemoteDataSourceImpl(this._api);
 
   final ApiManager _api;
 
   List<Country>? _cachedCountries;
 
-  Future<Either<Failure, PaginatedResponse<Publisher>>> getPublishers({
+  Future<Either<Failure, PaginatedResponse<Publisher>>> _fetchPublishers({
     String? country,
     int page = 1,
     int limit = 20,
@@ -40,6 +42,7 @@ class PublishersRemoteDataSourceImpl {
         ),
       );
 
+  @override
   Future<Either<Failure, (Publisher, List<PublisherBook>)>>
       getPublisherBySlug(String slug) => _api.get(
             path: '/publishers/$slug',
@@ -63,9 +66,10 @@ class PublishersRemoteDataSourceImpl {
             },
           );
 
+  @override
   Future<Either<Failure, List<Country>>> getCountries() async {
     if (_cachedCountries != null) return right(_cachedCountries!);
-    final result = await getPublishers(limit: 100);
+    final result = await _fetchPublishers(limit: 100);
     return result.fold(
       (f) => left(f),
       (paginated) {
@@ -90,11 +94,12 @@ class PublishersRemoteDataSourceImpl {
     );
   }
 
-  Future<Either<Failure, List<Publisher>>> getPublishersLegacy({
+  @override
+  Future<Either<Failure, List<Publisher>>> getPublishers({
     String? countrySlug,
     String? search,
   }) async {
-    final result = await getPublishers(
+    final result = await _fetchPublishers(
       country: countrySlug,
       search: search,
       limit: 20,

@@ -5,12 +5,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:booksplatform/core/helpers/bottom_sheet_helper.dart';
 import 'package:booksplatform/features/more/presentation/widgets/more_bottom_sheet.dart';
 
+import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/router/args/book_detail_args.dart';
 import '../../../../../core/router/args/category_books_args.dart';
+import '../../../../../core/router/shell_tab_notifier.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/app_bar_widget.dart';
-import '../../../../../core/widgets/bottom_nav_widget.dart';
+import '../../../../../core/widgets/bottom_nav_widget.dart' show BottomNavTab;
 import '../../../../../core/widgets/error_state_widget.dart';
 import '../../cubit/home_content_cubit/home_content_cubit.dart';
 import '../../cubit/home_content_cubit/home_content_state.dart';
@@ -83,9 +85,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         locale: locale,
                         onBookTap: (id, title) => _openBook(ctx, id, title),
                         onBrowse: () =>
-                            Navigator.of(ctx).pushNamed(AppRoutes.books),
-                        onPublisher: () =>
-                            Navigator.of(ctx).pushNamed(AppRoutes.publishers),
+                            getIt<ShellTabNotifier>().select(BottomNavTab.books),
+                        onPublisher: () => getIt<ShellTabNotifier>()
+                            .select(BottomNavTab.publishers),
                         onCategoryTap: (cat) => Navigator.of(ctx).pushNamed(
                           AppRoutes.categoryBooks,
                           arguments: CategoryBooksArgs(
@@ -102,32 +104,8 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
           ),
-          BottomNavWidget(
-            activeTab: BottomNavTab.home,
-            onTabSelected: (tab) => _onTabSelected(context, tab),
-            onPublishTap: () =>
-                Navigator.of(context).pushNamed(AppRoutes.publish),
-            currentLocale: locale,
-          ),
         ],
       ),
     );
-  }
-
-  void _onTabSelected(BuildContext context, BottomNavTab tab) {
-    switch (tab) {
-      case BottomNavTab.home:
-        break;
-      case BottomNavTab.books:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.books);
-      case BottomNavTab.articles:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.articles);
-      case BottomNavTab.media:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.media);
-      case BottomNavTab.publishers:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.publishers);
-      case BottomNavTab.wishlist:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.wishlist);
-    }
   }
 }

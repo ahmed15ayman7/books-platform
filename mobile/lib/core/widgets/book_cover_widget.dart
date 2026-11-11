@@ -1,9 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../theme/app_colors.dart';
+import 'app_network_image.dart';
 
 /// Book cover widget. Shows the actual cover photo when [imageUrl] is provided,
 /// scaled to fit entirely inside the frame ([BoxFit.contain]), falling back to
@@ -125,13 +125,13 @@ class BookCoverWidget extends StatelessWidget {
 
             if (hasPhoto)
               Positioned.fill(
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl!,
+                child: AppNetworkImage(
+                  url: imageUrl,
                   fit: BoxFit.contain,
-                  placeholder: (_, _) => Container(
+                  placeholder: (_) => Container(
                     decoration: BoxDecoration(gradient: gradient),
                   ),
-                  errorWidget: (_, _, _) => Container(
+                  error: (_) => Container(
                     decoration: BoxDecoration(gradient: gradient),
                   ),
                 ),

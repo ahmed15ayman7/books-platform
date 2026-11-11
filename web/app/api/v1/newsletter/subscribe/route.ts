@@ -1,7 +1,7 @@
 import { type NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { subscribeNewsletterSchema } from "@/lib/validation/wishlist.schema";
-import { apiSuccess, ApiErrors } from "@/lib/api-client/response";
+import { apiSuccess, apiError, ApiErrors } from "@/lib/api-client/response";
 import { sendMail } from "@/lib/email/mailer";
 import { renderWelcomeEmail } from "@/lib/email/templates/welcome";
 import crypto from "node:crypto";
@@ -15,9 +15,18 @@ async function sendWelcome(
   confirmToken: string,
   manageToken: string,
   locale: string,
-): Promise<void> {
+): Promise<boolean> {
   const { html, text, subject } = renderWelcomeEmail({ email, confirmToken, manageToken, locale });
-  await sendMail({ to: email, subject, html, text });
+  return sendMail({ to: email, subject, html, text });
+}
+
+function welcomeMailFailed() {
+  console.error("[newsletter] welcome mail failed");
+  return apiError(
+    "WELCOME_MAIL_FAILED",
+    "Could not send the confirmation email. Please try again.",
+    500,
+  );
 }
 
 export async function POST(request: NextRequest) {
@@ -46,7 +55,8 @@ export async function POST(request: NextRequest) {
             manageToken: existing.manageToken ?? manageToken,
           },
         });
-        await sendWelcome(email, confirmToken, manageToken, existing.locale);
+        const sent = await sendWelcome(email, confirmToken, manageToken, existing.locale);
+        if (!sent) return welcomeMailFailed();
         return apiSuccess({ message: "Confirmation email resent" });
       }
 
@@ -57,7 +67,8 @@ export async function POST(request: NextRequest) {
         where: { email },
         data: { status: "PENDING", confirmToken, manageToken, unsubscribedAt: null },
       });
-      await sendWelcome(email, confirmToken, manageToken, existing.locale);
+      const sent = await sendWelcome(email, confirmToken, manageToken, existing.locale);
+      if (!sent) return welcomeMailFailed();
       return apiSuccess({ message: "Resubscription initiated. Check your email." });
     }
 
@@ -68,7 +79,8 @@ export async function POST(request: NextRequest) {
       data: { email, locale, source, status: "PENDING", confirmToken, manageToken },
     });
 
-    await sendWelcome(email, confirmToken, manageToken, locale);
+    const sent = await sendWelcome(email, confirmToken, manageToken, locale);
+    if (!sent) return welcomeMailFailed();
 
     return apiSuccess({ message: "Check your email to confirm subscription" });
   } catch (error) {

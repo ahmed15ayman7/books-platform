@@ -1,6 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'app_network_image.dart';
 
 class FullScreenImageViewer extends StatelessWidget {
   const FullScreenImageViewer({super.key, required this.imageUrl});
@@ -20,13 +21,13 @@ class FullScreenImageViewer extends StatelessWidget {
                 minScale: 0.5,
                 maxScale: 4.0,
                 child: Center(
-                  child: CachedNetworkImage(
-                    imageUrl: imageUrl,
+                  child: AppNetworkImage(
+                    url: imageUrl,
                     fit: BoxFit.contain,
-                    placeholder: (_, _) => const Center(
+                    placeholder: (_) => const Center(
                       child: CircularProgressIndicator(color: Colors.white),
                     ),
-                    errorWidget: (_, _, _) => const SizedBox.shrink(),
+                    error: (_) => const SizedBox.shrink(),
                   ),
                 ),
               ),

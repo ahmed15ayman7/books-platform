@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:share_plus/share_plus.dart';
 
+import '../../../../../core/constants/api_constants.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/book_cover_filled_widget.dart';
 import '../../../domain/entities/book.dart';
@@ -17,6 +19,13 @@ class BookDetailHeroCover extends StatelessWidget {
   final Book book;
   final String locale;
   final VoidCallback onBack;
+
+  Future<void> _shareBook() {
+    final title = locale == 'ar' ? book.titleAr : book.titleEn;
+    final slug = book.slug.isNotEmpty ? book.slug : book.id;
+    final url = '${ApiConstants.webBaseUrl}/$locale/books/$slug';
+    return SharePlus.instance.share(ShareParams(text: '$title\n$url'));
+  }
 
   void _openViewer(BuildContext context) {
     Navigator.of(context).push(
@@ -101,6 +110,7 @@ class BookDetailHeroCover extends StatelessWidget {
                       color: Colors.white,
                       size: 18.r,
                     ),
+                    onTap: _shareBook,
                   ),
                 ],
               ),

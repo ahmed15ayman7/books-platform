@@ -4,9 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/di/injection_container.dart';
 import '../../../../../core/router/app_routes.dart';
+import '../../../../../core/router/args/main_shell_args.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/app_bar_widget.dart';
-import '../../../../../core/widgets/bottom_nav_widget.dart';
+import '../../../../../core/widgets/bottom_nav_widget.dart' show BottomNavTab;
 import '../../../../../core/widgets/empty_state_widget.dart';
 import '../../cubit/cart_cubit.dart';
 import 'cart_body.dart';
@@ -43,41 +44,21 @@ class CartScreen extends StatelessWidget {
                           subtitle: 'cart.empty_subtitle'.tr(),
                           actionLabel: 'cart.browse_books'.tr(),
                           onAction: () =>
-                              Navigator.of(ctx).pushReplacementNamed(
-                            AppRoutes.books,
+                              Navigator.of(ctx).pushNamedAndRemoveUntil(
+                            AppRoutes.home,
+                            (_) => false,
+                            arguments: const MainShellArgs(
+                              initialTab: BottomNavTab.books,
+                            ),
                           ),
                         ),
                       )
                     : CartBody(state: state, locale: locale),
-              ),
-              BottomNavWidget(
-                activeTab: null,
-                onTabSelected: (tab) => _onTabSelected(ctx, tab),
-                onPublishTap: () =>
-                    Navigator.of(ctx).pushNamed(AppRoutes.publish),
-                currentLocale: locale,
               ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  void _onTabSelected(BuildContext context, BottomNavTab tab) {
-    switch (tab) {
-      case BottomNavTab.home:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
-      case BottomNavTab.books:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.books);
-      case BottomNavTab.articles:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.articles);
-      case BottomNavTab.media:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.media);
-      case BottomNavTab.publishers:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.publishers);
-      case BottomNavTab.wishlist:
-        Navigator.of(context).pushReplacementNamed(AppRoutes.wishlist);
-    }
   }
 }

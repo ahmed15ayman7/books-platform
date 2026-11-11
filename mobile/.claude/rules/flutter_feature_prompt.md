@@ -93,31 +93,83 @@ datasources/
 └── <feature>_remote_data_source_impl.dart   # concrete, @lazySingleton
 ```
 
-When a feature needs a **local data source** (offline cache, Hive, SQLite), introduce an
-abstract contract and split into two implementations:
+When a feature needs a **local data source** (offline cache, recently-viewed records, local
+persistence), introduce an abstract contract and split into two implementations:
 ```
 datasources/
-├── base_<feature>_data_source.dart              # abstract contract
-├── <feature>_remote_data_source_impl.dart       # @Named('remote') @lazySingleton
+├── base_<feature>_data_source.dart              # abstract contract, read operations only
+├── <feature>_remote_data_source_impl.dart       # @Named('remote') @LazySingleton(as: Base<Feature>DataSource)
 └── <feature>_local_data_source_impl.dart        # @Named('local')  @lazySingleton
 ```
 
-The repository impl then holds both and decides which to call:
+The remote impl must bind **as** the abstract contract — plain `@lazySingleton` only
+registers it under its own concrete type, and the repository's `Base<Feature>DataSource`-typed
+constructor parameter can't resolve it (`build_runner` fails with "depends on unregistered
+type"). `@LazySingleton(as: Base<Feature>DataSource)` is what actually satisfies that.
+
+The abstract contract covers **read** operations only — whatever the repository needs to
+be able to serve from either source. The local impl also exposes its own `save*` methods to
+populate the cache after a successful remote fetch; those have no remote equivalent, so they
+live only on the concrete local class, never on the shared interface.
+
+The repository impl holds `_remote` typed against the abstraction (swappable, no extra
+methods) and `_local` typed against its **concrete** class (so it can call the save methods):
 ```dart
 @LazySingleton(as: BookRepository)
 class BookRepositoryImpl implements BookRepository {
-  final BaseBookDataSource _remote;
-  final BaseBookDataSource _local;
+  final BaseBookDataSource _remote;        // abstract — read-only contract
+  final BookLocalDataSourceImpl _local;    // concrete — exposes save* too
 
   BookRepositoryImpl(
     @Named('remote') this._remote,
     @Named('local') this._local,
   );
+
+  @override
+  Future<Either<Failure, Book>> getBook(String id) async {
+    final result = await _remote.getBook(id);
+    return result.fold(
+      (_) => _local.getBook(id),
+      (book) async {
+        await _local.saveBook(book);
+        return right(book);
+      },
+    );
+  }
 }
 ```
 
 Do not create the abstract contract until a local data source actually exists.
 A base class with one implementation is ceremony with no benefit.
+
+### Choosing a storage backend
+
+`SharedPreferences` is the default for feature-level local data source caching — it's
+already `@preResolve @singleton` in `register_module.dart`, and it's what `CartStorage`,
+`SearchHistoryStorage`, and `WishlistStorage` already use for the same kind of data. Only
+reach for something heavier when a feature's data genuinely outgrows a flat key-value
+store — decide per feature against this table, not preemptively:
+
+| Signal | Storage choice |
+|---|---|
+| Bounded reference/user data (settings, wishlist, cart, recently-viewed, small paginated lists) | `SharedPreferences` |
+| Caching a full catalog for real offline-first browsing (e.g. entire books list so search/filter/sort work with no connection) | `Hive` — SharedPreferences forces decoding the entire JSON blob on every read just to filter a subset, and rewriting the whole blob on every write |
+| Relational queries across cached entities (joins, filtered counts, cross-entity lookups) | `drift` — Hive is still a KV/box store; `drift` gives real type-safe SQL queries |
+| Sync/conflict resolution (bi-directional offline edits) | Out of scope for a read cache — needs its own design |
+
+Adding Hive or drift is still a new package — it must clear the dependency rule (see
+CLAUDE.md) same as anything else. This table is what makes "necessary and justified"
+concrete for caching specifically.
+
+### Per-entity cache keys need an eviction strategy
+
+A single default-list/countries-style cache is naturally bounded — it gets overwritten
+wholesale on each successful fetch. A per-entity cache (one key per viewed record, e.g.
+`cache_<feature>_detail_<slug>`) is not — every entity a user ever views gets a permanent
+key, with no built-in expiry. If the feature's cardinality is large or unbounded, the local
+data source needs an explicit cap (e.g. LRU to N most-recently-viewed, prune on write).
+Deciding "no eviction" is fine for a small catalog, but it must be a deliberate call, not
+a default.
 
 ---
 
