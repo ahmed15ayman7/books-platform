@@ -14,8 +14,8 @@ interface PrivacySectionSource {
 }
 
 const lastUpdated: BilingualString = {
-  ar: "يونيو 2026",
-  en: "June 2026",
+  ar: "نوفمبر 2026",
+  en: "November 2026",
 };
 
 const sections: PrivacySectionSource[] = [
@@ -106,6 +106,20 @@ const sections: PrivacySectionSource[] = [
       {
         ar: "سياسة الخصوصية هذه لا تنطبق على مواقع أو ممارسات المعلنين الآخرين الذين لا نستطيع التحكم في أنشطتهم.",
         en: "Our Privacy Policy does not apply to other advertisers or websites, and we cannot control their activities.",
+      },
+    ],
+  },
+  {
+    id: "social-messages",
+    title: { ar: "رسائلك على حساباتنا في فيسبوك وإنستجرام", en: "Messages to our Facebook and Instagram accounts" },
+    paragraphs: [
+      {
+        ar: "عندما تراسل صفحة منصة الكتب على فيسبوك أو حسابها على إنستجرام، نستقبل اسمك واسم المستخدم ونص الرسالة عبر منصة Meta، ونحتفظ بها في نظام الشراكات الداخلي لدينا للرد والمتابعة فقط. لا نبيع هذه البيانات ولا نشاركها.",
+        en: "When you message the Books Platform Facebook Page or Instagram account, we receive your name, username and message through Meta's platform and keep them in our internal partnerships system only to reply and follow up. We do not sell or share this data.",
+      },
+      {
+        ar: "لطلب حذف هذه البيانات راجع صفحة «تعليمات حذف البيانات» على الرابط: https://booksplatform.net/ar/data-deletion",
+        en: "To have this data deleted, see our Data Deletion Instructions at https://booksplatform.net/en/data-deletion",
       },
     ],
   },
